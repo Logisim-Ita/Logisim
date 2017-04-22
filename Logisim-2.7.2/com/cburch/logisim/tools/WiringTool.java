@@ -93,6 +93,7 @@ public class WiringTool extends Tool {
 	}
 	
 	private boolean computeMove(int newX, int newY) {
+		//get the direction
 		if (cur.getX() == newX && cur.getY() == newY) return false;
 		Location start = this.start;
 		if (direction == 0) {
@@ -120,6 +121,7 @@ public class WiringTool extends Tool {
 
 	@Override
 	public void draw(Canvas canvas, ComponentDrawContext context) {
+		//draw wire's shadow after mouse move
 		Graphics g = context.getGraphics();
 		if (exists) {
 			Location e0 = start;
@@ -250,6 +252,7 @@ public class WiringTool extends Tool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
+		//add the wire
 		if (!exists) return;
 
 		Canvas.snapToGrid(e);
@@ -311,7 +314,7 @@ public class WiringTool extends Tool {
 		}
 
 		for (Component comp : canvas.getCircuit().getNonWires(cand)) {
-			if (comp.getBounds().contains(end, 2)) {
+			if (comp.getBounds().contains(end)) {
 				WireRepair repair = (WireRepair) comp.getFeature(WireRepair.class);
 				if (repair != null && repair.shouldRepairWire(new WireRepairData(w, cand))) {
 					w = Wire.create(w.getOtherEnd(end), cand);

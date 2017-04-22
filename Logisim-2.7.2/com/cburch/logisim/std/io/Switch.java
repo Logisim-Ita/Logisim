@@ -24,7 +24,7 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
-
+//all based on normal button
 public class Switch extends InstanceFactory {
 	private static final int DEPTH = 3;
 
@@ -49,6 +49,7 @@ public class Switch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
+		//changed to a rectangle
 		return Bounds.create(-20, -15, 20, 30).rotate(Direction.EAST, facing, 0, 0);
 	}
 
@@ -116,12 +117,13 @@ public class Switch extends InstanceFactory {
 	
 	@Override
 	public void paintInstance(InstancePainter painter) {
+		//draw
 		Bounds bds = painter.getBounds();
-		int x = bds.getX();
-		int y = bds.getY();
-		int w = bds.getWidth();
-		int h = bds.getHeight();
-		int circle=4;
+		int x = bds.getX(); //x position
+		int y = bds.getY(); //y position
+		int w = bds.getWidth(); //width
+		int h = bds.getHeight(); //height
+		int circle=4; //0 symbol radius
 		int[] xp;
 		int[] yp;
 		int[] xr;
@@ -143,7 +145,7 @@ public class Switch extends InstanceFactory {
 		
 		Graphics g = painter.getGraphics();
 		int depress;
-		if (val == Value.TRUE) {
+		if (val == Value.TRUE) { //case true output
 			Object labelLoc = painter.getAttributeValue(Io.ATTR_LABEL_LOC);
 			if (labelLoc == Io.LABEL_CENTER || labelLoc == Direction.NORTH
 					|| labelLoc == Direction.WEST) {
@@ -163,14 +165,14 @@ public class Switch extends InstanceFactory {
 				GraphicsUtil.switchToWidth(g, 1);
 			}
 			
-			if(facing==Direction.NORTH||facing==Direction.SOUTH){
-				xp = new int[] {x, x + w - DEPTH, x + w, x + w, x};
-				yp = new int[] {y + DEPTH, y, y + DEPTH, y + h, y + h};
-				xr = new int[] {x, x + w - DEPTH, x + w - DEPTH, x};
-				yr = new int[] {y + DEPTH, y, y + h - DEPTH, y + h};
+			if(facing==Direction.NORTH||facing==Direction.SOUTH){//horizontal
+				xp = new int[] {x, x + w - DEPTH, x + w, x + w, x};//grey polygon x points
+				yp = new int[] {y + DEPTH, y, y + DEPTH, y + h, y + h}; // grey poligon y points
+				xr = new int[] {x, x + w - DEPTH, x + w - DEPTH, x}; //white polygon x points
+				yr = new int[] {y + DEPTH, y, y + h - DEPTH, y + h}; //white poligon y points
 
 			}
-			else{
+			else{//vertical
 				xp = new int[] {x + DEPTH, x + w, x + w, x + DEPTH, x};
 				yp = new int[] {y, y, y + h, y + h, y + DEPTH};
 				xr = new int[] {x, x + w - DEPTH, x + w, x + DEPTH};
@@ -195,7 +197,7 @@ public class Switch extends InstanceFactory {
 				g.drawLine(x + ((w-DEPTH)/2)+ (DEPTH-DEPTH/6), y + ((h-DEPTH)*5/6) + DEPTH, x + ((w-DEPTH)/2)+ (DEPTH-DEPTH/3), y + ((h-DEPTH)*2/3) + DEPTH);
 				g.drawOval(x+(DEPTH/4)+((w-DEPTH-circle)/2), y+((h-DEPTH)/4-(circle/2))+ DEPTH, circle, circle);
 			}
-		} else {
+		} else { //csse false output
 			depress = 0;
 			if(facing==Direction.NORTH||facing==Direction.SOUTH){
 				xp = new int[] {x, x + DEPTH, x + w, x + w, x};
@@ -239,7 +241,7 @@ public class Switch extends InstanceFactory {
 	
 	public static class Poker extends InstancePoker {
 		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) {
+		public void mouseReleased(InstanceState state, MouseEvent e) { //on mouse released check the value and set the opposite
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			Value val = data == null ? Value.FALSE : (Value) data.getValue();
 			if(val==Value.TRUE) setValue(state, Value.FALSE);
