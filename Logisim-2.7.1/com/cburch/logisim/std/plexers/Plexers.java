@@ -55,6 +55,8 @@ public class Plexers extends Library {
 				"demultiplexer.gif", "Demultiplexer"),
 		new FactoryDescription("Decoder", Strings.getter("decoderComponent"),
 				"decoder.gif", "Decoder"),
+		new FactoryDescription("DisplayDecoder", Strings.getter("DisplayDecoderComponent"),
+				"DisplayDecoder.gif", "DisplayDecoder"),
 		new FactoryDescription("Priority Encoder", Strings.getter("priorityEncoderComponent"),
 				"priencod.gif", "PriorityEncoder"),
 		new FactoryDescription("BitSelector", Strings.getter("bitSelectorComponent"),
