@@ -27,7 +27,7 @@ public class SevenSegment extends InstanceFactory {
 					Io.DEFAULT_BACKGROUND, Boolean.TRUE });
 		setOffsetBounds(Bounds.create(-5, 0, 40, 60));
 		setIconName("7seg.gif");
-		setPorts(new Port[] {
+		Port[] port = new Port[]{
 				new Port(20,  0, Port.INPUT, 1),
 				new Port(30,  0, Port.INPUT, 1),
 				new Port(20, 60, Port.INPUT, 1),
@@ -35,8 +35,16 @@ public class SevenSegment extends InstanceFactory {
 				new Port( 0, 60, Port.INPUT, 1),
 				new Port(10,  0, Port.INPUT, 1),
 				new Port( 0,  0, Port.INPUT, 1),
-				new Port(30, 60, Port.INPUT, 1),
-			});
+				new Port(30, 60, Port.INPUT, 1)
+			};
+		char c = 97;//a
+		for(int i=0;i<7;i++)
+		{
+		port[i].setToolTip(Strings.getter("" + c));
+		c++;
+		}
+		port[7].setToolTip(Strings.getter("dp"));//dot
+		setPorts(port);
 	}
 
 	@Override
