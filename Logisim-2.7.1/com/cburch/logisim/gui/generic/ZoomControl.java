@@ -47,18 +47,18 @@ public class ZoomControl extends JPanel {
 		
 		private String toString(double factor) {
 			if (factor > 10) {
-				return (int) (factor + 0.5) + "%";
+				return "Zoom: " + (int) (factor + 0.5) + "%";
 			} else if (factor > 0.1) {
-				return (int) (factor * 100 + 0.5) / 100.0 + "%";
+				return "Zoom: " + (int) (factor * 100 + 0.5) / 100.0 + "%";
 			} else {
-				return factor + "%";
+				return "Zoom: " + factor + "%";
 			}
 		}
 
 		public void setValue(Object value) {
 			if (value instanceof String) {
 				String s = (String) value;
-				if (s.endsWith("%")) s = s.substring(0, s.length() - 1);
+				if (s.endsWith("%")) s = s.substring(6, s.length() - 1);
 				s = s.trim();
 				try {
 					double zoom = Double.parseDouble(s) / 100.0;
@@ -79,7 +79,7 @@ public class ZoomControl extends JPanel {
 		public GridIcon() {
 			addMouseListener(this);
 			setPreferredSize(new Dimension(15, 15));
-			setToolTipText("");
+			setToolTipText("Show grid");
 			setFocusable(true);
 		}
 		
