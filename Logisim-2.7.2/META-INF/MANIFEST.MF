@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Created-By: 1.6.0_11 (Sun Microsystems Inc.)
-Main-Class: com.cburch.logisim.Main
-
