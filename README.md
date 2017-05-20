@@ -13,5 +13,5 @@ This is a fork based on 2.7.1 and 2.7.2 original versions.
 * Some small graphic editing
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
-##How to compile
+## How to compile
 To compile you need to set into compile&run.bat your jdk and 7zip's directories; before compiling make sure the project isn't in any folder with a name containing spaces because it gives problems, you can also delete the "set path" line and add the jdk's path in your system environment
