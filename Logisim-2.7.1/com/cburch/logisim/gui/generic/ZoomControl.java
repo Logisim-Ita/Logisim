@@ -18,8 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 public class ZoomControl extends JPanel {
-	private class SpinnerModel extends AbstractSpinnerModel
+	public class SpinnerModel extends AbstractSpinnerModel
 			implements PropertyChangeListener {
+		@Override
 		public Object getNextValue() {
 			double zoom = model.getZoomFactor();
 			double[] choices = model.getZoomOptions();
@@ -29,7 +30,8 @@ public class ZoomControl extends JPanel {
 			}
 			return null;
 		}
-
+		
+		@Override
 		public Object getPreviousValue() {
 			double zoom = model.getZoomFactor();
 			double[] choices = model.getZoomOptions();
@@ -39,7 +41,8 @@ public class ZoomControl extends JPanel {
 			}
 			return null;
 		}
-
+		
+		@Override
 		public Object getValue() {
 			double zoom = model.getZoomFactor();
 			return toString(zoom * 100.0);
@@ -54,7 +57,8 @@ public class ZoomControl extends JPanel {
 				return "Zoom: " + factor + "%";
 			}
 		}
-
+		
+		@Override
 		public void setValue(Object value) {
 			if (value instanceof String) {
 				String s = (String) value;
@@ -66,7 +70,8 @@ public class ZoomControl extends JPanel {
 				} catch (NumberFormatException e) { }
 			}
 		}
-
+		
+		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			fireStateChanged();
 		}
@@ -110,16 +115,21 @@ public class ZoomControl extends JPanel {
 				}
 			}
 		}
-
+		@Override
 		public void mouseClicked(MouseEvent e) { }
+		@Override
 		public void mouseEntered(MouseEvent e) { }
+		@Override
 		public void mouseExited(MouseEvent e) { }
+		@Override
 		public void mouseReleased(MouseEvent e) { }
-
+		
+		@Override
 		public void mousePressed(MouseEvent e) {
 			model.setShowGrid(!state);
 		}
-
+		
+		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			update();
 		}
@@ -127,8 +137,16 @@ public class ZoomControl extends JPanel {
 	
 	private ZoomModel model;
 	private JSpinner spinner;
-	private SpinnerModel spinnerModel;
+	public static SpinnerModel spinnerModel;
 	private GridIcon grid;
+	
+	public void zoomIn() {
+    	spinnerModel.setValue(spinnerModel.getNextValue());
+    }
+    
+    public void zoomOut() {
+    	spinnerModel.setValue(spinnerModel.getPreviousValue());
+    }
 	
 	public ZoomControl(ZoomModel model) {
 		super(new BorderLayout());

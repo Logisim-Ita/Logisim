@@ -4,6 +4,6 @@ javac @src.txt
 del "src.txt"
 set zdir="E:\Program Files\7-Zip\7z.exe"
 for %%* in (.) do set currentfolder=%%~nx*
-%zdir% a -tzip ..\..\"%currentfolder%".jar *\ COPYING.txt
-cd ../../
+%zdir% a -tzip ..\Compiled\"%currentfolder%".jar *\ COPYING.txt
+cd ../Compiled/
 java -jar "%currentfolder%".jar -plain
