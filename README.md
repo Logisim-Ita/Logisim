@@ -10,6 +10,7 @@ This is a fork based on 2.7.1 and 2.7.2 original versions.
 	* I/O->Switch
 	* Plexers->7-Segment Display Decoder
 * Added 7-Segment Display input names
+* Zoom in and out using mouse wheel
 * Some small graphic editing
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
