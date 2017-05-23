@@ -140,14 +140,6 @@ public class ZoomControl extends JPanel {
 	public static SpinnerModel spinnerModel;
 	private GridIcon grid;
 	
-	public void zoomIn() {
-    	spinnerModel.setValue(spinnerModel.getNextValue());
-    }
-    
-    public void zoomOut() {
-    	spinnerModel.setValue(spinnerModel.getPreviousValue());
-    }
-	
 	public ZoomControl(ZoomModel model) {
 		super(new BorderLayout());
 		this.model = model;

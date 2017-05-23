@@ -170,7 +170,7 @@ public class Canvas extends JPanel
         }
         
 		@Override
-    	public void mouseWheelMoved(MouseWheelEvent arg0) {
+    	public void mouseWheelMoved(MouseWheelEvent arg0) {//zoom mouse wheel
     			if(arg0.getPreciseWheelRotation() < 0) {
     				 ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getNextValue());
     			} else if(arg0.getPreciseWheelRotation() > 0){
