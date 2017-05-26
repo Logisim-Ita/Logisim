@@ -3,26 +3,38 @@
 
 package com.cburch.logisim.gui.start;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.io.File;
 
 import javax.swing.UIManager;
+import javax.swing.JOptionPane;
 
+import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.Main;
 import com.cburch.logisim.file.LoadFailedException;
 import com.cburch.logisim.file.Loader;
 import com.cburch.logisim.gui.main.Print;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.gui.menu.WindowManagers;
-import com.cburch.logisim.gui.start.SplashScreen;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
+import com.cburch.logisim.util.ArgonXML;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.MacCompatibility;
 import com.cburch.logisim.util.StringUtil;
@@ -377,6 +389,10 @@ public class Startup {
 				ret.showSplash = false;
 			} else if (arg.equals("-clearprefs")) {
 				// already handled above
+			} else if (arg.equals("-analyze")) {
+				Main.ANALYZE = true;
+			} else if (arg.equals("-noupdates")) {
+				Main.UPDATE = false;
 			} else if (arg.charAt(0) == '-') {
 				printUsage();
 				return null;
@@ -413,5 +429,284 @@ public class Startup {
 		System.err.println("   " + Strings.get("argTtyOption")); //OK
 		System.err.println("   " + Strings.get("argVersionOption")); //OK
 		System.exit(-1);
+	}
+	/**
+	 * Auto-update Logisim if a new version is available
+	 * 
+	 * Original idea taken from logisim-evolution:
+	 * https://github.com/reds-heig/logisim-evolution
+	 * @return true if the code has been updated, and therefore the execution
+	 *         has to be stopped, false otherwise
+	 */
+	public boolean autoUpdate() {
+		if (!Main.UPDATE || !networkConnectionAvailable()) {
+			// Auto-update disabled from command line, or network connection not
+			// available
+			return (false);
+		}
+
+		// Get the remote XML file containing the current version
+		URL xmlURL;
+		URLConnection conn;
+		InputStream in;
+		try {
+			xmlURL = new URL(Main.UPDATE_URL);
+			conn = xmlURL.openConnection();
+			in = conn.getInputStream();
+		} catch (MalformedURLException e) {
+			System.err
+					.println("The URL of the XML file for the auto-updater is malformed.");
+			System.err
+					.println("Please report this error to the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);		
+		} catch (IOException e) {
+			System.err
+					.println("Although an Internet connection should be available, the system couldn't connect to the URL requested by the auto-updater");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+		ArgonXML logisimData = new ArgonXML(in, "logisim");
+
+		// Get the appropriate remote version number
+		LogisimVersion remoteVersion = LogisimVersion.parse(Main.VERSION
+				.isJar() ? logisimData.child("jar_version").content()
+				: logisimData.child("exe_version").content());
+
+		// If the remote version is newer, perform the update
+		if (remoteVersion.compareTo(Main.VERSION) > 0) {
+			int answer = JOptionPane.showConfirmDialog(null,
+					"A new Logisim version (" + remoteVersion
+							+ ") is available!\nWould you like to update?",
+					"Update", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE);
+
+			if (answer == 1) {
+				// User refused to update -- we just hope he gets sufficiently
+				// annoyed by the message that he finally updates!
+				return (false);
+			}
+
+			// Obtain the base directory of the archive
+			CodeSource codeSource = Startup.class.getProtectionDomain()
+					.getCodeSource();
+			File jarFile = null;
+			try {
+				jarFile = new File(codeSource.getLocation().toURI().getPath());
+			} catch (URISyntaxException e) {
+				System.err
+						.println("Error in the syntax of the URI for the path of the executed Logisim JAR file!");
+				e.printStackTrace();
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
+								"Update failed", JOptionPane.ERROR_MESSAGE);
+				return (false);
+			}
+
+			// Get the appropriate remote filename to download
+			String remoteJar = Main.VERSION.isJar() ? logisimData.child(
+					"jar_file").content() : logisimData.child(
+					"exe_file").content();
+
+			boolean updateOk = downloadInstallUpdatedVersion(remoteJar,
+					jarFile.getAbsolutePath());
+
+			if (updateOk) {
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"The new Logisim version ("
+										+ remoteVersion
+										+ ") has been correctly installed.\nPlease restart Logisim for the changes to take effect.",
+								"Update succeeded",
+								JOptionPane.INFORMATION_MESSAGE);
+				return (true);
+			} else {
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
+								"Update failed", JOptionPane.ERROR_MESSAGE);
+				return (false);
+			}
+		}
+		return (false);
+	}
+
+	/**
+	 * Download a new version of Logisim, according to the instructions received
+	 * from autoUpdate(), and install it at the specified location
+	 * 
+	 * Original idea taken from:
+	 * http://baptiste-wicht.developpez.com/tutoriels/java/update/ by Baptiste
+	 * Wicht
+	 *
+	 * @param filePath
+	 *            remote file URL
+	 * @param destination
+	 *            local destination for the updated Jar file
+	 * @return true if the new version has been downloaded and installed, false
+	 *         otherwise
+	 * @throws IOException
+	 */
+	private boolean downloadInstallUpdatedVersion(String filePath,
+			String destination) {
+		URL fileURL;
+		try {
+			fileURL = new URL(filePath);
+		} catch (MalformedURLException e) {
+			System.err
+					.println("The URL of the requested update file is malformed.");
+			System.err
+					.println("Please report this error to the software maintainer.");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+		URLConnection conn;
+		try {
+			conn = fileURL.openConnection();
+		} catch (IOException e) {
+			System.err
+					.println("Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+
+		// Get remote file size
+		int length = conn.getContentLength();
+		if (length == -1) {
+			System.err
+					.println("Cannot retrieve the file containing the updated version.");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+
+		// Get remote file stream
+		InputStream is;
+		try {
+			is = new BufferedInputStream(conn.getInputStream());
+		} catch (IOException e) {
+			System.err.println("Cannot get remote file stream.");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+
+		// Local file buffer
+		byte[] data = new byte[length];
+
+		// Helper variables for marking the current position in the downloaded
+		// file
+		int currentBit = 0;
+		int deplacement = 0;
+
+		// Download remote content
+		try {
+			while (deplacement < length) {
+				currentBit = is.read(data, deplacement, data.length
+						- deplacement);
+
+				if (currentBit == -1) {
+					// Reached EOF
+					break;
+				}
+				deplacement += currentBit;
+			}
+		} catch (IOException e) {
+			System.err
+					.println("An error occured while retrieving remote file (remote peer hung up).");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+		// Close remote stream
+		try {
+			is.close();
+		} catch (IOException e) {
+			System.err
+					.println("Error encountered while closing the remote stream!");
+			e.printStackTrace();
+		}
+
+		// If not all the bytes have been retrieved, abort update
+		if (deplacement != length) {
+			System.err
+					.println("An error occured while retrieving remote file (local size != remote size), download corrupted.");
+			System.err
+					.println("If the error persist, please contact the software maintainer");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+
+		// Open stream for local Jar and write data
+		FileOutputStream destinationFile;
+		try {
+			destinationFile = new FileOutputStream(destination);
+		} catch (FileNotFoundException e) {
+			System.err
+					.println("An error occured while opening the local Jar file.");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			return (false);
+		}
+		try {
+			destinationFile.write(data);
+			destinationFile.flush();
+		} catch (IOException e) {
+			System.err
+					.println("An error occured while writing to the local Jar file.");
+			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err
+					.println("The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+		} finally {
+			try {
+				destinationFile.close();
+			} catch (IOException e) {
+				System.err
+						.println("Error encountered while closing the local destination file!");
+				System.err
+						.println("The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+				return (false);
+			}
+		}
+
+		return (true);
+	}
+
+	/**
+	 * Check if network connection is available.
+	 * 
+	 * This function tries to connect to google in order to test the
+	 * availability of a network connection. This step is needed before
+	 * attempting to perform an auto-update. It assumes that google is
+	 * accessible -- usually this is the case, and it should also provide a
+	 * quick reply to the connection attempt, reducing the lag.
+	 * 
+	 * @return true if the connection is available, false otherwise
+	 */
+	private boolean networkConnectionAvailable() {
+		try {
+			URL url = new URL("http://www.google.com");
+			URLConnection uC = url.openConnection();
+			uC.connect();
+			return (true);
+		} catch (MalformedURLException e) {
+			System.err
+					.println("The URL used to check the connectivity is malformed -- no Google?");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// If we get here, the connection somehow failed
+			return (false);
+		}
+		return (false);
 	}
 }

@@ -21,19 +21,57 @@
 
 package com.cburch.logisim;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import javax.swing.JOptionPane;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
 import com.cburch.logisim.gui.start.Startup;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1);
-	public static final String VERSION_NAME = VERSION.toString();
-	public static final int COPYRIGHT_YEAR = 2017;
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
 		if (startup == null) {
 			System.exit(0);
 		} else {
-			startup.run();
+			// If the auto-updater actually performed an update, then quit the
+			// program, otherwise continue with the execution
+			if (!startup.autoUpdate()) {
+				try {
+					startup.run();
+				} catch (Throwable e) {
+					Writer result = new StringWriter();
+					PrintWriter printWriter = new PrintWriter(result);
+					e.printStackTrace(printWriter);
+					JOptionPane.showMessageDialog(null, result.toString());
+					System.exit(-1);
+				}
+			}
 		}
 	}
+
+//	final static Logger logger = LoggerFactory.getLogger(Main.class);
+
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 1, "jar");
+
+	public static final String VERSION_NAME = VERSION.toString();
+	public static final int COPYRIGHT_YEAR = 2017;
+
+	public static boolean ANALYZE = false;
+	/**
+	 * This flag enables auto-updates. It is true by default, so that users
+	 * normally check for updates at startup. On the other hand, this might be
+	 * annoying for developers, therefore we let them disable it from the
+	 * command line with the '-noupdates' option.
+	 */
+	public static boolean UPDATE = true;
+
+	/**
+	 * URL for the automatic updater
+	 */
+	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 }
