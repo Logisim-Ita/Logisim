@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-2.7.1.jar</jar_file>
-  <jar_version>2.7.1.1</jar_version>
+  <jar_version>2.7.1.3</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-2.7.1.exe</exe_file>
-  <exe_version>2.7.1.1</exe_version>
+  <exe_version>2.7.1.2</exe_version>
 </logisim>
