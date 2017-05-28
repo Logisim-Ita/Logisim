@@ -479,11 +479,9 @@ public class Startup {
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
 						
 			String changelog = logisimData.child("changelog").content();
-			
 			int answer = JOptionPane.showConfirmDialog(null,
-					"A new Logisim version (" + remoteVersion
-							+ ") is available!\nWould you like to update?\n\nChangelog:" + changelog,
-					"Update", JOptionPane.YES_NO_OPTION,
+					StringUtil.format(Strings.get("UpdateMessage"),remoteVersion.toString(),changelog),
+					Strings.get("Update"), JOptionPane.YES_NO_OPTION,
 					JOptionPane.INFORMATION_MESSAGE);
 
 			if (answer == 1) {
@@ -522,18 +520,16 @@ public class Startup {
 				JOptionPane
 						.showMessageDialog(
 								null,
-								"The new Logisim version ("
-										+ remoteVersion
-										+ ") has been correctly installed.\nPlease restart Logisim for the changes to take effect.",
-								"Update succeeded",
+								StringUtil.format(Strings.get("UpdateSucceededMessage"),remoteVersion.toString()),
+								Strings.get("UpdateSucceeded"),
 								JOptionPane.INFORMATION_MESSAGE);
 				return (true);
 			} else {
 				JOptionPane
 						.showMessageDialog(
 								null,
-								"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
-								"Update failed", JOptionPane.ERROR_MESSAGE);
+								Strings.get("UpdateFailedMessage"),
+								Strings.get("UpdateFailed"), JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
 		}

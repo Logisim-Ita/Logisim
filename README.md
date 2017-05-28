@@ -17,3 +17,5 @@ This is an italian fork based on original Logisim 2.7.1.
 All in our website [here](https://logisim.altervista.org)
 ## How to compile
 To compile you have to set into compile&run.bat your jdk and 7zip's directories; before compiling make sure the project isn't in any folder with a name containing spaces because it gives problems, you can also delete the "set path" line and add the jdk's path in your system environment
+## Translation
+New strings are translated really bad (Google Translate) because i just know Italian and English so, if you want, please help me translating other languages or you can add a new one, contact me at logisimit@gmail.com

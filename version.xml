@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.7.1.2</jar_version>
+  <jar_version>2.7.1.3</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.7.1.2</exe_version>
+  <exe_version>2.7.1.3</exe_version>
   <changelog>
-*New "About" window
-*Version number in window title
-*Changelog in update message
+*Update message in different languages from the next update
   </changelog>
 </logisim>
