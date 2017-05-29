@@ -100,7 +100,7 @@ public class Startup {
 	private SplashScreen monitor = null;
 	private ArrayList<File> filesToPrint = new ArrayList<File>();
 
-	private Startup(boolean isTty) {
+	public Startup(boolean isTty) {
 		this.isTty = isTty;
 		this.showSplash = !isTty;
 	}
@@ -438,7 +438,7 @@ public class Startup {
 	 * @return true if the code has been updated, and therefore the execution
 	 *         has to be stopped, false otherwise
 	 */
-	public boolean autoUpdate() {
+	public boolean autoUpdate(boolean FromMenu) { //from "check version" = 1
 		if (!Main.UPDATE || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line, or network connection not
 			// available
@@ -532,6 +532,10 @@ public class Startup {
 								Strings.get("UpdateFailed"), JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
+		} else if(FromMenu){
+			JOptionPane.showMessageDialog(null,Strings.get("NoUpdates"),
+								Strings.get("Update"),
+								JOptionPane.INFORMATION_MESSAGE);
 		}
 		return (false);
 	}

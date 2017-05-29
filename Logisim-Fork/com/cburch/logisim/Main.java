@@ -37,7 +37,7 @@ public class Main {
 		} else {
 			// If the auto-updater actually performed an update, then quit the
 			// program, otherwise continue with the execution
-			if (!startup.autoUpdate()) {
+			if (!startup.autoUpdate(false)) {
 				try {
 					startup.run();
 				} catch (Throwable e) {
@@ -51,7 +51,7 @@ public class Main {
 		}
 	}
 
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 3, "jar");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 4, "exe");
 
 	public static final String VERSION_NAME = VERSION.toString();
 	public static final int COPYRIGHT_YEAR = 2017;
