@@ -10,14 +10,22 @@ import javax.swing.Scrollable;
 
 public interface CanvasPaneContents extends Scrollable {
 	public void setCanvasPane(CanvasPane pane);
+
 	public void recomputeSize();
-	
+
 	// from Scrollable
+	@Override
 	public Dimension getPreferredScrollableViewportSize();
-	public int getScrollableBlockIncrement(Rectangle visibleRect,
-			int orientation, int direction);
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction);
+
+	@Override
 	public boolean getScrollableTracksViewportHeight();
+
+	@Override
 	public boolean getScrollableTracksViewportWidth();
-	public int getScrollableUnitIncrement(Rectangle visibleRect,
-			int orientation, int direction);
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction);
 }

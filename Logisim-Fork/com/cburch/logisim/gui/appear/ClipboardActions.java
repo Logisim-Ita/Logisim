@@ -16,15 +16,15 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 
 public class ClipboardActions extends Action {
-	
+
 	public static Action cut(AppearanceCanvas canvas) {
 		return new ClipboardActions(true, canvas);
 	}
-	
+
 	public static Action copy(AppearanceCanvas canvas) {
 		return new ClipboardActions(false, canvas);
 	}
-	
+
 	private boolean remove;
 	private AppearanceCanvas canvas;
 	private CanvasModel canvasModel;
@@ -36,7 +36,7 @@ public class ClipboardActions extends Action {
 		this.remove = remove;
 		this.canvas = canvas;
 		this.canvasModel = canvas.getModel();
-		
+
 		ArrayList<CanvasObject> contents = new ArrayList<CanvasObject>();
 		Direction anchorFacing = null;
 		Location anchorLocation = null;
@@ -55,7 +55,7 @@ public class ClipboardActions extends Action {
 		affected = ZOrder.getZIndex(aff, canvasModel);
 		newClipboard = new ClipboardContents(contents, anchorLocation, anchorFacing);
 	}
-	
+
 	@Override
 	public String getName() {
 		if (remove) {
@@ -64,7 +64,7 @@ public class ClipboardActions extends Action {
 			return Strings.get("copySelectionAction");
 		}
 	}
-	
+
 	@Override
 	public void doIt(Project proj) {
 		oldClipboard = Clipboard.get();
@@ -73,7 +73,7 @@ public class ClipboardActions extends Action {
 			canvasModel.removeObjects(affected.keySet());
 		}
 	}
-	
+
 	@Override
 	public void undo(Project proj) {
 		if (remove) {
@@ -83,5 +83,5 @@ public class ClipboardActions extends Action {
 		}
 		Clipboard.set(oldClipboard);
 	}
-	
+
 }

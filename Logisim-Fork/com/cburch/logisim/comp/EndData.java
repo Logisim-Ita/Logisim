@@ -22,23 +22,43 @@ public class EndData {
 		this.i_o = type;
 		this.exclusive = exclusive;
 	}
-	
+
 	public EndData(Location loc, BitWidth width, int type) {
 		this(loc, width, type, type == OUTPUT_ONLY);
 	}
 
-	public boolean isExclusive() { return exclusive; }
-	public boolean isInput() { return (i_o & INPUT_ONLY) != 0; }
-	public boolean isOutput() { return (i_o & OUTPUT_ONLY) != 0; }
-	public Location getLocation() { return loc; }
-	public BitWidth getWidth() { return width; }
-	public int getType() { return i_o; }
+	public boolean isExclusive() {
+		return exclusive;
+	}
+
+	public boolean isInput() {
+		return (i_o & INPUT_ONLY) != 0;
+	}
+
+	public boolean isOutput() {
+		return (i_o & OUTPUT_ONLY) != 0;
+	}
+
+	public Location getLocation() {
+		return loc;
+	}
+
+	public BitWidth getWidth() {
+		return width;
+	}
+
+	public int getType() {
+		return i_o;
+	}
+
 	@Override
 	public boolean equals(Object other) {
-		if (!(other instanceof EndData)) return false;
-		if (other == this) return true;
+		if (!(other instanceof EndData))
+			return false;
+		if (other == this)
+			return true;
 		EndData o = (EndData) other;
-		return o.loc.equals(this.loc) && o.width.equals(this.width)
-			&& o.i_o == this.i_o && o.exclusive == this.exclusive;
+		return o.loc.equals(this.loc) && o.width.equals(this.width) && o.i_o == this.i_o
+				&& o.exclusive == this.exclusive;
 	}
 }

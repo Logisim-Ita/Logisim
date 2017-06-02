@@ -23,8 +23,8 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.base.Text;
 
 public class TextTool extends Tool {
-	private class MyListener
-			implements CaretListener, CircuitListener {
+	private class MyListener implements CaretListener, CircuitListener {
+		@Override
 		public void editingCanceled(CaretEvent e) {
 			if (e.getCaret() != caret) {
 				e.getCaret().removeCaretListener(this);
@@ -38,7 +38,8 @@ public class TextTool extends Tool {
 			caretCreatingText = false;
 			caret = null;
 		}
-		
+
+		@Override
 		public void editingStopped(CaretEvent e) {
 			if (e.getCaret() != caret) {
 				e.getCaret().removeCaretListener(this);
@@ -46,7 +47,7 @@ public class TextTool extends Tool {
 			}
 			caret.removeCaretListener(this);
 			caretCircuit.removeCircuitListener(this);
-			
+
 			String val = caret.getText();
 			boolean isEmpty = (val == null || val.equals(""));
 			Action a;
@@ -55,8 +56,7 @@ public class TextTool extends Tool {
 				if (!isEmpty) {
 					CircuitMutation xn = new CircuitMutation(caretCircuit);
 					xn.add(caretComponent);
-					a = xn.toAction(Strings.getter("addComponentAction",
-							Text.FACTORY.getDisplayGetter()));
+					a = xn.toAction(Strings.getter("addComponentAction", Text.FACTORY.getDisplayGetter()));
 				} else {
 					a = null; // don't add the blank text field
 				}
@@ -64,8 +64,7 @@ public class TextTool extends Tool {
 				if (isEmpty && caretComponent.getFactory() instanceof Text) {
 					CircuitMutation xn = new CircuitMutation(caretCircuit);
 					xn.add(caretComponent);
-					a = xn.toAction(Strings.getter("removeComponentAction",
-							Text.FACTORY.getDisplayGetter()));
+					a = xn.toAction(Strings.getter("removeComponentAction", Text.FACTORY.getDisplayGetter()));
 				} else {
 					Object obj = caretComponent.getFeature(TextEditable.class);
 					if (obj == null) { // should never happen
@@ -81,10 +80,12 @@ public class TextTool extends Tool {
 			caretComponent = null;
 			caretCreatingText = false;
 			caret = null;
-			
-			if (a != null) proj.doAction(a);
+
+			if (a != null)
+				proj.doAction(a);
 		}
 
+		@Override
 		public void circuitChanged(CircuitEvent event) {
 			if (event.getCircuit() != caretCircuit) {
 				event.getCircuit().removeCircuitListener(this);
@@ -103,8 +104,7 @@ public class TextTool extends Tool {
 		}
 	}
 
-	private static Cursor cursor
-		= Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
 
 	private MyListener listener = new MyListener();
 	private AttributeSet attrs;
@@ -117,12 +117,12 @@ public class TextTool extends Tool {
 	public TextTool() {
 		attrs = Text.FACTORY.createAttributeSet();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return other instanceof TextTool;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return TextTool.class.hashCode();
@@ -155,7 +155,8 @@ public class TextTool extends Tool {
 
 	@Override
 	public void draw(Canvas canvas, ComponentDrawContext context) {
-		if (caret != null) caret.draw(context.getGraphics());
+		if (caret != null)
+			caret.draw(context.getGraphics());
 	}
 
 	@Override
@@ -172,7 +173,8 @@ public class TextTool extends Tool {
 		Circuit circ = canvas.getCircuit();
 
 		if (!proj.getLogisimFile().contains(circ)) {
-			if (caret != null) caret.cancelEditing();
+			if (caret != null)
+				caret.cancelEditing();
 			canvas.setErrorMessage(Strings.getter("cannotModifyError"));
 			return;
 		}
@@ -227,7 +229,8 @@ public class TextTool extends Tool {
 
 		// if nothing found, create a new label
 		if (caret == null) {
-			if (loc.getX() < 0 || loc.getY() < 0) return;
+			if (loc.getX() < 0 || loc.getY() < 0)
+				return;
 			AttributeSet copy = (AttributeSet) attrs.clone();
 			caretComponent = Text.FACTORY.createComponent(loc, copy);
 			caretCreatingText = true;
@@ -249,12 +252,12 @@ public class TextTool extends Tool {
 
 	@Override
 	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
-		//TODO: enhance label editing
+		// TODO: enhance label editing
 	}
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
-		//TODO: enhance label editing
+		// TODO: enhance label editing
 	}
 
 	@Override
@@ -286,4 +289,3 @@ public class TextTool extends Tool {
 		return cursor;
 	}
 }
-

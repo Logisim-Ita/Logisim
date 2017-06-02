@@ -18,35 +18,36 @@ public class SimulationTreeModel implements TreeModel {
 	private ArrayList<TreeModelListener> listeners;
 	private SimulationTreeCircuitNode root;
 	private CircuitState currentView;
-	
+
 	public SimulationTreeModel(CircuitState rootState) {
 		this.listeners = new ArrayList<TreeModelListener>();
-		this.root = new SimulationTreeCircuitNode(this, null,
-				rootState, null);
+		this.root = new SimulationTreeCircuitNode(this, null, rootState, null);
 		this.currentView = null;
 	}
-	
+
 	public CircuitState getRootState() {
 		return root.getCircuitState();
 	}
-	
+
 	public CircuitState getCurrentView() {
 		return currentView;
 	}
-	
+
 	public void setCurrentView(CircuitState value) {
 		CircuitState oldView = currentView;
 		if (oldView != value) {
 			currentView = value;
 
 			SimulationTreeCircuitNode node1 = mapToNode(oldView);
-			if (node1 != null) fireNodeChanged(node1);
+			if (node1 != null)
+				fireNodeChanged(node1);
 
 			SimulationTreeCircuitNode node2 = mapToNode(value);
-			if (node2 != null) fireNodeChanged(node2);
+			if (node2 != null)
+				fireNodeChanged(node2);
 		}
 	}
-	
+
 	private SimulationTreeCircuitNode mapToNode(CircuitState state) {
 		TreePath path = mapToPath(state);
 		if (path == null) {
@@ -55,9 +56,10 @@ public class SimulationTreeModel implements TreeModel {
 			return (SimulationTreeCircuitNode) path.getLastPathComponent();
 		}
 	}
-	
+
 	public TreePath mapToPath(CircuitState state) {
-		if (state == null) return null;
+		if (state == null)
+			return null;
 		ArrayList<CircuitState> path = new ArrayList<CircuitState>();
 		CircuitState current = state;
 		CircuitState parent = current.getParentState();
@@ -66,7 +68,7 @@ public class SimulationTreeModel implements TreeModel {
 			current = parent;
 			parent = current.getParentState();
 		}
-		
+
 		Object[] pathNodes = new Object[path.size() + 1];
 		pathNodes[0] = root;
 		int pathPos = 1;
@@ -92,33 +94,35 @@ public class SimulationTreeModel implements TreeModel {
 		}
 		return new TreePath(pathNodes);
 	}
-	
+
 	protected SimulationTreeNode mapComponentToNode(Component comp) {
 		return null;
 	}
 
+	@Override
 	public void addTreeModelListener(TreeModelListener l) {
 		listeners.add(l);
 	}
 
+	@Override
 	public void removeTreeModelListener(TreeModelListener l) {
 		listeners.remove(l);
 	}
-	
+
 	protected void fireNodeChanged(Object node) {
 		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
 		for (TreeModelListener l : listeners) {
 			l.treeNodesChanged(e);
 		}
 	}
-	
+
 	protected void fireStructureChanged(Object node) {
 		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(e);
 		}
 	}
-	
+
 	private TreePath findPath(Object node) {
 		ArrayList<Object> path = new ArrayList<Object>();
 		Object current = node;
@@ -132,10 +136,12 @@ public class SimulationTreeModel implements TreeModel {
 		return new TreePath(path.toArray());
 	}
 
+	@Override
 	public Object getRoot() {
 		return root;
 	}
 
+	@Override
 	public int getChildCount(Object parent) {
 		if (parent instanceof TreeNode) {
 			return ((TreeNode) parent).getChildCount();
@@ -144,6 +150,7 @@ public class SimulationTreeModel implements TreeModel {
 		}
 	}
 
+	@Override
 	public Object getChild(Object parent, int index) {
 		if (parent instanceof TreeNode) {
 			return ((TreeNode) parent).getChildAt(index);
@@ -152,6 +159,7 @@ public class SimulationTreeModel implements TreeModel {
 		}
 	}
 
+	@Override
 	public int getIndexOfChild(Object parent, Object child) {
 		if (parent instanceof TreeNode && child instanceof TreeNode) {
 			return ((TreeNode) parent).getIndex((TreeNode) child);
@@ -160,6 +168,7 @@ public class SimulationTreeModel implements TreeModel {
 		}
 	}
 
+	@Override
 	public boolean isLeaf(Object node) {
 		if (node instanceof TreeNode) {
 			return ((TreeNode) node).getChildCount() == 0;
@@ -168,6 +177,7 @@ public class SimulationTreeModel implements TreeModel {
 		}
 	}
 
+	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
 		throw new UnsupportedOperationException();
 	}

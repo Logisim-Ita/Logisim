@@ -46,11 +46,10 @@ class MouseOptions extends OptionsPanel {
 		public AddArea() {
 			setPreferredSize(new Dimension(75, 60));
 			setMinimumSize(new Dimension(75, 60));
-			setBorder(BorderFactory.createCompoundBorder(
-					BorderFactory.createEmptyBorder(10, 10, 10, 10),
+			setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10),
 					BorderFactory.createEtchedBorder()));
 		}
-		
+
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
@@ -65,8 +64,7 @@ class MouseOptions extends OptionsPanel {
 			} else {
 				g.setColor(Color.BLACK);
 				label1 = Strings.get("mouseMapText");
-				label2 = StringUtil.format(Strings.get("mouseMapText2"),
-						curTool.getDisplayName());
+				label2 = StringUtil.format(Strings.get("mouseMapText2"), curTool.getDisplayName());
 			}
 			FontMetrics fm = g.getFontMetrics();
 			int x1 = (sz.width - fm.stringWidth(label1)) / 2;
@@ -82,30 +80,40 @@ class MouseOptions extends OptionsPanel {
 			}
 		}
 	}
-	
-	private class MyListener
-			implements ActionListener, MouseListener, ListSelectionListener,
-				MouseMappings.MouseMappingsListener, ProjectExplorer.Listener {
+
+	private class MyListener implements ActionListener, MouseListener, ListSelectionListener,
+			MouseMappings.MouseMappingsListener, ProjectExplorer.Listener {
 		//
 		// ActionListener method
 		//
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			if (src == remove) {
 				int row = mappings.getSelectedRow();
-				getProject().doAction(OptionsActions.removeMapping(getOptions().getMouseMappings(),
-					model.getKey(row)));
+				getProject().doAction(OptionsActions.removeMapping(getOptions().getMouseMappings(), model.getKey(row)));
 				row = Math.min(row, model.getRowCount() - 1);
-				if (row >= 0) setSelectedRow(row);
+				if (row >= 0)
+					setSelectedRow(row);
 			}
 		}
 
 		//
 		// MouseListener methods
 		//
-		public void mouseClicked(MouseEvent e) { }
-		public void mouseEntered(MouseEvent e) { }
-		public void mouseExited(MouseEvent e) { }
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getSource() == addArea && curTool != null) {
 				Tool t = curTool.cloneTool();
@@ -114,11 +122,15 @@ class MouseOptions extends OptionsPanel {
 				setSelectedRow(model.getRow(mods));
 			}
 		}
-		public void mouseReleased(MouseEvent e) { }
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
 
 		//
 		// ListSelectionListener method
 		//
+		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			int row = mappings.getSelectedRow();
 			if (row < 0) {
@@ -141,6 +153,7 @@ class MouseOptions extends OptionsPanel {
 		//
 		// MouseMappingsListener method
 		//
+		@Override
 		public void mouseMappingsChanged() {
 			model.fireTableStructureChanged();
 		}
@@ -148,6 +161,7 @@ class MouseOptions extends OptionsPanel {
 		//
 		// Explorer.Listener methods
 		//
+		@Override
 		public void selectionChanged(Event event) {
 			Object target = event.getTarget();
 			if (target instanceof Tool) {
@@ -157,10 +171,22 @@ class MouseOptions extends OptionsPanel {
 			}
 		}
 
-		public void doubleClicked(Event event) { }
-		public void moveRequested(Event event, AddTool dragged, AddTool target) { }
-		public void deleteRequested(Event event) { }
-		public JPopupMenu menuRequested(Event event) { return null; }
+		@Override
+		public void doubleClicked(Event event) {
+		}
+
+		@Override
+		public void moveRequested(Event event, AddTool dragged, AddTool target) {
+		}
+
+		@Override
+		public void deleteRequested(Event event) {
+		}
+
+		@Override
+		public JPopupMenu menuRequested(Event event) {
+			return null;
+		}
 	}
 
 	private class MappingsModel extends AbstractTableModel {
@@ -178,14 +204,17 @@ class MouseOptions extends OptionsPanel {
 			super.fireTableStructureChanged();
 		}
 
+		@Override
 		public int getRowCount() {
 			return cur_keys.size();
 		}
 
+		@Override
 		public int getColumnCount() {
 			return 2;
 		}
 
+		@Override
 		public Object getValueAt(int row, int column) {
 			Integer key = cur_keys.get(row);
 			if (column == 0) {
@@ -202,14 +231,16 @@ class MouseOptions extends OptionsPanel {
 		}
 
 		Tool getTool(int row) {
-			if (row < 0 || row >= cur_keys.size()) return null;
+			if (row < 0 || row >= cur_keys.size())
+				return null;
 			Integer key = cur_keys.get(row);
 			return getOptions().getMouseMappings().getToolFor(key.intValue());
 		}
 
 		int getRow(Integer mods) {
 			int row = Collections.binarySearch(cur_keys, mods);
-			if (row < 0) row = -(row + 1);
+			if (row < 0)
+				row = -(row + 1);
 			return row;
 		}
 	}
@@ -217,7 +248,7 @@ class MouseOptions extends OptionsPanel {
 	private MyListener listener = new MyListener();
 	private Tool curTool = null;
 	private MappingsModel model;
-	
+
 	private ProjectExplorer explorer;
 	private JPanel addArea = new AddArea();
 	private JTable mappings = new JTable();
@@ -226,7 +257,7 @@ class MouseOptions extends OptionsPanel {
 
 	public MouseOptions(OptionsFrame window) {
 		super(window, new GridLayout(1, 3));
-		
+
 		explorer = new ProjectExplorer(getProject());
 		explorer.setListener(listener);
 
@@ -258,23 +289,31 @@ class MouseOptions extends OptionsPanel {
 		gbc.weighty = 1.0;
 		gbc.gridheight = 4;
 		gbc.fill = GridBagConstraints.BOTH;
-		JScrollPane explorerPane = new JScrollPane(explorer,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane explorerPane = new JScrollPane(explorer, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		gridbag.setConstraints(explorerPane, gbc);
 		add(explorerPane);
 		gbc.weightx = 0.0;
 		JPanel gap = new JPanel();
 		gap.setPreferredSize(new Dimension(10, 10));
-		gridbag.setConstraints(gap, gbc); add(gap);
+		gridbag.setConstraints(gap, gbc);
+		add(gap);
 		gbc.weightx = 1.0;
 		gbc.gridheight = 1;
 		gbc.gridx = 2;
 		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.weighty = 0.0; gridbag.setConstraints(addArea, gbc); add(addArea);
-		gbc.weighty = 1.0; gridbag.setConstraints(mapPane, gbc); add(mapPane);
-		gbc.weighty = 0.0; gridbag.setConstraints(removeArea, gbc); add(removeArea);
-		gbc.weighty = 1.0; gridbag.setConstraints(attrTable, gbc); add(attrTable);
+		gbc.weighty = 0.0;
+		gridbag.setConstraints(addArea, gbc);
+		add(addArea);
+		gbc.weighty = 1.0;
+		gridbag.setConstraints(mapPane, gbc);
+		add(mapPane);
+		gbc.weighty = 0.0;
+		gridbag.setConstraints(removeArea, gbc);
+		add(removeArea);
+		gbc.weighty = 1.0;
+		gridbag.setConstraints(attrTable, gbc);
+		add(attrTable);
 
 		getOptions().getMouseMappings().addMouseMappingsListener(listener);
 		setCurrentTool(null);
@@ -289,7 +328,7 @@ class MouseOptions extends OptionsPanel {
 	public String getHelpText() {
 		return Strings.get("mouseHelp");
 	}
-	
+
 	@Override
 	public void localeChanged() {
 		remove.setText(Strings.get("mouseRemoveButton"));
@@ -302,8 +341,10 @@ class MouseOptions extends OptionsPanel {
 	}
 
 	private void setSelectedRow(int row) {
-		if (row < 0) row = 0;
-		if (row >= model.getRowCount()) row = model.getRowCount() - 1;
+		if (row < 0)
+			row = 0;
+		if (row >= model.getRowCount())
+			row = model.getRowCount() - 1;
 		if (row >= 0) {
 			mappings.getSelectionModel().setSelectionInterval(row, row);
 		}

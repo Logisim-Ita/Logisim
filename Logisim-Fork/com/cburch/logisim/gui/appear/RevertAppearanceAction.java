@@ -15,11 +15,11 @@ public class RevertAppearanceAction extends Action {
 	private Circuit circuit;
 	private ArrayList<CanvasObject> old;
 	private boolean wasDefault;
-	
+
 	public RevertAppearanceAction(Circuit circuit) {
 		this.circuit = circuit;
 	}
-	
+
 	@Override
 	public String getName() {
 		return Strings.get("revertAppearanceAction");

@@ -34,8 +34,9 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
 public class SelectionActions {
-	private SelectionActions() { }
-	
+	private SelectionActions() {
+	}
+
 	public static Action drop(Selection sel, Collection<Component> comps) {
 		HashSet<Component> floating = new HashSet<Component>(sel.getFloatingComponents());
 		HashSet<Component> anchored = new HashSet<Component>(sel.getAnchoredComponents());
@@ -59,7 +60,7 @@ public class SelectionActions {
 			return new Drop(sel, toDrop, numDrop);
 		}
 	}
-	
+
 	public static Action dropAll(Selection sel) {
 		return drop(sel, sel.getComponents());
 	}
@@ -67,7 +68,7 @@ public class SelectionActions {
 	public static Action clear(Selection sel) {
 		return new Delete(sel);
 	}
-	
+
 	public static Action duplicate(Selection sel) {
 		return new Duplicate(sel);
 	}
@@ -84,18 +85,18 @@ public class SelectionActions {
 		HashMap<Component, Component> replacements = getReplacementMap(proj);
 		return new Paste(sel, replacements);
 	}
-	
+
 	public static Action translate(Selection sel, int dx, int dy, ReplacementMap repl) {
 		return new Translate(sel, dx, dy, repl);
 	}
-	
+
 	private static class Drop extends Action {
 		private Selection sel;
 		private Component[] drops;
 		private int numDrops;
 		private SelectionSave before;
 		private CircuitTransaction xnReverse;
-		
+
 		Drop(Selection sel, Collection<Component> toDrop, int numDrops) {
 			this.sel = sel;
 			this.drops = new Component[toDrop.size()];
@@ -106,8 +107,7 @@ public class SelectionActions {
 
 		@Override
 		public String getName() {
-			return numDrops == 1 ? Strings.get("dropComponentAction")
-					: Strings.get("dropComponentsAction");
+			return numDrops == 1 ? Strings.get("dropComponentAction") : Strings.get("dropComponentsAction");
 		}
 
 		@Override
@@ -129,9 +129,11 @@ public class SelectionActions {
 		@Override
 		public boolean shouldAppendTo(Action other) {
 			Action last;
-			if (other instanceof JoinedAction) last = ((JoinedAction) other).getLastAction();
-			else last = other;
-			
+			if (other instanceof JoinedAction)
+				last = ((JoinedAction) other).getLastAction();
+			else
+				last = other;
+
 			SelectionSave otherAfter = null;
 			if (last instanceof Paste) {
 				otherAfter = ((Paste) last).after;
@@ -237,7 +239,9 @@ public class SelectionActions {
 		}
 
 		@Override
-		public boolean isModification() { return false; }
+		public boolean isModification() {
+			return false;
+		}
 
 		@Override
 		public String getName() {
@@ -255,24 +259,25 @@ public class SelectionActions {
 			Clipboard.set(oldClip);
 		}
 	}
-	
+
 	private static HashMap<Component, Component> getReplacementMap(Project proj) {
 		HashMap<Component, Component> replMap;
 		replMap = new HashMap<Component, Component>();
-		
+
 		LogisimFile file = proj.getLogisimFile();
 		ArrayList<Library> libs = new ArrayList<Library>();
 		libs.add(file);
 		libs.addAll(file.getLibraries());
-		
-		ArrayList<String> dropped = null; 
+
+		ArrayList<String> dropped = null;
 		Clipboard clip = Clipboard.get();
 		Collection<Component> comps = clip.getComponents();
 		HashMap<ComponentFactory, ComponentFactory> factoryReplacements;
 		factoryReplacements = new HashMap<ComponentFactory, ComponentFactory>();
 		for (Component comp : comps) {
-			if (comp instanceof Wire) continue;
-			
+			if (comp instanceof Wire)
+				continue;
+
 			ComponentFactory compFactory = comp.getFactory();
 			ComponentFactory copyFactory = findComponentFactory(compFactory, libs, false);
 			if (factoryReplacements.containsKey(compFactory)) {
@@ -285,13 +290,10 @@ public class SelectionActions {
 					}
 					dropped.add(compFactory.getDisplayName());
 				} else {
-					String msg = Strings.get("pasteCloneQuery",
-							compFactory.getName());
-					Object[] opts = { Strings.get("pasteCloneReplace"),
-							Strings.get("pasteCloneIgnore"),
+					String msg = Strings.get("pasteCloneQuery", compFactory.getName());
+					Object[] opts = { Strings.get("pasteCloneReplace"), Strings.get("pasteCloneIgnore"),
 							Strings.get("pasteCloneCancel") };
-					int select = JOptionPane.showOptionDialog(proj.getFrame(),
-							msg, Strings.get("pasteCloneTitle"), 0,
+					int select = JOptionPane.showOptionDialog(proj.getFrame(), msg, Strings.get("pasteCloneTitle"), 0,
 							JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
 					if (select == 0) {
 						copyFactory = candidate;
@@ -303,7 +305,7 @@ public class SelectionActions {
 					factoryReplacements.put(compFactory, copyFactory);
 				}
 			}
-			
+
 			if (copyFactory == null) {
 				replMap.put(comp, null);
 			} else if (copyFactory != compFactory) {
@@ -313,7 +315,7 @@ public class SelectionActions {
 				replMap.put(comp, copy);
 			}
 		}
-		
+
 		if (dropped != null) {
 			Collections.sort(dropped);
 			StringBuilder droppedStr = new StringBuilder();
@@ -332,7 +334,7 @@ public class SelectionActions {
 					if (curCount > 1) {
 						droppedStr.append(" \u00d7 " + curCount);
 					}
-					
+
 					curName = nextName;
 					curCount = 1;
 				}
@@ -344,16 +346,15 @@ public class SelectionActions {
 			area.setText(droppedStr.toString());
 			area.setCaretPosition(0);
 			JScrollPane areaPane = new JScrollPane(area);
-			JOptionPane.showMessageDialog(proj.getFrame(), areaPane,
-					Strings.get("pasteDropTitle"),
+			JOptionPane.showMessageDialog(proj.getFrame(), areaPane, Strings.get("pasteDropTitle"),
 					JOptionPane.WARNING_MESSAGE);
 		}
-		
+
 		return replMap;
 	}
-	
-	private static ComponentFactory findComponentFactory(ComponentFactory factory,
-			ArrayList<Library> libs, boolean acceptNameMatch) {
+
+	private static ComponentFactory findComponentFactory(ComponentFactory factory, ArrayList<Library> libs,
+			boolean acceptNameMatch) {
 		String name = factory.getName();
 		for (Library lib : libs) {
 			for (Tool tool : lib.getTools()) {
@@ -365,8 +366,7 @@ public class SelectionActions {
 							return fact;
 						} else if (fact == factory) {
 							return fact;
-						} else if (fact.getClass() == factory.getClass()
-								&& !(fact instanceof SubcircuitFactory)) {
+						} else if (fact.getClass() == factory.getClass() && !(fact instanceof SubcircuitFactory)) {
 							return fact;
 						}
 					}
@@ -380,7 +380,7 @@ public class SelectionActions {
 		private Selection sel;
 		private CircuitTransaction xnReverse;
 		private SelectionSave after;
-		private HashMap<Component,Component> componentReplacements; 
+		private HashMap<Component, Component> componentReplacements;
 
 		Paste(Selection sel, HashMap<Component, Component> replacements) {
 			this.sel = sel;
@@ -408,11 +408,11 @@ public class SelectionActions {
 				xnReverse = null;
 			}
 		}
-		
+
 		private Collection<Component> computeAdditions(Collection<Component> comps) {
 			HashMap<Component, Component> replMap = componentReplacements;
 			ArrayList<Component> toAdd = new ArrayList<Component>(comps.size());
-			for (Iterator<Component> it = comps.iterator(); it.hasNext(); ) {
+			for (Iterator<Component> it = comps.iterator(); it.hasNext();) {
 				Component comp = it.next();
 				if (replMap.containsKey(comp)) {
 					Component repl = replMap.get(comp);
@@ -425,7 +425,7 @@ public class SelectionActions {
 			}
 			return toAdd;
 		}
-		
+
 		@Override
 		public void undo(Project proj) {
 			if (xnReverse != null) {
@@ -441,7 +441,7 @@ public class SelectionActions {
 		private ReplacementMap replacements;
 		private SelectionSave before;
 		private CircuitTransaction xnReverse;
-		
+
 		Translate(Selection sel, int dx, int dy, ReplacementMap replacements) {
 			this.sel = sel;
 			this.dx = dx;
@@ -477,9 +477,11 @@ public class SelectionActions {
 		@Override
 		public boolean shouldAppendTo(Action other) {
 			Action last;
-			if (other instanceof JoinedAction) last = ((JoinedAction) other).getLastAction();
-			else last = other;
-			
+			if (other instanceof JoinedAction)
+				last = ((JoinedAction) other).getLastAction();
+			else
+				last = other;
+
 			SelectionSave otherAfter = null;
 			if (last instanceof Paste) {
 				otherAfter = ((Paste) last).after;

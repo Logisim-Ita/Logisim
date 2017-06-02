@@ -5,5 +5,6 @@ package com.cburch.logisim.tools.key;
 
 public interface KeyConfigurator {
 	public KeyConfigurator clone();
+
 	public KeyConfigurationResult keyEventReceived(KeyConfigurationEvent event);
 }

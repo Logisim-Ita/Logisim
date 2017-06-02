@@ -7,6 +7,8 @@ import com.cburch.logisim.data.Value;
 
 interface ModelListener {
 	public void selectionChanged(ModelEvent event);
+
 	public void entryAdded(ModelEvent event, Value[] values);
+
 	public void filePropertyChanged(ModelEvent event);
 }

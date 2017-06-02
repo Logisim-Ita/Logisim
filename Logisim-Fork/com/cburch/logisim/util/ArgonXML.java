@@ -71,14 +71,12 @@ public class ArgonXML {
 
 	private static Element rootElement(InputStream inputStream, String rootName) {
 		try {
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			Document document = builder.parse(inputStream);
 			Element rootElement = document.getDocumentElement();
 			if (!rootElement.getNodeName().equals(rootName))
-				throw new RuntimeException("Could not find root node: "
-						+ rootName);
+				throw new RuntimeException("Could not find root node: " + rootName);
 			return rootElement;
 		} catch (IOException exception) {
 			throw new RuntimeException(exception);
@@ -193,8 +191,7 @@ public class ArgonXML {
 		ArrayList<ArgonXML> children = children(name);
 		int n = children.size();
 		if (n > 1)
-			throw new RuntimeException("Could not find individual child node: "
-					+ name);
+			throw new RuntimeException("Could not find individual child node: " + name);
 		return n == 0 ? null : children.get(0);
 	}
 
@@ -223,8 +220,7 @@ public class ArgonXML {
 	public String string(String name) {
 		String value = optString(name);
 		if (value == null) {
-			throw new RuntimeException("Could not find attribute: " + name
-					+ ", in node: " + this.name);
+			throw new RuntimeException("Could not find attribute: " + name + ", in node: " + this.name);
 		}
 		return value;
 	}

@@ -16,15 +16,14 @@ public class EditableLabelField extends JTextField {
 		super(10);
 		setBackground(new Color(255, 255, 255, 128));
 		setOpaque(false);
-		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(Color.BLACK),
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
 				BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		g.setColor(getBackground());
-		g.fillRect(0,0, getWidth(),getHeight());
+		g.fillRect(0, 0, getWidth(), getHeight());
 		super.paintComponent(g);
 	}
 }

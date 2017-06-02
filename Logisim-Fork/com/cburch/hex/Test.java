@@ -11,34 +11,40 @@ import javax.swing.JScrollPane;
 
 public class Test {
 	private static class Model implements HexModel {
-		private ArrayList<HexModelListener> listeners
-			= new ArrayList<HexModelListener>();
+		private ArrayList<HexModelListener> listeners = new ArrayList<HexModelListener>();
 		private int[] data = new int[924];
-		
+
+		@Override
 		public void addHexModelListener(HexModelListener l) {
 			listeners.add(l);
 		}
 
+		@Override
 		public void removeHexModelListener(HexModelListener l) {
 			listeners.remove(l);
 		}
 
+		@Override
 		public long getFirstOffset() {
 			return 11111;
 		}
 
+		@Override
 		public long getLastOffset() {
 			return data.length + 11110;
 		}
 
+		@Override
 		public int getValueWidth() {
 			return 9;
 		}
 
+		@Override
 		public int get(long address) {
 			return data[(int) (address - 11111)];
 		}
 
+		@Override
 		public void set(long address, int value) {
 			int[] oldValues = new int[] { data[(int) (address - 11111)] };
 			data[(int) (address - 11111)] = value & 0x1FF;
@@ -46,7 +52,8 @@ public class Test {
 				l.bytesChanged(this, address, 1, oldValues);
 			}
 		}
-		
+
+		@Override
 		public void set(long start, int[] values) {
 			int[] oldValues = new int[values.length];
 			System.arraycopy(data, (int) (start - 11111), oldValues, 0, values.length);
@@ -55,7 +62,8 @@ public class Test {
 				l.bytesChanged(this, start, values.length, oldValues);
 			}
 		}
-		
+
+		@Override
 		public void fill(long start, long len, int value) {
 			int[] oldValues = new int[(int) len];
 			System.arraycopy(data, (int) (start - 11111), oldValues, 0, (int) len);
@@ -65,7 +73,7 @@ public class Test {
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
 		HexModel model = new Model();

@@ -10,7 +10,8 @@ import com.cburch.logisim.instance.InstanceState;
 
 /** Represents the state of a counter. */
 class CounterData implements InstanceData, Cloneable {
-	/** Retrieves the state associated with this counter in the circuit state,
+	/**
+	 * Retrieves the state associated with this counter in the circuit state,
 	 * generating the state if necessary.
 	 */
 	public static CounterData get(InstanceState state, BitWidth width) {
@@ -29,7 +30,7 @@ class CounterData implements InstanceData, Cloneable {
 
 	/** The last clock input value observed. */
 	private Value lastClock;
-	
+
 	/** The current value emitted by the counter. */
 	private Value value;
 
@@ -42,29 +43,34 @@ class CounterData implements InstanceData, Cloneable {
 	/** Returns a copy of this object. */
 	@Override
 	public Object clone() {
-		// We can just use what super.clone() returns: The only instance variables are
-		// Value objects, which are immutable, so we don't care that both the copy
-		// and the copied refer to the same Value objects. If we had mutable instance
+		// We can just use what super.clone() returns: The only instance
+		// variables are
+		// Value objects, which are immutable, so we don't care that both the
+		// copy
+		// and the copied refer to the same Value objects. If we had mutable
+		// instance
 		// variables, then of course we would need to clone them.
-		try { return super.clone(); }
-		catch (CloneNotSupportedException e) { return null; }
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
 	}
-	
+
 	/** Updates the last clock observed, returning true if triggered. */
 	public boolean updateClock(Value value) {
 		Value old = lastClock;
 		lastClock = value;
 		return old == Value.FALSE && value == Value.TRUE;
 	}
-	
+
 	/** Returns the current value emitted by the counter. */
 	public Value getValue() {
 		return value;
 	}
-	
+
 	/** Updates the current value emitted by the counter. */
 	public void setValue(Value value) {
 		this.value = value;
 	}
 }
-

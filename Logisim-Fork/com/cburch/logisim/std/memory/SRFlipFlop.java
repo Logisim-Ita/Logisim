@@ -7,8 +7,7 @@ import com.cburch.logisim.data.Value;
 
 public class SRFlipFlop extends AbstractFlipFlop {
 	public SRFlipFlop() {
-		super("S-R Flip-Flop", "srFlipFlop.gif",
-				Strings.getter("srFlipFlopComponent"), 2, true);
+		super("S-R Flip-Flop", "srFlipFlop.gif", Strings.getter("srFlipFlopComponent"), 2, true);
 	}
 
 	@Override

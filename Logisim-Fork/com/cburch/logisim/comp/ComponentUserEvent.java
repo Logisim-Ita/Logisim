@@ -6,7 +6,6 @@ package com.cburch.logisim.comp;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.gui.main.Canvas;
 
-
 public class ComponentUserEvent {
 	private Canvas canvas;
 	private int x = 0;

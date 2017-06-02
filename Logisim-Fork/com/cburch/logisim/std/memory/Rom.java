@@ -30,15 +30,15 @@ import com.cburch.logisim.proj.Project;
 
 public class Rom extends Mem {
 	public static Attribute<MemContents> CONTENTS_ATTR = new ContentsAttribute();
-	
+
 	// The following is so that instance's MemListeners aren't freed by the
 	// garbage collector until the instance itself is ready to be freed.
-	private WeakHashMap<Instance,MemListener> memListeners;
-	
+	private WeakHashMap<Instance, MemListener> memListeners;
+
 	public Rom() {
 		super("ROM", Strings.getter("romComponent"), 0);
 		setIconName("rom.gif");
-		memListeners = new WeakHashMap<Instance,MemListener>();
+		memListeners = new WeakHashMap<Instance, MemListener>();
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class Rom extends Mem {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	MemState getState(InstanceState state) {
 		MemState ret = (MemState) state.getData();
@@ -74,12 +74,12 @@ public class Rom extends Mem {
 		}
 		return ret;
 	}
- 
+
 	@Override
 	HexFrame getHexFrame(Project proj, Instance instance, CircuitState state) {
 		return RomAttributes.getHexFrame(getMemContents(instance), proj);
 	}
-	
+
 	// TODO - maybe delete this method?
 	MemContents getMemContents(Instance instance) {
 		return instance.getAttributeValue(CONTENTS_ATTR);
@@ -92,7 +92,7 @@ public class Rom extends Mem {
 
 		Value addrValue = state.getPort(ADDR);
 		boolean chipSelect = state.getPort(CS) != Value.FALSE;
-		
+
 		if (!chipSelect) {
 			myState.setCurrent(-1);
 			state.setPort(DATA, Value.createUnknown(dataBits), DELAY);
@@ -110,7 +110,7 @@ public class Rom extends Mem {
 		int val = myState.getContents().get(addr);
 		state.setPort(DATA, Value.createKnown(dataBits, val), DELAY);
 	}
-	
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		super.configureNewInstance(instance);
@@ -119,7 +119,7 @@ public class Rom extends Mem {
 		memListeners.put(instance, listener);
 		contents.addHexModelListener(listener);
 	}
-	
+
 	private static class ContentsAttribute extends Attribute<MemContents> {
 		public ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
@@ -149,7 +149,8 @@ public class Rom extends Mem {
 			ret.write("addr/data: " + addr + " " + data + "\n");
 			try {
 				HexFile.save(ret, state);
-			} catch (IOException e) { }
+			} catch (IOException e) {
+			}
 			return ret.toString();
 		}
 
@@ -161,7 +162,8 @@ public class Rom extends Mem {
 			StringTokenizer toks = new StringTokenizer(first);
 			try {
 				String header = toks.nextToken();
-				if (!header.equals("addr/data:")) return null;
+				if (!header.equals("addr/data:"))
+					return null;
 				int addr = Integer.parseInt(toks.nextToken());
 				int data = Integer.parseInt(toks.nextToken());
 				MemContents ret = MemContents.create(addr, data);
@@ -176,12 +178,11 @@ public class Rom extends Mem {
 			}
 		}
 	}
-		
-	private static class ContentsCell extends JLabel
-			implements MouseListener {
+
+	private static class ContentsCell extends JLabel implements MouseListener {
 		Window source;
 		MemContents contents;
-		
+
 		ContentsCell(Window source, MemContents contents) {
 			super(Strings.get("romContentsValue"));
 			this.source = source;
@@ -189,20 +190,30 @@ public class Rom extends Mem {
 			addMouseListener(this);
 		}
 
+		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (contents == null) return;
+			if (contents == null)
+				return;
 			Project proj = source instanceof Frame ? ((Frame) source).getProject() : null;
 			HexFrame frame = RomAttributes.getHexFrame(contents, proj);
 			frame.setVisible(true);
 			frame.toFront();
 		}
 
-		public void mousePressed(MouseEvent e) { }
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
 
-		public void mouseReleased(MouseEvent e) { }
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
 
-		public void mouseEntered(MouseEvent e) { }
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
 
-		public void mouseExited(MouseEvent e) { }
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
 	}
 }

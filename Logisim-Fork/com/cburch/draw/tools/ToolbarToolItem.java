@@ -15,20 +15,22 @@ import com.cburch.draw.toolbar.ToolbarItem;
 public class ToolbarToolItem implements ToolbarItem {
 	private AbstractTool tool;
 	private Icon icon;
-	
+
 	public ToolbarToolItem(AbstractTool tool) {
 		this.tool = tool;
 		this.icon = tool.getIcon();
 	}
-	
+
 	public AbstractTool getTool() {
 		return tool;
 	}
-	
+
+	@Override
 	public boolean isSelectable() {
 		return true;
 	}
-	
+
+	@Override
 	public void paintIcon(Component destination, Graphics g) {
 		if (icon == null) {
 			g.setColor(new Color(255, 128, 128));
@@ -41,11 +43,13 @@ public class ToolbarToolItem implements ToolbarItem {
 			icon.paintIcon(destination, g, 4, 4);
 		}
 	}
-	
+
+	@Override
 	public String getToolTip() {
 		return tool.getDescription();
 	}
-	
+
+	@Override
 	public Dimension getDimension(Object orientation) {
 		if (icon == null) {
 			return new Dimension(16, 16);

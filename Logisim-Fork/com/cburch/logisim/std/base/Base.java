@@ -22,23 +22,20 @@ public class Base extends Library {
 	public Base() {
 		SelectTool select = new SelectTool();
 		WiringTool wiring = new WiringTool();
-		
-		tools = Arrays.asList(new Tool[] {
-			new PokeTool(),
-			new EditTool(select, wiring),
-			select,
-			wiring,
-			new TextTool(),
-			new MenuTool(),
-			new AddTool(Text.FACTORY),
-		});
+
+		tools = Arrays.asList(new Tool[] { new PokeTool(), new EditTool(select, wiring), select, wiring, new TextTool(),
+				new MenuTool(), new AddTool(Text.FACTORY), });
 	}
 
 	@Override
-	public String getName() { return "Base"; }
+	public String getName() {
+		return "Base";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("baseLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("baseLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

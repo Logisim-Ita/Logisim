@@ -30,10 +30,9 @@ class SelectionAction extends Action {
 	private Direction anchorNewFacing;
 	private Location anchorOldLocation;
 	private Direction anchorOldFacing;
-	
-	public SelectionAction(AppearanceCanvas canvas, StringGetter displayName,
-			Collection<CanvasObject> toRemove, Collection<CanvasObject> toAdd,
-			Collection<CanvasObject> newSelection, Location anchorLocation,
+
+	public SelectionAction(AppearanceCanvas canvas, StringGetter displayName, Collection<CanvasObject> toRemove,
+			Collection<CanvasObject> toAdd, Collection<CanvasObject> newSelection, Location anchorLocation,
 			Direction anchorFacing) {
 		this.canvas = canvas;
 		this.canvasModel = canvas.getModel();
@@ -50,14 +49,16 @@ class SelectionAction extends Action {
 	public String getName() {
 		return displayName.get();
 	}
-	
+
 	@Override
 	public void doIt(Project proj) {
 		Selection sel = canvas.getSelection();
 		sel.clearSelected();
-		if (toRemove != null) canvasModel.removeObjects(toRemove.keySet());
+		if (toRemove != null)
+			canvasModel.removeObjects(toRemove.keySet());
 		int dest = AppearanceCanvas.getMaxIndex(canvasModel) + 1;
-		if (toAdd != null) canvasModel.addObjects(dest, toAdd);
+		if (toAdd != null)
+			canvasModel.addObjects(dest, toAdd);
 
 		AppearanceAnchor anchor = findAnchor(canvasModel);
 		if (anchor != null && anchorNewLocation != null) {
@@ -72,7 +73,7 @@ class SelectionAction extends Action {
 		sel.setSelected(newSelection, true);
 		canvas.repaint();
 	}
-	
+
 	private AppearanceAnchor findAnchor(CanvasModel canvasModel) {
 		for (Object o : canvasModel.getObjectsFromTop()) {
 			if (o instanceof AppearanceAnchor) {
@@ -81,7 +82,7 @@ class SelectionAction extends Action {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void undo(Project proj) {
 		AppearanceAnchor anchor = findAnchor(canvasModel);
@@ -94,8 +95,10 @@ class SelectionAction extends Action {
 		}
 		Selection sel = canvas.getSelection();
 		sel.clearSelected();
-		if (toAdd != null) canvasModel.removeObjects(toAdd);
-		if (toRemove != null) canvasModel.addObjects(toRemove);
+		if (toAdd != null)
+			canvasModel.removeObjects(toAdd);
+		if (toRemove != null)
+			canvasModel.addObjects(toRemove);
 		sel.setSelected(oldSelection, true);
 		canvas.repaint();
 	}

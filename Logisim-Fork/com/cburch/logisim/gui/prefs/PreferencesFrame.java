@@ -23,20 +23,19 @@ import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class PreferencesFrame extends LFrame {
 	private static WindowMenuManager MENU_MANAGER = null;
-	
+
 	public static void initializeManager() {
 		MENU_MANAGER = new WindowMenuManager();
 	}
-	
-	private static class WindowMenuManager extends WindowMenuItemManager
-			implements LocaleListener {
+
+	private static class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
 		private PreferencesFrame window = null;
 
 		WindowMenuManager() {
 			super(Strings.get("preferencesFrameMenuItem"), true);
 			LocaleManager.addLocaleListener(this);
 		}
-		
+
 		@Override
 		public JFrame getJFrame(boolean create) {
 			if (create) {
@@ -47,23 +46,24 @@ public class PreferencesFrame extends LFrame {
 			}
 			return window;
 		}
-		
+
+		@Override
 		public void localeChanged() {
 			setText(Strings.get("preferencesFrameMenuItem"));
 		}
 	}
 
-	private class MyListener
-			implements ActionListener, LocaleListener {
+	private class MyListener implements ActionListener, LocaleListener {
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			if (src == close) {
-				WindowEvent e = new WindowEvent(PreferencesFrame.this,
-						WindowEvent.WINDOW_CLOSING);
+				WindowEvent e = new WindowEvent(PreferencesFrame.this, WindowEvent.WINDOW_CLOSING);
 				PreferencesFrame.this.processWindowEvent(e);
 			}
 		}
-		
+
+		@Override
 		public void localeChanged() {
 			setTitle(Strings.get("preferencesFrameTitle"));
 			for (int i = 0; i < panels.length; i++) {
@@ -74,9 +74,9 @@ public class PreferencesFrame extends LFrame {
 			close.setText(Strings.get("closeButton"));
 		}
 	}
-	
+
 	private MyListener myListener = new MyListener();
-	
+
 	private OptionsPanel[] panels;
 	private JTabbedPane tabbedPane;
 	private JButton close = new JButton();
@@ -84,20 +84,16 @@ public class PreferencesFrame extends LFrame {
 	private PreferencesFrame() {
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		setJMenuBar(new LogisimMenuBar(this, null));
-		
-		panels = new OptionsPanel[] {
-				new TemplateOptions(this),
-				new IntlOptions(this),
-				new WindowOptions(this),
-				new LayoutOptions(this),
-				new ExperimentalOptions(this),
-		};
+
+		panels = new OptionsPanel[] { new TemplateOptions(this), new IntlOptions(this), new WindowOptions(this),
+				new LayoutOptions(this), new ExperimentalOptions(this), };
 		tabbedPane = new JTabbedPane();
 		int intlIndex = -1;
 		for (int index = 0; index < panels.length; index++) {
 			OptionsPanel panel = panels[index];
 			tabbedPane.addTab(panel.getTitle(), null, panel, panel.getToolTipText());
-			if (panel instanceof IntlOptions) intlIndex = index;
+			if (panel instanceof IntlOptions)
+				intlIndex = index;
 		}
 
 		JPanel buttonPanel = new JPanel();
@@ -108,14 +104,15 @@ public class PreferencesFrame extends LFrame {
 		tabbedPane.setPreferredSize(new Dimension(450, 300));
 		contents.add(tabbedPane, BorderLayout.CENTER);
 		contents.add(buttonPanel, BorderLayout.SOUTH);
-		
-		if (intlIndex >= 0) tabbedPane.setSelectedIndex(intlIndex);
+
+		if (intlIndex >= 0)
+			tabbedPane.setSelectedIndex(intlIndex);
 
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 		pack();
 	}
-	
+
 	public static void showPreferences() {
 		JFrame frame = MENU_MANAGER.getJFrame(true);
 		frame.setVisible(true);

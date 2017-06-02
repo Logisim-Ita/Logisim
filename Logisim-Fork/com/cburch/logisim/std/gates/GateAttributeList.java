@@ -10,14 +10,11 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
 
 class GateAttributeList extends AbstractList<Attribute<?>> {
-	private static final Attribute<?>[] BASE_ATTRIBUTES = {
-			StdAttr.FACING, StdAttr.WIDTH,
-			GateAttributes.ATTR_SIZE, GateAttributes.ATTR_INPUTS,
-			GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT,
-	};
+	private static final Attribute<?>[] BASE_ATTRIBUTES = { StdAttr.FACING, StdAttr.WIDTH, GateAttributes.ATTR_SIZE,
+			GateAttributes.ATTR_INPUTS, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT, };
 
 	private GateAttributes attrs;
-	
+
 	public GateAttributeList(GateAttributes attrs) {
 		this.attrs = attrs;
 	}
@@ -31,7 +28,8 @@ class GateAttributeList extends AbstractList<Attribute<?>> {
 		index -= len;
 		if (attrs.xorBehave != null) {
 			index--;
-			if (index < 0) return GateAttributes.ATTR_XOR;
+			if (index < 0)
+				return GateAttributes.ATTR_XOR;
 		}
 		Direction facing = attrs.facing;
 		int inputs = attrs.inputs;
@@ -56,7 +54,8 @@ class GateAttributeList extends AbstractList<Attribute<?>> {
 	@Override
 	public int size() {
 		int ret = BASE_ATTRIBUTES.length;
-		if (attrs.xorBehave != null) ret++;
+		if (attrs.xorBehave != null)
+			ret++;
 		ret += attrs.inputs;
 		return ret;
 	}

@@ -12,12 +12,14 @@ import javax.swing.JPanel;
 public class Toolbar extends JPanel {
 	public static final Object VERTICAL = new Object();
 	public static final Object HORIZONTAL = new Object();
-	
+
 	private class MyListener implements ToolbarModelListener {
+		@Override
 		public void toolbarAppearanceChanged(ToolbarModelEvent event) {
 			repaint();
 		}
 
+		@Override
 		public void toolbarContentsChanged(ToolbarModelEvent event) {
 			computeContents();
 		}
@@ -39,25 +41,28 @@ public class Toolbar extends JPanel {
 
 		this.add(new JPanel(), BorderLayout.CENTER);
 		setOrientation(HORIZONTAL);
-		
+
 		computeContents();
-		if (model != null) model.addToolbarModelListener(myListener);
+		if (model != null)
+			model.addToolbarModelListener(myListener);
 	}
-	
+
 	public ToolbarModel getToolbarModel() {
 		return model;
 	}
-	
+
 	public void setToolbarModel(ToolbarModel value) {
 		ToolbarModel oldValue = model;
 		if (value != oldValue) {
-			if (oldValue != null) oldValue.removeToolbarModelListener(myListener);
-			if (value != null) value.addToolbarModelListener(myListener);
+			if (oldValue != null)
+				oldValue.removeToolbarModelListener(myListener);
+			if (value != null)
+				value.addToolbarModelListener(myListener);
 			model = value;
 			computeContents();
 		}
 	}
-	
+
 	public void setOrientation(Object value) {
 		int axis;
 		String position;
@@ -75,7 +80,7 @@ public class Toolbar extends JPanel {
 		this.add(subpanel, position);
 		this.orientation = value;
 	}
-	
+
 	private void computeContents() {
 		subpanel.removeAll();
 		ToolbarModel m = model;
@@ -87,20 +92,22 @@ public class Toolbar extends JPanel {
 		}
 		revalidate();
 	}
-	
+
 	ToolbarButton getPressed() {
 		return curPressed;
 	}
-	
+
 	void setPressed(ToolbarButton value) {
 		ToolbarButton oldValue = curPressed;
 		if (oldValue != value) {
 			curPressed = value;
-			if (oldValue != null) oldValue.repaint();
-			if (value != null) value.repaint();		
+			if (oldValue != null)
+				oldValue.repaint();
+			if (value != null)
+				value.repaint();
 		}
 	}
-	
+
 	Object getOrientation() {
 		return orientation;
 	}

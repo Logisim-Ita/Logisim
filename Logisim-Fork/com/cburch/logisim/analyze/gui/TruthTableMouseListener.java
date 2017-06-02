@@ -14,7 +14,8 @@ class TruthTableMouseListener implements MouseListener {
 	private int cellY;
 	private Entry oldValue;
 	private Entry newValue;
-	
+
+	@Override
 	public void mousePressed(MouseEvent event) {
 		TruthTablePanel source = (TruthTablePanel) event.getSource();
 		TruthTable model = source.getTruthTable();
@@ -22,19 +23,26 @@ class TruthTableMouseListener implements MouseListener {
 		int rows = model.getRowCount();
 		cellX = source.getOutputColumn(event);
 		cellY = source.getRow(event);
-		if (cellX < 0 || cellY < 0 || cellX >= cols || cellY >= rows) return;
+		if (cellX < 0 || cellY < 0 || cellX >= cols || cellY >= rows)
+			return;
 		oldValue = source.getTruthTable().getOutputEntry(cellY, cellX);
-		if (oldValue == Entry.ZERO)     newValue = Entry.ONE;
-		else if (oldValue == Entry.ONE) newValue = Entry.DONT_CARE;
-		else                           newValue = Entry.ZERO;
+		if (oldValue == Entry.ZERO)
+			newValue = Entry.ONE;
+		else if (oldValue == Entry.ONE)
+			newValue = Entry.DONT_CARE;
+		else
+			newValue = Entry.ZERO;
 		source.setEntryProvisional(cellY, cellX, newValue);
 	}
+
+	@Override
 	public void mouseReleased(MouseEvent event) {
 		TruthTablePanel source = (TruthTablePanel) event.getSource();
 		TruthTable model = source.getTruthTable();
 		int cols = model.getInputColumnCount() + model.getOutputColumnCount();
 		int rows = model.getRowCount();
-		if (cellX < 0 || cellY < 0 || cellX >= cols || cellY >= rows) return;
+		if (cellX < 0 || cellY < 0 || cellX >= cols || cellY >= rows)
+			return;
 
 		int x = source.getOutputColumn(event);
 		int y = source.getRow(event);
@@ -47,7 +55,15 @@ class TruthTableMouseListener implements MouseListener {
 		cellY = -1;
 	}
 
-	public void mouseClicked(MouseEvent e) { }
-	public void mouseEntered(MouseEvent e) { }
-	public void mouseExited(MouseEvent e) { }
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
 }

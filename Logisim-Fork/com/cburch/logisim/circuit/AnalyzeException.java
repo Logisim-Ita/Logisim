@@ -17,15 +17,16 @@ public class AnalyzeException extends Exception {
 			super(Strings.get("analyzeConflictError"));
 		}
 	}
-	
+
 	public static class CannotHandle extends AnalyzeException {
 		public CannotHandle(String reason) {
 			super(StringUtil.format(Strings.get("analyzeCannotHandleError"), reason));
 		}
 	}
-	
-	public AnalyzeException() { }
-	
+
+	public AnalyzeException() {
+	}
+
 	public AnalyzeException(String message) {
 		super(message);
 	}

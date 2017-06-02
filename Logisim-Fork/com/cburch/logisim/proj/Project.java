@@ -45,10 +45,12 @@ public class Project {
 	}
 
 	private class MyListener implements Selection.Listener, LibraryListener {
+		@Override
 		public void selectionChanged(Selection.Event e) {
 			fireEvent(ProjectEvent.ACTION_SELECTION, e.getSource());
 		}
-		
+
+		@Override
 		public void libraryChanged(LibraryEvent event) {
 			int action = event.getAction();
 			if (action == LibraryEvent.REMOVE_LIBRARY) {
@@ -74,20 +76,16 @@ public class Project {
 	private Simulator simulator = new Simulator();
 	private LogisimFile file;
 	private CircuitState circuitState;
-	private HashMap<Circuit,CircuitState> stateMap
-		= new HashMap<Circuit,CircuitState>();
+	private HashMap<Circuit, CircuitState> stateMap = new HashMap<Circuit, CircuitState>();
 	private Frame frame = null;
 	private OptionsFrame optionsFrame = null;
 	private LogFrame logFrame = null;
 	private Tool tool = null;
 	private LinkedList<ActionData> undoLog = new LinkedList<ActionData>();
 	private int undoMods = 0;
-	private EventSourceWeakSupport<ProjectListener> projectListeners
-		= new EventSourceWeakSupport<ProjectListener>();
-	private EventSourceWeakSupport<LibraryListener> fileListeners
-		= new EventSourceWeakSupport<LibraryListener>();
-	private EventSourceWeakSupport<CircuitListener> circuitListeners
-		= new EventSourceWeakSupport<CircuitListener>();
+	private EventSourceWeakSupport<ProjectListener> projectListeners = new EventSourceWeakSupport<ProjectListener>();
+	private EventSourceWeakSupport<LibraryListener> fileListeners = new EventSourceWeakSupport<LibraryListener>();
+	private EventSourceWeakSupport<CircuitListener> circuitListeners = new EventSourceWeakSupport<CircuitListener>();
 	private Dependencies depends;
 	private MyListener myListener = new MyListener();
 	private boolean startupScreen = false;
@@ -98,7 +96,8 @@ public class Project {
 	}
 
 	public void setFrame(Frame value) {
-		if (frame == value) return;
+		if (frame == value)
+			return;
 		Frame oldValue = frame;
 		frame = value;
 		Projects.windowCreated(this, oldValue, value);
@@ -127,18 +126,21 @@ public class Project {
 	public Frame getFrame() {
 		return frame;
 	}
-	
+
 	public OptionsFrame getOptionsFrame(boolean create) {
 		if (optionsFrame == null || optionsFrame.getLogisimFile() != file) {
-			if (create) optionsFrame = new OptionsFrame(this);
-			else optionsFrame = null;
+			if (create)
+				optionsFrame = new OptionsFrame(this);
+			else
+				optionsFrame = null;
 		}
 		return optionsFrame;
 	}
-	
+
 	public LogFrame getLogFrame(boolean create) {
 		if (logFrame == null) {
-			if (create) logFrame = new LogFrame(this);
+			if (create)
+				logFrame = new LogFrame(this);
 		}
 		return logFrame;
 	}
@@ -150,7 +152,7 @@ public class Project {
 	public CircuitState getCircuitState() {
 		return circuitState;
 	}
-	
+
 	public CircuitState getCircuitState(Circuit circuit) {
 		if (circuitState != null && circuitState.getCircuit() == circuit) {
 			return circuitState;
@@ -177,9 +179,11 @@ public class Project {
 	}
 
 	public Selection getSelection() {
-		if (frame == null) return null;
+		if (frame == null)
+			return null;
 		Canvas canvas = frame.getCanvas();
-		if (canvas == null) return null;
+		if (canvas == null)
+			return null;
 		return canvas.getSelection();
 	}
 
@@ -188,7 +192,8 @@ public class Project {
 	}
 
 	public JFileChooser createChooser() {
-		if (file == null) return JFileChoosers.create();
+		if (file == null)
+			return JFileChoosers.create();
 		Loader loader = file.getLoader();
 		return loader == null ? JFileChoosers.create() : loader.createChooser();
 	}
@@ -203,27 +208,31 @@ public class Project {
 	public void removeProjectListener(ProjectListener what) {
 		projectListeners.remove(what);
 	}
-	
+
 	public void addLibraryListener(LibraryListener value) {
 		fileListeners.add(value);
-		if (file != null) file.addLibraryListener(value);
+		if (file != null)
+			file.addLibraryListener(value);
 	}
-	
+
 	public void removeLibraryListener(LibraryListener value) {
 		fileListeners.remove(value);
-		if (file != null) file.removeLibraryListener(value);
+		if (file != null)
+			file.removeLibraryListener(value);
 	}
-	
+
 	public void addCircuitListener(CircuitListener value) {
 		circuitListeners.add(value);
 		Circuit current = getCurrentCircuit();
-		if (current != null) current.addCircuitListener(value);
+		if (current != null)
+			current.addCircuitListener(value);
 	}
-	
+
 	public void removeCircuitListener(CircuitListener value) {
 		circuitListeners.remove(value);
 		Circuit current = getCurrentCircuit();
-		if (current != null) current.removeCircuitListener(value);
+		if (current != null)
+			current.removeCircuitListener(value);
 	}
 
 	private void fireEvent(int action, Object old, Object data) {
@@ -239,7 +248,7 @@ public class Project {
 			l.projectChanged(event);
 		}
 	}
-	
+
 	// We track whether this project is the empty project opened
 	// at startup by default, because we want to close it
 	// immediately as another project is opened, if there
@@ -247,7 +256,7 @@ public class Project {
 	public boolean isStartupScreen() {
 		return startupScreen;
 	}
-	
+
 	public boolean confirmClose(String title) {
 		return frame.confirmClose(title);
 	}
@@ -278,12 +287,14 @@ public class Project {
 				file.addLibraryListener(l);
 			}
 		}
-		file.setDirty(true); // toggle it so that everybody hears the file is fresh
+		file.setDirty(true); // toggle it so that everybody hears the file is
+								// fresh
 		file.setDirty(false);
 	}
 
 	public void setCircuitState(CircuitState value) {
-		if (value == null || circuitState == value) return;
+		if (value == null || circuitState == value)
+			return;
 
 		CircuitState old = circuitState;
 		Circuit oldCircuit = old == null ? null : old.getCircuit();
@@ -292,7 +303,8 @@ public class Project {
 		if (circuitChanged) {
 			Canvas canvas = frame == null ? null : frame.getCanvas();
 			if (canvas != null) {
-				if (tool != null) tool.deselect(canvas);
+				if (tool != null)
+					tool.deselect(canvas);
 				Selection selection = canvas.getSelection();
 				if (selection != null) {
 					Action act = SelectionActions.dropAll(selection);
@@ -300,7 +312,8 @@ public class Project {
 						doAction(act);
 					}
 				}
-				if (tool != null) tool.select(canvas);
+				if (tool != null)
+					tool.select(canvas);
 			}
 			if (oldCircuit != null) {
 				for (CircuitListener l : circuitListeners) {
@@ -324,15 +337,18 @@ public class Project {
 
 	public void setCurrentCircuit(Circuit circuit) {
 		CircuitState circState = stateMap.get(circuit);
-		if (circState == null) circState = new CircuitState(this, circuit);
+		if (circState == null)
+			circState = new CircuitState(this, circuit);
 		setCircuitState(circState);
 	}
 
 	public void setTool(Tool value) {
-		if (tool == value) return;
+		if (tool == value)
+			return;
 		Tool old = tool;
 		Canvas canvas = frame.getCanvas();
-		if (old != null) old.deselect(canvas);
+		if (old != null)
+			old.deselect(canvas);
 		Selection selection = canvas.getSelection();
 		if (selection != null && !selection.isEmpty()) {
 			Circuit circuit = canvas.getCircuit();
@@ -348,26 +364,31 @@ public class Project {
 					doAction(act);
 				}
 			}
-			if (!xn.isEmpty()) doAction(xn.toAction(null));
+			if (!xn.isEmpty())
+				doAction(xn.toAction(null));
 		}
 		startupScreen = false;
 		tool = value;
-		if (tool != null) tool.select(frame.getCanvas());
+		if (tool != null)
+			tool.select(frame.getCanvas());
 		fireEvent(ProjectEvent.ACTION_SET_TOOL, old, tool);
 	}
 
 	public void doAction(Action act) {
-		if (act == null) return;
+		if (act == null)
+			return;
 		Action toAdd = act;
 		startupScreen = false;
 		if (!undoLog.isEmpty() && act.shouldAppendTo(getLastAction())) {
 			ActionData firstData = undoLog.removeLast();
 			Action first = firstData.action;
-			if (first.isModification()) --undoMods;
+			if (first.isModification())
+				--undoMods;
 			toAdd = first.append(act);
 			if (toAdd != null) {
 				undoLog.add(new ActionData(circuitState, toAdd));
-				if (toAdd.isModification()) ++undoMods;
+				if (toAdd.isModification())
+					++undoMods;
 			}
 			fireEvent(new ProjectEvent(ProjectEvent.ACTION_START, this, act));
 			act.doIt(this);
@@ -382,7 +403,8 @@ public class Project {
 		while (undoLog.size() > MAX_UNDO_SIZE) {
 			undoLog.removeFirst();
 		}
-		if (toAdd.isModification()) ++undoMods;
+		if (toAdd.isModification())
+			++undoMods;
 		file.setDirty(isFileDirty());
 		fireEvent(new ProjectEvent(ProjectEvent.ACTION_COMPLETE, this, act));
 	}
@@ -392,7 +414,8 @@ public class Project {
 			ActionData data = undoLog.removeLast();
 			setCircuitState(data.circuitState);
 			Action action = data.action;
-			if (action.isModification()) --undoMods;
+			if (action.isModification())
+				--undoMods;
 			fireEvent(new ProjectEvent(ProjectEvent.UNDO_START, this, action));
 			action.undo(this);
 			file.setDirty(isFileDirty());

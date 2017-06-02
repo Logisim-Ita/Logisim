@@ -26,16 +26,15 @@ import com.cburch.logisim.tools.Tool;
 public class XmlCircuitReader extends CircuitTransaction {
 	private XmlReader.ReadContext reader;
 	private List<XmlReader.CircuitData> circuitsData;
-	
-	public XmlCircuitReader(XmlReader.ReadContext reader,
-			List<XmlReader.CircuitData> circDatas) {
+
+	public XmlCircuitReader(XmlReader.ReadContext reader, List<XmlReader.CircuitData> circDatas) {
 		this.reader = reader;
 		this.circuitsData = circDatas;
 	}
 
 	@Override
 	protected Map<Circuit, Integer> getAccessedCircuits() {
-		HashMap<Circuit, Integer> access = new HashMap<Circuit,Integer>();
+		HashMap<Circuit, Integer> access = new HashMap<Circuit, Integer>();
 		for (XmlReader.CircuitData data : circuitsData) {
 			access.put(data.circuit, READ_WRITE);
 		}
@@ -53,7 +52,8 @@ public class XmlCircuitReader extends CircuitTransaction {
 		Element elt = circData.circuitElement;
 		Circuit dest = circData.circuit;
 		Map<Element, Component> knownComponents = circData.knownComponents;
-		if (knownComponents == null) knownComponents = Collections.emptyMap();
+		if (knownComponents == null)
+			knownComponents = Collections.emptyMap();
 		try {
 			reader.initAttributeSet(circData.circuitElement, dest.getStaticAttributes(), null);
 		} catch (XmlReaderException e) {
@@ -80,28 +80,27 @@ public class XmlCircuitReader extends CircuitTransaction {
 				}
 			}
 		}
-		
+
 		List<AbstractCanvasObject> appearance = circData.appearance;
 		if (appearance != null && !appearance.isEmpty()) {
 			dest.getAppearance().setObjectsForce(appearance);
 			dest.getAppearance().setDefaultAppearance(false);
 		}
 	}
-	
+
 	private String toComponentString(Element elt) {
 		String name = elt.getAttribute("name");
 		String loc = elt.getAttribute("loc");
 		return name + "(" + loc + ")";
 	}
-	
+
 	private String toWireString(Element elt) {
 		String from = elt.getAttribute("from");
 		String to = elt.getAttribute("to");
 		return "w" + from + "-" + to;
 	}
 
-	void addWire(Circuit dest, CircuitMutator mutator, Element elt)
-			throws XmlReaderException {
+	void addWire(Circuit dest, CircuitMutator mutator, Element elt) throws XmlReaderException {
 		Location pt0;
 		try {
 			String str = elt.getAttribute("from");
@@ -126,9 +125,8 @@ public class XmlCircuitReader extends CircuitTransaction {
 
 		mutator.add(dest, Wire.create(pt0, pt1));
 	}
-	
-	static Component getComponent(Element elt, XmlReader.ReadContext reader)
-			throws XmlReaderException {
+
+	static Component getComponent(Element elt, XmlReader.ReadContext reader) throws XmlReaderException {
 		// Determine the factory that creates this element
 		String name = elt.getAttribute("name");
 		if (name == null || name.equals("")) {
@@ -164,8 +162,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 				Location loc = Location.parse(loc_str);
 				return source.createComponent(loc, attrs);
 			} catch (NumberFormatException e) {
-				throw new XmlReaderException(Strings.get("compLocInvalidError",
-					source.getName(), loc_str));
+				throw new XmlReaderException(Strings.get("compLocInvalidError", source.getName(), loc_str));
 			}
 		}
 	}

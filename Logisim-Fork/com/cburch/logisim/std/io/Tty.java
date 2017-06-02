@@ -27,52 +27,49 @@ public class Tty extends InstanceFactory {
 	private static final int CK = 1;
 	private static final int WE = 2;
 	private static final int IN = 3;
-	
+
 	private static final int BORDER = 5;
 	private static final int ROW_HEIGHT = 15;
-	private static final int COL_WIDTH = 7; 
+	private static final int COL_WIDTH = 7;
 	private static final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 64);
-	
+
 	private static final Font DEFAULT_FONT = new Font("monospaced", Font.PLAIN, 12);
 
-	private static final Attribute<Integer> ATTR_COLUMNS
-		= Attributes.forIntegerRange("cols",
+	private static final Attribute<Integer> ATTR_COLUMNS = Attributes.forIntegerRange("cols",
 			Strings.getter("ttyColsAttr"), 1, 120);
-	private static final Attribute<Integer> ATTR_ROWS
-		= Attributes.forIntegerRange("rows",
+	private static final Attribute<Integer> ATTR_ROWS = Attributes.forIntegerRange("rows",
 			Strings.getter("ttyRowsAttr"), 1, 48);
 
 	public Tty() {
 		super("TTY", Strings.getter("ttyComponent"));
-		setAttributes(new Attribute[] {
-				ATTR_ROWS, ATTR_COLUMNS, StdAttr.EDGE_TRIGGER,
-				Io.ATTR_COLOR, Io.ATTR_BACKGROUND
-			}, new Object[] {
-				Integer.valueOf(8), Integer.valueOf(32), StdAttr.TRIG_RISING,
-				Color.BLACK, DEFAULT_BACKGROUND
-			});
+		setAttributes(
+				new Attribute[] { ATTR_ROWS, ATTR_COLUMNS, StdAttr.EDGE_TRIGGER, Io.ATTR_COLOR, Io.ATTR_BACKGROUND },
+				new Object[] { Integer.valueOf(8), Integer.valueOf(32), StdAttr.TRIG_RISING, Color.BLACK,
+						DEFAULT_BACKGROUND });
 		setIconName("tty.gif");
-		
+
 		Port[] ps = new Port[4];
-		ps[CLR] = new Port(20,  10, Port.INPUT, 1);
-		ps[CK]  = new Port( 0,   0, Port.INPUT, 1);
-		ps[WE]  = new Port(10,  10, Port.INPUT, 1);
-		ps[IN]  = new Port( 0, -10, Port.INPUT, 7);
+		ps[CLR] = new Port(20, 10, Port.INPUT, 1);
+		ps[CK] = new Port(0, 0, Port.INPUT, 1);
+		ps[WE] = new Port(10, 10, Port.INPUT, 1);
+		ps[IN] = new Port(0, -10, Port.INPUT, 7);
 		ps[CLR].setToolTip(Strings.getter("ttyClearTip"));
 		ps[CK].setToolTip(Strings.getter("ttyClockTip"));
 		ps[WE].setToolTip(Strings.getter("ttyEnableTip"));
 		ps[IN].setToolTip(Strings.getter("ttyInputTip"));
 		setPorts(ps);
 	}
-	
+
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		int rows = getRowCount(attrs.getValue(ATTR_ROWS));
 		int cols = getColumnCount(attrs.getValue(ATTR_COLUMNS));
 		int width = 2 * BORDER + cols * COL_WIDTH;
 		int height = 2 * BORDER + rows * ROW_HEIGHT;
-		if (width < 30) width = 30;
-		if (height < 30) height = 30;
+		if (width < 30)
+			width = 30;
+		if (height < 30)
+			height = 30;
 		return Bounds.create(0, 10 - height, width, height);
 	}
 
@@ -96,8 +93,8 @@ public class Tty extends InstanceFactory {
 		Value clock = circState.getPort(CK);
 		Value enable = circState.getPort(WE);
 		Value in = circState.getPort(IN);
-		
-		synchronized(state) {
+
+		synchronized (state) {
 			Value lastClock = state.setLastClock(clock);
 			if (clear == Value.TRUE) {
 				state.clear();
@@ -108,7 +105,8 @@ public class Tty extends InstanceFactory {
 				} else {
 					go = lastClock == Value.FALSE && clock == Value.TRUE;
 				}
-				if (go) state.add(in.isFullyDefined() ? (char) in.toIntValue() : '?');
+				if (go)
+					state.add(in.isFullyDefined() ? (char) in.toIntValue() : '?');
 			}
 		}
 	}
@@ -118,8 +116,7 @@ public class Tty extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
 		Bounds bds = painter.getBounds();
-		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(),
-				10, 10);
+		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 	}
 
 	@Override
@@ -130,18 +127,16 @@ public class Tty extends InstanceFactory {
 		painter.drawClock(CK, Direction.EAST);
 		if (painter.shouldDrawColor()) {
 			g.setColor(painter.getAttributeValue(Io.ATTR_BACKGROUND));
-			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(),
-					10, 10);
+			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 		}
 		GraphicsUtil.switchToWidth(g, 2);
 		g.setColor(Color.BLACK);
-		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(),
-				2 * BORDER, 2 * BORDER);
+		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 2 * BORDER, 2 * BORDER);
 		GraphicsUtil.switchToWidth(g, 1);
 		painter.drawPort(CLR);
 		painter.drawPort(WE);
 		painter.drawPort(IN);
-		
+
 		int rows = getRowCount(painter.getAttributeValue(ATTR_ROWS));
 		int cols = getColumnCount(painter.getAttributeValue(ATTR_COLUMNS));
 
@@ -150,7 +145,7 @@ public class Tty extends InstanceFactory {
 			int curRow;
 			int curCol;
 			TtyState state = getTtyState(painter);
-			synchronized(state) {
+			synchronized (state) {
 				for (int i = 0; i < rows; i++) {
 					rowData[i] = state.getRowString(i);
 				}
@@ -197,19 +192,23 @@ public class Tty extends InstanceFactory {
 		}
 		return ret;
 	}
-	
+
 	public void sendToStdout(InstanceState state) {
 		TtyState tty = getTtyState(state);
 		tty.setSendStdout(true);
 	}
-	
+
 	private static int getRowCount(Object val) {
-		if (val instanceof Integer) return ((Integer) val).intValue();
-		else return 4;
+		if (val instanceof Integer)
+			return ((Integer) val).intValue();
+		else
+			return 4;
 	}
-	
+
 	private static int getColumnCount(Object val) {
-		if (val instanceof Integer) return ((Integer) val).intValue();
-		else return 16;
+		if (val instanceof Integer)
+			return ((Integer) val).intValue();
+		else
+			return 16;
 	}
 }

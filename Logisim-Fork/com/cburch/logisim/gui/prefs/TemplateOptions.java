@@ -33,6 +33,7 @@ import com.cburch.logisim.util.StringUtil;
 
 class TemplateOptions extends OptionsPanel {
 	private class MyListener implements ActionListener, PropertyChangeListener {
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			if (src == templateButton) {
@@ -56,27 +57,34 @@ class TemplateOptions extends OptionsPanel {
 					} catch (IOException ex) {
 						JOptionPane.showMessageDialog(getPreferencesFrame(),
 								StringUtil.format(Strings.get("templateErrorMessage"), ex.toString()),
-								Strings.get("templateErrorTitle"),
-								JOptionPane.ERROR_MESSAGE);
+								Strings.get("templateErrorTitle"), JOptionPane.ERROR_MESSAGE);
 					} finally {
 						try {
-							if (reader != null) reader.close();
-						} catch (IOException ex) { }
+							if (reader != null)
+								reader.close();
+						} catch (IOException ex) {
+						}
 						try {
-							if (reader != null) reader2.close();
-						} catch (IOException ex) { }
+							if (reader != null)
+								reader2.close();
+						} catch (IOException ex) {
+						}
 					}
 				}
 			} else {
 				int value = AppPreferences.TEMPLATE_UNKNOWN;
-				if (plain.isSelected()) value = AppPreferences.TEMPLATE_PLAIN;
-				else if (empty.isSelected()) value = AppPreferences.TEMPLATE_EMPTY;
-				else if (custom.isSelected()) value = AppPreferences.TEMPLATE_CUSTOM;
+				if (plain.isSelected())
+					value = AppPreferences.TEMPLATE_PLAIN;
+				else if (empty.isSelected())
+					value = AppPreferences.TEMPLATE_EMPTY;
+				else if (custom.isSelected())
+					value = AppPreferences.TEMPLATE_CUSTOM;
 				AppPreferences.setTemplateType(value);
 			}
 			computeEnabled();
 		}
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			String prop = event.getPropertyName();
 			if (prop.equals(AppPreferences.TEMPLATE_TYPE)) {
@@ -88,7 +96,7 @@ class TemplateOptions extends OptionsPanel {
 				setTemplateField((File) event.getNewValue());
 			}
 		}
-		
+
 		private void setTemplateField(File f) {
 			try {
 				templateField.setText(f == null ? "" : f.getCanonicalPath());
@@ -97,13 +105,13 @@ class TemplateOptions extends OptionsPanel {
 			}
 			computeEnabled();
 		}
-		
+
 		private void computeEnabled() {
 			custom.setEnabled(!templateField.getText().equals(""));
 			templateField.setEnabled(custom.isSelected());
 		}
 	}
-	
+
 	private MyListener myListener = new MyListener();
 
 	private JRadioButton plain = new JRadioButton();
@@ -114,19 +122,19 @@ class TemplateOptions extends OptionsPanel {
 
 	public TemplateOptions(PreferencesFrame window) {
 		super(window);
-		
+
 		ButtonGroup bgroup = new ButtonGroup();
 		bgroup.add(plain);
 		bgroup.add(empty);
 		bgroup.add(custom);
-		
+
 		plain.addActionListener(myListener);
 		empty.addActionListener(myListener);
 		custom.addActionListener(myListener);
 		templateField.setEditable(false);
 		templateButton.addActionListener(myListener);
 		myListener.computeEnabled();
-		
+
 		GridBagLayout gridbag = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(gridbag);
@@ -135,9 +143,12 @@ class TemplateOptions extends OptionsPanel {
 		gbc.gridy = GridBagConstraints.RELATIVE;
 		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.LINE_START;
-		gridbag.setConstraints(plain, gbc); add(plain);
-		gridbag.setConstraints(empty, gbc); add(empty);
-		gridbag.setConstraints(custom, gbc); add(custom);
+		gridbag.setConstraints(plain, gbc);
+		add(plain);
+		gridbag.setConstraints(empty, gbc);
+		add(empty);
+		gridbag.setConstraints(custom, gbc);
+		add(custom);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = 1;
 		gbc.gridy = 3;
@@ -145,16 +156,28 @@ class TemplateOptions extends OptionsPanel {
 		JPanel strut = new JPanel();
 		strut.setMinimumSize(new Dimension(50, 1));
 		strut.setPreferredSize(new Dimension(50, 1));
-		gbc.weightx = 0.0; gridbag.setConstraints(strut, gbc); add(strut);
-		gbc.weightx = 1.0; gridbag.setConstraints(templateField, gbc); add(templateField);
-		gbc.weightx = 0.0; gridbag.setConstraints(templateButton, gbc); add(templateButton);
-		
+		gbc.weightx = 0.0;
+		gridbag.setConstraints(strut, gbc);
+		add(strut);
+		gbc.weightx = 1.0;
+		gridbag.setConstraints(templateField, gbc);
+		add(templateField);
+		gbc.weightx = 0.0;
+		gridbag.setConstraints(templateButton, gbc);
+		add(templateButton);
+
 		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_TYPE, myListener);
 		AppPreferences.addPropertyChangeListener(AppPreferences.TEMPLATE_FILE, myListener);
 		switch (AppPreferences.getTemplateType()) {
-		case AppPreferences.TEMPLATE_PLAIN: plain.setSelected(true); break;
-		case AppPreferences.TEMPLATE_EMPTY: empty.setSelected(true); break;
-		case AppPreferences.TEMPLATE_CUSTOM: custom.setSelected(true); break;
+		case AppPreferences.TEMPLATE_PLAIN:
+			plain.setSelected(true);
+			break;
+		case AppPreferences.TEMPLATE_EMPTY:
+			empty.setSelected(true);
+			break;
+		case AppPreferences.TEMPLATE_CUSTOM:
+			custom.setSelected(true);
+			break;
 		}
 		myListener.setTemplateField(AppPreferences.getTemplateFile());
 	}
@@ -168,7 +191,7 @@ class TemplateOptions extends OptionsPanel {
 	public String getHelpText() {
 		return Strings.get("templateHelp");
 	}
-	
+
 	@Override
 	public void localeChanged() {
 		plain.setText(Strings.get("templatePlainOption"));

@@ -8,6 +8,8 @@ import com.cburch.logisim.data.Value;
 
 public interface Loggable {
 	public Object[] getLogOptions(CircuitState state);
+
 	public String getLogName(Object option);
+
 	public Value getLogValue(CircuitState state, Object option);
 }

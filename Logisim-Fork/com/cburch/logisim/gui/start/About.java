@@ -3,16 +3,12 @@
 
 package com.cburch.logisim.gui.start;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,20 +17,19 @@ import javax.swing.event.AncestorListener;
 
 import com.cburch.logisim.Main;
 import com.cburch.logisim.data.Value;
-import com.cburch.logisim.util.GraphicsUtil;
 
 public class About {
 	static final int IMAGE_WIDTH = 400;
 	static final int IMAGE_HEIGHT = 250;
-	
+
 	private static class PanelThread extends Thread {
 		private MyPanel panel;
 		private boolean running = true;
-		
+
 		PanelThread(MyPanel panel) {
 			this.panel = panel;
 		}
-		
+
 		@Override
 		public void run() {
 			long start = System.currentTimeMillis();
@@ -47,11 +42,12 @@ public class About {
 				panel.repaint();
 				try {
 					Thread.sleep(20);
-				} catch (InterruptedException ex) { }
+				} catch (InterruptedException ex) {
+				}
 			}
 		}
 	}
-	
+
 	private static class MyPanel extends JPanel implements AncestorListener {
 		private final Color fadeColor = new Color(240, 240, 240);
 		private final Color headerColor = Value.TRUE_COLOR;
@@ -65,11 +61,11 @@ public class About {
 
 		public MyPanel() {
 			setLayout(null);
-			
+
 			setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
 			setBackground(Color.WHITE);
 			addAncestorListener(this);
-			
+
 			credits = new AboutCredits();
 			credits.setBounds(0, IMAGE_HEIGHT / 3, IMAGE_WIDTH, IMAGE_HEIGHT * 2 / 3);
 			add(credits);
@@ -78,28 +74,32 @@ public class About {
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			
+
 			try {
 				g.setColor(fadeColor);
 				g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 				drawText(g, 10, 5);
-			} catch (Throwable t) { }
+			} catch (Throwable t) {
+			}
 		}
-					
+
 		private void drawText(Graphics g, int x, int y) {
 			FontMetrics fm;
 			String str;
-			
+
 			g.setColor(headerColor);
-			g.setFont(headerFont); fm = g.getFontMetrics();
+			g.setFont(headerFont);
+			fm = g.getFontMetrics();
 			g.drawString("Logisim", x, y + 55);
 			g.setFont(versionFont);
 			g.drawString(Main.VERSION_NAME, x + fm.stringWidth("Logisim") + 5, y + 55);
-			g.setFont(copyrightFont); fm = g.getFontMetrics();
+			g.setFont(copyrightFont);
+			fm = g.getFontMetrics();
 			str = "\u00a9 " + Main.COPYRIGHT_YEAR;
 			g.drawString(str, IMAGE_WIDTH - fm.stringWidth(str) - x, y + 16);
 		}
 
+		@Override
 		public void ancestorAdded(AncestorEvent arg0) {
 			if (thread == null) {
 				thread = new PanelThread(this);
@@ -107,16 +107,20 @@ public class About {
 			}
 		}
 
+		@Override
 		public void ancestorRemoved(AncestorEvent arg0) {
 			if (thread != null) {
 				thread.running = false;
 			}
 		}
 
-		public void ancestorMoved(AncestorEvent arg0) { }
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+		}
 	}
 
-	private About() { }
+	private About() {
+	}
 
 	public static MyPanel getImagePanel() {
 		return new MyPanel();
@@ -127,7 +131,6 @@ public class About {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(imgPanel);
 
-		JOptionPane.showMessageDialog(owner, panel,
-				"Logisim " + Main.VERSION_NAME, JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(owner, panel, "Logisim " + Main.VERSION_NAME, JOptionPane.PLAIN_MESSAGE);
 	}
 }

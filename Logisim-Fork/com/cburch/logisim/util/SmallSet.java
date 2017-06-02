@@ -18,15 +18,17 @@ public class SmallSet<E> extends AbstractSet<E> {
 		int pos = 0; // position of next item to return
 		boolean hasNext = true;
 		boolean removeOk = false;
-		
+
 		private ArrayIterator() {
 			myValues = values;
 		}
-		
+
+		@Override
 		public boolean hasNext() {
 			return hasNext;
 		}
-		
+
+		@Override
 		public E next() {
 			if (itVersion != version) {
 				throw new ConcurrentModificationException();
@@ -48,7 +50,8 @@ public class SmallSet<E> extends AbstractSet<E> {
 				return ret;
 			}
 		}
-		
+
+		@Override
 		public void remove() {
 			if (itVersion != version) {
 				throw new ConcurrentModificationException();
@@ -80,13 +83,14 @@ public class SmallSet<E> extends AbstractSet<E> {
 			}
 		}
 	}
-	
+
 	private int size = 0;
 	private int version = 0;
 	private Object values = null;
-	
-	public SmallSet() { }
-	
+
+	public SmallSet() {
+	}
+
 	@Override
 	public SmallSet<E> clone() {
 		SmallSet<E> ret = new SmallSet<E>();
@@ -96,7 +100,8 @@ public class SmallSet<E> extends AbstractSet<E> {
 		} else if (size <= HASH_POINT) {
 			Object[] oldVals = (Object[]) this.values;
 			Object[] retVals = new Object[size];
-			for (int i = size - 1; i >= 0; i--) retVals[i] = oldVals[i];
+			for (int i = size - 1; i >= 0; i--)
+				retVals[i] = oldVals[i];
 		} else {
 			@SuppressWarnings("unchecked")
 			HashSet<E> oldVals = (HashSet<E>) this.values;
@@ -104,7 +109,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public Object[] toArray() {
 		Object vals = values;
@@ -120,14 +125,14 @@ public class SmallSet<E> extends AbstractSet<E> {
 			return hash.toArray();
 		}
 	}
-	
+
 	@Override
 	public void clear() {
 		size = 0;
 		values = null;
 		++version;
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		if (size <= HASH_POINT) {
@@ -145,13 +150,13 @@ public class SmallSet<E> extends AbstractSet<E> {
 			return ((HashSet<?>) values).size();
 		}
 	}
-	
+
 	@Override
 	public boolean add(E value) {
 		int oldSize = size;
 		Object oldValues = values;
 		int newVersion = version + 1;
-		
+
 		if (oldSize < 2) {
 			if (oldSize == 0) {
 				values = value;
@@ -178,7 +183,8 @@ public class SmallSet<E> extends AbstractSet<E> {
 			for (int i = 0; i < oldSize; i++) {
 				Object val = vals[i];
 				boolean same = val == null ? value == null : val.equals(value);
-				if (same) return false;
+				if (same)
+					return false;
 			}
 			if (oldSize < HASH_POINT) {
 				vals[oldSize] = value;
@@ -187,7 +193,8 @@ public class SmallSet<E> extends AbstractSet<E> {
 				return true;
 			} else {
 				HashSet<E> newValues = new HashSet<E>();
-				for (int i = 0; i < oldSize; i++) newValues.add(vals[i]);
+				for (int i = 0; i < oldSize; i++)
+					newValues.add(vals[i]);
 				newValues.add(value);
 				values = newValues;
 				size = oldSize + 1;
@@ -205,7 +212,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean contains(Object value) {
 		if (size <= 2) {
@@ -217,7 +224,8 @@ public class SmallSet<E> extends AbstractSet<E> {
 		} else if (size <= HASH_POINT) {
 			Object[] vals = (Object[]) values;
 			for (int i = 0; i < size; i++) {
-				if (vals[i].equals(value)) return true;
+				if (vals[i].equals(value))
+					return true;
 			}
 			return false;
 		} else {
@@ -241,20 +249,20 @@ public class SmallSet<E> extends AbstractSet<E> {
 			return set.iterator();
 		}
 	}
-	
+
 	public static void main(String[] args) throws java.io.IOException {
 		SmallSet<String> set = new SmallSet<String>();
-		java.io.BufferedReader in = new java.io.BufferedReader(
-				new java.io.InputStreamReader(System.in));
+		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 		while (true) {
-			System.out.print(set.size() + ":"); //OK
-			for (Iterator<String> it = set.iterator(); it.hasNext(); ) {
-				System.out.print(" " + it.next()); //OK
+			System.out.print(set.size() + ":"); // OK
+			for (Iterator<String> it = set.iterator(); it.hasNext();) {
+				System.out.print(" " + it.next()); // OK
 			}
-			System.out.println(); //OK
-			System.out.print("> "); //OK
+			System.out.println(); // OK
+			System.out.print("> "); // OK
 			String cmd = in.readLine();
-			if (cmd == null) break;
+			if (cmd == null)
+				break;
 			cmd = cmd.trim();
 			if (cmd.equals("")) {
 				;
@@ -264,9 +272,9 @@ public class SmallSet<E> extends AbstractSet<E> {
 				set.remove(cmd.substring(1));
 			} else if (cmd.startsWith("?")) {
 				boolean ret = set.contains(cmd.substring(1));
-				System.out.println("  " + ret); //OK
+				System.out.println("  " + ret); // OK
 			} else {
-				System.out.println("unrecognized command"); //OK
+				System.out.println("unrecognized command"); // OK
 			}
 		}
 	}

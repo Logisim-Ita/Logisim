@@ -48,12 +48,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class SelectTool extends Tool {
-	private static final Cursor selectCursor
-		= Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-	private static final Cursor rectSelectCursor
-		= Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-	private static final Cursor moveCursor
-		= Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+	private static final Cursor selectCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+	private static final Cursor rectSelectCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	private static final Cursor moveCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
 
 	private static final int IDLE = 0;
 	private static final int MOVING = 1;
@@ -64,32 +61,34 @@ public class SelectTool extends Tool {
 	private static final Color COLOR_COMPUTING = new Color(96, 192, 96);
 	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
 	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
-	
+
 	private static class MoveRequestHandler implements MoveRequestListener {
 		private Canvas canvas;
-		
+
 		MoveRequestHandler(Canvas canvas) {
 			this.canvas = canvas;
 		}
-		
+
+		@Override
 		public void requestSatisfied(MoveGesture gesture, int dx, int dy) {
 			clearCanvasMessage(canvas, dx, dy);
 		}
 	}
-	
+
 	private class Listener implements Selection.Listener {
+		@Override
 		public void selectionChanged(Event event) {
 			keyHandlers = null;
 		}
 	}
-	
+
 	private Location start;
 	private int state;
 	private int curDx;
 	private int curDy;
 	private boolean drawConnections;
 	private MoveGesture moveGesture;
-	private HashMap<Component,KeyConfigurator> keyHandlers;
+	private HashMap<Component, KeyConfigurator> keyHandlers;
 	private HashSet<Selection> selectionsAdded;
 	private Listener selListener;
 
@@ -100,12 +99,12 @@ public class SelectTool extends Tool {
 		selListener = new Listener();
 		keyHandlers = null;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return other instanceof SelectTool;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return SelectTool.class.hashCode();
@@ -125,7 +124,7 @@ public class SelectTool extends Tool {
 	public String getDescription() {
 		return Strings.get("selectToolDesc");
 	}
-	
+
 	@Override
 	public AttributeSet getAttributeSet(Canvas canvas) {
 		return canvas.getSelection().getAttributeSet();
@@ -155,8 +154,7 @@ public class SelectTool extends Tool {
 					for (Wire w : wiresToAdd) {
 						Location loc0 = w.getEnd0();
 						Location loc1 = w.getEnd1();
-						g.drawLine(loc0.getX(), loc0.getY(),
-								loc1.getX(), loc1.getY());
+						g.drawLine(loc0.getX(), loc0.getY(), loc1.getX(), loc1.getY());
 					}
 					GraphicsUtil.switchToWidth(g, 1);
 					g.setColor(COLOR_UNMATCHED);
@@ -171,11 +169,19 @@ public class SelectTool extends Tool {
 		} else if (state == RECT_SELECT) {
 			int left = start.getX();
 			int right = left + dx;
-			if (left > right) { int i = left; left = right; right = i; }
+			if (left > right) {
+				int i = left;
+				left = right;
+				right = i;
+			}
 			int top = start.getY();
 			int bot = top + dy;
-			if (top > bot) { int i = top; top = bot; bot = i; }
-			
+			if (top > bot) {
+				int i = top;
+				top = bot;
+				bot = i;
+			}
+
 			Graphics gBase = context.getGraphics();
 			int w = right - left - 1;
 			int h = bot - top - 1;
@@ -183,26 +189,27 @@ public class SelectTool extends Tool {
 				gBase.setColor(BACKGROUND_RECT_SELECT);
 				gBase.fillRect(left + 1, top + 1, w - 1, h - 1);
 			}
-			
+
 			Circuit circ = canvas.getCircuit();
 			Bounds bds = Bounds.create(left, top, right - left, bot - top);
 			for (Component c : circ.getAllWithin(bds)) {
 				Location cloc = c.getLocation();
 				Graphics gDup = gBase.create();
 				context.setGraphics(gDup);
-				c.getFactory().drawGhost(context, COLOR_RECT_SELECT,
-						cloc.getX(), cloc.getY(), c.getAttributeSet());
+				c.getFactory().drawGhost(context, COLOR_RECT_SELECT, cloc.getX(), cloc.getY(), c.getAttributeSet());
 				gDup.dispose();
 			}
 
 			gBase.setColor(COLOR_RECT_SELECT);
 			GraphicsUtil.switchToWidth(gBase, 2);
-			if (w < 0) w = 0;
-			if (h < 0) h = 0;
+			if (w < 0)
+				w = 0;
+			if (h < 0)
+				h = 0;
 			gBase.drawRect(left, top, w, h);
 		}
 	}
-	
+
 	@Override
 	public void select(Canvas canvas) {
 		Selection sel = canvas.getSelection();
@@ -210,12 +217,12 @@ public class SelectTool extends Tool {
 			sel.addListener(selListener);
 		}
 	}
-	
+
 	@Override
 	public void deselect(Canvas canvas) {
 		moveGesture = null;
 	}
-	
+
 	@Override
 	public void mouseEntered(Canvas canvas, Graphics g, MouseEvent e) {
 		canvas.requestFocusInWindow();
@@ -294,15 +301,15 @@ public class SelectTool extends Tool {
 			proj.repaintCanvas();
 		}
 	}
-	
+
 	private void handleMoveDrag(Canvas canvas, int dx, int dy, int modsEx) {
 		boolean connect = shouldConnect(canvas, modsEx);
 		drawConnections = connect;
 		if (connect) {
 			MoveGesture gesture = moveGesture;
 			if (gesture == null) {
-				gesture = new MoveGesture(new MoveRequestHandler(canvas),
-					canvas.getCircuit(), canvas.getSelection().getAnchoredComponents());
+				gesture = new MoveGesture(new MoveRequestHandler(canvas), canvas.getCircuit(),
+						canvas.getSelection().getAnchoredComponents());
 				moveGesture = gesture;
 			}
 			if (dx != 0 || dy != 0) {
@@ -322,7 +329,7 @@ public class SelectTool extends Tool {
 	}
 
 	private boolean shouldConnect(Canvas canvas, int modsEx) {
-		boolean shiftReleased = (modsEx & MouseEvent.SHIFT_DOWN_MASK) == 0;
+		boolean shiftReleased = (modsEx & InputEvent.SHIFT_DOWN_MASK) == 0;
 		boolean dflt = AppPreferences.MOVE_KEEP_CONNECT.getBoolean();
 		if (shiftReleased) {
 			return dflt;
@@ -351,8 +358,8 @@ public class SelectTool extends Tool {
 					if (connect) {
 						MoveGesture gesture = moveGesture;
 						if (gesture == null) {
-							gesture = new MoveGesture(new MoveRequestHandler(canvas),
-									canvas.getCircuit(), canvas.getSelection().getAnchoredComponents());
+							gesture = new MoveGesture(new MoveRequestHandler(canvas), canvas.getCircuit(),
+									canvas.getSelection().getAnchoredComponents());
 						}
 						canvas.setErrorMessage(new ComputingMessage(dx, dy), COLOR_COMPUTING);
 						MoveResult result = gesture.forceRequest(dx, dy);
@@ -368,13 +375,13 @@ public class SelectTool extends Tool {
 			moveGesture = null;
 			proj.repaintCanvas();
 		} else if (state == RECT_SELECT) {
-			Bounds bds = Bounds.create(start).add(start.getX() + curDx,
-				start.getY() + curDy);
+			Bounds bds = Bounds.create(start).add(start.getX() + curDx, start.getY() + curDy);
 			Circuit circuit = canvas.getCircuit();
 			Selection sel = proj.getSelection();
 			Collection<Component> in_sel = sel.getComponentsWithin(bds, g);
 			for (Component comp : circuit.getAllWithin(bds, g)) {
-				if (!in_sel.contains(comp)) sel.add(comp);
+				if (!in_sel.contains(comp))
+					sel.add(comp);
 			}
 			Action act = SelectionActions.drop(sel, in_sel);
 			if (act != null) {
@@ -384,7 +391,7 @@ public class SelectTool extends Tool {
 			proj.repaintCanvas();
 		}
 	}
-	
+
 	@Override
 	public void keyPressed(Canvas canvas, KeyEvent e) {
 		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -404,7 +411,7 @@ public class SelectTool extends Tool {
 			}
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(Canvas canvas, KeyEvent e) {
 		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -413,12 +420,12 @@ public class SelectTool extends Tool {
 			processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_RELEASED);
 		}
 	}
-	
+
 	@Override
 	public void keyTyped(Canvas canvas, KeyEvent e) {
 		processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_TYPED);
 	}
-	
+
 	private void processKeyEvent(Canvas canvas, KeyEvent e, int type) {
 		HashMap<Component, KeyConfigurator> handlers = keyHandlers;
 		if (handlers == null) {
@@ -443,8 +450,7 @@ public class SelectTool extends Tool {
 			for (Map.Entry<Component, KeyConfigurator> entry : handlers.entrySet()) {
 				Component comp = entry.getKey();
 				KeyConfigurator handler = entry.getValue();
-				KeyConfigurationEvent event = new KeyConfigurationEvent(type,
-						comp.getAttributeSet(), e, comp);
+				KeyConfigurationEvent event = new KeyConfigurationEvent(type, comp.getAttributeSet(), e, comp);
 				KeyConfigurationResult result = handler.keyEventReceived(event);
 				consume |= event.isConsumed();
 				if (result != null) {
@@ -459,8 +465,8 @@ public class SelectTool extends Tool {
 						Strings.getter("changeComponentAttributesAction"));
 				for (KeyConfigurationResult result : results) {
 					Component comp = (Component) result.getEvent().getData();
-					Map<Attribute<?>,Object> newValues = result.getAttributeValues();
-					for (Map.Entry<Attribute<?>,Object> entry : newValues.entrySet()) {
+					Map<Attribute<?>, Object> newValues = result.getAttributeValues();
+					for (Map.Entry<Attribute<?>, Object> entry : newValues.entrySet()) {
 						act.set(comp, entry.getKey(), entry.getValue());
 					}
 				}
@@ -498,8 +504,8 @@ public class SelectTool extends Tool {
 		if (toolIcon != null) {
 			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
 		} else {
-			int[] xp = { x+ 5, x+ 5, x+ 9, x+12, x+14, x+11, x+16 };
-			int[] yp = { y   , y+17, y+12, y+18, y+18, y+12, y+12 };
+			int[] xp = { x + 5, x + 5, x + 9, x + 12, x + 14, x + 11, x + 16 };
+			int[] yp = { y, y + 17, y + 12, y + 18, y + 18, y + 12, y + 12 };
 			g.setColor(java.awt.Color.black);
 			g.fillPolygon(xp, yp, xp.length);
 		}
@@ -507,10 +513,9 @@ public class SelectTool extends Tool {
 
 	@Override
 	public Cursor getCursor() {
-		return state == IDLE ? selectCursor :
-			(state == RECT_SELECT ? rectSelectCursor : moveCursor);
+		return state == IDLE ? selectCursor : (state == RECT_SELECT ? rectSelectCursor : moveCursor);
 	}
-	
+
 	@Override
 	public Set<Component> getHiddenComponents(Canvas canvas) {
 		if (state == MOVING) {
@@ -537,12 +542,13 @@ public class SelectTool extends Tool {
 	}
 
 	private void setState(Project proj, int new_state) {
-		if (state == new_state) return; // do nothing if state not new
+		if (state == new_state)
+			return; // do nothing if state not new
 
 		state = new_state;
 		proj.getFrame().getCanvas().setCursor(getCursor());
 	}
-	
+
 	private static void clearCanvasMessage(Canvas canvas, int dx, int dy) {
 		Object getter = canvas.getErrorMessage();
 		if (getter instanceof ComputingMessage) {
@@ -553,13 +559,17 @@ public class SelectTool extends Tool {
 			}
 		}
 	}
-	
+
 	private static class ComputingMessage implements StringGetter {
 		private int dx;
 		private int dy;
-		
-		public ComputingMessage(int dx, int dy) { this.dx = dx; this.dy = dy; }
-		
+
+		public ComputingMessage(int dx, int dy) {
+			this.dx = dx;
+			this.dy = dy;
+		}
+
+		@Override
 		public String get() {
 			return Strings.get("moveWorkingMsg");
 		}

@@ -23,22 +23,25 @@ class CircuitJList extends JList {
 		boolean currentFound = false;
 		for (Circuit circ : file.getCircuits()) {
 			if (!includeEmpty || circ.getBounds() != Bounds.EMPTY_BOUNDS) {
-				if (circ == current) currentFound = true;
+				if (circ == current)
+					currentFound = true;
 				options.add(circ);
 			}
 		}
-		
+
 		setListData(options);
-		if (currentFound) setSelectedValue(current, true);
+		if (currentFound)
+			setSelectedValue(current, true);
 		setVisibleRowCount(Math.min(6, options.size()));
 	}
-	
+
 	public List<Circuit> getSelectedCircuits() {
 		Object[] selected = getSelectedValues();
 		if (selected != null && selected.length > 0) {
 			ArrayList<Circuit> ret = new ArrayList<Circuit>(selected.length);
 			for (Object sel : selected) {
-				if (sel instanceof Circuit) ret.add((Circuit) sel);
+				if (sel instanceof Circuit)
+					ret.add((Circuit) sel);
 			}
 			return ret;
 		} else {

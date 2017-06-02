@@ -9,8 +9,8 @@ import com.cburch.logisim.util.Cache;
 
 /**
  * Represents an immutable rectangular bounding box. This is analogous to
- * java.awt's <code>Rectangle</code> class, except that objects of this type
- * are immutable.
+ * java.awt's <code>Rectangle</code> class, except that objects of this type are
+ * immutable.
  */
 public class Bounds {
 	public static Bounds EMPTY_BOUNDS = new Bounds(0, 0, 0, 0);
@@ -21,7 +21,8 @@ public class Bounds {
 		Object cached = cache.get(hashCode);
 		if (cached != null) {
 			Bounds bds = (Bounds) cached;
-			if (bds.x == x && bds.y == y && bds.wid == wid && bds.ht == ht) return bds;
+			if (bds.x == x && bds.y == y && bds.wid == wid && bds.ht == ht)
+				return bds;
 		}
 		Bounds ret = new Bounds(x, y, wid, ht);
 		cache.put(hashCode, ret);
@@ -46,18 +47,24 @@ public class Bounds {
 		this.y = y;
 		this.wid = wid;
 		this.ht = ht;
-		if (wid < 0) { x += wid / 2; wid = 0; }
-		if (ht < 0)  { y += ht  / 2; ht = 0;  }
+		if (wid < 0) {
+			x += wid / 2;
+			wid = 0;
+		}
+		if (ht < 0) {
+			y += ht / 2;
+			ht = 0;
+		}
 	}
 
 	@Override
 	public boolean equals(Object other_obj) {
-		if (!(other_obj instanceof Bounds)) return false;
+		if (!(other_obj instanceof Bounds))
+			return false;
 		Bounds other = (Bounds) other_obj;
-		return x == other.x && y == other.y
-			&& wid == other.wid && ht == other.ht;
+		return x == other.x && y == other.y && wid == other.wid && ht == other.ht;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int ret = 31 * x + y;
@@ -91,7 +98,6 @@ public class Bounds {
 		return new Rectangle(x, y, wid, ht);
 	}
 
-
 	public boolean contains(Location p) {
 		return contains(p.getX(), p.getY(), 0);
 	}
@@ -103,10 +109,10 @@ public class Bounds {
 	public boolean contains(int px, int py) {
 		return contains(px, py, 0);
 	}
-	
+
 	public boolean contains(int px, int py, int allowedError) {
-		return px >= x - allowedError && px < x + wid + allowedError
-			&& py >= y - allowedError && py < y + ht + allowedError;
+		return px >= x - allowedError && px < x + wid + allowedError && py >= y - allowedError
+				&& py < y + ht + allowedError;
 	}
 
 	public boolean contains(int x, int y, int wid, int ht) {
@@ -142,8 +148,10 @@ public class Bounds {
 	}
 
 	public Bounds add(int x, int y) {
-		if (this == EMPTY_BOUNDS) return Bounds.create(x, y, 1, 1);
-		if (contains(x, y)) return this;
+		if (this == EMPTY_BOUNDS)
+			return Bounds.create(x, y, 1, 1);
+		if (contains(x, y))
+			return this;
 
 		int new_x = this.x;
 		int new_wid = this.wid;
@@ -167,7 +175,8 @@ public class Bounds {
 	}
 
 	public Bounds add(int x, int y, int wid, int ht) {
-		if (this == EMPTY_BOUNDS) return Bounds.create(x, y, wid, ht);
+		if (this == EMPTY_BOUNDS)
+			return Bounds.create(x, y, wid, ht);
 		int retX = Math.min(x, this.x);
 		int retY = Math.min(y, this.y);
 		int retWidth = Math.max(x + wid, this.x + this.wid) - retX;
@@ -180,8 +189,10 @@ public class Bounds {
 	}
 
 	public Bounds add(Bounds bd) {
-		if (this == EMPTY_BOUNDS) return bd;
-		if (bd == EMPTY_BOUNDS) return this;
+		if (this == EMPTY_BOUNDS)
+			return bd;
+		if (bd == EMPTY_BOUNDS)
+			return this;
 		int retX = Math.min(bd.x, this.x);
 		int retY = Math.min(bd.y, this.y);
 		int retWidth = Math.max(bd.x + bd.wid, this.x + this.wid) - retX;
@@ -196,14 +207,18 @@ public class Bounds {
 	}
 
 	public Bounds expand(int d) { // d pixels in each direction
-		if (this == EMPTY_BOUNDS) return this;
-		if (d == 0) return this;
+		if (this == EMPTY_BOUNDS)
+			return this;
+		if (d == 0)
+			return this;
 		return create(x - d, y - d, wid + 2 * d, ht + 2 * d);
 	}
 
 	public Bounds translate(int dx, int dy) {
-		if (this == EMPTY_BOUNDS) return this;
-		if (dx == 0 && dy == 0) return this;
+		if (this == EMPTY_BOUNDS)
+			return this;
+		if (dx == 0 && dy == 0)
+			return this;
 		return create(x + dx, y + dy, wid, ht);
 	}
 
@@ -211,9 +226,11 @@ public class Bounds {
 	// from direction and the returned bounds should face in the to direction.
 	public Bounds rotate(Direction from, Direction to, int xc, int yc) {
 		int degrees = to.toDegrees() - from.toDegrees();
-		while (degrees >= 360) degrees -= 360;
-		while (degrees < 0) degrees += 360;
-		
+		while (degrees >= 360)
+			degrees -= 360;
+		while (degrees < 0)
+			degrees += 360;
+
 		int dx = x - xc;
 		int dy = y - yc;
 		if (degrees == 90) {
@@ -226,7 +243,7 @@ public class Bounds {
 			return this;
 		}
 	}
-	
+
 	public Bounds intersect(Bounds other) {
 		int x0 = this.x;
 		int y0 = this.y;
@@ -236,10 +253,14 @@ public class Bounds {
 		int y2 = other.y;
 		int x3 = x2 + other.wid;
 		int y3 = y2 + other.ht;
-		if (x2 > x0) x0 = x2;
-		if (y2 > y0) y0 = y2;
-		if (x3 < x1) x1 = x3;
-		if (y3 < y1) y1 = y3;
+		if (x2 > x0)
+			x0 = x2;
+		if (y2 > y0)
+			y0 = y2;
+		if (x3 < x1)
+			x1 = x3;
+		if (y3 < y1)
+			y1 = y3;
 		if (x1 < x0 || y1 < y0) {
 			return EMPTY_BOUNDS;
 		} else {

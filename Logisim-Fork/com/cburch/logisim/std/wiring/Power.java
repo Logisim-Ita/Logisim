@@ -52,8 +52,7 @@ public class Power extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		return Bounds.create(0, -8, 15, 16)
-			.rotate(Direction.EAST, attrs.getValue(StdAttr.FACING), 0, 0);
+		return Bounds.create(0, -8, 15, 16).rotate(Direction.EAST, attrs.getValue(StdAttr.FACING), 0, 0);
 	}
 
 	@Override

@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.std.gates;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -28,7 +27,7 @@ class OddParityGate extends AbstractGate {
 	public void paintIconShaped(InstancePainter painter) {
 		paintIconRectangular(painter);
 	}
-	
+
 	@Override
 	public void paintIconRectangular(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
@@ -36,7 +35,7 @@ class OddParityGate extends AbstractGate {
 		g.drawRect(1, 2, 16, 16);
 		Font old = g.getFont();
 		g.setFont(old.deriveFont(9.0f));
-		GraphicsUtil.drawCenteredText(g, "2k", 9,  6);
+		GraphicsUtil.drawCenteredText(g, "2k", 9, 6);
 		GraphicsUtil.drawCenteredText(g, "+1", 9, 13);
 		g.setFont(old);
 	}
@@ -47,14 +46,12 @@ class OddParityGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height,
-			int inputs) {
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
 		paintRectangular(painter, width, height);
 	}
 
 	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs,
-			InstanceState state) {
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
 		return GateFunctions.computeOddParity(inputs, numInputs);
 	}
 
@@ -68,6 +65,8 @@ class OddParityGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.FALSE; }
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
 
 }

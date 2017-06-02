@@ -34,23 +34,16 @@ class MenuFile extends Menu implements ActionListener {
 	public MenuFile(LogisimMenuBar menubar) {
 		this.menubar = menubar;
 		openRecent = new OpenRecent(menubar);
-		
+
 		int menuMask = getToolkit().getMenuShortcutKeyMask();
 
-		newi.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_N, menuMask));
-		open.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_O, menuMask));
-		close.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_W, menuMask | InputEvent.SHIFT_MASK));
-		save.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_S, menuMask));
-		saveAs.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_S, menuMask | InputEvent.SHIFT_MASK));
-		print.setAccelerator(KeyStroke.getKeyStroke(
-			KeyEvent.VK_P, menuMask));
-		quit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, menuMask));
+		newi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuMask));
+		open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuMask));
+		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask | InputEvent.SHIFT_MASK));
+		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuMask));
+		saveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuMask | InputEvent.SHIFT_MASK));
+		print.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, menuMask));
+		quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuMask));
 
 		add(newi);
 		add(open);
@@ -108,7 +101,8 @@ class MenuFile extends Menu implements ActionListener {
 		setEnabled(true);
 		menubar.fireEnableChanged();
 	}
-	
+
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		Project proj = menubar.getProject();
@@ -121,7 +115,8 @@ class MenuFile extends Menu implements ActionListener {
 			if (frame.confirmClose()) {
 				frame.dispose();
 				OptionsFrame f = proj.getOptionsFrame(false);
-				if (f != null) f.dispose();
+				if (f != null)
+					f.dispose();
 			}
 		} else if (src == save) {
 			ProjectActions.doSave(proj);

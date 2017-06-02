@@ -12,7 +12,8 @@ import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.StringUtil;
 
 class OptionsActions {
-	private OptionsActions() { }
+	private OptionsActions() {
+	}
 
 	public static Action setAttribute(AttributeSet attrs, Attribute<?> attr, Object value) {
 		Object oldValue = attrs.getValue(attr);
@@ -22,24 +23,22 @@ class OptionsActions {
 			return null;
 		}
 	}
-	
-	public static Action setMapping(MouseMappings mm, Integer mods,
-			Tool tool) {
+
+	public static Action setMapping(MouseMappings mm, Integer mods, Tool tool) {
 		return new SetMapping(mm, mods, tool);
 	}
 
 	public static Action removeMapping(MouseMappings mm, Integer mods) {
 		return new RemoveMapping(mm, mods);
 	}
-	
+
 	private static class SetAction extends Action {
 		private AttributeSet attrs;
 		private Attribute<Object> attr;
 		private Object newval;
 		private Object oldval;
 
-		SetAction(AttributeSet attrs, Attribute<?> attr,
-				Object value) {
+		SetAction(AttributeSet attrs, Attribute<?> attr, Object value) {
 			@SuppressWarnings("unchecked")
 			Attribute<Object> a = (Attribute<Object>) attr;
 			this.attrs = attrs;
@@ -49,8 +48,7 @@ class OptionsActions {
 
 		@Override
 		public String getName() {
-			return StringUtil.format(Strings.get("setOptionAction"),
-				attr.getDisplayName());
+			return StringUtil.format(Strings.get("setOptionAction"), attr.getDisplayName());
 		}
 
 		@Override

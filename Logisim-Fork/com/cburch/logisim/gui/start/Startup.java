@@ -43,12 +43,15 @@ public class Startup {
 	private static Startup startupTemp = null;
 
 	static void doOpen(File file) {
-		if (startupTemp != null) startupTemp.doOpenFile(file);
+		if (startupTemp != null)
+			startupTemp.doOpenFile(file);
 	}
+
 	static void doPrint(File file) {
-		if (startupTemp != null) startupTemp.doPrintFile(file);
+		if (startupTemp != null)
+			startupTemp.doPrintFile(file);
 	}
-	
+
 	private void doOpenFile(File file) {
 		if (initialized) {
 			ProjectActions.doOpen(null, null, file);
@@ -66,13 +69,15 @@ public class Startup {
 			filesToPrint.add(file);
 		}
 	}
-	
+
 	private static void registerHandler() {
 		try {
 			Class<?> needed1 = Class.forName("com.apple.eawt.Application");
-			if (needed1 == null) return;
+			if (needed1 == null)
+				return;
 			Class<?> needed2 = Class.forName("com.apple.eawt.ApplicationAdapter");
-			if (needed2 == null) return;
+			if (needed2 == null)
+				return;
 			MacOsAdapter.register();
 			MacOsAdapter.addListeners(true);
 		} catch (ClassNotFoundException e) {
@@ -80,10 +85,11 @@ public class Startup {
 		} catch (Throwable t) {
 			try {
 				MacOsAdapter.addListeners(false);
-			} catch (Throwable t2) { }
+			} catch (Throwable t2) {
+			}
 		}
 	}
-	
+
 	// based on command line
 	boolean isTty;
 	private File templFile = null;
@@ -92,9 +98,9 @@ public class Startup {
 	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
 	private File loadFile;
-	private HashMap<File,File> substitutions = new HashMap<File,File>();
+	private HashMap<File, File> substitutions = new HashMap<File, File>();
 	private int ttyFormat = 0;
-	
+
 	// from other sources
 	private boolean initialized = false;
 	private SplashScreen monitor = null;
@@ -104,20 +110,20 @@ public class Startup {
 		this.isTty = isTty;
 		this.showSplash = !isTty;
 	}
-	
+
 	List<File> getFilesToOpen() {
 		return filesToOpen;
 	}
-	
+
 	File getLoadFile() {
 		return loadFile;
 	}
-	
+
 	int getTtyFormat() {
 		return ttyFormat;
 	}
-	
-	Map<File,File> getSubstitutions() {
+
+	Map<File, File> getSubstitutions() {
 		return Collections.unmodifiableMap(substitutions);
 	}
 
@@ -132,7 +138,7 @@ public class Startup {
 				return;
 			}
 		}
-		
+
 		// kick off the progress monitor
 		// (The values used for progress values are based on a single run where
 		// I loaded a large file.)
@@ -145,25 +151,27 @@ public class Startup {
 				showSplash = false;
 			}
 		}
-		
+
 		// pre-load the two basic component libraries, just so that the time
 		// taken is shown separately in the progress bar.
-		if (showSplash) monitor.setProgress(SplashScreen.LIBRARIES);
+		if (showSplash)
+			monitor.setProgress(SplashScreen.LIBRARIES);
 		Loader templLoader = new Loader(monitor);
 		int count = templLoader.getBuiltin().getLibrary("Base").getTools().size()
-			 + templLoader.getBuiltin().getLibrary("Gates").getTools().size();
+				+ templLoader.getBuiltin().getLibrary("Gates").getTools().size();
 		if (count < 0) {
 			// this will never happen, but the optimizer doesn't know that...
-			System.err.println("FATAL ERROR - no components"); //OK
+			System.err.println("FATAL ERROR - no components"); // OK
 			System.exit(-1);
 		}
 
 		// load in template
 		loadTemplate(templLoader, templFile, templEmpty);
-		
+
 		// now that the splash screen is almost gone, we do some last-minute
 		// interface initialization
-		if (showSplash) monitor.setProgress(SplashScreen.GUI_INIT);
+		if (showSplash)
+			monitor.setProgress(SplashScreen.GUI_INIT);
 		WindowManagers.initialize();
 		if (MacCompatibility.isSwingUsingScreenMenuBar()) {
 			MacCompatibility.setFramelessJMenuBar(new LogisimMenuBar(null, null));
@@ -177,23 +185,25 @@ public class Startup {
 		// if user has double-clicked a file to open, we'll
 		// use that as the file to open now.
 		initialized = true;
-		
+
 		// load file
 		if (filesToOpen.isEmpty()) {
 			ProjectActions.doNew(monitor, true);
-			if (showSplash) monitor.close();
+			if (showSplash)
+				monitor.close();
 		} else {
 			boolean first = true;
 			for (File fileToOpen : filesToOpen) {
 				try {
 					ProjectActions.doOpen(monitor, fileToOpen, substitutions);
 				} catch (LoadFailedException ex) {
-					System.err.println(fileToOpen.getName() + ": " + ex.getMessage()); //OK
+					System.err.println(fileToOpen.getName() + ": " + ex.getMessage()); // OK
 					System.exit(-1);
 				}
 				if (first) {
 					first = false;
-					if (showSplash) monitor.close();
+					if (showSplash)
+						monitor.close();
 					monitor = null;
 				}
 			}
@@ -212,17 +222,17 @@ public class Startup {
 				return;
 			}
 		}
-		System.err.println(Strings.get("invalidLocaleError")); //OK
-		System.err.println(Strings.get("invalidLocaleOptionsHeader")); //OK
+		System.err.println(Strings.get("invalidLocaleError")); // OK
+		System.err.println(Strings.get("invalidLocaleOptionsHeader")); // OK
 		for (int i = 0; i < opts.length; i++) {
-			System.err.println("   " + opts[i].toString()); //OK
+			System.err.println("   " + opts[i].toString()); // OK
 		}
 		System.exit(-1);
 	}
 
-	private void loadTemplate(Loader loader, File templFile,
-			boolean templEmpty) {
-		if (showSplash) monitor.setProgress(SplashScreen.TEMPLATE_OPEN);
+	private void loadTemplate(Loader loader, File templFile, boolean templEmpty) {
+		if (showSplash)
+			monitor.setProgress(SplashScreen.TEMPLATE_OPEN);
 		if (templFile != null) {
 			AppPreferences.setTemplateFile(templFile);
 			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_CUSTOM);
@@ -232,7 +242,7 @@ public class Startup {
 			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_PLAIN);
 		}
 	}
-	
+
 	public static Startup parseArgs(String[] args) {
 		// see whether we'll be using any graphics
 		boolean isTty = false;
@@ -244,31 +254,32 @@ public class Startup {
 				isClearPreferences = true;
 			}
 		}
-		
+
 		if (!isTty) {
 			// we're using the GUI: Set up the Look&Feel to match the platform
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Logisim");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			
+
 			LocaleManager.setReplaceAccents(false);
-	
+
 			// Initialize graphics acceleration if appropriate
 			AppPreferences.handleGraphicsAcceleration();
 		}
-		
+
 		Startup ret = new Startup(isTty);
 		startupTemp = ret;
 		if (!isTty) {
 			registerHandler();
 		}
-		
+
 		if (isClearPreferences) {
 			AppPreferences.clear();
 		}
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) { }
+		} catch (Exception ex) {
+		}
 
 		// parse arguments
 		for (int i = 0; i < args.length; i++) {
@@ -278,7 +289,7 @@ public class Startup {
 					i++;
 					String[] fmts = args[i].split(",");
 					if (fmts.length == 0) {
-						System.err.println(Strings.get("ttyFormatError")); //OK
+						System.err.println(Strings.get("ttyFormatError")); // OK
 					}
 					for (int j = 0; j < fmts.length; j++) {
 						String fmt = fmts[j].trim();
@@ -293,11 +304,11 @@ public class Startup {
 						} else if (fmt.equals("stats")) {
 							ret.ttyFormat |= TtyInterface.FORMAT_STATISTICS;
 						} else {
-							System.err.println(Strings.get("ttyFormatError")); //OK
+							System.err.println(Strings.get("ttyFormatError")); // OK
 						}
 					}
 				} else {
-					System.err.println(Strings.get("ttyFormatError")); //OK
+					System.err.println(Strings.get("ttyFormatError")); // OK
 					return null;
 				}
 			} else if (arg.equals("-sub")) {
@@ -305,84 +316,88 @@ public class Startup {
 					File a = new File(args[i + 1]);
 					File b = new File(args[i + 2]);
 					if (ret.substitutions.containsKey(a)) {
-						System.err.println(Strings.get("argDuplicateSubstitutionError")); //OK
+						System.err.println(Strings.get("argDuplicateSubstitutionError")); // OK
 						return null;
 					} else {
 						ret.substitutions.put(a, b);
 						i += 2;
 					}
 				} else {
-					System.err.println(Strings.get("argTwoSubstitutionError")); //OK
+					System.err.println(Strings.get("argTwoSubstitutionError")); // OK
 					return null;
 				}
 			} else if (arg.equals("-load")) {
 				if (i + 1 < args.length) {
 					i++;
 					if (ret.loadFile != null) {
-						System.err.println(Strings.get("loadMultipleError")); //OK
+						System.err.println(Strings.get("loadMultipleError")); // OK
 					}
 					File f = new File(args[i]);
 					ret.loadFile = f;
 				} else {
-					System.err.println(Strings.get("loadNeedsFileError")); //OK
+					System.err.println(Strings.get("loadNeedsFileError")); // OK
 					return null;
 				}
 			} else if (arg.equals("-empty")) {
 				if (ret.templFile != null || ret.templEmpty || ret.templPlain) {
-					System.err.println(Strings.get("argOneTemplateError")); //OK
+					System.err.println(Strings.get("argOneTemplateError")); // OK
 					return null;
 				}
 				ret.templEmpty = true;
 			} else if (arg.equals("-plain")) {
 				if (ret.templFile != null || ret.templEmpty || ret.templPlain) {
-					System.err.println(Strings.get("argOneTemplateError")); //OK
+					System.err.println(Strings.get("argOneTemplateError")); // OK
 					return null;
 				}
 				ret.templPlain = true;
 			} else if (arg.equals("-version")) {
-				System.out.println(Main.VERSION_NAME); //OK
+				System.out.println(Main.VERSION_NAME); // OK
 				return null;
 			} else if (arg.equals("-gates")) {
 				i++;
-				if (i >= args.length) printUsage();
+				if (i >= args.length)
+					printUsage();
 				String a = args[i];
 				if (a.equals("shaped")) {
 					AppPreferences.GATE_SHAPE.set(AppPreferences.SHAPE_SHAPED);
 				} else if (a.equals("rectangular")) {
 					AppPreferences.GATE_SHAPE.set(AppPreferences.SHAPE_RECTANGULAR);
 				} else {
-					System.err.println(Strings.get("argGatesOptionError")); //OK
+					System.err.println(Strings.get("argGatesOptionError")); // OK
 					System.exit(-1);
 				}
 			} else if (arg.equals("-locale")) {
 				i++;
-				if (i >= args.length) printUsage();
+				if (i >= args.length)
+					printUsage();
 				setLocale(args[i]);
 			} else if (arg.equals("-accents")) {
 				i++;
-				if (i >= args.length) printUsage();
+				if (i >= args.length)
+					printUsage();
 				String a = args[i];
 				if (a.equals("yes")) {
 					AppPreferences.ACCENTS_REPLACE.setBoolean(false);
 				} else if (a.equals("no")) {
 					AppPreferences.ACCENTS_REPLACE.setBoolean(true);
 				} else {
-					System.err.println(Strings.get("argAccentsOptionError")); //OK
+					System.err.println(Strings.get("argAccentsOptionError")); // OK
 					System.exit(-1);
 				}
 			} else if (arg.equals("-template")) {
 				if (ret.templFile != null || ret.templEmpty || ret.templPlain) {
-					System.err.println(Strings.get("argOneTemplateError")); //OK
+					System.err.println(Strings.get("argOneTemplateError")); // OK
 					return null;
 				}
 				i++;
-				if (i >= args.length) printUsage();
+				if (i >= args.length)
+					printUsage();
 				ret.templFile = new File(args[i]);
 				if (!ret.templFile.exists()) {
-					System.err.println(StringUtil.format( //OK
+					System.err.println(StringUtil.format( // OK
 							Strings.get("templateMissingError"), args[i]));
 				} else if (!ret.templFile.canRead()) {
-					System.err.println(StringUtil.format( //OK
+					System.err.println(StringUtil.format( // OK
 							Strings.get("templateCannotReadError"), args[i]));
 				}
 			} else if (arg.equals("-nosplash")) {
@@ -401,44 +416,46 @@ public class Startup {
 			}
 		}
 		if (ret.isTty && ret.filesToOpen.isEmpty()) {
-			System.err.println(Strings.get("ttyNeedsFileError")); //OK
+			System.err.println(Strings.get("ttyNeedsFileError")); // OK
 			return null;
 		}
 		if (ret.loadFile != null && !ret.isTty) {
-			System.err.println(Strings.get("loadNeedsTtyError")); //OK
+			System.err.println(Strings.get("loadNeedsTtyError")); // OK
 			return null;
 		}
 		return ret;
 	}
 
 	private static void printUsage() {
-		System.err.println(StringUtil.format(Strings.get("argUsage"), Startup.class.getName())); //OK
-		System.err.println(); //OK
-		System.err.println(Strings.get("argOptionHeader")); //OK
-		System.err.println("   " + Strings.get("argAccentsOption")); //OK
-		System.err.println("   " + Strings.get("argClearOption")); //OK
-		System.err.println("   " + Strings.get("argEmptyOption")); //OK
-		System.err.println("   " + Strings.get("argGatesOption")); //OK
-		System.err.println("   " + Strings.get("argHelpOption")); //OK
-		System.err.println("   " + Strings.get("argLoadOption")); //OK
-		System.err.println("   " + Strings.get("argLocaleOption")); //OK
-		System.err.println("   " + Strings.get("argNoSplashOption")); //OK
-		System.err.println("   " + Strings.get("argPlainOption")); //OK
-		System.err.println("   " + Strings.get("argSubOption")); //OK
-		System.err.println("   " + Strings.get("argTemplateOption")); //OK
-		System.err.println("   " + Strings.get("argTtyOption")); //OK
-		System.err.println("   " + Strings.get("argVersionOption")); //OK
+		System.err.println(StringUtil.format(Strings.get("argUsage"), Startup.class.getName())); // OK
+		System.err.println(); // OK
+		System.err.println(Strings.get("argOptionHeader")); // OK
+		System.err.println("   " + Strings.get("argAccentsOption")); // OK
+		System.err.println("   " + Strings.get("argClearOption")); // OK
+		System.err.println("   " + Strings.get("argEmptyOption")); // OK
+		System.err.println("   " + Strings.get("argGatesOption")); // OK
+		System.err.println("   " + Strings.get("argHelpOption")); // OK
+		System.err.println("   " + Strings.get("argLoadOption")); // OK
+		System.err.println("   " + Strings.get("argLocaleOption")); // OK
+		System.err.println("   " + Strings.get("argNoSplashOption")); // OK
+		System.err.println("   " + Strings.get("argPlainOption")); // OK
+		System.err.println("   " + Strings.get("argSubOption")); // OK
+		System.err.println("   " + Strings.get("argTemplateOption")); // OK
+		System.err.println("   " + Strings.get("argTtyOption")); // OK
+		System.err.println("   " + Strings.get("argVersionOption")); // OK
 		System.exit(-1);
 	}
+
 	/**
 	 * Auto-update Logisim if a new version is available
 	 * 
 	 * Original idea taken from logisim-evolution:
 	 * https://github.com/reds-heig/logisim-evolution
+	 * 
 	 * @return true if the code has been updated, and therefore the execution
 	 *         has to be stopped, false otherwise
 	 */
-	public boolean autoUpdate(boolean FromMenu) { //from "check version" = 1
+	public boolean autoUpdate(boolean FromMenu) { // from "check version" = 1
 		if (!Main.UPDATE || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line, or network connection not
 			// available
@@ -454,88 +471,70 @@ public class Startup {
 			conn = xmlURL.openConnection();
 			in = conn.getInputStream();
 		} catch (MalformedURLException e) {
-			System.err
-					.println("The URL of the XML file for the auto-updater is malformed.");
-			System.err
-					.println("Please report this error to the software maintainer");
+			System.err.println("The URL of the XML file for the auto-updater is malformed.");
+			System.err.println("Please report this error to the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
-			return (false);		
+			return (false);
 		} catch (IOException e) {
-			System.err
-					.println("Although an Internet connection should be available, the system couldn't connect to the URL requested by the auto-updater");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println(
+					"Although an Internet connection should be available, the system couldn't connect to the URL requested by the auto-updater");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 		ArgonXML logisimData = new ArgonXML(in, "logisim");
 
 		// Get the appropriate remote version number
-		LogisimVersion remoteVersion = LogisimVersion.parse(Main.VERSION
-				.isJar() ? logisimData.child("jar_version").content()
-				: logisimData.child("exe_version").content());
+		LogisimVersion remoteVersion = LogisimVersion.parse(Main.VERSION.isJar()
+				? logisimData.child("jar_version").content() : logisimData.child("exe_version").content());
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
-						
+
 			String changelog = logisimData.child("changelog").content();
 			int answer = JOptionPane.showConfirmDialog(null,
-					StringUtil.format(Strings.get("UpdateMessage"),remoteVersion.toString(),changelog),
-					Strings.get("Update"), JOptionPane.YES_NO_OPTION,
-					JOptionPane.INFORMATION_MESSAGE);
+					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(), changelog),
+					Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
 			if (answer == 1) {
 				// User refused to update -- we just hope he gets sufficiently
 				// annoyed by the message that he finally updates!
 				return (false);
 			}
-			
+
 			// Obtain the base directory of the archive
-			CodeSource codeSource = Startup.class.getProtectionDomain()
-					.getCodeSource();
+			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();
 			File jarFile = null;
 			try {
 				jarFile = new File(codeSource.getLocation().toURI().getPath());
 			} catch (URISyntaxException e) {
-				System.err
-						.println("Error in the syntax of the URI for the path of the executed Logisim file!");
+				System.err.println("Error in the syntax of the URI for the path of the executed Logisim file!");
 				e.printStackTrace();
-				JOptionPane
-						.showMessageDialog(
-								null,
-								"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
-								"Update failed", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
+						"Update failed", JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
 
 			// Get the appropriate remote filename to download
-			String remoteJar = Main.VERSION.isJar() ? logisimData.child(
-					"jar_file").content() : logisimData.child(
-					"exe_file").content();
+			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
+					: logisimData.child("exe_file").content();
 
-			boolean updateOk = downloadInstallUpdatedVersion(remoteJar,
-					jarFile.getAbsolutePath());
+			boolean updateOk = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
 			if (updateOk) {
-				JOptionPane
-						.showMessageDialog(
-								null,
-								StringUtil.format(Strings.get("UpdateSucceededMessage"),remoteVersion.toString()),
-								Strings.get("UpdateSucceeded"),
-								JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						StringUtil.format(Strings.get("UpdateSucceededMessage"), remoteVersion.toString()),
+						Strings.get("UpdateSucceeded"), JOptionPane.INFORMATION_MESSAGE);
 				return (true);
 			} else {
-				JOptionPane
-						.showMessageDialog(
-								null,
-								Strings.get("UpdateFailedMessage"),
-								Strings.get("UpdateFailed"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailedMessage"), Strings.get("UpdateFailed"),
+						JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
-		} else if(FromMenu){
-			JOptionPane.showMessageDialog(null,Strings.get("NoUpdates"),
-								Strings.get("Update"),
-								JOptionPane.INFORMATION_MESSAGE);
+		} else if (FromMenu) {
+			JOptionPane.showMessageDialog(null, Strings.get("NoUpdates"), Strings.get("Update"),
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 		return (false);
 	}
@@ -556,16 +555,13 @@ public class Startup {
 	 *         otherwise
 	 * @throws IOException
 	 */
-	private boolean downloadInstallUpdatedVersion(String filePath,
-			String destination) {
+	private boolean downloadInstallUpdatedVersion(String filePath, String destination) {
 		URL fileURL;
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
-			System.err
-					.println("The URL of the requested update file is malformed.");
-			System.err
-					.println("Please report this error to the software maintainer.");
+			System.err.println("The URL of the requested update file is malformed.");
+			System.err.println("Please report this error to the software maintainer.");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -573,10 +569,9 @@ public class Startup {
 		try {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
-			System.err
-					.println("Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println(
+					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -584,10 +579,8 @@ public class Startup {
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
-			System.err
-					.println("Cannot retrieve the file containing the updated version.");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println("Cannot retrieve the file containing the updated version.");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -598,8 +591,7 @@ public class Startup {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
 			System.err.println("Cannot get remote file stream.");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -615,8 +607,7 @@ public class Startup {
 		// Download remote content
 		try {
 			while (deplacement < length) {
-				currentBit = is.read(data, deplacement, data.length
-						- deplacement);
+				currentBit = is.read(data, deplacement, data.length - deplacement);
 
 				if (currentBit == -1) {
 					// Reached EOF
@@ -625,10 +616,8 @@ public class Startup {
 				deplacement += currentBit;
 			}
 		} catch (IOException e) {
-			System.err
-					.println("An error occured while retrieving remote file (remote peer hung up).");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println("An error occured while retrieving remote file (remote peer hung up).");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -636,17 +625,15 @@ public class Startup {
 		try {
 			is.close();
 		} catch (IOException e) {
-			System.err
-					.println("Error encountered while closing the remote stream!");
+			System.err.println("Error encountered while closing the remote stream!");
 			e.printStackTrace();
 		}
 
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
-			System.err
-					.println("An error occured while retrieving remote file (local size != remote size), download corrupted.");
-			System.err
-					.println("If the error persist, please contact the software maintainer");
+			System.err.println(
+					"An error occured while retrieving remote file (local size != remote size), download corrupted.");
+			System.err.println("If the error persist, please contact the software maintainer");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -656,8 +643,7 @@ public class Startup {
 		try {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
-			System.err
-					.println("An error occured while opening the local Jar file.");
+			System.err.println("An error occured while opening the local Jar file.");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
@@ -665,19 +651,17 @@ public class Startup {
 			destinationFile.write(data);
 			destinationFile.flush();
 		} catch (IOException e) {
-			System.err
-					.println("An error occured while writing to the local Jar file.");
+			System.err.println("An error occured while writing to the local Jar file.");
 			System.err.println("-- AUTO-UPDATE ABORTED --");
-			System.err
-					.println("The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+			System.err.println(
+					"The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 		} finally {
 			try {
 				destinationFile.close();
 			} catch (IOException e) {
-				System.err
-						.println("Error encountered while closing the local destination file!");
-				System.err
-						.println("The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+				System.err.println("Error encountered while closing the local destination file!");
+				System.err.println(
+						"The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 				return (false);
 			}
 		}
@@ -703,8 +687,7 @@ public class Startup {
 			uC.connect();
 			return (true);
 		} catch (MalformedURLException e) {
-			System.err
-					.println("The URL used to check the connectivity is malformed -- no Google?");
+			System.err.println("The URL used to check the connectivity is malformed -- no Google?");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// If we get here, the connection somehow failed

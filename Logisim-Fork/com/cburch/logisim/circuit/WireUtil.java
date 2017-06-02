@@ -11,7 +11,8 @@ import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Location;
 
 public class WireUtil {
-	private WireUtil() { }
+	private WireUtil() {
+	}
 
 	static CircuitPoints computeCircuitPoints(Collection<? extends Component> components) {
 		CircuitPoints points = new CircuitPoints();
@@ -23,11 +24,12 @@ public class WireUtil {
 
 	// Merge all parallel endpoint-to-endpoint wires within the given set.
 	public static Collection<? extends Component> mergeExclusive(Collection<? extends Component> toMerge) {
-		if (toMerge.size() <= 1) return toMerge;
-		
+		if (toMerge.size() <= 1)
+			return toMerge;
+
 		HashSet<Component> ret = new HashSet<Component>(toMerge);
 		CircuitPoints points = computeCircuitPoints(toMerge);
-		
+
 		HashSet<Wire> wires = new HashSet<Wire>();
 		for (Location loc : points.getSplitLocations()) {
 			Collection<? extends Component> at = points.getComponents(loc);
@@ -46,7 +48,7 @@ public class WireUtil {
 			}
 		}
 		points = null;
-		
+
 		ret.removeAll(wires);
 		while (!wires.isEmpty()) {
 			Iterator<Wire> it = wires.iterator();
@@ -57,7 +59,7 @@ public class WireUtil {
 			boolean found;
 			do {
 				found = false;
-				for (it = wires.iterator(); it.hasNext(); ) {
+				for (it = wires.iterator(); it.hasNext();) {
 					Wire cand = it.next();
 					if (cand.e0.equals(e1)) {
 						e1 = cand.e1;
@@ -72,7 +74,7 @@ public class WireUtil {
 			} while (found);
 			ret.add(Wire.create(e0, e1));
 		}
-		
+
 		return ret;
 	}
 }

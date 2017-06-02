@@ -17,29 +17,26 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
 
 class SplitterAttributes extends AbstractAttributeSet {
-	public static final AttributeOption APPEAR_LEGACY
-		= new AttributeOption("legacy", Strings.getter("splitterAppearanceLegacy"));
-	public static final AttributeOption APPEAR_LEFT
-		= new AttributeOption("left", Strings.getter("splitterAppearanceLeft"));
-	public static final AttributeOption APPEAR_RIGHT
-		= new AttributeOption("right", Strings.getter("splitterAppearanceRight"));
-	public static final AttributeOption APPEAR_CENTER
-		= new AttributeOption("center", Strings.getter("splitterAppearanceCenter"));
-	
-	public static final Attribute<AttributeOption> ATTR_APPEARANCE
-		= Attributes.forOption("appear", Strings.getter("splitterAppearanceAttr"),
-				new AttributeOption[] { APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER,
-					APPEAR_LEGACY});
-	
-	public static final Attribute<BitWidth> ATTR_WIDTH
-		= Attributes.forBitWidth("incoming", Strings.getter("splitterBitWidthAttr"));
-	public static final Attribute<Integer> ATTR_FANOUT
-		= Attributes.forIntegerRange("fanout", Strings.getter("splitterFanOutAttr"), 1, 32);
+	public static final AttributeOption APPEAR_LEGACY = new AttributeOption("legacy",
+			Strings.getter("splitterAppearanceLegacy"));
+	public static final AttributeOption APPEAR_LEFT = new AttributeOption("left",
+			Strings.getter("splitterAppearanceLeft"));
+	public static final AttributeOption APPEAR_RIGHT = new AttributeOption("right",
+			Strings.getter("splitterAppearanceRight"));
+	public static final AttributeOption APPEAR_CENTER = new AttributeOption("center",
+			Strings.getter("splitterAppearanceCenter"));
 
-	private static final List<Attribute<?>> INIT_ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE,
-		});
+	public static final Attribute<AttributeOption> ATTR_APPEARANCE = Attributes.forOption("appear",
+			Strings.getter("splitterAppearanceAttr"),
+			new AttributeOption[] { APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER, APPEAR_LEGACY });
+
+	public static final Attribute<BitWidth> ATTR_WIDTH = Attributes.forBitWidth("incoming",
+			Strings.getter("splitterBitWidthAttr"));
+	public static final Attribute<Integer> ATTR_FANOUT = Attributes.forIntegerRange("fanout",
+			Strings.getter("splitterFanOutAttr"), 1, 32);
+
+	private static final List<Attribute<?>> INIT_ATTRIBUTES = Arrays
+			.asList(new Attribute<?>[] { StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE, });
 
 	private static final String unchosen_val = "none";
 
@@ -85,11 +82,11 @@ class SplitterAttributes extends AbstractAttributeSet {
 			this.which = which;
 			this.options = options;
 		}
-		
+
 		private BitOutAttribute createCopy() {
 			return new BitOutAttribute(which, options);
 		}
-		
+
 		public Object getDefault() {
 			return Integer.valueOf(which + 1);
 		}
@@ -132,9 +129,9 @@ class SplitterAttributes extends AbstractAttributeSet {
 	private SplitterParameters parameters;
 	AttributeOption appear = APPEAR_LEFT;
 	Direction facing = Direction.EAST;
-	byte fanout = 2;                 // number of ends this splits into
-	byte[] bit_end = new byte[2];    // how each bit maps to an end (0 if nowhere);
-									 //   other values will be between 1 and fanout
+	byte fanout = 2; // number of ends this splits into
+	byte[] bit_end = new byte[2]; // how each bit maps to an end (0 if nowhere);
+									// other values will be between 1 and fanout
 	BitOutOption[] options = null;
 
 	SplitterAttributes() {
@@ -142,7 +139,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		configureDefaults();
 		parameters = new SplitterParameters(this);
 	}
-	
+
 	Attribute<?> getBitOutAttribute(int index) {
 		return attrs.get(INIT_ATTRIBUTES.size() + index);
 	}
@@ -164,7 +161,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		dest.bit_end = this.bit_end.clone();
 		dest.options = this.options;
 	}
-	
+
 	public SplitterParameters getParameters() {
 		SplitterParameters ret = parameters;
 		if (ret == null) {
@@ -208,7 +205,8 @@ class SplitterAttributes extends AbstractAttributeSet {
 			int newValue = ((Integer) value).intValue();
 			byte[] bits = bit_end;
 			for (int i = 0; i < bits.length; i++) {
-				if (bits[i] >= newValue) bits[i] = (byte) (newValue - 1);
+				if (bits[i] >= newValue)
+					bits[i] = (byte) (newValue - 1);
 			}
 			fanout = (byte) newValue;
 			configureOptions();
@@ -228,7 +226,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			if (value instanceof Integer) {
 				val = ((Integer) value).intValue();
 			} else {
-				val= ((BitOutOption) value).value + 1;
+				val = ((BitOutOption) value).value + 1;
 			}
 			if (val >= 0 && val <= fanout) {
 				bit_end[bitOutAttr.which] = (byte) val;
@@ -255,7 +253,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			attr.options = options;
 		}
 	}
-	
+
 	private void configureDefaults() {
 		int offs = INIT_ATTRIBUTES.size();
 		int curNum = attrs.size() - offs;
@@ -264,7 +262,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		byte[] dflt = computeDistribution(fanout, bit_end.length, 1);
 
 		boolean changed = curNum != bit_end.length;
-		
+
 		// remove excess attributes
 		while (curNum > bit_end.length) {
 			curNum--;
@@ -286,15 +284,17 @@ class SplitterAttributes extends AbstractAttributeSet {
 			bit_end[i] = dflt[i];
 			attrs.add(attr);
 		}
-		
-		if (changed) fireAttributeListChanged();
+
+		if (changed)
+			fireAttributeListChanged();
 	}
-	
+
 	static byte[] computeDistribution(int fanout, int bits, int order) {
 		byte[] ret = new byte[bits];
 		if (order >= 0) {
 			if (fanout >= bits) {
-				for (int i = 0; i < bits; i++) ret[i] = (byte) (i + 1);
+				for (int i = 0; i < bits; i++)
+					ret[i] = (byte) (i + 1);
 			} else {
 				int threads_per_end = bits / fanout;
 				int ends_with_extra = bits % fanout;
@@ -315,7 +315,8 @@ class SplitterAttributes extends AbstractAttributeSet {
 			}
 		} else {
 			if (fanout >= bits) {
-				for (int i = 0; i < bits; i++) ret[i] = (byte) (fanout - i);
+				for (int i = 0; i < bits; i++)
+					ret[i] = (byte) (fanout - i);
 			} else {
 				int threads_per_end = bits / fanout;
 				int ends_with_extra = bits % fanout;

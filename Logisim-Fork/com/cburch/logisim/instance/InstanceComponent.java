@@ -45,9 +45,8 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	private AttributeSet attrs;
 	private boolean attrListenRequested;
 	private InstanceTextField textField;
-	
-	InstanceComponent(InstanceFactory factory, Location loc,
-			AttributeSet attrs) {
+
+	InstanceComponent(InstanceFactory factory, Location loc, AttributeSet attrs) {
 		this.listeners = null;
 		this.factory = factory;
 		this.instance = new Instance(this);
@@ -62,7 +61,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 
 		computeEnds();
 	}
-	
+
 	private void computeEnds() {
 		List<Port> ports = portList;
 		EndData[] esOld = endArray;
@@ -85,7 +84,8 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 			EndData oldEnd = i < esOldLength ? esOld[i] : null;
 			EndData newEnd = p == null ? null : p.toEnd(loc, attrs);
 			if (oldEnd == null || !oldEnd.equals(newEnd)) {
-				if (newEnd != null) es[i] = newEnd;
+				if (newEnd != null)
+					es[i] = newEnd;
 				if (endsChangedOld == null) {
 					endsChangedOld = new ArrayList<EndData>();
 					endsChangedNew = new ArrayList<EndData>();
@@ -93,7 +93,7 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 				endsChangedOld.add(oldEnd);
 				endsChangedNew.add(newEnd);
 			}
-			
+
 			if (p != null) {
 				Attribute<BitWidth> attr = p.getWidthAttribute();
 				if (attr != null) {
@@ -102,8 +102,9 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 					}
 					wattrs.add(attr);
 				}
-				
-				if (p.getToolTip() != null) toolTipFound = true;
+
+				if (p.getToolTip() != null)
+					toolTipFound = true;
 			}
 		}
 		if (!attrListenRequested) {
@@ -124,10 +125,11 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 			fireEndsChanged(endsChangedOld, endsChangedNew);
 		}
 	}
-	
+
 	//
 	// listening methods
 	//
+	@Override
 	public void addComponentListener(ComponentListener l) {
 		EventSourceWeakSupport<ComponentListener> ls = listeners;
 		if (ls == null) {
@@ -139,31 +141,34 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 		}
 	}
 
+	@Override
 	public void removeComponentListener(ComponentListener l) {
 		if (listeners != null) {
 			listeners.remove(l);
-			if (listeners.isEmpty()) listeners = null;
+			if (listeners.isEmpty())
+				listeners = null;
 		}
 	}
-	
-	private void fireEndsChanged(ArrayList<EndData> oldEnds,
-			ArrayList<EndData> newEnds) {
+
+	private void fireEndsChanged(ArrayList<EndData> oldEnds, ArrayList<EndData> newEnds) {
 		EventSourceWeakSupport<ComponentListener> ls = listeners;
 		if (ls != null) {
 			ComponentEvent e = null;
 			for (ComponentListener l : ls) {
-				if (e == null) e = new ComponentEvent(this, oldEnds, newEnds);
+				if (e == null)
+					e = new ComponentEvent(this, oldEnds, newEnds);
 				l.endChanged(e);
 			}
 		}
 	}
-	
+
 	void fireInvalidated() {
 		EventSourceWeakSupport<ComponentListener> ls = listeners;
 		if (ls != null) {
 			ComponentEvent e = null;
 			for (ComponentListener l : ls) {
-				if (e == null) e = new ComponentEvent(this);
+				if (e == null)
+					e = new ComponentEvent(this);
 				l.componentInvalidated(e);
 			}
 		}
@@ -172,24 +177,29 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	//
 	// basic information methods
 	//
+	@Override
 	public ComponentFactory getFactory() {
 		return factory;
 	}
 
+	@Override
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
 
+	@Override
 	public Object getFeature(Object key) {
 		Object ret = factory.getInstanceFeature(instance, key);
 		if (ret != null) {
 			return ret;
 		} else if (key == ToolTipMaker.class) {
 			Object defaultTip = factory.getDefaultToolTip();
-			if (hasToolTips || defaultTip != null) return this;
+			if (hasToolTips || defaultTip != null)
+				return this;
 		} else if (key == TextEditable.class) {
 			InstanceTextField field = textField;
-			if (field != null) return field;
+			if (field != null)
+				return field;
 		}
 		return null;
 	}
@@ -197,52 +207,65 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	//
 	// location/extent methods
 	//
+	@Override
 	public Location getLocation() {
 		return loc;
 	}
-	
+
+	@Override
 	public Bounds getBounds() {
 		return bounds;
 	}
 
+	@Override
 	public Bounds getBounds(Graphics g) {
 		Bounds ret = bounds;
 		InstanceTextField field = textField;
-		if (field != null) ret = ret.add(field.getBounds(g));
+		if (field != null)
+			ret = ret.add(field.getBounds(g));
 		return ret;
 	}
 
+	@Override
 	public boolean contains(Location pt) {
 		Location translated = pt.translate(-loc.getX(), -loc.getY());
 		InstanceFactory factory = instance.getFactory();
 		return factory.contains(translated, instance.getAttributeSet());
 	}
-	
+
+	@Override
 	public boolean contains(Location pt, Graphics g) {
 		InstanceTextField field = textField;
-		if (field != null && field.getBounds(g).contains(pt)) return true;
-		else return contains(pt);
+		if (field != null && field.getBounds(g).contains(pt))
+			return true;
+		else
+			return contains(pt);
 	}
-	
+
 	//
 	// propagation methods
 	//
+	@Override
 	public List<EndData> getEnds() {
 		return endList;
 	}
 
+	@Override
 	public EndData getEnd(int index) {
 		return endArray[index];
 	}
 
+	@Override
 	public boolean endsAt(Location pt) {
 		EndData[] ends = endArray;
 		for (int i = 0; i < ends.length; i++) {
-			if (ends[i].getLocation().equals(pt)) return true;
+			if (ends[i].getLocation().equals(pt))
+				return true;
 		}
 		return false;
 	}
 
+	@Override
 	public void propagate(CircuitState state) {
 		factory.propagate(state.getInstanceState(this));
 	}
@@ -250,17 +273,20 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	//
 	// drawing methods
 	//
+	@Override
 	public void draw(ComponentDrawContext context) {
 		InstancePainter painter = context.getInstancePainter();
 		painter.setInstance(this);
 		factory.paintInstance(painter);
 	}
 
+	@Override
 	public void expose(ComponentDrawContext context) {
 		Bounds b = bounds;
 		context.getDestination().repaint(b.getX(), b.getY(), b.getWidth(), b.getHeight());
 	}
-	
+
+	@Override
 	public String getToolTip(ComponentUserEvent e) {
 		int x = e.getX();
 		int y = e.getY();
@@ -279,22 +305,27 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	//
 	// AttributeListener methods
 	//
-	public void attributeListChanged(AttributeEvent e) { }
+	@Override
+	public void attributeListChanged(AttributeEvent e) {
+	}
 
+	@Override
 	public void attributeValueChanged(AttributeEvent e) {
 		Attribute<?> attr = e.getAttribute();
-		if (widthAttrs != null && widthAttrs.contains(attr)) computeEnds();
+		if (widthAttrs != null && widthAttrs.contains(attr))
+			computeEnds();
 		if (attrListenRequested) {
 			factory.instanceAttributeChanged(instance, e.getAttribute());
 		}
 	}
-	
+
 	//
 	// methods for InstancePainter
 	//
 	void drawLabel(ComponentDrawContext context) {
 		InstanceTextField field = textField;
-		if (field != null) field.draw(this, context);
+		if (field != null)
+			field.draw(this, context);
 	}
 
 	//
@@ -303,31 +334,31 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 	Instance getInstance() {
 		return instance;
 	}
-	
+
 	List<Port> getPorts() {
 		return portList;
 	}
-	
+
 	void setPorts(Port[] ports) {
 		Port[] portsCopy = ports.clone();
 		portList = new UnmodifiableList<Port>(portsCopy);
 		computeEnds();
 	}
-	
+
 	void recomputeBounds() {
 		Location p = loc;
 		bounds = factory.getOffsetBounds(attrs).translate(p.getX(), p.getY());
 	}
-	
+
 	void addAttributeListener(Instance instance) {
 		if (!attrListenRequested) {
 			attrListenRequested = true;
-			if (widthAttrs == null) getAttributeSet().addAttributeListener(this);
+			if (widthAttrs == null)
+				getAttributeSet().addAttributeListener(this);
 		}
 	}
-	
-	void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr,
-			int x, int y, int halign, int valign) {
+
+	void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign, int valign) {
 		InstanceTextField field = textField;
 		if (field == null) {
 			field = new InstanceTextField(this);

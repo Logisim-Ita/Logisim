@@ -33,18 +33,17 @@ import com.cburch.logisim.util.EventSourceWeakSupport;
 public class Circuit {
 	private class EndChangedTransaction extends CircuitTransaction {
 		private Component comp;
-		private Map<Location,EndData> toRemove;
-		private Map<Location,EndData> toAdd;
-		
-		EndChangedTransaction(Component comp, Map<Location,EndData> toRemove,
-				Map<Location,EndData> toAdd) {
+		private Map<Location, EndData> toRemove;
+		private Map<Location, EndData> toAdd;
+
+		EndChangedTransaction(Component comp, Map<Location, EndData> toRemove, Map<Location, EndData> toAdd) {
 			this.comp = comp;
 			this.toRemove = toRemove;
 			this.toAdd = toAdd;
 		}
-		
+
 		@Override
-		protected Map<Circuit,Integer> getAccessedCircuits() {
+		protected Map<Circuit, Integer> getAccessedCircuits() {
 			return Collections.singletonMap(Circuit.this, READ_WRITE);
 		}
 
@@ -67,18 +66,19 @@ public class Circuit {
 	}
 
 	private class MyComponentListener implements ComponentListener {
+		@Override
 		public void endChanged(ComponentEvent e) {
 			locker.checkForWritePermission("ends changed");
 			Component comp = e.getSource();
-			HashMap<Location,EndData> toRemove = toMap(e.getOldData());
-			HashMap<Location,EndData> toAdd = toMap(e.getData());
+			HashMap<Location, EndData> toRemove = toMap(e.getOldData());
+			HashMap<Location, EndData> toAdd = toMap(e.getData());
 			EndChangedTransaction xn = new EndChangedTransaction(comp, toRemove, toAdd);
 			locker.execute(xn);
 			fireEvent(CircuitEvent.ACTION_INVALIDATE, comp);
 		}
 
-		private HashMap<Location,EndData> toMap(Object val) {
-			HashMap<Location,EndData> map = new HashMap<Location,EndData>();
+		private HashMap<Location, EndData> toMap(Object val) {
+			HashMap<Location, EndData> map = new HashMap<Location, EndData>();
 			if (val instanceof List) {
 				@SuppressWarnings("unchecked")
 				List<EndData> valList = (List<EndData>) val;
@@ -95,7 +95,8 @@ public class Circuit {
 			}
 			return map;
 		}
-		
+
+		@Override
 		public void componentInvalidated(ComponentEvent e) {
 			fireEvent(CircuitEvent.ACTION_INVALIDATE, e.getSource());
 		}
@@ -105,11 +106,12 @@ public class Circuit {
 	private CircuitAppearance appearance;
 	private AttributeSet staticAttrs;
 	private SubcircuitFactory subcircuitFactory;
-	private EventSourceWeakSupport<CircuitListener> listeners
-		= new EventSourceWeakSupport<CircuitListener>();
-	private HashSet<Component> comps = new HashSet<Component>(); // doesn't include wires
+	private EventSourceWeakSupport<CircuitListener> listeners = new EventSourceWeakSupport<CircuitListener>();
+	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
+																	// include
+																	// wires
 	CircuitWires wires = new CircuitWires();
-		// wires is package-protected for CircuitState and Analyze only.
+	// wires is package-protected for CircuitState and Analyze only.
 	private ArrayList<Component> clocks = new ArrayList<Component>();
 	private CircuitLocker locker;
 	private WeakHashMap<Component, Circuit> circuitsUsingThis;
@@ -121,15 +123,15 @@ public class Circuit {
 		locker = new CircuitLocker();
 		circuitsUsingThis = new WeakHashMap<Component, Circuit>();
 	}
-	
+
 	CircuitLocker getLocker() {
 		return locker;
 	}
-	
+
 	public Collection<Circuit> getCircuitsUsingThis() {
 		return circuitsUsingThis.values();
 	}
-	
+
 	public void mutatorClear() {
 		locker.checkForWritePermission("clear");
 
@@ -150,7 +152,7 @@ public class Circuit {
 	public String toString() {
 		return staticAttrs.getValue(CircuitAttributes.NAME_ATTR);
 	}
-	
+
 	public AttributeSet getStaticAttributes() {
 		return staticAttrs;
 	}
@@ -186,11 +188,11 @@ public class Circuit {
 	public CircuitAppearance getAppearance() {
 		return appearance;
 	}
-	
+
 	public SubcircuitFactory getSubcircuitFactory() {
 		return subcircuitFactory;
 	}
-	
+
 	public Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
 		return wires.getWidthIncompatibilityData();
 	}
@@ -202,11 +204,11 @@ public class Circuit {
 	public Location getWidthDeterminant(Location p) {
 		return wires.getWidthDeterminant(p);
 	}
-	
+
 	public boolean hasConflict(Component comp) {
 		return wires.points.hasConflict(comp);
 	}
-	
+
 	public Component getExclusive(Location loc) {
 		return wires.points.getExclusive(loc);
 	}
@@ -214,7 +216,7 @@ public class Circuit {
 	private Set<Component> getComponents() {
 		return CollectionUtil.createUnmodifiableSetUnion(comps, wires.getWires());
 	}
-	
+
 	public boolean contains(Component c) {
 		return comps.contains(c) || wires.getWires().contains(c);
 	}
@@ -230,26 +232,27 @@ public class Circuit {
 	public Collection<? extends Component> getComponents(Location loc) {
 		return wires.points.getComponents(loc);
 	}
-	
+
 	public Collection<? extends Component> getSplitCauses(Location loc) {
 		return wires.points.getSplitCauses(loc);
 	}
-	
+
 	public Collection<Wire> getWires(Location loc) {
 		return wires.points.getWires(loc);
 	}
-	
+
 	public Collection<? extends Component> getNonWires(Location loc) {
 		return wires.points.getNonWires(loc);
 	}
-	
+
 	public boolean isConnected(Location loc, Component ignore) {
 		for (Component o : wires.points.getComponents(loc)) {
-			if (o != ignore) return true;
+			if (o != ignore)
+				return true;
 		}
 		return false;
 	}
-	
+
 	public Set<Location> getSplitLocations() {
 		return wires.points.getSplitLocations();
 	}
@@ -257,7 +260,8 @@ public class Circuit {
 	public Collection<Component> getAllContaining(Location pt) {
 		HashSet<Component> ret = new HashSet<Component>();
 		for (Component comp : getComponents()) {
-			if (comp.contains(pt)) ret.add(comp);
+			if (comp.contains(pt))
+				ret.add(comp);
 		}
 		return ret;
 	}
@@ -265,7 +269,8 @@ public class Circuit {
 	public Collection<Component> getAllContaining(Location pt, Graphics g) {
 		HashSet<Component> ret = new HashSet<Component>();
 		for (Component comp : getComponents()) {
-			if (comp.contains(pt, g)) ret.add(comp);
+			if (comp.contains(pt, g))
+				ret.add(comp);
 		}
 		return ret;
 	}
@@ -273,7 +278,8 @@ public class Circuit {
 	public Collection<Component> getAllWithin(Bounds bds) {
 		HashSet<Component> ret = new HashSet<Component>();
 		for (Component comp : getComponents()) {
-			if (bds.contains(comp.getBounds())) ret.add(comp);
+			if (bds.contains(comp.getBounds()))
+				ret.add(comp);
 		}
 		return ret;
 	}
@@ -281,11 +287,12 @@ public class Circuit {
 	public Collection<Component> getAllWithin(Bounds bds, Graphics g) {
 		HashSet<Component> ret = new HashSet<Component>();
 		for (Component comp : getComponents()) {
-			if (bds.contains(comp.getBounds(g))) ret.add(comp);
+			if (bds.contains(comp.getBounds(g)))
+				ret.add(comp);
 		}
 		return ret;
 	}
-	
+
 	public WireSet getWireSet(Wire start) {
 		return wires.getWireSet(start);
 	}
@@ -293,7 +300,8 @@ public class Circuit {
 	public Bounds getBounds() {
 		Bounds wireBounds = wires.getWireBounds();
 		Iterator<Component> it = comps.iterator();
-		if (!it.hasNext()) return wireBounds;
+		if (!it.hasNext())
+			return wireBounds;
 		Component first = it.next();
 		Bounds firstBounds = first.getBounds();
 		int xMin = firstBounds.getX();
@@ -303,12 +311,18 @@ public class Circuit {
 		while (it.hasNext()) {
 			Component c = it.next();
 			Bounds bds = c.getBounds();
-			int x0 = bds.getX(); int x1 = x0 + bds.getWidth();
-			int y0 = bds.getY(); int y1 = y0 + bds.getHeight();
-			if (x0 < xMin) xMin = x0;
-			if (x1 > xMax) xMax = x1;
-			if (y0 < yMin) yMin = y0;
-			if (y1 > yMax) yMax = y1;
+			int x0 = bds.getX();
+			int x1 = x0 + bds.getWidth();
+			int y0 = bds.getY();
+			int y1 = y0 + bds.getHeight();
+			if (x0 < xMin)
+				xMin = x0;
+			if (x1 > xMax)
+				xMax = x1;
+			if (y0 < yMin)
+				yMin = y0;
+			if (y1 > yMax)
+				yMax = y1;
 		}
 		Bounds compBounds = Bounds.create(xMin, yMin, xMax - xMin, yMax - yMin);
 		if (wireBounds.getWidth() == 0 || wireBounds.getHeight() == 0) {
@@ -333,15 +347,22 @@ public class Circuit {
 		for (Component c : comps) {
 			Bounds bds = c.getBounds(g);
 			if (bds != null && bds != Bounds.EMPTY_BOUNDS) {
-				int x0 = bds.getX(); int x1 = x0 + bds.getWidth();
-				int y0 = bds.getY(); int y1 = y0 + bds.getHeight();
-				if (x0 < xMin) xMin = x0;
-				if (x1 > xMax) xMax = x1;
-				if (y0 < yMin) yMin = y0;
-				if (y1 > yMax) yMax = y1;
+				int x0 = bds.getX();
+				int x1 = x0 + bds.getWidth();
+				int y0 = bds.getY();
+				int y1 = y0 + bds.getHeight();
+				if (x0 < xMin)
+					xMin = x0;
+				if (x1 > xMax)
+					xMax = x1;
+				if (y0 < yMin)
+					yMin = y0;
+				if (y1 > yMax)
+					yMax = y1;
 			}
 		}
-		if (xMin > xMax || yMin > yMax) return Bounds.EMPTY_BOUNDS;
+		if (xMin > xMax || yMin > yMax)
+			return Bounds.EMPTY_BOUNDS;
 		return Bounds.create(xMin, yMin, xMax - xMin, yMax - yMin);
 	}
 
@@ -361,13 +382,16 @@ public class Circuit {
 
 		if (c instanceof Wire) {
 			Wire w = (Wire) c;
-			if (w.getEnd0().equals(w.getEnd1())) return;
+			if (w.getEnd0().equals(w.getEnd1()))
+				return;
 			boolean added = wires.add(w);
-			if (!added) return;
+			if (!added)
+				return;
 		} else {
 			// add it into the circuit
 			boolean added = comps.add(c);
-			if (!added) return;
+			if (!added)
+				return;
 
 			wires.add(c);
 			ComponentFactory factory = c.getFactory();
@@ -431,7 +455,8 @@ public class Circuit {
 					try {
 						c.draw(context);
 					} catch (RuntimeException e) {
-						// this is a JAR developer error - display it and move on
+						// this is a JAR developer error - display it and move
+						// on
 						e.printStackTrace();
 					}
 				}

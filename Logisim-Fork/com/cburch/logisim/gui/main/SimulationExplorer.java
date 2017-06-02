@@ -19,16 +19,15 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectEvent;
 import com.cburch.logisim.proj.ProjectListener;
 
-class SimulationExplorer extends JPanel
-		implements ProjectListener, MouseListener {
+class SimulationExplorer extends JPanel implements ProjectListener, MouseListener {
 	private Project project;
 	private SimulationTreeModel model;
 	private JTree tree;
-	
+
 	SimulationExplorer(Project proj, MenuListener menu) {
 		super(new BorderLayout());
 		this.project = proj;
-		
+
 		SimulationToolbarModel toolbarModel = new SimulationToolbarModel(proj, menu);
 		Toolbar toolbar = new Toolbar(toolbarModel);
 		add(toolbar, BorderLayout.NORTH);
@@ -46,6 +45,7 @@ class SimulationExplorer extends JPanel
 	//
 	// ProjectListener methods
 	//
+	@Override
 	public void projectChanged(ProjectEvent event) {
 		int action = event.getAction();
 		if (action == ProjectEvent.ACTION_SET_STATE) {
@@ -62,27 +62,39 @@ class SimulationExplorer extends JPanel
 			}
 		}
 	}
-	
+
 	//
 	// MouseListener methods
 	//
 	//
 	// MouseListener methods
 	//
-	public void mouseEntered(MouseEvent e) { }
-	public void mouseExited(MouseEvent e) { }
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
 	public void mousePressed(MouseEvent e) {
 		requestFocus();
 		checkForPopup(e);
 	}
+
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		checkForPopup(e);
 	}
+
 	private void checkForPopup(MouseEvent e) {
 		if (e.isPopupTrigger()) {
 			; // do nothing
 		}
 	}
+
+	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			TreePath path = tree.getPathForLocation(e.getX(), e.getY());

@@ -7,12 +7,12 @@ import com.cburch.logisim.util.Cache;
 
 /**
  * Represents an immutable rectangular bounding box. This is analogous to
- * java.awt's <code>Point</code> class, except that objects of this type
- * are immutable.
+ * java.awt's <code>Point</code> class, except that objects of this type are
+ * immutable.
  */
 public class Location implements Comparable<Location> {
 	private static final Cache cache = new Cache();
-	
+
 	private final int hashCode;
 	private final int x;
 	private final int y;
@@ -30,40 +30,48 @@ public class Location implements Comparable<Location> {
 	public int getY() {
 		return y;
 	}
-	
+
 	public int manhattanDistanceTo(Location o) {
 		return Math.abs(o.x - this.x) + Math.abs(o.y - this.y);
 	}
-	
+
 	public int manhattanDistanceTo(int x, int y) {
 		return Math.abs(x - this.x) + Math.abs(y - this.y);
 	}
 
 	public Location translate(int dx, int dy) {
-		if (dx == 0 && dy == 0) return this;
+		if (dx == 0 && dy == 0)
+			return this;
 		return Location.create(x + dx, y + dy);
 	}
-	
+
 	public Location translate(Direction dir, int dist) {
 		return translate(dir, dist, 0);
 	}
-	
+
 	public Location translate(Direction dir, int dist, int right) {
-		if (dist == 0 && right == 0) return this;
-		if (dir == Direction.EAST) return Location.create(x + dist, y + right);
-		if (dir == Direction.WEST) return Location.create(x - dist, y - right);
-		if (dir == Direction.SOUTH) return Location.create(x - right, y + dist);
-		if (dir == Direction.NORTH) return Location.create(x + right, y - dist);
+		if (dist == 0 && right == 0)
+			return this;
+		if (dir == Direction.EAST)
+			return Location.create(x + dist, y + right);
+		if (dir == Direction.WEST)
+			return Location.create(x - dist, y - right);
+		if (dir == Direction.SOUTH)
+			return Location.create(x - right, y + dist);
+		if (dir == Direction.NORTH)
+			return Location.create(x + right, y - dist);
 		return Location.create(x + dist, y + right);
 	}
-	
+
 	// rotates this around (xc,yc) assuming that this is facing in the
 	// from direction and the returned bounds should face in the to direction.
 	public Location rotate(Direction from, Direction to, int xc, int yc) {
 		int degrees = to.toDegrees() - from.toDegrees();
-		while (degrees >= 360) degrees -= 360;
-		while (degrees < 0) degrees += 360;
-		
+		while (degrees >= 360)
+			degrees -= 360;
+		while (degrees < 0)
+			degrees += 360;
+
 		int dx = x - xc;
 		int dy = y - yc;
 		if (degrees == 90) {
@@ -79,7 +87,8 @@ public class Location implements Comparable<Location> {
 
 	@Override
 	public boolean equals(Object other_obj) {
-		if (!(other_obj instanceof Location)) return false;
+		if (!(other_obj instanceof Location))
+			return false;
 		Location other = (Location) other_obj;
 		return this.x == other.x && this.y == other.y;
 	}
@@ -89,9 +98,12 @@ public class Location implements Comparable<Location> {
 		return hashCode;
 	}
 
+	@Override
 	public int compareTo(Location other) {
-		if (this.x != other.x) return this.x - other.x;
-		else                  return this.y - other.y;
+		if (this.x != other.x)
+			return this.x - other.x;
+		else
+			return this.y - other.y;
 	}
 
 	@Override
@@ -104,7 +116,8 @@ public class Location implements Comparable<Location> {
 		Object ret = cache.get(hashCode);
 		if (ret != null) {
 			Location loc = (Location) ret;
-			if (loc.x == x && loc.y == y) return loc;
+			if (loc.x == x && loc.y == y)
+				return loc;
 		}
 		Location loc = new Location(hashCode, x, y);
 		cache.put(hashCode, loc);
@@ -118,8 +131,7 @@ public class Location implements Comparable<Location> {
 		if (value.charAt(0) == '(') {
 			int len = value.length();
 			if (value.charAt(len - 1) != ')') {
-				throw new NumberFormatException("invalid point '"
-					+ base + "'");
+				throw new NumberFormatException("invalid point '" + base + "'");
 			}
 			value = value.substring(1, len - 1);
 		}
@@ -128,8 +140,7 @@ public class Location implements Comparable<Location> {
 		if (comma < 0) {
 			comma = value.indexOf(' ');
 			if (comma < 0) {
-				throw new NumberFormatException("invalid point '"
-					+ base + "'");
+				throw new NumberFormatException("invalid point '" + base + "'");
 			}
 		}
 		int x = Integer.parseInt(value.substring(0, comma).trim());

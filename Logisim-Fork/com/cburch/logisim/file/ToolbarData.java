@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.file;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,22 +39,24 @@ public class ToolbarData {
 	public void removeToolbarListener(ToolbarListener l) {
 		listeners.remove(l);
 	}
-	
+
 	public void addToolAttributeListener(AttributeListener l) {
 		for (Tool tool : contents) {
 			if (tool != null) {
 				AttributeSet attrs = tool.getAttributeSet();
-				if (attrs != null) attrs.addAttributeListener(l);
+				if (attrs != null)
+					attrs.addAttributeListener(l);
 			}
 		}
 		toolListeners.add(l);
 	}
-	
+
 	public void removeToolAttributeListener(AttributeListener l) {
 		for (Tool tool : contents) {
 			if (tool != null) {
 				AttributeSet attrs = tool.getAttributeSet();
-				if (attrs != null) attrs.removeAttributeListener(l);
+				if (attrs != null)
+					attrs.removeAttributeListener(l);
 			}
 		}
 		toolListeners.remove(l);
@@ -64,14 +65,16 @@ public class ToolbarData {
 	private void addAttributeListeners(Tool tool) {
 		for (AttributeListener l : toolListeners) {
 			AttributeSet attrs = tool.getAttributeSet();
-			if (attrs != null) attrs.addAttributeListener(l);
+			if (attrs != null)
+				attrs.addAttributeListener(l);
 		}
 	}
 
 	private void removeAttributeListeners(Tool tool) {
 		for (AttributeListener l : toolListeners) {
 			AttributeSet attrs = tool.getAttributeSet();
-			if (attrs != null) attrs.removeAttributeListener(l);
+			if (attrs != null)
+				attrs.removeAttributeListener(l);
 		}
 	}
 
@@ -90,15 +93,16 @@ public class ToolbarData {
 
 	public Tool getFirstTool() {
 		for (Tool tool : contents) {
-			if (tool != null) return tool;
+			if (tool != null)
+				return tool;
 		}
 		return null;
 	}
-	
+
 	public int size() {
 		return contents.size();
 	}
-	
+
 	public Object get(int index) {
 		return contents.get(index);
 	}
@@ -107,7 +111,8 @@ public class ToolbarData {
 	// modification methods
 	//
 	public void copyFrom(ToolbarData other, LogisimFile file) {
-		if (this == other) return;
+		if (this == other)
+			return;
 		for (Tool tool : contents) {
 			if (tool != null) {
 				removeAttributeListeners(tool);
@@ -121,8 +126,7 @@ public class ToolbarData {
 				Tool toolCopy = file.findTool(srcTool);
 				if (toolCopy != null) {
 					Tool dstTool = toolCopy.cloneTool();
-					AttributeSets.copy(srcTool.getAttributeSet(),
-							dstTool.getAttributeSet());
+					AttributeSets.copy(srcTool.getAttributeSet(), dstTool.getAttributeSet());
 					this.addTool(dstTool);
 					addAttributeListeners(toolCopy);
 				}
@@ -162,14 +166,16 @@ public class ToolbarData {
 
 	public Object remove(int pos) {
 		Object ret = contents.remove(pos);
-		if (ret instanceof Tool) removeAttributeListeners((Tool) ret);
+		if (ret instanceof Tool)
+			removeAttributeListeners((Tool) ret);
 		fireToolbarChanged();
 		return ret;
 	}
 
 	boolean usesToolFromSource(Tool query) {
 		for (Tool tool : contents) {
-			if (tool != null && tool.sharesSource(query)) return true;
+			if (tool != null && tool.sharesSource(query))
+				return true;
 		}
 		return false;
 	}
@@ -177,9 +183,9 @@ public class ToolbarData {
 	//
 	// package-protected methods
 	//
-	void replaceAll(Map<Tool,Tool> toolMap) {
+	void replaceAll(Map<Tool, Tool> toolMap) {
 		boolean changed = false;
-		for (ListIterator<Tool> it = contents.listIterator(); it.hasNext(); ) {
+		for (ListIterator<Tool> it = contents.listIterator(); it.hasNext();) {
 			Object old = it.next();
 			if (toolMap.containsKey(old)) {
 				changed = true;
@@ -190,12 +196,12 @@ public class ToolbarData {
 				} else {
 					Tool addedTool = newTool.cloneTool();
 					addAttributeListeners(addedTool);
-					LoadedLibrary.copyAttributes(addedTool.getAttributeSet(),
-							((Tool) old).getAttributeSet());
+					LoadedLibrary.copyAttributes(addedTool.getAttributeSet(), ((Tool) old).getAttributeSet());
 					it.set(addedTool);
 				}
 			}
 		}
-		if (changed) fireToolbarChanged();
+		if (changed)
+			fireToolbarChanged();
 	}
 }

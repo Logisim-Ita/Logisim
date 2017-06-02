@@ -18,7 +18,6 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -70,10 +69,10 @@ public class Frame extends LFrame implements LocaleListener {
 	public static final String VIEW_SIMULATION = "simulation";
 
 	private static final double[] ZOOM_OPTIONS = { 20, 50, 75, 100, 133, 150, 200, 250, 300, 400 };
-	
+
 	class MyProjectListener
-			implements ProjectListener, LibraryListener, CircuitListener,
-				PropertyChangeListener, ChangeListener {
+			implements ProjectListener, LibraryListener, CircuitListener, PropertyChangeListener, ChangeListener {
+		@Override
 		public void projectChanged(ProjectEvent event) {
 			int action = event.getAction();
 
@@ -89,13 +88,15 @@ public class Frame extends LFrame implements LocaleListener {
 				viewAttributes(proj.getTool());
 				computeTitle();
 			} else if (action == ProjectEvent.ACTION_SET_TOOL) {
-				if (attrTable == null) return; // for startup
+				if (attrTable == null)
+					return; // for startup
 				Tool oldTool = (Tool) event.getOldData();
 				Tool newTool = (Tool) event.getData();
 				viewAttributes(oldTool, newTool, false);
 			}
 		}
 
+		@Override
 		public void libraryChanged(LibraryEvent e) {
 			if (e.getAction() == LibraryEvent.SET_NAME) {
 				computeTitle();
@@ -104,6 +105,7 @@ public class Frame extends LFrame implements LocaleListener {
 			}
 		}
 
+		@Override
 		public void circuitChanged(CircuitEvent event) {
 			if (event.getAction() == CircuitEvent.ACTION_SET_NAME) {
 				computeTitle();
@@ -116,14 +118,17 @@ public class Frame extends LFrame implements LocaleListener {
 			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
 		}
 
-		public void attributeListChanged(AttributeEvent e) { }
+		public void attributeListChanged(AttributeEvent e) {
+		}
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
 				placeToolbar();
 			}
 		}
-		
+
+		@Override
 		public void stateChanged(ChangeEvent event) {
 			Object source = event.getSource();
 			if (source == explorerPane) {
@@ -149,32 +154,32 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 	}
 
-	private Project         proj;
+	private Project proj;
 	private MyProjectListener myProjectListener = new MyProjectListener();
 
 	// GUI elements shared between views
-	private LogisimMenuBar  menubar;
-	private MenuListener    menuListener;
-	private Toolbar         toolbar;
+	private LogisimMenuBar menubar;
+	private MenuListener menuListener;
+	private Toolbar toolbar;
 	private HorizontalSplitPane leftRegion;
 	private VerticalSplitPane mainRegion;
-	private JPanel          mainPanelSuper;
-	private CardPanel       mainPanel;
+	private JPanel mainPanelSuper;
+	private CardPanel mainPanel;
 	// left-side elements
-	private Toolbar         projectToolbar;
-	private CardPanel       explorerPane;
-	private Toolbox         toolbox;
+	private Toolbar projectToolbar;
+	private CardPanel explorerPane;
+	private Toolbox toolbox;
 	private SimulationExplorer simExplorer;
-	private AttrTable       attrTable;
-	private ZoomControl     zoom;
-	
+	private AttrTable attrTable;
+	private ZoomControl zoom;
+
 	// for the Layout view
 	private LayoutToolbarModel layoutToolbarModel;
-	private Canvas          layoutCanvas;
-	private ZoomModel       layoutZoomModel;
+	private Canvas layoutCanvas;
+	private ZoomModel layoutZoomModel;
 	private LayoutEditHandler layoutEditHandler;
 	private AttrTableSelectionModel attrTableSelectionModel;
-	
+
 	// for the Appearance view
 	private AppearanceView appearance;
 
@@ -189,12 +194,11 @@ public class Frame extends LFrame implements LocaleListener {
 		proj.addLibraryListener(myProjectListener);
 		proj.addCircuitListener(myProjectListener);
 		computeTitle();
-		
+
 		// set up elements for the Layout view
 		layoutToolbarModel = new LayoutToolbarModel(this, proj);
 		layoutCanvas = new Canvas(proj);
-		layoutZoomModel = new BasicZoomModel(AppPreferences.LAYOUT_SHOW_GRID,
-				AppPreferences.LAYOUT_ZOOM, ZOOM_OPTIONS);
+		layoutZoomModel = new BasicZoomModel(AppPreferences.LAYOUT_SHOW_GRID, AppPreferences.LAYOUT_ZOOM, ZOOM_OPTIONS);
 
 		layoutCanvas.getGridPainter().setZoomModel(layoutZoomModel);
 		layoutEditHandler = new LayoutEditHandler(this);
@@ -247,14 +251,13 @@ public class Frame extends LFrame implements LocaleListener {
 
 		computeTitle();
 
-		this.setSize(AppPreferences.WINDOW_WIDTH.get().intValue(),
-				AppPreferences.WINDOW_HEIGHT.get().intValue());
+		this.setSize(AppPreferences.WINDOW_WIDTH.get().intValue(), AppPreferences.WINDOW_HEIGHT.get().intValue());
 		Point prefPoint = getInitialLocation();
 		if (prefPoint != null) {
 			this.setLocation(prefPoint);
 		}
 		this.setExtendedState(AppPreferences.WINDOW_STATE.get().intValue());
-		
+
 		menuListener.register(mainPanel);
 		KeyboardToolSelection.register(toolbar);
 
@@ -270,7 +273,7 @@ public class Frame extends LFrame implements LocaleListener {
 
 		LocaleManager.addLocaleListener(this);
 	}
-	
+
 	private void placeToolbar() {
 		String loc = AppPreferences.TOOLBAR_PLACEMENT.get();
 		Container contents = getContentPane();
@@ -285,10 +288,14 @@ public class Frame extends LFrame implements LocaleListener {
 			Object value = BorderLayout.NORTH;
 			for (Direction dir : Direction.cardinals) {
 				if (dir.toString().equals(loc)) {
-					if (dir == Direction.EAST)       value = BorderLayout.EAST;
-					else if (dir == Direction.SOUTH) value = BorderLayout.SOUTH;
-					else if (dir == Direction.WEST)  value = BorderLayout.WEST;
-					else                             value = BorderLayout.NORTH;
+					if (dir == Direction.EAST)
+						value = BorderLayout.EAST;
+					else if (dir == Direction.SOUTH)
+						value = BorderLayout.SOUTH;
+					else if (dir == Direction.WEST)
+						value = BorderLayout.WEST;
+					else
+						value = BorderLayout.NORTH;
 				}
 			}
 
@@ -298,7 +305,7 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 		contents.validate();
 	}
-	
+
 	public Project getProject() {
 		return proj;
 	}
@@ -310,7 +317,7 @@ public class Frame extends LFrame implements LocaleListener {
 			setAttrTableModel(new AttrTableComponentModel(proj, circ, comp));
 		}
 	}
-	
+
 	void setAttrTableModel(AttrTableModel value) {
 		attrTable.setAttrTableModel(value);
 		if (value instanceof AttrTableToolModel) {
@@ -329,19 +336,20 @@ public class Frame extends LFrame implements LocaleListener {
 			layoutCanvas.setHaloedComponent(null, null);
 		}
 	}
-	
+
 	public void setExplorerView(String view) {
 		explorerPane.setView(view);
 	}
-	
+
 	public String getExplorerView() {
 		return explorerPane.getView();
 	}
-	
+
 	public void setEditorView(String view) {
 		String curView = mainPanel.getView();
-		if (curView.equals(view)) return;
-		
+		if (curView.equals(view))
+			return;
+
 		if (view.equals(EDIT_APPEARANCE)) { // appearance view
 			AppearanceView app = appearance;
 			if (app == null) {
@@ -379,20 +387,18 @@ public class Frame extends LFrame implements LocaleListener {
 		Circuit circuit = proj.getCurrentCircuit();
 		String name = proj.getLogisimFile().getName();
 		if (circuit != null) {
-			s = StringUtil.format(Strings.get("titleCircFileKnown"),
-			Main.VERSION_NAME, circuit.getName(), name);
+			s = StringUtil.format(Strings.get("titleCircFileKnown"), Main.VERSION_NAME, circuit.getName(), name);
 		} else {
-			s = StringUtil.format(Strings.get("titleFileKnown"),
-			Main.VERSION_NAME, name);
+			s = StringUtil.format(Strings.get("titleFileKnown"), Main.VERSION_NAME, name);
 		}
 		this.setTitle(s);
 		myProjectListener.enableSave();
 	}
-	
+
 	void viewAttributes(Tool newTool) {
 		viewAttributes(null, newTool, false);
 	}
-	
+
 	private void viewAttributes(Tool newTool, boolean force) {
 		viewAttributes(null, newTool, force);
 	}
@@ -401,14 +407,15 @@ public class Frame extends LFrame implements LocaleListener {
 		AttributeSet newAttrs;
 		if (newTool == null) {
 			newAttrs = null;
-			if (!force) return;
+			if (!force)
+				return;
 		} else {
 			newAttrs = newTool.getAttributeSet(layoutCanvas);
 		}
 		if (newAttrs == null) {
 			AttrTableModel oldModel = attrTable.getAttrTableModel();
 			boolean same = oldModel instanceof AttrTableToolModel
-				&& ((AttrTableToolModel) oldModel).getTool() == oldTool;
+					&& ((AttrTableToolModel) oldModel).getTool() == oldTool;
 			if (!force && !same && !(oldModel instanceof AttrTableCircuitModel)) {
 				return;
 			}
@@ -427,10 +434,11 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 	}
 
+	@Override
 	public void localeChanged() {
 		computeTitle();
 	}
-	
+
 	public void savePreferences() {
 		AppPreferences.TICK_FREQUENCY.set(Double.valueOf(proj.getSimulator().getTickFrequency()));
 		AppPreferences.LAYOUT_SHOW_GRID.setBoolean(layoutZoomModel.getShowGrid());
@@ -440,7 +448,7 @@ public class Frame extends LFrame implements LocaleListener {
 			AppPreferences.APPEARANCE_SHOW_GRID.setBoolean(aZoom.getShowGrid());
 			AppPreferences.APPEARANCE_ZOOM.set(Double.valueOf(aZoom.getZoomFactor()));
 		}
-		int state = getExtendedState() & ~JFrame.ICONIFIED;
+		int state = getExtendedState() & ~java.awt.Frame.ICONIFIED;
 		AppPreferences.WINDOW_STATE.set(Integer.valueOf(state));
 		Dimension dim = getSize();
 		AppPreferences.WINDOW_WIDTH.set(Integer.valueOf(dim.width));
@@ -458,22 +466,21 @@ public class Frame extends LFrame implements LocaleListener {
 		AppPreferences.WINDOW_MAIN_SPLIT.set(Double.valueOf(mainRegion.getFraction()));
 		AppPreferences.DIALOG_DIRECTORY.set(JFileChoosers.getCurrentDirectory());
 	}
-	
+
 	public boolean confirmClose() {
 		return confirmClose(Strings.get("confirmCloseTitle"));
 	}
-	
+
 	// returns true if user is OK with proceeding
 	public boolean confirmClose(String title) {
-		String message = StringUtil.format(Strings.get("confirmDiscardMessage"),
-				proj.getLogisimFile().getName());
-		
-		if (!proj.isFileDirty()) return true;
+		String message = StringUtil.format(Strings.get("confirmDiscardMessage"), proj.getLogisimFile().getName());
+
+		if (!proj.isFileDirty())
+			return true;
 		toFront();
 		String[] options = { Strings.get("saveOption"), Strings.get("discardOption"), Strings.get("cancelOption") };
-		int result = JOptionPane.showOptionDialog(this,
-				message, title, 0, JOptionPane.QUESTION_MESSAGE, null,
-				options, options[0]);
+		int result = JOptionPane.showOptionDialog(this, message, title, 0, JOptionPane.QUESTION_MESSAGE, null, options,
+				options[0]);
 		boolean ret;
 		if (result == 0) {
 			ret = ProjectActions.doSave(proj);
@@ -487,12 +494,14 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 		return ret;
 	}
-	
+
 	private static Point getInitialLocation() {
 		String s = AppPreferences.WINDOW_LOCATION.get();
-		if (s == null) return null;
+		if (s == null)
+			return null;
 		int comma = s.indexOf(',');
-		if (comma < 0) return null;
+		if (comma < 0)
+			return null;
 		try {
 			int x = Integer.parseInt(s.substring(0, comma));
 			int y = Integer.parseInt(s.substring(comma + 1));
@@ -501,7 +510,7 @@ public class Frame extends LFrame implements LocaleListener {
 				y += 20;
 			}
 			Rectangle desired = new Rectangle(x, y, 50, 50);
-		
+
 			int gcBestSize = 0;
 			Point gcBestPoint = null;
 			GraphicsEnvironment ge;
@@ -514,10 +523,8 @@ public class Frame extends LFrame implements LocaleListener {
 						int size = inter.width * inter.height;
 						if (size > gcBestSize) {
 							gcBestSize = size;
-							int x2 = Math.max(gcBounds.x, Math.min(inter.x,
-									inter.x + inter.width - 50));
-							int y2 = Math.max(gcBounds.y, Math.min(inter.y,
-									inter.y + inter.height - 50));
+							int x2 = Math.max(gcBounds.x, Math.min(inter.x, inter.x + inter.width - 50));
+							int y2 = Math.max(gcBounds.y, Math.min(inter.y, inter.y + inter.height - 50));
 							gcBestPoint = new Point(x2, y2);
 						}
 					}
@@ -540,7 +547,8 @@ public class Frame extends LFrame implements LocaleListener {
 			if (frame != null) {
 				Point loc = frame.getLocationOnScreen();
 				int d = Math.abs(loc.x - x) + Math.abs(loc.y - y);
-				if (d <= 3) return true;
+				if (d <= 3)
+					return true;
 			}
 		}
 		return false;

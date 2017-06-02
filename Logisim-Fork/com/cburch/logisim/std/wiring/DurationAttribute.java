@@ -12,7 +12,7 @@ import com.cburch.logisim.util.StringUtil;
 public class DurationAttribute extends Attribute<Integer> {
 	private int min;
 	private int max;
-	
+
 	public DurationAttribute(String name, StringGetter disp, int min, int max) {
 		super(name, disp);
 		this.min = min;
@@ -39,8 +39,7 @@ public class DurationAttribute extends Attribute<Integer> {
 		if (value.equals(Integer.valueOf(1))) {
 			return Strings.get("clockDurationOneValue");
 		} else {
-			return StringUtil.format(Strings.get("clockDurationValue"),
-					value.toString());
+			return StringUtil.format(Strings.get("clockDurationValue"), value.toString());
 		}
 	}
 

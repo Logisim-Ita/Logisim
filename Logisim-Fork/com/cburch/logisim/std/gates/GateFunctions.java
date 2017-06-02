@@ -6,8 +6,9 @@ package com.cburch.logisim.std.gates;
 import com.cburch.logisim.data.Value;
 
 class GateFunctions {
-	private GateFunctions() { }
-	
+	private GateFunctions() {
+	}
+
 	static Value computeOr(Value[] inputs, int numInputs) {
 		Value ret = inputs[0];
 		for (int i = 1; i < numInputs; i++) {
@@ -15,7 +16,7 @@ class GateFunctions {
 		}
 		return ret;
 	}
-	
+
 	static Value computeAnd(Value[] inputs, int numInputs) {
 		Value ret = inputs[0];
 		for (int i = 1; i < numInputs; i++) {
@@ -23,7 +24,7 @@ class GateFunctions {
 		}
 		return ret;
 	}
-	
+
 	static Value computeOddParity(Value[] inputs, int numInputs) {
 		Value ret = inputs[0];
 		for (int i = 1; i < numInputs; i++) {
@@ -31,7 +32,7 @@ class GateFunctions {
 		}
 		return ret;
 	}
-	
+
 	static Value computeExactlyOne(Value[] inputs, int numInputs) {
 		int width = inputs[0].getWidth();
 		Value[] ret = new Value[width];

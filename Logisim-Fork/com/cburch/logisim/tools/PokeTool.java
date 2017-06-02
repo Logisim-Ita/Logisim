@@ -53,38 +53,35 @@ public class PokeTool extends Tool {
 			Value v = canvas.getCircuitState().getValue(wire.getEnd0());
 			RadixOption radix1 = RadixOption.decode(AppPreferences.POKE_WIRE_RADIX1.get());
 			RadixOption radix2 = RadixOption.decode(AppPreferences.POKE_WIRE_RADIX2.get());
-			if (radix1 == null) radix1 = RadixOption.RADIX_2;
+			if (radix1 == null)
+				radix1 = RadixOption.RADIX_2;
 			String vStr = radix1.toString(v);
 			if (radix2 != null && v.getWidth() > 1) {
 				vStr += " / " + radix2.toString(v);
 			}
-			
+
 			FontMetrics fm = g.getFontMetrics();
 			g.setColor(caretColor);
-			g.fillRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, 
-					fm.getAscent() + fm.getDescent() + 4);
+			g.fillRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, fm.getAscent() + fm.getDescent() + 4);
 			g.setColor(Color.BLACK);
-			g.drawRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, 
-					fm.getAscent() + fm.getDescent() + 4);
+			g.drawRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, fm.getAscent() + fm.getDescent() + 4);
 			g.fillOval(x - 2, y - 2, 5, 5);
 			g.drawString(vStr, x + 4, y + 4 + fm.getAscent());
 		}
 	}
-	
+
 	private class Listener implements CircuitListener {
+		@Override
 		public void circuitChanged(CircuitEvent event) {
 			Circuit circ = pokedCircuit;
-			if (event.getCircuit() == circ && circ != null
-					&& (event.getAction() == CircuitEvent.ACTION_REMOVE
-							|| event.getAction() == CircuitEvent.ACTION_CLEAR)
-					&& !circ.contains(pokedComponent)) {
+			if (event.getCircuit() == circ && circ != null && (event.getAction() == CircuitEvent.ACTION_REMOVE
+					|| event.getAction() == CircuitEvent.ACTION_CLEAR) && !circ.contains(pokedComponent)) {
 				removeCaret(false);
 			}
 		}
 	}
 
-	private static Cursor cursor
-		= Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
 	private Listener listener;
 	private Circuit pokedCircuit;
@@ -94,12 +91,12 @@ public class PokeTool extends Tool {
 	public PokeTool() {
 		this.listener = new Listener();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return other instanceof PokeTool;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return PokeTool.class.hashCode();
@@ -114,12 +111,15 @@ public class PokeTool extends Tool {
 	public String getDisplayName() {
 		return Strings.get("pokeTool");
 	}
-	
+
 	private void removeCaret(boolean normal) {
 		Circuit circ = pokedCircuit;
 		Caret caret = pokeCaret;
 		if (caret != null) {
-			if (normal) caret.stopEditing(); else caret.cancelEditing();
+			if (normal)
+				caret.stopEditing();
+			else
+				caret.cancelEditing();
 			circ.removeCircuitListener(listener);
 			pokedCircuit = null;
 			pokedComponent = null;
@@ -144,7 +144,8 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void draw(Canvas canvas, ComponentDrawContext context) {
-		if (pokeCaret != null) pokeCaret.draw(context.getGraphics());
+		if (pokeCaret != null)
+			pokeCaret.draw(context.getGraphics());
 	}
 
 	@Override
@@ -168,11 +169,12 @@ public class PokeTool extends Tool {
 			ComponentUserEvent event = new ComponentUserEvent(canvas, x, y);
 			Circuit circ = canvas.getCircuit();
 			for (Component c : circ.getAllContaining(loc, g)) {
-				if (pokeCaret != null) break;
+				if (pokeCaret != null)
+					break;
 
 				if (c instanceof Wire) {
 					Caret caret = new WireCaret(canvas, (Wire) c, x, y,
-						canvas.getProject().getOptions().getAttributeSet());
+							canvas.getProject().getOptions().getAttributeSet());
 					setPokedComponent(circ, c, caret);
 					canvas.setHighlightedWires(circ.getWireSet((Wire) c));
 				} else {
@@ -193,7 +195,8 @@ public class PokeTool extends Tool {
 			dirty = true;
 			pokeCaret.mousePressed(e);
 		}
-		if (dirty) canvas.getProject().repaintCanvas();
+		if (dirty)
+			canvas.getProject().repaintCanvas();
 	}
 
 	@Override
@@ -243,17 +246,18 @@ public class PokeTool extends Tool {
 			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
 		} else {
 			g.setColor(java.awt.Color.black);
-			g.drawLine(x + 4, y +  2, x + 4, y + 17);
+			g.drawLine(x + 4, y + 2, x + 4, y + 17);
 			g.drawLine(x + 4, y + 17, x + 1, y + 11);
 			g.drawLine(x + 4, y + 17, x + 7, y + 11);
 
-			g.drawLine(x + 15, y +  2, x + 15, y + 17);
-			g.drawLine(x + 15, y +  2, x + 12, y + 8);
-			g.drawLine(x + 15, y +  2, x + 18, y + 8);
+			g.drawLine(x + 15, y + 2, x + 15, y + 17);
+			g.drawLine(x + 15, y + 2, x + 12, y + 8);
+			g.drawLine(x + 15, y + 2, x + 18, y + 8);
 		}
 	}
 
 	@Override
-	public Cursor getCursor() { return cursor; }
+	public Cursor getCursor() {
+		return cursor;
+	}
 }
-

@@ -24,46 +24,41 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringUtil;
 
 public class Random extends InstanceFactory {
-	private static final Attribute<Integer> ATTR_SEED
-		= Attributes.forInteger("seed", Strings.getter("randomSeedAttr"));
-	
+	private static final Attribute<Integer> ATTR_SEED = Attributes.forInteger("seed", Strings.getter("randomSeedAttr"));
+
 	private static final int OUT = 0;
-	private static final int CK  = 1;
+	private static final int CK = 1;
 	private static final int NXT = 2;
 	private static final int RST = 3;
 
 	public Random() {
 		super("Random", Strings.getter("randomComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.WIDTH, ATTR_SEED, StdAttr.EDGE_TRIGGER,
-				StdAttr.LABEL, StdAttr.LABEL_FONT
-			}, new Object[] {
-				BitWidth.create(8), Integer.valueOf(0), StdAttr.TRIG_RISING,
-				"", StdAttr.DEFAULT_LABEL_FONT
-			});
+		setAttributes(
+				new Attribute[] { StdAttr.WIDTH, ATTR_SEED, StdAttr.EDGE_TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT },
+				new Object[] { BitWidth.create(8), Integer.valueOf(0), StdAttr.TRIG_RISING, "",
+						StdAttr.DEFAULT_LABEL_FONT });
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 
 		setOffsetBounds(Bounds.create(-30, -20, 30, 40));
 		setIconName("random.gif");
 		setInstanceLogger(Logger.class);
-		
+
 		Port[] ps = new Port[4];
-		ps[OUT] = new Port(  0,   0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[CK]  = new Port(-30, -10, Port.INPUT, 1);
-		ps[NXT] = new Port(-30,  10, Port.INPUT, 1);
-		ps[RST] = new Port(-20,  20, Port.INPUT, 1);
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[CK] = new Port(-30, -10, Port.INPUT, 1);
+		ps[NXT] = new Port(-30, 10, Port.INPUT, 1);
+		ps[RST] = new Port(-20, 20, Port.INPUT, 1);
 		ps[OUT].setToolTip(Strings.getter("randomQTip"));
 		ps[CK].setToolTip(Strings.getter("randomClockTip"));
 		ps[NXT].setToolTip(Strings.getter("randomNextTip"));
 		ps[RST].setToolTip(Strings.getter("randomResetTip"));
 		setPorts(ps);
 	}
-	
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		Bounds bds = instance.getBounds();
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT,
-				bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
 				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
@@ -83,7 +78,7 @@ public class Random extends InstanceFactory {
 			data.reset(state.getAttributeValue(ATTR_SEED));
 		} else if (triggered && state.getPort(NXT) != Value.FALSE) {
 			data.step();
-		} 
+		}
 
 		state.setPort(OUT, Value.createKnown(dataWidth, data.value), 4);
 	}
@@ -111,21 +106,18 @@ public class Random extends InstanceFactory {
 			int val = state == null ? 0 : state.value;
 			String str = StringUtil.toHexString(width, val);
 			if (str.length() <= 4) {
-				GraphicsUtil.drawText(g, str,
-						bds.getX() + 15, bds.getY() + 4,
-						GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.drawText(g, str, bds.getX() + 15, bds.getY() + 4, GraphicsUtil.H_CENTER,
+						GraphicsUtil.V_TOP);
 			} else {
 				int split = str.length() - 4;
-				GraphicsUtil.drawText(g, str.substring(0, split),
-						bds.getX() + 15, bds.getY() + 3,
+				GraphicsUtil.drawText(g, str.substring(0, split), bds.getX() + 15, bds.getY() + 3,
 						GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
-				GraphicsUtil.drawText(g, str.substring(split),
-						bds.getX() + 15, bds.getY() + 15,
-						GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+				GraphicsUtil.drawText(g, str.substring(split), bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER,
+						GraphicsUtil.V_TOP);
 			}
 		}
 	}
-	
+
 	private static class StateData extends ClockState implements InstanceData {
 		private final static long multiplier = 0x5DEECE66DL;
 		private final static long addend = 0xBL;
@@ -134,11 +126,11 @@ public class Random extends InstanceFactory {
 		private long initSeed;
 		private long curSeed;
 		private int value;
-	
+
 		public StateData(Object seed) {
 			reset(seed);
 		}
-		
+
 		void reset(Object seed) {
 			long start = seed instanceof Integer ? ((Integer) seed).intValue() : 0;
 			if (start == 0) {
@@ -154,7 +146,7 @@ public class Random extends InstanceFactory {
 			this.curSeed = start;
 			this.value = (int) start;
 		}
-		
+
 		void step() {
 			long v = curSeed;
 			v = (v * multiplier + addend) & mask;
@@ -162,20 +154,22 @@ public class Random extends InstanceFactory {
 			value = (int) (v >> 12);
 		}
 	}
-	
+
 	public static class Logger extends InstanceLogger {
 		@Override
 		public String getLogName(InstanceState state, Object option) {
 			String ret = state.getAttributeValue(StdAttr.LABEL);
 			return ret != null && !ret.equals("") ? ret : null;
 		}
-	
+
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
 			BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-			if (dataWidth == null) dataWidth = BitWidth.create(0);
+			if (dataWidth == null)
+				dataWidth = BitWidth.create(0);
 			StateData data = (StateData) state.getData();
-			if (data == null) return Value.createKnown(dataWidth, 0);
+			if (data == null)
+				return Value.createKnown(dataWidth, 0);
 			return Value.createKnown(dataWidth, data.value);
 		}
 	}

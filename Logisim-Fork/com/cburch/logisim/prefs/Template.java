@@ -19,7 +19,7 @@ public class Template {
 		buf.append("</project>");
 		return new Template(buf.toString());
 	}
-	
+
 	public static Template create(InputStream in) {
 		InputStreamReader reader = new InputStreamReader(in);
 		char[] buf = new char[4096];
@@ -27,7 +27,8 @@ public class Template {
 		while (true) {
 			try {
 				int nbytes = reader.read(buf);
-				if (nbytes < 0) break;
+				if (nbytes < 0)
+					break;
 				dest.append(buf, 0, nbytes);
 			} catch (IOException e) {
 				break;
@@ -35,18 +36,18 @@ public class Template {
 		}
 		return new Template(dest.toString());
 	}
-	
+
 	private String contents;
-	
+
 	private Template(String contents) {
 		this.contents = contents;
 	}
-	
+
 	public InputStream createStream() {
 		try {
 			return new ByteArrayInputStream(contents.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			System.err.println("warning: UTF-8 is not supported"); //OK
+			System.err.println("warning: UTF-8 is not supported"); // OK
 			return new ByteArrayInputStream(contents.getBytes());
 		}
 	}

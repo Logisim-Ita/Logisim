@@ -15,10 +15,10 @@ import java.util.Locale;
 
 import javax.help.HelpSet;
 import javax.help.JHelp;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 class MenuHelp extends JMenu implements ActionListener {
 	private LogisimMenuBar menubar;
@@ -40,7 +40,7 @@ class MenuHelp extends JMenu implements ActionListener {
 		library.addActionListener(this);
 		update.addActionListener(this);
 		about.addActionListener(this);
-		
+
 		add(tutorial);
 		add(guide);
 		add(library);
@@ -60,13 +60,14 @@ class MenuHelp extends JMenu implements ActionListener {
 		guide.setText(Strings.get("helpGuideItem"));
 		library.setText(Strings.get("helpLibraryItem"));
 		update.setText(Strings.get("CheckUpdates"));
-		about.setText(Strings.get("helpAboutItem"));		
+		about.setText(Strings.get("helpAboutItem"));
 		if (helpFrame != null) {
 			helpFrame.setLocale(Locale.getDefault());
 			loadBroker();
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if (src == guide) {
@@ -82,18 +83,18 @@ class MenuHelp extends JMenu implements ActionListener {
 			About.showAboutDialog(menubar.getParentWindow());
 		}
 	}
-	
+
 	private void loadBroker() {
 		String helpUrl = Strings.get("helpsetUrl");
-		if (helpUrl == null) helpUrl = "doc/doc_en.hs";
+		if (helpUrl == null)
+			helpUrl = "doc/doc_en.hs";
 		if (helpSet == null || helpFrame == null || !helpUrl.equals(helpSetUrl)) {
 			ClassLoader loader = MenuHelp.class.getClassLoader();
 			try {
 				URL hsURL = HelpSet.findHelpSet(loader, helpUrl);
 				if (hsURL == null) {
 					disableHelp();
-					JOptionPane.showMessageDialog(menubar.getParentWindow(),
-							Strings.get("helpNotFoundError"));
+					JOptionPane.showMessageDialog(menubar.getParentWindow(), Strings.get("helpNotFoundError"));
 					return;
 				}
 				helpSetUrl = helpUrl;
@@ -102,7 +103,7 @@ class MenuHelp extends JMenu implements ActionListener {
 				if (helpFrame == null) {
 					helpFrame = new LFrame();
 					helpFrame.setTitle(Strings.get("helpWindowTitle"));
-					helpFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+					helpFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 					helpFrame.getContentPane().add(helpComponent);
 					helpFrame.pack();
 				} else {
@@ -113,8 +114,7 @@ class MenuHelp extends JMenu implements ActionListener {
 			} catch (Exception e) {
 				disableHelp();
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(menubar.getParentWindow(),
-						Strings.get("helpUnavailableError"));
+				JOptionPane.showMessageDialog(menubar.getParentWindow(), Strings.get("helpUnavailableError"));
 				return;
 			}
 		}
@@ -129,8 +129,7 @@ class MenuHelp extends JMenu implements ActionListener {
 		} catch (Exception e) {
 			disableHelp();
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(menubar.getParentWindow(),
-					Strings.get("helpDisplayError"));
+			JOptionPane.showMessageDialog(menubar.getParentWindow(), Strings.get("helpDisplayError"));
 		}
 	}
 

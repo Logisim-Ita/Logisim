@@ -31,26 +31,27 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
 
 public class Clock extends InstanceFactory {
-	public static final Attribute<Integer> ATTR_HIGH
-		= new DurationAttribute("highDuration", Strings.getter("clockHighAttr"),
-				1, Integer.MAX_VALUE);
+	public static final Attribute<Integer> ATTR_HIGH = new DurationAttribute("highDuration",
+			Strings.getter("clockHighAttr"), 1, Integer.MAX_VALUE);
 
-	public static final Attribute<Integer> ATTR_LOW
-		= new DurationAttribute("lowDuration", Strings.getter("clockLowAttr"),
-				1, Integer.MAX_VALUE);
-	
+	public static final Attribute<Integer> ATTR_LOW = new DurationAttribute("lowDuration",
+			Strings.getter("clockLowAttr"), 1, Integer.MAX_VALUE);
+
 	public static final Clock FACTORY = new Clock();
 
 	private static final Icon toolIcon = Icons.getIcon("clock.gif");
-	
+
 	private static class ClockState implements InstanceData, Cloneable {
 		Value sending = Value.FALSE;
 		int clicks = 0;
-		
+
 		@Override
 		public ClockState clone() {
-			try { return (ClockState) super.clone(); }
-			catch (CloneNotSupportedException e) { return null; }
+			try {
+				return (ClockState) super.clone();
+			} catch (CloneNotSupportedException e) {
+				return null;
+			}
 		}
 	}
 
@@ -66,7 +67,7 @@ public class Clock extends InstanceFactory {
 			return s.sending;
 		}
 	}
-	
+
 	public static class ClockPoker extends InstancePoker {
 		boolean isPressed = true;
 
@@ -74,7 +75,7 @@ public class Clock extends InstanceFactory {
 		public void mousePressed(InstanceState state, MouseEvent e) {
 			isPressed = isInside(state, e);
 		}
-		
+
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			if (isPressed && isInside(state, e)) {
@@ -94,13 +95,11 @@ public class Clock extends InstanceFactory {
 
 	public Clock() {
 		super("Clock", Strings.getter("clockComponent"));
-		setAttributes(new Attribute[] {
-					StdAttr.FACING, ATTR_HIGH, ATTR_LOW,
-					StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT
-				}, new Object[] {
-					Direction.EAST, Integer.valueOf(1), Integer.valueOf(1),
-					"", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT
-				});
+		setAttributes(
+				new Attribute[] { StdAttr.FACING, ATTR_HIGH, ATTR_LOW, StdAttr.LABEL, Pin.ATTR_LABEL_LOC,
+						StdAttr.LABEL_FONT },
+				new Object[] { Direction.EAST, Integer.valueOf(1), Integer.valueOf(1), "", Direction.WEST,
+						StdAttr.DEFAULT_LABEL_FONT });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);
@@ -108,9 +107,7 @@ public class Clock extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		return Probe.getOffsetBounds(
-				attrs.getValue(StdAttr.FACING),
-				BitWidth.ONE, RadixOption.RADIX_2);
+		return Probe.getOffsetBounds(attrs.getValue(StdAttr.FACING), BitWidth.ONE, RadixOption.RADIX_2);
 	}
 
 	//
@@ -124,16 +121,21 @@ public class Clock extends InstanceFactory {
 		} else {
 			g.drawRect(4, 4, 13, 13);
 			g.setColor(Value.FALSE.getColor());
-			g.drawPolyline(new int[] { 6, 6, 10, 10, 14, 14 },
-					new int[] { 10, 6, 6, 14, 14, 10 }, 6);
+			g.drawPolyline(new int[] { 6, 6, 10, 10, 14, 14 }, new int[] { 10, 6, 6, 14, 14, 10 }, 6);
 		}
 
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
-		int pinx = 15; int piny = 8;
+		int pinx = 15;
+		int piny = 8;
 		if (dir == Direction.EAST) { // keep defaults
-		} else if (dir == Direction.WEST) { pinx = 3;
-		} else if (dir == Direction.NORTH) { pinx = 8; piny = 3;
-		} else if (dir == Direction.SOUTH) { pinx = 8; piny = 15;
+		} else if (dir == Direction.WEST) {
+			pinx = 3;
+		} else if (dir == Direction.NORTH) {
+			pinx = 8;
+			piny = 3;
+		} else if (dir == Direction.SOUTH) {
+			pinx = 8;
+			piny = 15;
 		}
 		g.setColor(Value.TRUE.getColor());
 		g.fillOval(pinx, piny, 3, 3);
@@ -142,7 +144,10 @@ public class Clock extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		java.awt.Graphics g = painter.getGraphics();
-		Bounds bds = painter.getInstance().getBounds(); // intentionally with no graphics object - we don't want label included
+		Bounds bds = painter.getInstance().getBounds(); // intentionally with no
+														// graphics object - we
+														// don't want label
+														// included
 		int x = bds.getX();
 		int y = bds.getY();
 		GraphicsUtil.switchToWidth(g, 2);
@@ -183,7 +188,7 @@ public class Clock extends InstanceFactory {
 		instance.setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, BitWidth.ONE) });
 		configureLabel(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == Pin.ATTR_LABEL_LOC) {
@@ -216,7 +221,8 @@ public class Clock extends InstanceFactory {
 			circState.setData(comp, state);
 		}
 		boolean curValue = ticks % (durationHigh + durationLow) < durationLow;
-		if (state.clicks % 2 == 1) curValue = !curValue;
+		if (state.clicks % 2 == 1)
+			curValue = !curValue;
 		Value desired = (curValue ? Value.FALSE : Value.TRUE);
 		if (!state.sending.equals(desired)) {
 			state.sending = desired;

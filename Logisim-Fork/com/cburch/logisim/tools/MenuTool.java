@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.tools;
 
-
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.event.ActionListener;
@@ -26,8 +25,7 @@ import com.cburch.logisim.proj.Project;
 import java.util.Collection;
 
 public class MenuTool extends Tool {
-	private class MenuComponent extends JPopupMenu
-			implements ActionListener {
+	private class MenuComponent extends JPopupMenu implements ActionListener {
 		Project proj;
 		Circuit circ;
 		Component comp;
@@ -40,26 +38,29 @@ public class MenuTool extends Tool {
 			this.comp = comp;
 			boolean canChange = proj.getLogisimFile().contains(circ);
 
-			add(del); del.addActionListener(this);
+			add(del);
+			del.addActionListener(this);
 			del.setEnabled(canChange);
-			add(attrs); attrs.addActionListener(this);
+			add(attrs);
+			attrs.addActionListener(this);
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			if (src == del) {
 				Circuit circ = proj.getCurrentCircuit();
 				CircuitMutation xn = new CircuitMutation(circ);
 				xn.remove(comp);
-				proj.doAction(xn.toAction(Strings.getter("removeComponentAction", comp.getFactory().getDisplayGetter())));
+				proj.doAction(
+						xn.toAction(Strings.getter("removeComponentAction", comp.getFactory().getDisplayGetter())));
 			} else if (src == attrs) {
 				proj.getFrame().viewComponentAttributes(circ, comp);
 			}
 		}
 	}
 
-	private class MenuSelection extends JPopupMenu
-			implements ActionListener {
+	private class MenuSelection extends JPopupMenu implements ActionListener {
 		Project proj;
 		JMenuItem del = new JMenuItem(Strings.get("selDeleteItem"));
 		JMenuItem cut = new JMenuItem(Strings.get("selCutItem"));
@@ -68,13 +69,17 @@ public class MenuTool extends Tool {
 		MenuSelection(Project proj) {
 			this.proj = proj;
 			boolean canChange = proj.getLogisimFile().contains(proj.getCurrentCircuit());
-			add(del); del.addActionListener(this);
+			add(del);
+			del.addActionListener(this);
 			del.setEnabled(canChange);
-			add(cut); cut.addActionListener(this);
+			add(cut);
+			cut.addActionListener(this);
 			cut.setEnabled(canChange);
-			add(copy); copy.addActionListener(this);
+			add(copy);
+			copy.addActionListener(this);
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			Selection sel = proj.getSelection();
@@ -92,26 +97,33 @@ public class MenuTool extends Tool {
 		}
 	}
 
-	public MenuTool() { }
-	
+	public MenuTool() {
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		return other instanceof MenuTool;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return MenuTool.class.hashCode();
 	}
 
 	@Override
-	public String getName() { return "Menu Tool"; }
+	public String getName() {
+		return "Menu Tool";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("menuTool"); }
+	public String getDisplayName() {
+		return Strings.get("menuTool");
+	}
 
 	@Override
-	public String getDescription() { return Strings.get("menuToolDesc"); }
+	public String getDescription() {
+		return Strings.get("menuToolDesc");
+	}
 
 	@Override
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
@@ -128,19 +140,19 @@ public class MenuTool extends Tool {
 			if (sel.getComponents().size() > 1) {
 				menu = new MenuSelection(proj);
 			} else {
-				menu = new MenuComponent(proj,
-					canvas.getCircuit(), comp);
+				menu = new MenuComponent(proj, canvas.getCircuit(), comp);
 				MenuExtender extender = (MenuExtender) comp.getFeature(MenuExtender.class);
-				if (extender != null) extender.configureMenu(menu, proj);
+				if (extender != null)
+					extender.configureMenu(menu, proj);
 			}
 		} else {
 			Collection<Component> cl = canvas.getCircuit().getAllContaining(pt, g);
 			if (!cl.isEmpty()) {
 				Component comp = cl.iterator().next();
-				menu = new MenuComponent(proj,
-					canvas.getCircuit(), comp);
+				menu = new MenuComponent(proj, canvas.getCircuit(), comp);
 				MenuExtender extender = (MenuExtender) comp.getFeature(MenuExtender.class);
-				if (extender != null) extender.configureMenu(menu, proj);
+				if (extender != null)
+					extender.configureMenu(menu, proj);
 			} else {
 				menu = null;
 			}

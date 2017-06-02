@@ -14,20 +14,15 @@ import com.cburch.logisim.instance.StdAttr;
 
 class CounterAttributes extends AbstractAttributeSet {
 	private AttributeSet base;
-	
+
 	public CounterAttributes() {
-		base = AttributeSets.fixedSet(new Attribute<?>[] {
-				StdAttr.WIDTH, Counter.ATTR_MAX, Counter.ATTR_ON_GOAL,
-				StdAttr.EDGE_TRIGGER,
-				StdAttr.LABEL, StdAttr.LABEL_FONT
-			}, new Object[] {
-				BitWidth.create(8), Integer.valueOf(0xFF),
-				Counter.ON_GOAL_WRAP,
-				StdAttr.TRIG_RISING,
-				"", StdAttr.DEFAULT_LABEL_FONT
-			});
+		base = AttributeSets.fixedSet(
+				new Attribute<?>[] { StdAttr.WIDTH, Counter.ATTR_MAX, Counter.ATTR_ON_GOAL, StdAttr.EDGE_TRIGGER,
+						StdAttr.LABEL, StdAttr.LABEL_FONT },
+				new Object[] { BitWidth.create(8), Integer.valueOf(0xFF), Counter.ON_GOAL_WRAP, StdAttr.TRIG_RISING, "",
+						StdAttr.DEFAULT_LABEL_FONT });
 	}
-	
+
 	@Override
 	public void copyInto(AbstractAttributeSet dest) {
 		((CounterAttributes) dest).base = (AttributeSet) this.base.clone();
@@ -46,7 +41,8 @@ class CounterAttributes extends AbstractAttributeSet {
 	@Override
 	public <V> void setValue(Attribute<V> attr, V value) {
 		Object oldValue = base.getValue(attr);
-		if (oldValue == null ? value == null : oldValue.equals(value)) return;
+		if (oldValue == null ? value == null : oldValue.equals(value))
+			return;
 
 		Integer newMax = null;
 		if (attr == StdAttr.WIDTH) {

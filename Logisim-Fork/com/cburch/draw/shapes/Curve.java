@@ -24,20 +24,19 @@ public class Curve extends FillableCanvasObject {
 	private Location p1;
 	private Location p2;
 	private Bounds bounds;
-	
+
 	public Curve(Location end0, Location end1, Location ctrl) {
 		this.p0 = end0;
 		this.p1 = ctrl;
 		this.p2 = end1;
 		bounds = CurveUtil.getBounds(toArray(p0), toArray(p1), toArray(p2));
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof Curve) {
 			Curve that = (Curve) other;
-			return this.p0.equals(that.p0) && this.p1.equals(that.p1)
-				&& this.p2.equals(that.p2) && super.matches(that);
+			return this.p0.equals(that.p0) && this.p1.equals(that.p1) && this.p2.equals(that.p2) && super.matches(that);
 		} else {
 			return false;
 		}
@@ -51,7 +50,7 @@ public class Curve extends FillableCanvasObject {
 		ret = ret * 31 + super.matchesHashCode();
 		return ret;
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		return SvgCreator.createCurve(doc, this);
@@ -60,20 +59,19 @@ public class Curve extends FillableCanvasObject {
 	public Location getEnd0() {
 		return p0;
 	}
-	
+
 	public Location getEnd1() {
 		return p2;
 	}
-	
+
 	public Location getControl() {
 		return p1;
 	}
-	
+
 	public QuadCurve2D getCurve2D() {
-		return new QuadCurve2D.Double(p0.getX(), p0.getY(),
-				p1.getX(), p1.getY(), p2.getX(), p2.getY());
+		return new QuadCurve2D.Double(p0.getX(), p0.getY(), p1.getX(), p1.getY(), p2.getX(), p2.getY());
 	}
-	
+
 	@Override
 	public String getDisplayName() {
 		return Strings.get("shapeCurve");
@@ -83,12 +81,12 @@ public class Curve extends FillableCanvasObject {
 	public List<Attribute<?>> getAttributes() {
 		return DrawAttr.getFillAttributes(getPaintType());
 	}
-	
+
 	@Override
 	public Bounds getBounds() {
 		return bounds;
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, boolean assumeFilled) {
 		Object type = getPaintType();
@@ -97,13 +95,14 @@ public class Curve extends FillableCanvasObject {
 		}
 		if (type != DrawAttr.PAINT_FILL) {
 			int stroke = getStrokeWidth();
-			double[] q = toArray(loc); 
+			double[] q = toArray(loc);
 			double[] p0 = toArray(this.p0);
 			double[] p1 = toArray(this.p1);
 			double[] p2 = toArray(this.p2);
 			double[] p = CurveUtil.findNearestPoint(q, p0, p1, p2);
-			if (p == null) return false;
-			
+			if (p == null)
+				return false;
+
 			int thr;
 			if (type == DrawAttr.PAINT_STROKE) {
 				thr = Math.max(Line.ON_LINE_THRESH, stroke / 2);
@@ -122,7 +121,7 @@ public class Curve extends FillableCanvasObject {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void translate(int dx, int dy) {
 		p0 = p0.translate(dx, dy);
@@ -130,26 +129,24 @@ public class Curve extends FillableCanvasObject {
 		p2 = p2.translate(dx, dy);
 		bounds = bounds.translate(dx, dy);
 	}
-	
+
 	public List<Handle> getHandles() {
 		return UnmodifiableList.create(getHandleArray(null));
 	}
-	
+
 	@Override
 	public List<Handle> getHandles(HandleGesture gesture) {
 		return UnmodifiableList.create(getHandleArray(gesture));
 	}
-	
+
 	private Handle[] getHandleArray(HandleGesture gesture) {
 		if (gesture == null) {
-			return new Handle[] { new Handle(this, p0), new Handle(this, p1),
-					new Handle(this, p2) };
+			return new Handle[] { new Handle(this, p0), new Handle(this, p1), new Handle(this, p2) };
 		} else {
 			Handle g = gesture.getHandle();
 			int gx = g.getX() + gesture.getDeltaX();
 			int gy = g.getY() + gesture.getDeltaY();
-			Handle[] ret = { new Handle(this, p0), new Handle(this, p1),
-					new Handle(this, p2) };
+			Handle[] ret = { new Handle(this, p0), new Handle(this, p1), new Handle(this, p2) };
 			if (g.isAt(p0)) {
 				if (gesture.isShiftDown()) {
 					Location p = LineUtil.snapTo8Cardinals(p2, gx, gy);
@@ -174,8 +171,7 @@ public class Curve extends FillableCanvasObject {
 					double midy = (y0 + y1) / 2;
 					double dx = x1 - x0;
 					double dy = y1 - y0;
-					double[] p = LineUtil.nearestPointInfinite(gx, gy,
-							midx, midy, midx - dy, midy + dx);
+					double[] p = LineUtil.nearestPointInfinite(gx, gy, midx, midy, midx - dy, midy + dx);
 					gx = (int) Math.round(p[0]);
 					gy = (int) Math.round(p[1]);
 				}
@@ -192,12 +188,12 @@ public class Curve extends FillableCanvasObject {
 			return ret;
 		}
 	}
-	
+
 	@Override
 	public boolean canMoveHandle(Handle handle) {
 		return true;
 	}
-	
+
 	@Override
 	public Handle moveHandle(HandleGesture gesture) {
 		Handle[] hs = getHandleArray(gesture);
@@ -217,7 +213,7 @@ public class Curve extends FillableCanvasObject {
 		bounds = CurveUtil.getBounds(toArray(p0), toArray(p1), toArray(p2));
 		return ret;
 	}
-	
+
 	@Override
 	public void paint(Graphics g, HandleGesture gesture) {
 		QuadCurve2D curve = getCurve(gesture);
@@ -228,13 +224,12 @@ public class Curve extends FillableCanvasObject {
 			((Graphics2D) g).draw(curve);
 		}
 	}
-	
+
 	private QuadCurve2D getCurve(HandleGesture gesture) {
 		Handle[] p = getHandleArray(gesture);
-		return new QuadCurve2D.Double(p[0].getX(), p[0].getY(),
-				p[1].getX(), p[1].getY(), p[2].getX(), p[2].getY());
+		return new QuadCurve2D.Double(p[0].getX(), p[0].getY(), p[1].getX(), p[1].getY(), p[2].getX(), p[2].getY());
 	}
-	
+
 	private static double[] toArray(Location loc) {
 		return new double[] { loc.getX(), loc.getY() };
 	}

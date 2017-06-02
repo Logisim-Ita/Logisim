@@ -18,8 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 
 public abstract class JDialogOk extends JDialog {
-	private class MyListener extends WindowAdapter
-			implements ActionListener {
+	private class MyListener extends WindowAdapter implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			if (src == ok) {
@@ -73,10 +73,13 @@ public abstract class JDialogOk extends JDialog {
 	}
 
 	@Override
-	public Container getContentPane() { return contents; }
+	public Container getContentPane() {
+		return contents;
+	}
 
 	public abstract void okClicked();
 
-	public void cancelClicked() { }
+	public void cancelClicked() {
+	}
 
 }

@@ -32,15 +32,17 @@ import java.util.List;
 class LayoutToolbarModel extends AbstractToolbarModel {
 	private class ToolItem implements ToolbarItem {
 		private Tool tool;
-		
+
 		ToolItem(Tool tool) {
 			this.tool = tool;
 		}
-		
+
+		@Override
 		public boolean isSelectable() {
 			return true;
 		}
-		
+
+		@Override
 		public void paintIcon(Component destination, Graphics g) {
 			// draw halo
 			if (tool == haloedTool && AppPreferences.ATTRIBUTE_HALO.getBoolean()) {
@@ -51,38 +53,42 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			// draw tool icon
 			g.setColor(Color.BLACK);
 			Graphics g_copy = g.create();
-			ComponentDrawContext c = new ComponentDrawContext(destination,
-					null, null, g, g_copy);
+			ComponentDrawContext c = new ComponentDrawContext(destination, null, null, g, g_copy);
 			tool.paintIcon(c, 2, 2);
 			g_copy.dispose();
 		}
-		
+
+		@Override
 		public String getToolTip() {
 			String ret = tool.getDescription();
 			int index = 1;
 			for (ToolbarItem item : items) {
-				if (item == this) break;
-				if (item instanceof ToolItem) ++index;
+				if (item == this)
+					break;
+				if (item instanceof ToolItem)
+					++index;
 			}
 			if (index <= 10) {
-				if (index == 10) index = 0;
+				if (index == 10)
+					index = 0;
 				int mask = frame.getToolkit().getMenuShortcutKeyMask();
-				ret += " (" + InputEventUtil.toKeyDisplayString(mask)
-					+ "-" + index + ")";
+				ret += " (" + InputEventUtil.toKeyDisplayString(mask) + "-" + index + ")";
 			}
 			return ret;
 		}
-		
+
+		@Override
 		public Dimension getDimension(Object orientation) {
 			return new Dimension(24, 24);
 		}
 	}
 
-	private class MyListener implements ProjectListener, AttributeListener,
-				ToolbarData.ToolbarListener, PropertyChangeListener {
+	private class MyListener
+			implements ProjectListener, AttributeListener, ToolbarData.ToolbarListener, PropertyChangeListener {
 		//
 		// ProjectListener methods
 		//
+		@Override
 		public void projectChanged(ProjectEvent e) {
 			int act = e.getAction();
 			if (act == ProjectEvent.ACTION_SET_TOOL) {
@@ -107,28 +113,34 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 		//
 		// ToolbarListener methods
 		//
+		@Override
 		public void toolbarChanged() {
 			buildContents();
 		}
-		
+
 		//
 		// AttributeListener methods
 		//
-		public void attributeListChanged(AttributeEvent e) { }
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			fireToolbarAppearanceChanged();
 		}
-		
+
 		//
 		// PropertyChangeListener method
 		//
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (AppPreferences.GATE_SHAPE.isSource(event)) {
 				fireToolbarAppearanceChanged();
 			}
 		}
 	}
-		
+
 	private Frame frame;
 	private Project proj;
 	private MyListener myListener;
@@ -155,7 +167,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 	public List<ToolbarItem> getItems() {
 		return items;
 	}
-	
+
 	@Override
 	public boolean isSelected(ToolbarItem item) {
 		if (item instanceof ToolItem) {
@@ -180,7 +192,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			fireToolbarAppearanceChanged();
 		}
 	}
-	
+
 	private void buildContents() {
 		List<ToolbarItem> oldItems = items;
 		List<ToolbarItem> newItems = new ArrayList<ToolbarItem>();
@@ -202,7 +214,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 		items = Collections.unmodifiableList(newItems);
 		fireToolbarContentsChanged();
 	}
-	
+
 	private static ToolbarItem findItem(List<ToolbarItem> items, Tool tool) {
 		for (ToolbarItem item : items) {
 			if (item instanceof ToolItem) {

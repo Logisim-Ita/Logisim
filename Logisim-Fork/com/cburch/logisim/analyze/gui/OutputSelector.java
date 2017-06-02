@@ -17,26 +17,30 @@ import com.cburch.logisim.analyze.model.VariableListEvent;
 import com.cburch.logisim.analyze.model.VariableListListener;
 
 class OutputSelector {
-	private class Model extends AbstractListModel
-			implements ComboBoxModel, VariableListListener {
+	private class Model extends AbstractListModel implements ComboBoxModel, VariableListListener {
 		private Object selected;
 
+		@Override
 		public void setSelectedItem(Object value) {
 			selected = value;
 		}
 
+		@Override
 		public Object getSelectedItem() {
 			return selected;
 		}
 
+		@Override
 		public int getSize() {
 			return source.size();
 		}
 
+		@Override
 		public Object getElementAt(int index) {
 			return source.get(index);
 		}
 
+		@Override
 		public void listChanged(VariableListEvent event) {
 			int index;
 			String variable;
@@ -56,7 +60,7 @@ class OutputSelector {
 				if (prototypeValue == null || variable.length() > prototypeValue.length()) {
 					computePrototypeValue();
 				}
-				
+
 				index = source.indexOf(variable);
 				fireIntervalAdded(this, index, index);
 				if (select.getSelectedItem() == null) {
@@ -65,7 +69,8 @@ class OutputSelector {
 				break;
 			case VariableListEvent.REMOVE:
 				variable = event.getVariable();
-				if (variable.equals(prototypeValue)) computePrototypeValue();
+				if (variable.equals(prototypeValue))
+					computePrototypeValue();
 				index = ((Integer) event.getData()).intValue();
 				fireIntervalRemoved(this, index, index);
 				selection = select.getSelectedItem();
@@ -79,7 +84,8 @@ class OutputSelector {
 				break;
 			case VariableListEvent.REPLACE:
 				variable = event.getVariable();
-				if (variable.equals(prototypeValue)) computePrototypeValue();
+				if (variable.equals(prototypeValue))
+					computePrototypeValue();
 				index = ((Integer) event.getData()).intValue();
 				fireContentsChanged(this, index, index);
 				selection = select.getSelectedItem();
@@ -95,42 +101,42 @@ class OutputSelector {
 	private JLabel label = new JLabel();
 	private JComboBox select = new JComboBox();
 	private String prototypeValue = null;
-	
+
 	public OutputSelector(AnalyzerModel model) {
 		this.source = model.getOutputs();
-		
+
 		Model listModel = new Model();
 		select.setModel(listModel);
 		source.addVariableListListener(listModel);
 	}
-	
+
 	public JPanel createPanel() {
 		JPanel ret = new JPanel();
 		ret.add(label);
 		ret.add(select);
 		return ret;
 	}
-	
+
 	public JLabel getLabel() {
 		return label;
 	}
-	
+
 	public JComboBox getComboBox() {
 		return select;
 	}
-	
+
 	void localeChanged() {
 		label.setText(Strings.get("outputSelectLabel"));
 	}
-	
+
 	public void addItemListener(ItemListener l) {
 		select.addItemListener(l);
 	}
-	
+
 	public void removeItemListener(ItemListener l) {
 		select.removeItemListener(l);
 	}
-	
+
 	public String getSelectedOutput() {
 		String value = (String) select.getSelectedItem();
 		if (value != null && !source.contains(value)) {
@@ -143,7 +149,7 @@ class OutputSelector {
 		}
 		return value;
 	}
-	
+
 	private void computePrototypeValue() {
 		String newValue;
 		if (source.isEmpty()) {
@@ -152,7 +158,8 @@ class OutputSelector {
 			newValue = "xx";
 			for (int i = 0, n = source.size(); i < n; i++) {
 				String candidate = source.get(i);
-				if (candidate.length() > newValue.length()) newValue = candidate;
+				if (candidate.length() > newValue.length())
+					newValue = candidate;
 			}
 		}
 		if (prototypeValue == null || newValue.length() != prototypeValue.length()) {

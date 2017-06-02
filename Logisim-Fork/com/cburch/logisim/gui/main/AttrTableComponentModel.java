@@ -22,11 +22,11 @@ class AttrTableComponentModel extends AttributeSetTableModel {
 		this.circ = circ;
 		this.comp = comp;
 	}
-	
+
 	public Circuit getCircuit() {
 		return circ;
 	}
-	
+
 	public Component getComponent() {
 		return comp;
 	}
@@ -37,18 +37,14 @@ class AttrTableComponentModel extends AttributeSetTableModel {
 	}
 
 	@Override
-	public void setValueRequested(Attribute<Object> attr, Object value)
-			throws AttrTableSetException {
+	public void setValueRequested(Attribute<Object> attr, Object value) throws AttrTableSetException {
 		if (!proj.getLogisimFile().contains(circ)) {
 			String msg = Strings.get("cannotModifyCircuitError");
 			throw new AttrTableSetException(msg);
 		} else {
-			SetAttributeAction act = new SetAttributeAction(circ,
-					Strings.getter("changeAttributeAction"));
+			SetAttributeAction act = new SetAttributeAction(circ, Strings.getter("changeAttributeAction"));
 			act.set(comp, attr, value);
 			proj.doAction(act);
 		}
 	}
 }
-
-

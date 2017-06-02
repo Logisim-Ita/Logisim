@@ -13,17 +13,16 @@ import javax.swing.event.ListSelectionListener;
 
 import com.cburch.logisim.prefs.AppPreferences;
 
-class LocaleSelector extends JList
-			implements LocaleListener, ListSelectionListener {
+class LocaleSelector extends JList implements LocaleListener, ListSelectionListener {
 	private static class LocaleOption implements Runnable {
 		private Locale locale;
 		private String text;
-		
+
 		LocaleOption(Locale locale) {
 			this.locale = locale;
 			update(locale);
 		}
-		
+
 		@Override
 		public String toString() {
 			return text;
@@ -33,11 +32,11 @@ class LocaleSelector extends JList
 			if (current != null && current.equals(locale)) {
 				text = locale.getDisplayName(locale);
 			} else {
-				text = locale.getDisplayName(locale)
-					+ " / " + locale.getDisplayName(current);
+				text = locale.getDisplayName(locale) + " / " + locale.getDisplayName(current);
 			}
 		}
-		
+
+		@Override
 		public void run() {
 			if (!LocaleManager.getLocale().equals(locale)) {
 				LocaleManager.setLocale(locale);
@@ -47,7 +46,7 @@ class LocaleSelector extends JList
 	}
 
 	private LocaleOption[] items;
-	
+
 	LocaleSelector(Locale[] locales) {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		DefaultListModel model = new DefaultListModel();
@@ -62,19 +61,22 @@ class LocaleSelector extends JList
 		localeChanged();
 		addListSelectionListener(this);
 	}
-	
+
+	@Override
 	public void localeChanged() {
 		Locale current = LocaleManager.getLocale();
 		LocaleOption sel = null;
 		for (int i = 0; i < items.length; i++) {
 			items[i].update(current);
-			if (current.equals(items[i].locale)) sel = items[i];
+			if (current.equals(items[i].locale))
+				sel = items[i];
 		}
 		if (sel != null) {
 			setSelectedValue(sel, true);
 		}
 	}
 
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		LocaleOption opt = (LocaleOption) getSelectedValue();
 		if (opt != null) {

@@ -16,7 +16,7 @@ class MenuItemHelper implements ActionListener {
 	private boolean enabled;
 	private boolean inActionListener;
 	private ArrayList<ActionListener> listeners;
-	
+
 	public MenuItemHelper(JMenuItem source, Menu menu, LogisimMenuItem menuItem) {
 		this.source = source;
 		this.menu = menu;
@@ -25,27 +25,27 @@ class MenuItemHelper implements ActionListener {
 		this.inActionListener = false;
 		this.listeners = new ArrayList<ActionListener>();
 	}
-	
+
 	public boolean hasListeners() {
 		return !listeners.isEmpty();
 	}
-	
+
 	public void addActionListener(ActionListener l) {
 		listeners.add(l);
 		computeEnabled();
 	}
-	
+
 	public void removeActionListener(ActionListener l) {
 		listeners.remove(l);
 		computeEnabled();
 	}
-	
+
 	public void setEnabled(boolean value) {
 		if (!inActionListener) {
 			enabled = value;
 		}
 	}
-	
+
 	private void computeEnabled() {
 		inActionListener = true;
 		try {
@@ -56,10 +56,10 @@ class MenuItemHelper implements ActionListener {
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (!listeners.isEmpty()) {
-			ActionEvent e = new ActionEvent(menuItem, event.getID(),
-					event.getActionCommand(), event.getWhen(),
+			ActionEvent e = new ActionEvent(menuItem, event.getID(), event.getActionCommand(), event.getWhen(),
 					event.getModifiers());
 			for (ActionListener l : listeners) {
 				l.actionPerformed(e);

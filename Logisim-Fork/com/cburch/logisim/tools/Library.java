@@ -17,11 +17,17 @@ public abstract class Library {
 	public abstract List<? extends Tool> getTools();
 
 	@Override
-	public String toString() { return getName(); }
+	public String toString() {
+		return getName();
+	}
 
-	public String getDisplayName() { return getName(); }
-	
-	public boolean isDirty() { return false; }
+	public String getDisplayName() {
+		return getName();
+	}
+
+	public boolean isDirty() {
+		return false;
+	}
 
 	public List<Library> getLibraries() {
 		return Collections.emptyList();
@@ -48,19 +54,20 @@ public abstract class Library {
 		}
 		return false;
 	}
-	
+
 	public int indexOf(ComponentFactory query) {
 		int index = -1;
 		for (Tool obj : getTools()) {
 			index++;
 			if (obj instanceof AddTool) {
 				AddTool tool = (AddTool) obj;
-				if (tool.getFactory() == query) return index;
+				if (tool.getFactory() == query)
+					return index;
 			}
 		}
 		return -1;
 	}
-	
+
 	public boolean contains(ComponentFactory query) {
 		return indexOf(query) >= 0;
 	}

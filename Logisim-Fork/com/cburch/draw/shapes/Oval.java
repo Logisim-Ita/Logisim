@@ -19,7 +19,7 @@ public class Oval extends Rectangular {
 	public Oval(int x, int y, int w, int h) {
 		super(x, y, w, h);
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof Oval) {
@@ -38,7 +38,7 @@ public class Oval extends Rectangular {
 	public Element toSvgElement(Document doc) {
 		return SvgCreator.createOval(doc, this);
 	}
-	
+
 	@Override
 	public String getDisplayName() {
 		return Strings.get("shapeOval");
@@ -77,10 +77,12 @@ public class Oval extends Rectangular {
 			return super.getRandomPoint(bds, rand);
 		}
 	}
-	
+
 	@Override
 	public void draw(Graphics g, int x, int y, int w, int h) {
-		if (setForFill(g)) g.fillOval(x, y, w, h);
-		if (setForStroke(g)) g.drawOval(x, y, w, h);
+		if (setForFill(g))
+			g.fillOval(x, y, w, h);
+		if (setForStroke(g))
+			g.drawOval(x, y, w, h);
 	}
 }

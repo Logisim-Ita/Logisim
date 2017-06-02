@@ -19,24 +19,27 @@ import com.cburch.logisim.analyze.model.TruthTable;
 
 class TableTabClip implements ClipboardOwner {
 	private static final DataFlavor binaryFlavor = new DataFlavor(Data.class, "Binary data");
-	
+
 	private static class Data implements Transferable, Serializable {
 		private String[] headers;
 		private String[][] contents;
-		
+
 		Data(String[] headers, String[][] contents) {
 			this.headers = headers;
 			this.contents = contents;
 		}
 
+		@Override
 		public DataFlavor[] getTransferDataFlavors() {
 			return new DataFlavor[] { binaryFlavor, DataFlavor.stringFlavor };
 		}
 
+		@Override
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
 		}
 
+		@Override
 		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 			if (flavor == binaryFlavor) {
 				return this;
@@ -54,26 +57,34 @@ class TableTabClip implements ClipboardOwner {
 				}
 				return buf.toString();
 			} else {
-				throw new UnsupportedFlavorException(flavor); 
+				throw new UnsupportedFlavorException(flavor);
 			}
 		}
 	}
-	
+
 	private TableTab table;
-	
+
 	TableTabClip(TableTab table) {
 		this.table = table;
 	}
-	
+
 	public void copy() {
 		TableTabCaret caret = table.getCaret();
 		int c0 = caret.getCursorCol();
 		int r0 = caret.getCursorRow();
 		int c1 = caret.getMarkCol();
 		int r1 = caret.getMarkRow();
-		if (c1 < c0) { int t = c0; c0 = c1; c1 = t; }
-		if (r1 < r0) { int t = r0; r0 = r1; r1 = t; }
-		
+		if (c1 < c0) {
+			int t = c0;
+			c0 = c1;
+			c1 = t;
+		}
+		if (r1 < r0) {
+			int t = r0;
+			r0 = r1;
+			r1 = t;
+		}
+
 		TruthTable t = table.getTruthTable();
 		int inputs = t.getInputColumnCount();
 		String[] header = new String[c1 - c0 + 1];
@@ -94,29 +105,28 @@ class TableTabClip implements ClipboardOwner {
 				}
 			}
 		}
-		
+
 		Clipboard clip = table.getToolkit().getSystemClipboard();
 		clip.setContents(new Data(header, contents), this);
 	}
-	
+
 	public boolean canPaste() {
 		Clipboard clip = table.getToolkit().getSystemClipboard();
 		Transferable xfer = clip.getContents(this);
 		return xfer.isDataFlavorSupported(binaryFlavor);
 	}
-	
+
 	public void paste() {
 		Clipboard clip = table.getToolkit().getSystemClipboard();
 		Transferable xfer;
 		try {
 			xfer = clip.getContents(this);
 		} catch (Throwable t) {
-			// I don't know - the above was observed to throw an odd ArrayIndexOutOfBounds
+			// I don't know - the above was observed to throw an odd
+			// ArrayIndexOutOfBounds
 			// exception on a Linux computer using Sun's Java 5 JVM
-			JOptionPane.showMessageDialog(table.getRootPane(),
-					Strings.get("clipPasteSupportedError"),
-					Strings.get("clipPasteErrorTitle"),
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(table.getRootPane(), Strings.get("clipPasteSupportedError"),
+					Strings.get("clipPasteErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		Entry[][] entries;
@@ -141,7 +151,8 @@ class TableTabClip implements ClipboardOwner {
 				String buf = (String) xfer.getTransferData(DataFlavor.stringFlavor);
 				StringTokenizer lines = new StringTokenizer(buf, "\r\n");
 				String first;
-				if (!lines.hasMoreTokens()) return;
+				if (!lines.hasMoreTokens())
+					return;
 				first = lines.nextToken();
 				StringTokenizer toks = new StringTokenizer(first, "\t,");
 				String[] headers = new String[toks.countTokens()];
@@ -153,7 +164,8 @@ class TableTabClip implements ClipboardOwner {
 					allParsed = allParsed && firstEntries[i] != null;
 				}
 				int rows = lines.countTokens();
-				if (allParsed) rows++;
+				if (allParsed)
+					rows++;
 				entries = new Entry[rows][];
 				int cur = 0;
 				if (allParsed) {
@@ -175,10 +187,8 @@ class TableTabClip implements ClipboardOwner {
 				return;
 			}
 		} else {
-			JOptionPane.showMessageDialog(table.getRootPane(),
-				Strings.get("clipPasteSupportedError"),
-				Strings.get("clipPasteErrorTitle"),
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(table.getRootPane(), Strings.get("clipPasteSupportedError"),
+					Strings.get("clipPasteErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -187,43 +197,47 @@ class TableTabClip implements ClipboardOwner {
 		int c1 = caret.getMarkCol();
 		int r0 = caret.getCursorRow();
 		int r1 = caret.getMarkRow();
-		if (r0 < 0 || r1 < 0 || c0 < 0 || c1 < 0) return;
+		if (r0 < 0 || r1 < 0 || c0 < 0 || c1 < 0)
+			return;
 		TruthTable model = table.getTruthTable();
 		int rows = model.getRowCount();
 		int inputs = model.getInputColumnCount();
 		int outputs = model.getOutputColumnCount();
 		if (c0 == c1 && r0 == r1) {
-			if (r0 + entries.length > rows
-					|| c0 + entries[0].length > inputs + outputs) {
-				JOptionPane.showMessageDialog(table.getRootPane(),
-						Strings.get("clipPasteEndError"),
-						Strings.get("clipPasteErrorTitle"),
-						JOptionPane.ERROR_MESSAGE);
+			if (r0 + entries.length > rows || c0 + entries[0].length > inputs + outputs) {
+				JOptionPane.showMessageDialog(table.getRootPane(), Strings.get("clipPasteEndError"),
+						Strings.get("clipPasteErrorTitle"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		} else {
-			if (r0 > r1) { int t = r0; r0 = r1; r1 = t; }
-			if (c0 > c1) { int t = c0; c0 = c1; c1 = t; }
-			
-			if (r1 - r0 + 1 != entries.length
-					|| c1 - c0 + 1 != entries[0].length) {
-				JOptionPane.showMessageDialog(table.getRootPane(),
-						Strings.get("clipPasteSizeError"),
-						Strings.get("clipPasteErrorTitle"),
-						JOptionPane.ERROR_MESSAGE);
+			if (r0 > r1) {
+				int t = r0;
+				r0 = r1;
+				r1 = t;
+			}
+			if (c0 > c1) {
+				int t = c0;
+				c0 = c1;
+				c1 = t;
+			}
+
+			if (r1 - r0 + 1 != entries.length || c1 - c0 + 1 != entries[0].length) {
+				JOptionPane.showMessageDialog(table.getRootPane(), Strings.get("clipPasteSizeError"),
+						Strings.get("clipPasteErrorTitle"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
 		for (int r = 0; r < entries.length; r++) {
 			for (int c = 0; c < entries[0].length; c++) {
 				if (c0 + c >= inputs) {
-					model.setOutputEntry(r0 + r, c0 + c - inputs,
-							entries[r][c]);
+					model.setOutputEntry(r0 + r, c0 + c - inputs, entries[r][c]);
 				}
 			}
 		}
 	}
-	
-	public void lostOwnership(Clipboard clip, Transferable transfer) { }
+
+	@Override
+	public void lostOwnership(Clipboard clip, Transferable transfer) {
+	}
 
 }

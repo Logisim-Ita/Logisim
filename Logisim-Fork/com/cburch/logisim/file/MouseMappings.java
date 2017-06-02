@@ -21,13 +21,13 @@ public class MouseMappings {
 	}
 
 	private ArrayList<MouseMappingsListener> listeners;
-	private HashMap<Integer,Tool> map;
+	private HashMap<Integer, Tool> map;
 	private int cache_mods;
 	private Tool cache_tool;
 
 	public MouseMappings() {
 		listeners = new ArrayList<MouseMappingsListener>();
-		map = new HashMap<Integer,Tool>();
+		map = new HashMap<Integer, Tool>();
 	}
 
 	//
@@ -50,7 +50,7 @@ public class MouseMappings {
 	//
 	// query methods
 	//
-	public Map<Integer,Tool> getMappings() {
+	public Map<Integer, Tool> getMappings() {
 		return map;
 	}
 
@@ -92,10 +92,11 @@ public class MouseMappings {
 		}
 		return false;
 	}
-	
+
 	public boolean containsSelectTool() {
 		for (Tool tool : map.values()) {
-			if (tool instanceof SelectTool) return true;
+			if (tool instanceof SelectTool)
+				return true;
 		}
 		return false;
 	}
@@ -104,7 +105,8 @@ public class MouseMappings {
 	// modification methods
 	//
 	public void copyFrom(MouseMappings other, LogisimFile file) {
-		if (this == other) return;
+		if (this == other)
+			return;
 		cache_mods = -1;
 		this.map.clear();
 		for (Integer mods : other.map.keySet()) {
@@ -112,8 +114,7 @@ public class MouseMappings {
 			Tool dstTool = file.findTool(srcTool);
 			if (dstTool != null) {
 				dstTool = dstTool.cloneTool();
-				AttributeSets.copy(srcTool.getAttributeSet(),
-						dstTool.getAttributeSet());
+				AttributeSets.copy(srcTool.getAttributeSet(), dstTool.getAttributeSet());
 				this.map.put(mods, dstTool);
 			}
 		}
@@ -125,35 +126,41 @@ public class MouseMappings {
 	}
 
 	public void setToolFor(int mods, Tool tool) {
-		if (mods == cache_mods) cache_mods = -1;
+		if (mods == cache_mods)
+			cache_mods = -1;
 
 		if (tool == null) {
 			Object old = map.remove(Integer.valueOf(mods));
-			if (old != null) fireMouseMappingsChanged();
+			if (old != null)
+				fireMouseMappingsChanged();
 		} else {
 			Object old = map.put(Integer.valueOf(mods), tool);
-			if (old != tool) fireMouseMappingsChanged();
+			if (old != tool)
+				fireMouseMappingsChanged();
 		}
 	}
 
 	public void setToolFor(Integer mods, Tool tool) {
-		if (mods.intValue() == cache_mods) cache_mods = -1;
+		if (mods.intValue() == cache_mods)
+			cache_mods = -1;
 
 		if (tool == null) {
 			Object old = map.remove(mods);
-			if (old != null) fireMouseMappingsChanged();
+			if (old != null)
+				fireMouseMappingsChanged();
 		} else {
 			Object old = map.put(mods, tool);
-			if (old != tool) fireMouseMappingsChanged();
+			if (old != tool)
+				fireMouseMappingsChanged();
 		}
 	}
 
 	//
 	// package-protected methods
 	//
-	void replaceAll(Map<Tool,Tool> toolMap) {
+	void replaceAll(Map<Tool, Tool> toolMap) {
 		boolean changed = false;
-		for (Map.Entry<Integer,Tool> entry : map.entrySet()) {
+		for (Map.Entry<Integer, Tool> entry : map.entrySet()) {
 			Integer key = entry.getKey();
 			Tool tool = entry.getValue();
 			if (tool instanceof AddTool) {
@@ -165,8 +172,7 @@ public class MouseMappings {
 						map.remove(key);
 					} else {
 						Tool clone = newTool.cloneTool();
-						LoadedLibrary.copyAttributes(clone.getAttributeSet(),
-								tool.getAttributeSet());
+						LoadedLibrary.copyAttributes(clone.getAttributeSet(), tool.getAttributeSet());
 						map.put(key, clone);
 					}
 				}
@@ -178,13 +184,13 @@ public class MouseMappings {
 						map.remove(key);
 					} else {
 						Tool clone = newTool.cloneTool();
-						LoadedLibrary.copyAttributes(clone.getAttributeSet(),
-								tool.getAttributeSet());
+						LoadedLibrary.copyAttributes(clone.getAttributeSet(), tool.getAttributeSet());
 						map.put(key, clone);
 					}
 				}
 			}
 		}
-		if (changed) fireMouseMappingsChanged();
+		if (changed)
+			fireMouseMappingsChanged();
 	}
 }

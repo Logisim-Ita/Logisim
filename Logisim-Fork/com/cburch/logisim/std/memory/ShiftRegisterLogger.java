@@ -19,13 +19,12 @@ public class ShiftRegisterLogger extends InstanceLogger {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public String getLogName(InstanceState state, Object option) {
 		String inName = state.getAttributeValue(StdAttr.LABEL);
 		if (inName == null || inName.equals("")) {
-			inName = Strings.get("shiftRegisterComponent")
-				+ state.getInstance().getLocation();
+			inName = Strings.get("shiftRegisterComponent") + state.getInstance().getLocation();
 		}
 		if (option instanceof Integer) {
 			return inName + "[" + option + "]";
@@ -37,12 +36,13 @@ public class ShiftRegisterLogger extends InstanceLogger {
 	@Override
 	public Value getLogValue(InstanceState state, Object option) {
 		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-		if (dataWidth == null) dataWidth = BitWidth.create(0);
+		if (dataWidth == null)
+			dataWidth = BitWidth.create(0);
 		ShiftRegisterData data = (ShiftRegisterData) state.getData();
 		if (data == null) {
 			return Value.createKnown(dataWidth, 0);
 		} else {
-			int index = option == null ? 0 : ((Integer) option).intValue(); 
+			int index = option == null ? 0 : ((Integer) option).intValue();
 			return data.get(index);
 		}
 	}

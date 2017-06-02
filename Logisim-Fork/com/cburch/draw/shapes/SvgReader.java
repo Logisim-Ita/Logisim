@@ -19,10 +19,11 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class SvgReader {
-	private SvgReader() { }
-	
+	private SvgReader() {
+	}
+
 	private static final Pattern PATH_REGEX = Pattern.compile("[a-zA-Z]|[-0-9.]+");
-	
+
 	public static AbstractCanvasObject createShape(Element elt) {
 		String name = elt.getTagName();
 		AbstractCanvasObject ret;
@@ -69,7 +70,8 @@ public class SvgReader {
 		}
 		if (attrs.contains(DrawAttr.FILL_COLOR)) {
 			String color = elt.getAttribute("fill");
-			if (color.equals("")) color = "#000000";
+			if (color.equals(""))
+				color = "#000000";
 			String opacity = elt.getAttribute("fill-opacity");
 			if (!color.equals("none")) {
 				ret.setValue(DrawAttr.FILL_COLOR, getColor(color, opacity));
@@ -77,7 +79,7 @@ public class SvgReader {
 		}
 		return ret;
 	}
-	
+
 	private static AbstractCanvasObject createRectangle(Element elt) {
 		int x = Integer.parseInt(elt.getAttribute("x"));
 		int y = Integer.parseInt(elt.getAttribute("y"));
@@ -104,7 +106,7 @@ public class SvgReader {
 		int h = (int) Math.round(ry * 2);
 		return new Oval(x, y, w, h);
 	}
-	
+
 	private static AbstractCanvasObject createLine(Element elt) {
 		int x0 = Integer.parseInt(elt.getAttribute("x1"));
 		int y0 = Integer.parseInt(elt.getAttribute("y1"));
@@ -112,31 +114,33 @@ public class SvgReader {
 		int y1 = Integer.parseInt(elt.getAttribute("y2"));
 		return new Line(x0, y0, x1, y1);
 	}
-	
+
 	private static AbstractCanvasObject createPolygon(Element elt) {
 		return new Poly(true, parsePoints(elt.getAttribute("points")));
 	}
-	
+
 	private static AbstractCanvasObject createPolyline(Element elt) {
 		return new Poly(false, parsePoints(elt.getAttribute("points")));
 	}
-	
+
 	private static AbstractCanvasObject createText(Element elt) {
 		int x = Integer.parseInt(elt.getAttribute("x"));
 		int y = Integer.parseInt(elt.getAttribute("y"));
 		String text = elt.getTextContent();
 		Text ret = new Text(x, y, text);
-		
+
 		String fontFamily = elt.getAttribute("font-family");
 		String fontStyle = elt.getAttribute("font-style");
 		String fontWeight = elt.getAttribute("font-weight");
 		String fontSize = elt.getAttribute("font-size");
 		int styleFlags = 0;
-		if (fontStyle.equals("italic")) styleFlags |= Font.ITALIC;
-		if (fontWeight.equals("bold")) styleFlags |= Font.BOLD;
+		if (fontStyle.equals("italic"))
+			styleFlags |= Font.ITALIC;
+		if (fontWeight.equals("bold"))
+			styleFlags |= Font.BOLD;
 		int size = Integer.parseInt(fontSize);
 		ret.setValue(DrawAttr.FONT, new Font(fontFamily, styleFlags, size));
-		
+
 		String alignStr = elt.getAttribute("text-anchor");
 		AttributeOption halign;
 		if (alignStr.equals("start")) {
@@ -147,11 +151,11 @@ public class SvgReader {
 			halign = DrawAttr.ALIGN_CENTER;
 		}
 		ret.setValue(DrawAttr.ALIGNMENT, halign);
-		
+
 		// fill color is handled after we return
 		return ret;
 	}
-	
+
 	private static List<Location> parsePoints(String points) {
 		Pattern patt = Pattern.compile("[ ,\n\r\t]+");
 		String[] toks = patt.split(points);
@@ -163,7 +167,7 @@ public class SvgReader {
 		}
 		return UnmodifiableList.create(ret);
 	}
-	
+
 	private static AbstractCanvasObject createPath(Element elt) {
 		Matcher patt = PATH_REGEX.matcher(elt.getAttribute("d"));
 		List<String> tokens = new ArrayList<String>();
@@ -174,21 +178,23 @@ public class SvgReader {
 			if (Character.isLetter(token.charAt(0))) {
 				switch (token.charAt(0)) {
 				case 'M':
-					if (type == -1) type = 0;
-					else type = -1;
+					if (type == -1)
+						type = 0;
+					else
+						type = -1;
 					break;
-				case 'Q': case 'q':
-					if (type == 0) type = 1;
-					else type = -1;
+				case 'Q':
+				case 'q':
+					if (type == 0)
+						type = 1;
+					else
+						type = -1;
 					break;
-				/* not supported
-				case 'L': case 'l':
-				case 'H': case 'h':
-				case 'V': case 'v':
-					if (type == 0 || type == 2) type = 2;
-					else type = -1;
-					break;
-				*/
+				/*
+				 * not supported case 'L': case 'l': case 'H': case 'h': case
+				 * 'V': case 'v': if (type == 0 || type == 2) type = 2; else
+				 * type = -1; break;
+				 */
 				default:
 					type = -1;
 				}
@@ -197,10 +203,9 @@ public class SvgReader {
 				}
 			}
 		}
-	
+
 		if (type == 1) {
-			if (tokens.size() == 8 && tokens.get(0).equals("M")
-					&& tokens.get(3).toUpperCase().equals("Q")) {
+			if (tokens.size() == 8 && tokens.get(0).equals("M") && tokens.get(3).toUpperCase().equals("Q")) {
 				int x0 = Integer.parseInt(tokens.get(1));
 				int y0 = Integer.parseInt(tokens.get(2));
 				int x1 = Integer.parseInt(tokens.get(4));
@@ -224,7 +229,7 @@ public class SvgReader {
 			throw new NumberFormatException("Unrecognized path");
 		}
 	}
-	
+
 	private static Color getColor(String hue, String opacity) {
 		int r;
 		int g;

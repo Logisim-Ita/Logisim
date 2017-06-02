@@ -41,19 +41,21 @@ import com.cburch.logisim.util.StringUtil;
 
 public class AddTool extends Tool {
 	private static int INVALID_COORD = Integer.MIN_VALUE;
-	
-	private static int SHOW_NONE    = 0;
-	private static int SHOW_GHOST   = 1;
-	private static int SHOW_ADD     = 2;
-	private static int SHOW_ADD_NO  = 3;
 
-	private static Cursor cursor
-		= Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	private static int SHOW_NONE = 0;
+	private static int SHOW_GHOST = 1;
+	private static int SHOW_ADD = 2;
+	private static int SHOW_ADD_NO = 3;
+
+	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 
 	private class MyAttributeListener implements AttributeListener {
+		@Override
 		public void attributeListChanged(AttributeEvent e) {
 			bounds = null;
 		}
+
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			bounds = null;
 		}
@@ -72,7 +74,7 @@ public class AddTool extends Tool {
 	private Action lastAddition;
 	private boolean keyHandlerTried;
 	private KeyConfigurator keyHandler;
-	
+
 	public AddTool(Class<? extends Library> base, FactoryDescription description) {
 		this.descriptionBase = base;
 		this.description = description;
@@ -104,28 +106,29 @@ public class AddTool extends Tool {
 		this.attrs = (AttributeSet) base.attrs.clone();
 		attrs.addAttributeListener(new MyAttributeListener());
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
-		if (!(other instanceof AddTool)) return false;
+		if (!(other instanceof AddTool))
+			return false;
 		AddTool o = (AddTool) other;
 		if (this.description != null) {
-			return this.descriptionBase == o.descriptionBase
-				&& this.description.equals(o.description);
+			return this.descriptionBase == o.descriptionBase && this.description.equals(o.description);
 		} else {
 			return this.factory.equals(o.factory);
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		FactoryDescription desc = description;
 		return desc != null ? desc.hashCode() : factory.hashCode();
 	}
-	
+
 	@Override
 	public boolean sharesSource(Tool other) {
-		if (!(other instanceof AddTool)) return false;
+		if (!(other instanceof AddTool))
+			return false;
 		AddTool o = (AddTool) other;
 		if (this.sourceLoadAttempted && o.sourceLoadAttempted) {
 			return this.factory.equals(o.factory);
@@ -135,7 +138,7 @@ public class AddTool extends Tool {
 			return this.description.equals(o.description);
 		}
 	}
-	
+
 	public ComponentFactory getFactory(boolean forceLoad) {
 		return forceLoad ? getFactory() : factory;
 	}
@@ -178,8 +181,7 @@ public class AddTool extends Tool {
 		} else {
 			ComponentFactory source = getFactory();
 			if (source != null) {
-				ret = (String) source.getFeature(ComponentFactory.TOOL_TIP,
-						getAttributeSet());
+				ret = (String) source.getFeature(ComponentFactory.TOOL_TIP, getAttributeSet());
 			} else {
 				ret = null;
 			}
@@ -199,13 +201,13 @@ public class AddTool extends Tool {
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
-	
+
 	@Override
 	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
 		return this.attrs == attrs && attrs instanceof FactoryAttributes
-			&& !((FactoryAttributes) attrs).isFactoryInstantiated();
+				&& !((FactoryAttributes) attrs).isFactoryInstantiated();
 	}
-	
+
 	@Override
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		return getFactory().getDefaultAttributeValue(attr, ver);
@@ -217,16 +219,18 @@ public class AddTool extends Tool {
 		// repaint problems on OpenJDK under Ubuntu
 		int x = lastX;
 		int y = lastY;
-		if (x == INVALID_COORD || y == INVALID_COORD) return;
+		if (x == INVALID_COORD || y == INVALID_COORD)
+			return;
 		ComponentFactory source = getFactory();
-		if (source == null) return;
+		if (source == null)
+			return;
 		if (state == SHOW_GHOST) {
 			source.drawGhost(context, Color.GRAY, x, y, getBaseAttributes());
 		} else if (state == SHOW_ADD) {
 			source.drawGhost(context, Color.BLACK, x, y, getBaseAttributes());
 		}
 	}
-	
+
 	private AttributeSet getBaseAttributes() {
 		AttributeSet ret = attrs;
 		if (ret instanceof FactoryAttributes) {
@@ -235,7 +239,8 @@ public class AddTool extends Tool {
 		return ret;
 	}
 
-	public void cancelOp() { }
+	public void cancelOp() {
+	}
 
 	@Override
 	public void select(Canvas canvas) {
@@ -251,17 +256,17 @@ public class AddTool extends Tool {
 		lastAddition = null;
 	}
 
-	private synchronized void moveTo(Canvas canvas, Graphics g,
-			int x, int y) {
-		if (state != SHOW_NONE) expose(canvas, lastX, lastY);
+	private synchronized void moveTo(Canvas canvas, Graphics g, int x, int y) {
+		if (state != SHOW_NONE)
+			expose(canvas, lastX, lastY);
 		lastX = x;
 		lastY = y;
-		if (state != SHOW_NONE) expose(canvas, lastX, lastY);
+		if (state != SHOW_NONE)
+			expose(canvas, lastX, lastY);
 	}
 
 	@Override
-	public void mouseEntered(Canvas canvas, Graphics g,
-			MouseEvent e) {
+	public void mouseEntered(Canvas canvas, Graphics g, MouseEvent e) {
 		if (state == SHOW_GHOST || state == SHOW_NONE) {
 			setState(canvas, SHOW_GHOST);
 			canvas.requestFocusInWindow();
@@ -272,8 +277,7 @@ public class AddTool extends Tool {
 	}
 
 	@Override
-	public void mouseExited(Canvas canvas, Graphics g,
-			MouseEvent e) {
+	public void mouseExited(Canvas canvas, Graphics g, MouseEvent e) {
 		if (state == SHOW_GHOST) {
 			moveTo(canvas, canvas.getGraphics(), INVALID_COORD, INVALID_COORD);
 			setState(canvas, SHOW_NONE);
@@ -286,7 +290,8 @@ public class AddTool extends Tool {
 	@Override
 	public void mouseMoved(Canvas canvas, Graphics g, MouseEvent e) {
 		if (state != SHOW_NONE) {
-			if (shouldSnap) Canvas.snapToGrid(e);
+			if (shouldSnap)
+				Canvas.snapToGrid(e);
 			moveTo(canvas, g, e.getX(), e.getY());
 		}
 	}
@@ -308,7 +313,8 @@ public class AddTool extends Tool {
 			}
 		}
 
-		if (shouldSnap) Canvas.snapToGrid(e);
+		if (shouldSnap)
+			Canvas.snapToGrid(e);
 		moveTo(canvas, g, e.getX(), e.getY());
 		setState(canvas, SHOW_ADD);
 	}
@@ -316,32 +322,35 @@ public class AddTool extends Tool {
 	@Override
 	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
 		if (state != SHOW_NONE) {
-			if (shouldSnap) Canvas.snapToGrid(e);
+			if (shouldSnap)
+				Canvas.snapToGrid(e);
 			moveTo(canvas, g, e.getX(), e.getY());
 		}
 	}
 
 	@Override
-	public void mouseReleased(Canvas canvas, Graphics g,
-			MouseEvent e) {
+	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
 		Component added = null;
 		if (state == SHOW_ADD) {
 			Circuit circ = canvas.getCircuit();
-			if (!canvas.getProject().getLogisimFile().contains(circ)) return;
-			if (shouldSnap) Canvas.snapToGrid(e);
+			if (!canvas.getProject().getLogisimFile().contains(circ))
+				return;
+			if (shouldSnap)
+				Canvas.snapToGrid(e);
 			moveTo(canvas, g, e.getX(), e.getY());
 
 			Location loc = Location.create(e.getX(), e.getY());
 			AttributeSet attrsCopy = (AttributeSet) attrs.clone();
 			ComponentFactory source = getFactory();
-			if (source == null) return;
+			if (source == null)
+				return;
 			Component c = source.createComponent(loc, attrsCopy);
-			
+
 			if (circ.hasConflict(c)) {
 				canvas.setErrorMessage(Strings.getter("exclusiveError"));
 				return;
 			}
-			
+
 			Bounds bds = c.getBounds(g);
 			if (bds.getX() < 0 || bds.getY() < 0) {
 				canvas.setErrorMessage(Strings.getter("negativeCoordError"));
@@ -356,14 +365,13 @@ public class AddTool extends Tool {
 				lastAddition = action;
 				added = c;
 			} catch (CircuitException ex) {
-				JOptionPane.showMessageDialog(canvas.getProject().getFrame(),
-					ex.getMessage());
+				JOptionPane.showMessageDialog(canvas.getProject().getFrame(), ex.getMessage());
 			}
 			setState(canvas, SHOW_GHOST);
 		} else if (state == SHOW_ADD_NO) {
 			setState(canvas, SHOW_NONE);
 		}
-		
+
 		Project proj = canvas.getProject();
 		Tool next = determineNext(proj);
 		if (next != null) {
@@ -372,10 +380,11 @@ public class AddTool extends Tool {
 			if (act != null) {
 				proj.doAction(act);
 			}
-			if (added != null) canvas.getSelection().add(added);
+			if (added != null)
+				canvas.getSelection().add(added);
 		}
 	}
-	
+
 	private Tool determineNext(Project proj) {
 		String afterAdd = AppPreferences.ADD_AFTER.get();
 		if (afterAdd.equals(AppPreferences.ADD_AFTER_UNCHANGED)) {
@@ -389,17 +398,25 @@ public class AddTool extends Tool {
 			}
 		}
 	}
-	
+
 	@Override
 	public void keyPressed(Canvas canvas, KeyEvent event) {
 		processKeyEvent(canvas, event, KeyConfigurationEvent.KEY_PRESSED);
 
 		if (!event.isConsumed() && event.getModifiersEx() == 0) {
 			switch (event.getKeyCode()) {
-			case KeyEvent.VK_UP:    setFacing(canvas, Direction.NORTH); break;
-			case KeyEvent.VK_DOWN:  setFacing(canvas, Direction.SOUTH); break;
-			case KeyEvent.VK_LEFT:  setFacing(canvas, Direction.WEST); break;
-			case KeyEvent.VK_RIGHT: setFacing(canvas, Direction.EAST); break;
+			case KeyEvent.VK_UP:
+				setFacing(canvas, Direction.NORTH);
+				break;
+			case KeyEvent.VK_DOWN:
+				setFacing(canvas, Direction.SOUTH);
+				break;
+			case KeyEvent.VK_LEFT:
+				setFacing(canvas, Direction.WEST);
+				break;
+			case KeyEvent.VK_RIGHT:
+				setFacing(canvas, Direction.EAST);
+				break;
 			case KeyEvent.VK_BACK_SPACE:
 				if (lastAddition != null && canvas.getProject().getLastAction() == lastAddition) {
 					canvas.getProject().undoAction();
@@ -408,17 +425,17 @@ public class AddTool extends Tool {
 			}
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(Canvas canvas, KeyEvent event) {
 		processKeyEvent(canvas, event, KeyConfigurationEvent.KEY_RELEASED);
 	}
-	
+
 	@Override
 	public void keyTyped(Canvas canvas, KeyEvent event) {
 		processKeyEvent(canvas, event, KeyConfigurationEvent.KEY_TYPED);
 	}
-	
+
 	private void processKeyEvent(Canvas canvas, KeyEvent event, int type) {
 		KeyConfigurator handler = keyHandler;
 		if (!keyHandlerTried) {
@@ -439,10 +456,11 @@ public class AddTool extends Tool {
 			}
 		}
 	}
-	
+
 	private void setFacing(Canvas canvas, Direction facing) {
 		ComponentFactory source = getFactory();
-		if (source == null) return;
+		if (source == null)
+			return;
 		AttributeSet base = getBaseAttributes();
 		Object feature = source.getFeature(ComponentFactory.FACING_ATTRIBUTE_KEY, base);
 		@SuppressWarnings("unchecked")
@@ -463,7 +481,7 @@ public class AddTool extends Tool {
 				return;
 			}
 		}
-		
+
 		ComponentFactory source = getFactory();
 		if (source != null) {
 			AttributeSet base = getBaseAttributes();
@@ -473,12 +491,13 @@ public class AddTool extends Tool {
 
 	private void expose(java.awt.Component c, int x, int y) {
 		Bounds bds = getBounds();
-		c.repaint(x + bds.getX(), y + bds.getY(),
-			bds.getWidth(), bds.getHeight());
+		c.repaint(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
 	}
 
 	@Override
-	public Cursor getCursor() { return cursor; }
+	public Cursor getCursor() {
+		return cursor;
+	}
 
 	private void setState(Canvas canvas, int value) {
 		if (value == SHOW_GHOST) {
@@ -488,7 +507,7 @@ public class AddTool extends Tool {
 			} else {
 				state = SHOW_NONE;
 			}
-		} else{
+		} else {
 			state = value;
 		}
 	}

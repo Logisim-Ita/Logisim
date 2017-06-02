@@ -14,8 +14,7 @@ public class LogisimVersion {
 	 * Create a new version object for the current Logisim instance (the
 	 * constructor is private) where no variant is used
 	 */
-	public static LogisimVersion get(int major, int minor, int release,
-			int revision) {
+	public static LogisimVersion get(int major, int minor, int release, int revision) {
 		return (get(major, minor, release, revision, ""));
 	}
 
@@ -23,8 +22,7 @@ public class LogisimVersion {
 	 * Create a new version object for the current Logisim instance (the
 	 * constructor is private)
 	 */
-	public static LogisimVersion get(int major, int minor, int release,
-			int revision, String variant) {
+	public static LogisimVersion get(int major, int minor, int release, int revision, String variant) {
 		return (new LogisimVersion(major, minor, release, revision, variant));
 	}
 
@@ -33,8 +31,7 @@ public class LogisimVersion {
 	 * constructor is private) where the revision field is set to its default
 	 * value
 	 */
-	public static LogisimVersion get(int major, int minor, int release,
-			String variant) {
+	public static LogisimVersion get(int major, int minor, int release, String variant) {
 		return (get(major, minor, release, FINAL_REVISION, variant));
 	}
 
@@ -87,8 +84,7 @@ public class LogisimVersion {
 
 	private String repr;
 
-	private LogisimVersion(int major, int minor, int release, int revision,
-			String variant) {
+	private LogisimVersion(int major, int minor, int release, int revision, String variant) {
 		this.major = major;
 		this.minor = minor;
 		this.release = release;
@@ -136,8 +132,8 @@ public class LogisimVersion {
 	public boolean equals(Object other) {
 		if (other instanceof LogisimVersion) {
 			LogisimVersion o = (LogisimVersion) other;
-			return (this.major == o.major && this.minor == o.minor
-					&& this.release == o.release && this.revision == o.revision && this.variant == o.variant);
+			return (this.major == o.major && this.minor == o.minor && this.release == o.release
+					&& this.revision == o.revision && this.variant == o.variant);
 		} else {
 			return (false);
 		}
@@ -155,8 +151,8 @@ public class LogisimVersion {
 	}
 
 	/**
-	 * If the considered Logisim version is a jar, returns true.
-	 * Assumption: It's identified by a variant equals to "jar"
+	 * If the considered Logisim version is a jar, returns true. Assumption:
+	 * It's identified by a variant equals to "jar"
 	 */
 	public boolean isJar() {
 		return (variant.equals("jar"));

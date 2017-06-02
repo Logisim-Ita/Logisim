@@ -6,21 +6,21 @@ package com.cburch.logisim.gui.log;
 import java.awt.BorderLayout;
 
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 class ScrollPanel extends LogPanel {
 	private TablePanel table;
-	
+
 	public ScrollPanel(LogFrame frame) {
 		super(frame);
 		this.table = new TablePanel(frame);
-		JScrollPane pane = new JScrollPane(table,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane pane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pane.setVerticalScrollBar(table.getVerticalScrollBar());
 		setLayout(new BorderLayout());
 		add(pane);
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return table.getTitle();

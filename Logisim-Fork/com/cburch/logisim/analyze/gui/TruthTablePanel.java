@@ -13,7 +13,10 @@ interface TruthTablePanel {
 	public static final Color ERROR_COLOR = new Color(255, 128, 128);
 
 	public TruthTable getTruthTable();
+
 	public int getOutputColumn(MouseEvent event);
+
 	public int getRow(MouseEvent event);
+
 	public void setEntryProvisional(int row, int col, Entry value);
 }

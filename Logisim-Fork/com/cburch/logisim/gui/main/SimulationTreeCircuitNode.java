@@ -24,6 +24,7 @@ import com.cburch.logisim.instance.StdAttr;
 class SimulationTreeCircuitNode extends SimulationTreeNode
 		implements CircuitListener, AttributeListener, Comparator<Component> {
 	private static class CompareByName implements Comparator<Object> {
+		@Override
 		public int compare(Object a, Object b) {
 			return a.toString().compareToIgnoreCase(b.toString());
 		}
@@ -34,10 +35,9 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 	private CircuitState circuitState;
 	private Component subcircComp;
 	private ArrayList<TreeNode> children;
-		
-	public SimulationTreeCircuitNode(SimulationTreeModel model,
-			SimulationTreeCircuitNode parent, CircuitState circuitState,
-			Component subcircComp) {
+
+	public SimulationTreeCircuitNode(SimulationTreeModel model, SimulationTreeCircuitNode parent,
+			CircuitState circuitState, Component subcircComp) {
 		this.model = model;
 		this.parent = parent;
 		this.circuitState = circuitState;
@@ -51,21 +51,21 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 		}
 		computeChildren();
 	}
-	
+
 	public CircuitState getCircuitState() {
 		return circuitState;
 	}
-	
+
 	@Override
 	public ComponentFactory getComponentFactory() {
 		return circuitState.getCircuit().getSubcircuitFactory();
 	}
-	
+
 	@Override
 	public boolean isCurrentView(SimulationTreeModel model) {
 		return model.getCurrentView() == circuitState;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (subcircComp != null) {
@@ -116,6 +116,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 		return Collections.enumeration(children);
 	}
 
+	@Override
 	public void circuitChanged(CircuitEvent event) {
 		int action = event.getAction();
 		if (action == CircuitEvent.ACTION_SET_NAME) {
@@ -126,7 +127,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			}
 		}
 	}
-	
+
 	// returns true if changed
 	private boolean computeChildren() {
 		ArrayList<TreeNode> newChildren = new ArrayList<TreeNode>();
@@ -150,7 +151,10 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			for (TreeNode o : children) {
 				if (o instanceof SimulationTreeCircuitNode) {
 					SimulationTreeCircuitNode n = (SimulationTreeCircuitNode) o;
-					if (n.circuitState == state) { toAdd = n; break; }
+					if (n.circuitState == state) {
+						toAdd = n;
+						break;
+					}
 				}
 			}
 			if (toAdd == null) {
@@ -158,7 +162,7 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			}
 			newChildren.add(toAdd);
 		}
-		
+
 		if (!children.equals(newChildren)) {
 			children = newChildren;
 			return true;
@@ -166,21 +170,26 @@ class SimulationTreeCircuitNode extends SimulationTreeNode
 			return false;
 		}
 	}
-	
+
+	@Override
 	public int compare(Component a, Component b) {
 		if (a != b) {
 			String aName = a.getFactory().getDisplayName();
 			String bName = b.getFactory().getDisplayName();
 			int ret = aName.compareToIgnoreCase(bName);
-			if (ret != 0) return ret;
+			if (ret != 0)
+				return ret;
 		}
 		return a.getLocation().toString().compareTo(b.getLocation().toString());
 	}
 
 	//
 	// AttributeListener methods
-	public void attributeListChanged(AttributeEvent e) { }
+	@Override
+	public void attributeListChanged(AttributeEvent e) {
+	}
 
+	@Override
 	public void attributeValueChanged(AttributeEvent e) {
 		Object attr = e.getAttribute();
 		if (attr == CircuitAttributes.CIRCUIT_LABEL_ATTR || attr == StdAttr.LABEL) {

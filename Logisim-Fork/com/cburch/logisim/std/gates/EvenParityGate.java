@@ -29,8 +29,7 @@ class EvenParityGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height,
-			int inputs) {
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
 		paintRectangular(painter, width, height);
 	}
 
@@ -49,5 +48,7 @@ class EvenParityGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.FALSE; }
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
 }

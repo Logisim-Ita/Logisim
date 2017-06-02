@@ -14,17 +14,15 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.instance.StdAttr;
 
 class TextAttributes extends AbstractAttributeSet {
-	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_HALIGN, Text.ATTR_VALIGN
-		});
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays
+			.asList(new Attribute<?>[] { Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_HALIGN, Text.ATTR_VALIGN });
 
 	private String text;
 	private Font font;
 	private AttributeOption halign;
 	private AttributeOption valign;
 	private Bounds offsetBounds;
-	
+
 	public TextAttributes() {
 		text = "";
 		font = StdAttr.DEFAULT_LABEL_FONT;
@@ -32,27 +30,27 @@ class TextAttributes extends AbstractAttributeSet {
 		valign = Text.ATTR_VALIGN.parse("base");
 		offsetBounds = null;
 	}
-	
+
 	String getText() {
 		return text;
 	}
-	
+
 	Font getFont() {
 		return font;
 	}
-	
+
 	int getHorizontalAlign() {
 		return ((Integer) halign.getValue()).intValue();
 	}
-	
+
 	int getVerticalAlign() {
 		return ((Integer) valign.getValue()).intValue();
 	}
-	
+
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
-	
+
 	boolean setOffsetBounds(Bounds value) {
 		Bounds old = offsetBounds;
 		boolean same = old == null ? value == null : old.equals(value);
@@ -75,10 +73,14 @@ class TextAttributes extends AbstractAttributeSet {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
-		if (attr == Text.ATTR_TEXT) return (V) text;
-		if (attr == Text.ATTR_FONT) return (V) font;
-		if (attr == Text.ATTR_HALIGN) return (V) halign;
-		if (attr == Text.ATTR_VALIGN) return (V) valign;
+		if (attr == Text.ATTR_TEXT)
+			return (V) text;
+		if (attr == Text.ATTR_FONT)
+			return (V) font;
+		if (attr == Text.ATTR_HALIGN)
+			return (V) halign;
+		if (attr == Text.ATTR_VALIGN)
+			return (V) valign;
 		return null;
 	}
 

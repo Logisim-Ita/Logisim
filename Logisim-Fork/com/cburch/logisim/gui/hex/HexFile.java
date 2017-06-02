@@ -16,24 +16,25 @@ import java.util.StringTokenizer;
 import com.cburch.hex.HexModel;
 
 public class HexFile {
-	private HexFile() { }
-	
+	private HexFile() {
+	}
+
 	private static final String RAW_IMAGE_HEADER = "v2.0 raw";
 	private static final String COMMENT_MARKER = "#";
-	
+
 	private static class HexReader {
 		private BufferedReader in;
 		private int[] data;
 		private StringTokenizer curLine;
 		private long leftCount;
 		private long leftValue;
-		
+
 		public HexReader(BufferedReader in) throws IOException {
 			this.in = in;
 			data = new int[4096];
 			curLine = findNonemptyLine();
 		}
-		
+
 		private StringTokenizer findNonemptyLine() throws IOException {
 			String line = in.readLine();
 			while (line != null) {
@@ -43,12 +44,13 @@ public class HexFile {
 				}
 
 				StringTokenizer ret = new StringTokenizer(line);
-				if (ret.hasMoreTokens()) return ret;
+				if (ret.hasMoreTokens())
+					return ret;
 				line = this.in.readLine();
 			}
 			return null;
 		}
-		
+
 		private String nextToken() throws IOException {
 			if (curLine != null && curLine.hasMoreTokens()) {
 				return curLine.nextToken();
@@ -57,7 +59,7 @@ public class HexFile {
 				return curLine == null ? null : curLine.nextToken();
 			}
 		}
-		
+
 		public boolean hasNext() throws IOException {
 			if (leftCount > 0) {
 				return true;
@@ -68,7 +70,7 @@ public class HexFile {
 				return curLine != null;
 			}
 		}
-		
+
 		public int[] next() throws IOException {
 			int pos = 0;
 			if (leftCount > 0) {
@@ -83,8 +85,9 @@ public class HexFile {
 					leftCount -= n;
 				}
 			}
-			if (pos >= data.length) return data;
-				
+			if (pos >= data.length)
+				return data;
+
 			for (String tok = nextToken(); tok != null; tok = nextToken()) {
 				try {
 					int star = tok.indexOf("*");
@@ -98,7 +101,7 @@ public class HexFile {
 				} catch (NumberFormatException e) {
 					throw new IOException(Strings.get("hexNumberFormatError"));
 				}
-				
+
 				int n = (int) Math.min(data.length - pos, leftCount);
 				if (n == 1) {
 					data[pos] = (int) leftValue;
@@ -109,9 +112,10 @@ public class HexFile {
 					pos += n;
 					leftCount -= n;
 				}
-				if (pos >= data.length) return data;
+				if (pos >= data.length)
+					return data;
 			}
-			
+
 			if (pos >= data.length) {
 				return data;
 			} else {
@@ -125,28 +129,36 @@ public class HexFile {
 	public static void save(Writer out, HexModel src) throws IOException {
 		long first = src.getFirstOffset();
 		long last = src.getLastOffset();
-		while (last > first && src.get(last) == 0) last--;
+		while (last > first && src.get(last) == 0)
+			last--;
 		int tokens = 0;
 		long cur = 0;
 		while (cur <= last) {
 			int val = src.get(cur);
 			long start = cur;
 			cur++;
-			while (cur <= last && src.get(cur) == val) cur++;
+			while (cur <= last && src.get(cur) == val)
+				cur++;
 			long len = cur - start;
-			if (len < 4) { cur = start + 1; len = 1; }
+			if (len < 4) {
+				cur = start + 1;
+				len = 1;
+			}
 			try {
-				if (tokens > 0) out.write(tokens % 8 == 0 ? '\n' : ' ');
-				if (cur != start + 1) out.write((cur - start) + "*");
+				if (tokens > 0)
+					out.write(tokens % 8 == 0 ? '\n' : ' ');
+				if (cur != start + 1)
+					out.write((cur - start) + "*");
 				out.write(Integer.toHexString(val));
 			} catch (IOException e) {
 				throw new IOException(Strings.get("hexFileWriteError"));
 			}
 			tokens++;
 		}
-		if (tokens > 0) out.write('\n');
+		if (tokens > 0)
+			out.write('\n');
 	}
-	
+
 	public static void open(HexModel dst, Reader in) throws IOException {
 		HexReader reader = new HexReader(new BufferedReader(in));
 		long offs = dst.getFirstOffset();
@@ -160,7 +172,7 @@ public class HexFile {
 		}
 		dst.fill(offs, dst.getLastOffset() - offs + 1, 0);
 	}
-	
+
 	public static int[] parse(Reader in) throws IOException {
 		HexReader reader = new HexReader(new BufferedReader(in));
 		int cur = 0;
@@ -205,8 +217,10 @@ public class HexFile {
 			}
 		} finally {
 			try {
-				if (in != null) in.close();
-			} catch (IOException e) { }
+				if (in != null)
+					in.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 

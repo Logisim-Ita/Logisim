@@ -50,11 +50,9 @@ import javax.swing.tree.TreePath;
  * it is too encapsulated.
  */
 
-
 public class JTreeUtil {
 	private static final Insets DEFAULT_INSETS = new Insets(20, 20, 20, 20);
-	private static final DataFlavor NODE_FLAVOR = new DataFlavor(
-			DataFlavor.javaJVMLocalObjectMimeType, "Node");
+	private static final DataFlavor NODE_FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType, "Node");
 
 	private static Object draggedNode;
 	private static BufferedImage image = null; // buff image
@@ -67,8 +65,8 @@ public class JTreeUtil {
 			node = nd;
 		}
 
-		public synchronized Object getTransferData(DataFlavor flavor)
-				throws UnsupportedFlavorException {
+		@Override
+		public synchronized Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
 			if (flavor == NODE_FLAVOR) {
 				return node;
 			} else {
@@ -76,10 +74,12 @@ public class JTreeUtil {
 			}
 		}
 
+		@Override
 		public DataFlavor[] getTransferDataFlavors() {
 			return flavors;
 		}
 
+		@Override
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			return Arrays.asList(flavors).contains(flavor);
 		}
@@ -87,23 +87,20 @@ public class JTreeUtil {
 
 	/*
 	 * This class is the most important. It manages all the DnD behavior. It is
-	 * abstract because it contains two abstract methods:
-	 *   public abstract boolean canPerformAction(JTree target,
-	 *     Object draggedNode, int action, Point location);
-	 *   public abstract boolean executeDrop(DNDTree tree,
-	 *     Object draggedNode, Object newParentNode, int action);
-	 * we have to override to give the required behavior of DnD in your tree.
+	 * abstract because it contains two abstract methods: public abstract
+	 * boolean canPerformAction(JTree target, Object draggedNode, int action,
+	 * Point location); public abstract boolean executeDrop(DNDTree tree, Object
+	 * draggedNode, Object newParentNode, int action); we have to override to
+	 * give the required behavior of DnD in your tree.
 	 */
-	private static class TreeTransferHandler implements
-			DragGestureListener, DragSourceListener, DropTargetListener {
+	private static class TreeTransferHandler implements DragGestureListener, DragSourceListener, DropTargetListener {
 		private JTree tree;
 		private JTreeDragController controller;
 		private DragSource dragSource; // dragsource
 		private Rectangle rect2D = new Rectangle();
 		private boolean drawImage;
 
-		protected TreeTransferHandler(JTree tree, JTreeDragController controller,
-				int action, boolean drawIcon) {
+		protected TreeTransferHandler(JTree tree, JTreeDragController controller, int action, boolean drawIcon) {
 			this.tree = tree;
 			this.controller = controller;
 			drawImage = drawIcon;
@@ -112,70 +109,65 @@ public class JTreeUtil {
 		}
 
 		/* Methods for DragSourceListener */
+		@Override
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			/*
-			if (dsde.getDropSuccess()
-					&& dsde.getDropAction() == DnDConstants.ACTION_MOVE
-					&& draggedNodeParent != null) {
-				((DefaultTreeModel) tree.getModel())
-						.nodeStructureChanged(draggedNodeParent);
-			}
-			*/
+			 * if (dsde.getDropSuccess() && dsde.getDropAction() ==
+			 * DnDConstants.ACTION_MOVE && draggedNodeParent != null) {
+			 * ((DefaultTreeModel) tree.getModel())
+			 * .nodeStructureChanged(draggedNodeParent); }
+			 */
 		}
 
+		@Override
 		public final void dragEnter(DragSourceDragEvent dsde) {
 			int action = dsde.getDropAction();
 			if (action == DnDConstants.ACTION_COPY) {
-				dsde.getDragSourceContext().setCursor(
-						DragSource.DefaultCopyDrop);
+				dsde.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
 			} else {
 				if (action == DnDConstants.ACTION_MOVE) {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
 				} else {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveNoDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
 				}
 			}
 		}
 
+		@Override
 		public final void dragOver(DragSourceDragEvent dsde) {
 			int action = dsde.getDropAction();
 			if (action == DnDConstants.ACTION_COPY) {
-				dsde.getDragSourceContext().setCursor(
-						DragSource.DefaultCopyDrop);
+				dsde.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
 			} else {
 				if (action == DnDConstants.ACTION_MOVE) {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
 				} else {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveNoDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
 				}
 			}
 		}
 
+		@Override
 		public final void dropActionChanged(DragSourceDragEvent dsde) {
 			int action = dsde.getDropAction();
 			if (action == DnDConstants.ACTION_COPY) {
-				dsde.getDragSourceContext().setCursor(
-						DragSource.DefaultCopyDrop);
+				dsde.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
 			} else {
 				if (action == DnDConstants.ACTION_MOVE) {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
 				} else {
-					dsde.getDragSourceContext().setCursor(
-							DragSource.DefaultMoveNoDrop);
+					dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
 				}
 			}
 		}
 
+		@Override
 		public final void dragExit(DragSourceEvent dse) {
 			dse.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
 		}
 
 		/* Methods for DragGestureListener */
+		@Override
 		public final void dragGestureRecognized(DragGestureEvent dge) {
 			TreePath path = tree.getSelectionPath();
 			if (path != null) {
@@ -184,15 +176,9 @@ public class JTreeUtil {
 					Rectangle pathBounds = tree.getPathBounds(path); // getpathbounds
 																		// of
 																		// selectionpath
-					JComponent lbl = (JComponent) tree
-							.getCellRenderer()
-							.getTreeCellRendererComponent(
-									tree,
-									draggedNode,
-									false,
-									tree.isExpanded(path),
-									tree.getModel() .isLeaf(path.getLastPathComponent()),
-									0, false);// returning the label
+					JComponent lbl = (JComponent) tree.getCellRenderer().getTreeCellRendererComponent(tree, draggedNode,
+							false, tree.isExpanded(path), tree.getModel().isLeaf(path.getLastPathComponent()), 0,
+							false);// returning the label
 					lbl.setBounds(pathBounds);// setting bounds to lbl
 					image = new BufferedImage(lbl.getWidth(), lbl.getHeight(),
 							java.awt.image.BufferedImage.TYPE_INT_ARGB_PRE);// buffered
@@ -210,24 +196,25 @@ public class JTreeUtil {
 																	// for
 																	// buffered
 																	// image
-					graphics.setComposite(AlphaComposite.getInstance(
-							AlphaComposite.SRC_OVER, 0.5f)); // Sets the
-																// Composite for
-																// the
-																// Graphics2D
-																// context
+					graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f)); // Sets
+																										// the
+																										// Composite
+																										// for
+																										// the
+																										// Graphics2D
+																										// context
 					lbl.setOpaque(false);
 					lbl.paint(graphics); // painting the graphics to label
 					graphics.dispose();
 				}
-				dragSource.startDrag(dge, DragSource.DefaultMoveNoDrop, image,
-						new Point(0, 0), new TransferableNode(draggedNode),
-						this);
+				dragSource.startDrag(dge, DragSource.DefaultMoveNoDrop, image, new Point(0, 0),
+						new TransferableNode(draggedNode), this);
 			}
 		}
 
 		/* Methods for DropTargetListener */
 
+		@Override
 		public final void dragEnter(DropTargetDragEvent dtde) {
 			Point pt = dtde.getLocation();
 			int action = dtde.getDropAction();
@@ -241,12 +228,14 @@ public class JTreeUtil {
 			}
 		}
 
+		@Override
 		public final void dragExit(DropTargetEvent dte) {
 			if (drawImage) {
 				clearImage();
 			}
 		}
 
+		@Override
 		public final void dragOver(DropTargetDragEvent dtde) {
 			Point pt = dtde.getLocation();
 			int action = dtde.getDropAction();
@@ -261,6 +250,7 @@ public class JTreeUtil {
 			}
 		}
 
+		@Override
 		public final void dropActionChanged(DropTargetDragEvent dtde) {
 			Point pt = dtde.getLocation();
 			int action = dtde.getDropAction();
@@ -274,6 +264,7 @@ public class JTreeUtil {
 			}
 		}
 
+		@Override
 		public final void drop(DropTargetDropEvent dtde) {
 			try {
 				if (drawImage) {
@@ -282,8 +273,7 @@ public class JTreeUtil {
 				int action = dtde.getDropAction();
 				Transferable transferable = dtde.getTransferable();
 				Point pt = dtde.getLocation();
-				if (transferable
-						.isDataFlavorSupported(NODE_FLAVOR)
+				if (transferable.isDataFlavorSupported(NODE_FLAVOR)
 						&& controller.canPerformAction(tree, draggedNode, action, pt)) {
 					TreePath pathTarget = tree.getPathForLocation(pt.x, pt.y);
 					Object node = transferable.getTransferData(NODE_FLAVOR);
@@ -304,17 +294,15 @@ public class JTreeUtil {
 
 		private final void paintImage(Point pt) {
 			tree.paintImmediately(rect2D.getBounds());
-			rect2D.setRect((int) pt.getX(), (int) pt.getY(), image.getWidth(),
-					image.getHeight());
-			tree.getGraphics().drawImage(image, (int) pt.getX(),
-					(int) pt.getY(), tree);
+			rect2D.setRect((int) pt.getX(), (int) pt.getY(), image.getWidth(), image.getHeight());
+			tree.getGraphics().drawImage(image, (int) pt.getX(), (int) pt.getY(), tree);
 		}
 
 		private final void clearImage() {
 			tree.paintImmediately(rect2D.getBounds());
 		}
 	}
-	
+
 	public static void configureDragAndDrop(JTree tree, JTreeDragController controller) {
 		tree.setAutoscrolls(true);
 		new TreeTransferHandler(tree, controller, DnDConstants.ACTION_COPY_OR_MOVE, true);
@@ -323,12 +311,10 @@ public class JTreeUtil {
 	private static void autoscroll(JTree tree, Point cursorLocation) {
 		Insets insets = DEFAULT_INSETS;
 		Rectangle outer = tree.getVisibleRect();
-		Rectangle inner = new Rectangle(outer.x + insets.left, outer.y
-				+ insets.top, outer.width - (insets.left + insets.right),
-				outer.height - (insets.top + insets.bottom));
+		Rectangle inner = new Rectangle(outer.x + insets.left, outer.y + insets.top,
+				outer.width - (insets.left + insets.right), outer.height - (insets.top + insets.bottom));
 		if (!inner.contains(cursorLocation)) {
-			Rectangle scrollRect = new Rectangle(cursorLocation.x
-					- insets.left, cursorLocation.y - insets.top,
+			Rectangle scrollRect = new Rectangle(cursorLocation.x - insets.left, cursorLocation.y - insets.top,
 					insets.left + insets.right, insets.top + insets.bottom);
 			tree.scrollRectToVisible(scrollRect);
 		}

@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.analyze.model;
 
-
 public class TruthTableEvent {
 	private TruthTable source;
 	private int column;
@@ -13,20 +12,20 @@ public class TruthTableEvent {
 		this.source = source;
 		this.data = event;
 	}
-	
+
 	public TruthTableEvent(TruthTable source, int column) {
 		this.source = source;
 		this.column = column;
 	}
-	
+
 	public int getColumn() {
 		return column;
 	}
-	
+
 	public TruthTable getSource() {
 		return source;
 	}
-	
+
 	public Object getData() {
 		return data;
 	}

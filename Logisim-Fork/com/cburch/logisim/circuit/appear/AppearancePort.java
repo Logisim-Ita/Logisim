@@ -24,14 +24,14 @@ public class AppearancePort extends AppearanceElement {
 	private static final int OUTPUT_RADIUS = 5;
 	private static final int MINOR_RADIUS = 2;
 	public static final Color COLOR = Color.BLUE;
-	
+
 	private Instance pin;
-	
+
 	public AppearancePort(Location location, Instance pin) {
 		super(location);
 		this.pin = pin;
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof AppearancePort) {
@@ -51,7 +51,7 @@ public class AppearancePort extends AppearanceElement {
 	public String getDisplayName() {
 		return Strings.get("circuitPort");
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		Location loc = getLocation();
@@ -65,26 +65,26 @@ public class AppearancePort extends AppearanceElement {
 		ret.setAttribute("pin", "" + pinLoc.getX() + "," + pinLoc.getY());
 		return ret;
 	}
-	
+
 	public Instance getPin() {
 		return pin;
 	}
-	
+
 	void setPin(Instance value) {
 		pin = value;
 	}
-	
+
 	private boolean isInput() {
 		Instance p = pin;
 		return p == null || Pin.FACTORY.isInputPin(p);
 	}
-	
+
 	@Override
 	public Bounds getBounds() {
 		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
 		return super.getBounds(r);
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, boolean assumeFilled) {
 		if (isInput()) {
@@ -97,13 +97,11 @@ public class AppearancePort extends AppearanceElement {
 	@Override
 	public List<Handle> getHandles(HandleGesture gesture) {
 		Location loc = getLocation();
-		
+
 		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
-		return UnmodifiableList.create(new Handle[] {
-				new Handle(this, loc.translate(-r, -r)),
-				new Handle(this, loc.translate(r, -r)),
-				new Handle(this, loc.translate(r, r)),
-				new Handle(this, loc.translate(-r, r)) });
+		return UnmodifiableList
+				.create(new Handle[] { new Handle(this, loc.translate(-r, -r)), new Handle(this, loc.translate(r, -r)),
+						new Handle(this, loc.translate(r, r)), new Handle(this, loc.translate(-r, r)) });
 	}
 
 	@Override

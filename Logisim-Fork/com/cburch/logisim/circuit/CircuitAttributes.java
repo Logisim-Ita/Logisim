@@ -21,58 +21,59 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
 
 public class CircuitAttributes extends AbstractAttributeSet {
-	public static final Attribute<String> NAME_ATTR
-		= Attributes.forString("circuit", Strings.getter("circuitName"));
-	
-	public static final Attribute<Direction> LABEL_LOCATION_ATTR
-		= Attributes.forDirection("labelloc", Strings.getter("circuitLabelLocAttr"));
+	public static final Attribute<String> NAME_ATTR = Attributes.forString("circuit", Strings.getter("circuitName"));
 
-	public static final Attribute<String> CIRCUIT_LABEL_ATTR
-		= Attributes.forString("clabel", Strings.getter("circuitLabelAttr"));
-	
-	public static final Attribute<Direction> CIRCUIT_LABEL_FACING_ATTR
-		= Attributes.forDirection("clabelup", Strings.getter("circuitLabelDirAttr"));
-	
-	public static final Attribute<Font> CIRCUIT_LABEL_FONT_ATTR
-		= Attributes.forFont("clabelfont", Strings.getter("circuitLabelFontAttr"));
-	
-	private static final Attribute<?>[] STATIC_ATTRS = {
-		NAME_ATTR, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR,
-	};
-	private static final Object[] STATIC_DEFAULTS = {
-		"", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
-	};
-	private static final List<Attribute<?>> INSTANCE_ATTRS
-		= Arrays.asList(new Attribute<?>[] {
-				StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR,
-				StdAttr.LABEL_FONT,
-				CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
-				CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR,
-			});
-	
+	public static final Attribute<Direction> LABEL_LOCATION_ATTR = Attributes.forDirection("labelloc",
+			Strings.getter("circuitLabelLocAttr"));
+
+	public static final Attribute<String> CIRCUIT_LABEL_ATTR = Attributes.forString("clabel",
+			Strings.getter("circuitLabelAttr"));
+
+	public static final Attribute<Direction> CIRCUIT_LABEL_FACING_ATTR = Attributes.forDirection("clabelup",
+			Strings.getter("circuitLabelDirAttr"));
+
+	public static final Attribute<Font> CIRCUIT_LABEL_FONT_ATTR = Attributes.forFont("clabelfont",
+			Strings.getter("circuitLabelFontAttr"));
+
+	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR,
+			CIRCUIT_LABEL_FONT_ATTR, };
+	private static final Object[] STATIC_DEFAULTS = { "", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT, };
+	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays.asList(new Attribute<?>[] { StdAttr.FACING,
+			StdAttr.LABEL, LABEL_LOCATION_ATTR, StdAttr.LABEL_FONT, CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
+			CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR, });
+
 	private static class StaticListener implements AttributeListener {
 		private Circuit source;
-		
-		private StaticListener(Circuit s) { source = s; }
-		
-		public void attributeListChanged(AttributeEvent e) { }
 
+		private StaticListener(Circuit s) {
+			source = s;
+		}
+
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			if (e.getAttribute() == NAME_ATTR) {
 				source.fireEvent(CircuitEvent.ACTION_SET_NAME, e.getValue());
 			}
 		}
 	}
-	
-	private class MyListener implements AttributeListener, CircuitAppearanceListener {
-		public void attributeListChanged(AttributeEvent e) { }
 
+	private class MyListener implements AttributeListener, CircuitAppearanceListener {
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			@SuppressWarnings("unchecked")
 			Attribute<Object> a = (Attribute<Object>) e.getAttribute();
 			fireAttributeValueChanged(a, e.getValue());
 		}
-		
+
+		@Override
 		public void circuitAppearanceChanged(CircuitAppearanceEvent e) {
 			SubcircuitFactory factory;
 			factory = (SubcircuitFactory) subcircInstance.getFactory();
@@ -85,7 +86,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			subcircInstance.fireInvalidated();
 		}
 	}
-	
+
 	static AttributeSet createBaseAttrs(Circuit source, String name) {
 		AttributeSet ret = AttributeSets.fixedSet(STATIC_ATTRS, STATIC_DEFAULTS);
 		ret.setValue(CircuitAttributes.NAME_ATTR, name);
@@ -101,7 +102,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	private Font labelFont;
 	private MyListener listener;
 	private Instance[] pinInstances;
-	
+
 	public CircuitAttributes(Circuit source) {
 		this.source = source;
 		subcircInstance = null;
@@ -111,7 +112,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
 		pinInstances = new Instance[0];
 	}
-	
+
 	void setSubcircuit(Instance value) {
 		subcircInstance = value;
 		if (subcircInstance != null && listener == null) {
@@ -120,15 +121,15 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			source.getAppearance().addCircuitAppearanceListener(listener);
 		}
 	}
-	
+
 	Instance[] getPinInstances() {
 		return pinInstances;
 	}
-	
+
 	void setPinInstances(Instance[] value) {
 		pinInstances = value;
 	}
-	
+
 	public Direction getFacing() {
 		return facing;
 	}
@@ -139,12 +140,13 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		other.subcircInstance = null;
 		other.listener = null;
 	}
-	
+
 	@Override
 	public boolean isToSave(Attribute<?> attr) {
 		Attribute<?>[] statics = STATIC_ATTRS;
 		for (int i = 0; i < statics.length; i++) {
-			if (statics[i] == attr) return false;
+			if (statics[i] == attr)
+				return false;
 		}
 		return true;
 	}
@@ -157,11 +159,16 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <E> E getValue(Attribute<E> attr) {
-		if (attr == StdAttr.FACING) return (E) facing;
-		if (attr == StdAttr.LABEL) return (E) label;
-		if (attr == StdAttr.LABEL_FONT) return (E) labelFont;
-		if (attr == LABEL_LOCATION_ATTR) return (E) labelLocation;
-		else return source.getStaticAttributes().getValue(attr);
+		if (attr == StdAttr.FACING)
+			return (E) facing;
+		if (attr == StdAttr.LABEL)
+			return (E) label;
+		if (attr == StdAttr.LABEL_FONT)
+			return (E) labelFont;
+		if (attr == LABEL_LOCATION_ATTR)
+			return (E) labelLocation;
+		else
+			return source.getStaticAttributes().getValue(attr);
 	}
 
 	@Override
@@ -170,7 +177,8 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			Direction val = (Direction) value;
 			facing = val;
 			fireAttributeValueChanged(StdAttr.FACING, val);
-			if (subcircInstance != null) subcircInstance.recomputeBounds();
+			if (subcircInstance != null)
+				subcircInstance.recomputeBounds();
 		} else if (attr == StdAttr.LABEL) {
 			String val = (String) value;
 			label = val;

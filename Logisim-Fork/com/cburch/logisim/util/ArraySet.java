@@ -10,17 +10,19 @@ import java.util.NoSuchElementException;
 
 public class ArraySet<E> extends AbstractSet<E> {
 	private static final Object[] EMPTY_ARRAY = new Object[0];
-	
+
 	private class ArrayIterator implements Iterator<E> {
 		int itVersion = version;
 		int pos = 0; // position of next item to return
 		boolean hasNext = values.length > 0;
 		boolean removeOk = false;
-		
+
+		@Override
 		public boolean hasNext() {
 			return hasNext;
 		}
-		
+
+		@Override
 		public E next() {
 			if (itVersion != version) {
 				throw new ConcurrentModificationException();
@@ -35,7 +37,8 @@ public class ArraySet<E> extends AbstractSet<E> {
 				return ret;
 			}
 		}
-		
+
+		@Override
 		public void remove() {
 			if (itVersion != version) {
 				throw new ConcurrentModificationException();
@@ -62,17 +65,18 @@ public class ArraySet<E> extends AbstractSet<E> {
 			}
 		}
 	}
-	
+
 	private int version = 0;
 	private Object[] values = EMPTY_ARRAY;
-	
-	public ArraySet() { }
-	
+
+	public ArraySet() {
+	}
+
 	@Override
 	public Object[] toArray() {
 		return values;
 	}
-	
+
 	@Override
 	public Object clone() {
 		ArraySet<E> ret = new ArraySet<E>();
@@ -83,13 +87,13 @@ public class ArraySet<E> extends AbstractSet<E> {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public void clear() {
 		values = EMPTY_ARRAY;
 		++version;
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return values.length == 0;
@@ -99,14 +103,15 @@ public class ArraySet<E> extends AbstractSet<E> {
 	public int size() {
 		return values.length;
 	}
-	
+
 	@Override
 	public boolean add(Object value) {
 		int n = values.length;
 		for (int i = 0; i < n; i++) {
-			if (values[i].equals(value)) return false;
+			if (values[i].equals(value))
+				return false;
 		}
-		
+
 		Object[] newValues = new Object[n + 1];
 		System.arraycopy(values, 0, newValues, 0, n);
 		newValues[n] = value;
@@ -114,11 +119,12 @@ public class ArraySet<E> extends AbstractSet<E> {
 		++version;
 		return true;
 	}
-	
+
 	@Override
 	public boolean contains(Object value) {
 		for (int i = 0, n = values.length; i < n; i++) {
-			if (values[i].equals(value)) return true;
+			if (values[i].equals(value))
+				return true;
 		}
 		return false;
 	}
@@ -127,20 +133,20 @@ public class ArraySet<E> extends AbstractSet<E> {
 	public Iterator<E> iterator() {
 		return new ArrayIterator();
 	}
-	
+
 	public static void main(String[] args) throws java.io.IOException {
 		ArraySet<String> set = new ArraySet<String>();
-		java.io.BufferedReader in = new java.io.BufferedReader(
-				new java.io.InputStreamReader(System.in));
+		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 		while (true) {
-			System.out.print(set.size() + ":"); //OK
+			System.out.print(set.size() + ":"); // OK
 			for (String str : set) {
-				System.out.print(" " + str); //OK
+				System.out.print(" " + str); // OK
 			}
-			System.out.println(); //OK
-			System.out.print("> "); //OK
+			System.out.println(); // OK
+			System.out.print("> "); // OK
 			String cmd = in.readLine();
-			if (cmd == null) break;
+			if (cmd == null)
+				break;
 			cmd = cmd.trim();
 			if (cmd.equals("")) {
 				;
@@ -150,9 +156,9 @@ public class ArraySet<E> extends AbstractSet<E> {
 				set.remove(cmd.substring(1));
 			} else if (cmd.startsWith("?")) {
 				boolean ret = set.contains(cmd.substring(1));
-				System.out.println("  " + ret); //OK
+				System.out.println("  " + ret); // OK
 			} else {
-				System.out.println("unrecognized command"); //OK
+				System.out.println("unrecognized command"); // OK
 			}
 		}
 	}

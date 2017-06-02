@@ -24,8 +24,7 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
 public class Popups {
-	private static class ProjectPopup extends JPopupMenu
-			implements ActionListener {
+	private static class ProjectPopup extends JPopupMenu implements ActionListener {
 		Project proj;
 		JMenuItem add = new JMenuItem(Strings.get("projectAddCircuitItem"));
 		JMenu load = new JMenu(Strings.get("projectLoadLibraryItem"));
@@ -37,14 +36,19 @@ public class Popups {
 			super(Strings.get("projMenu"));
 			this.proj = proj;
 
-			load.add(loadBuiltin); loadBuiltin.addActionListener(this);
-			load.add(loadLogisim); loadLogisim.addActionListener(this);
-			load.add(loadJar); loadJar.addActionListener(this);
+			load.add(loadBuiltin);
+			loadBuiltin.addActionListener(this);
+			load.add(loadLogisim);
+			loadLogisim.addActionListener(this);
+			load.add(loadJar);
+			loadJar.addActionListener(this);
 
-			add(add); add.addActionListener(this);
+			add(add);
+			add.addActionListener(this);
 			add(load);
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			if (src == add) {
@@ -59,8 +63,7 @@ public class Popups {
 		}
 	}
 
-	private static class LibraryPopup extends JPopupMenu
-			implements ActionListener {
+	private static class LibraryPopup extends JPopupMenu implements ActionListener {
 		Project proj;
 		Library lib;
 		JMenuItem unload = new JMenuItem(Strings.get("projectUnloadLibraryItem"));
@@ -71,12 +74,15 @@ public class Popups {
 			this.proj = proj;
 			this.lib = lib;
 
-			add(unload); unload.addActionListener(this);
-			add(reload); reload.addActionListener(this);
+			add(unload);
+			unload.addActionListener(this);
+			add(reload);
+			reload.addActionListener(this);
 			unload.setEnabled(is_top);
 			reload.setEnabled(is_top && lib instanceof LoadedLibrary);
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			if (src == unload) {
@@ -88,8 +94,7 @@ public class Popups {
 		}
 	}
 
-	private static class CircuitPopup extends JPopupMenu
-			implements ActionListener {
+	private static class CircuitPopup extends JPopupMenu implements ActionListener {
 		Project proj;
 		Tool tool;
 		Circuit circuit;
@@ -106,14 +111,20 @@ public class Popups {
 			this.tool = tool;
 			this.circuit = circuit;
 
-			add(editLayout); editLayout.addActionListener(this);
-			add(editAppearance); editAppearance.addActionListener(this);
-			add(analyze); analyze.addActionListener(this);
-			add(stats); stats.addActionListener(this);
+			add(editLayout);
+			editLayout.addActionListener(this);
+			add(editAppearance);
+			editAppearance.addActionListener(this);
+			add(analyze);
+			analyze.addActionListener(this);
+			add(stats);
+			stats.addActionListener(this);
 			addSeparator();
-			add(main); main.addActionListener(this);
-			add(remove); remove.addActionListener(this);
-			
+			add(main);
+			main.addActionListener(this);
+			add(remove);
+			remove.addActionListener(this);
+
 			boolean canChange = proj.getLogisimFile().contains(circuit);
 			LogisimFile file = proj.getLogisimFile();
 			if (circuit == proj.getCurrentCircuit()) {
@@ -124,10 +135,10 @@ public class Popups {
 				}
 			}
 			main.setEnabled(canChange && file.getMainCircuit() != circuit);
-			remove.setEnabled(canChange && file.getCircuitCount() > 1
-					&& proj.getDependencies().canRemove(circuit));
+			remove.setEnabled(canChange && file.getCircuitCount() > 1 && proj.getDependencies().canRemove(circuit));
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object source = e.getSource();
 			if (source == editLayout) {
@@ -148,19 +159,19 @@ public class Popups {
 			}
 		}
 	}
-	
+
 	public static JPopupMenu forCircuit(Project proj, AddTool tool, Circuit circ) {
 		return new CircuitPopup(proj, tool, circ);
 	}
-	
+
 	public static JPopupMenu forTool(Project proj, Tool tool) {
 		return null;
 	}
-	
+
 	public static JPopupMenu forProject(Project proj) {
 		return new ProjectPopup(proj);
 	}
-	
+
 	public static JPopupMenu forLibrary(Project proj, Library lib, boolean isTop) {
 		return new LibraryPopup(proj, lib, isTop);
 	}

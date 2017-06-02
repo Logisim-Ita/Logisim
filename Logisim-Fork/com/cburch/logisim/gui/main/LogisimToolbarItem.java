@@ -23,33 +23,34 @@ class LogisimToolbarItem implements ToolbarItem {
 	private Icon icon;
 	private LogisimMenuItem action;
 	private StringGetter toolTip;
-	
-	public LogisimToolbarItem(MenuListener menu, String iconName,
-			LogisimMenuItem action, StringGetter toolTip) {
+
+	public LogisimToolbarItem(MenuListener menu, String iconName, LogisimMenuItem action, StringGetter toolTip) {
 		this.menu = menu;
 		this.icon = Icons.getIcon(iconName);
 		this.action = action;
 		this.toolTip = toolTip;
 	}
-	
+
 	public void setIcon(String iconName) {
 		this.icon = Icons.getIcon(iconName);
 	}
-	
+
 	public void setToolTip(StringGetter toolTip) {
 		this.toolTip = toolTip;
 	}
-	
+
 	public void doAction() {
 		if (menu != null && menu.isEnabled(action)) {
 			menu.doAction(action);
 		}
 	}
-	
+
+	@Override
 	public boolean isSelectable() {
 		return menu != null && menu.isEnabled(action);
 	}
-	
+
+	@Override
 	public void paintIcon(Component destination, Graphics g) {
 		if (!isSelectable() && g instanceof Graphics2D) {
 			Composite c = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
@@ -67,7 +68,8 @@ class LogisimToolbarItem implements ToolbarItem {
 			icon.paintIcon(destination, g, 0, 1);
 		}
 	}
-	
+
+	@Override
 	public String getToolTip() {
 		if (toolTip != null) {
 			return toolTip.get();
@@ -75,7 +77,8 @@ class LogisimToolbarItem implements ToolbarItem {
 			return null;
 		}
 	}
-	
+
+	@Override
 	public Dimension getDimension(Object orientation) {
 		if (icon == null) {
 			return new Dimension(16, 16);

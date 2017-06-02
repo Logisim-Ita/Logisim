@@ -14,12 +14,12 @@ import com.cburch.draw.model.HandleGesture;
 public class ModelMoveHandleAction extends ModelAction {
 	private HandleGesture gesture;
 	private Handle newHandle;
-	
+
 	public ModelMoveHandleAction(CanvasModel model, HandleGesture gesture) {
 		super(model);
 		this.gesture = gesture;
 	}
-	
+
 	public Handle getNewHandle() {
 		return newHandle;
 	}
@@ -33,12 +33,12 @@ public class ModelMoveHandleAction extends ModelAction {
 	public String getName() {
 		return Strings.get("actionMoveHandle");
 	}
-	
+
 	@Override
 	void doSub(CanvasModel model) {
 		newHandle = model.moveHandle(gesture);
 	}
-	
+
 	@Override
 	void undoSub(CanvasModel model) {
 		Handle oldHandle = gesture.getHandle();

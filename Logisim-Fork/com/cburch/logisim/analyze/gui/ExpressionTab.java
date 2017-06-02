@@ -33,10 +33,10 @@ import com.cburch.logisim.util.StringGetter;
 
 class ExpressionTab extends AnalyzerTab implements TabInterface {
 	private class MyListener extends AbstractAction
-			implements DocumentListener,
-				OutputExpressionsListener, ItemListener {
+			implements DocumentListener, OutputExpressionsListener, ItemListener {
 		boolean edited = false;
-		
+
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			if (src == clear) {
@@ -63,23 +63,28 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 			}
 		}
 
+		@Override
 		public void insertUpdate(DocumentEvent event) {
 			String curText = field.getText();
-			edited = curText.length() != curExprStringLength
-				|| !curText.equals(getCurrentString());
+			edited = curText.length() != curExprStringLength || !curText.equals(getCurrentString());
 
 			boolean enable = (edited && getCurrentVariable() != null);
 			clear.setEnabled(curText.length() > 0);
 			revert.setEnabled(enable);
 			enter.setEnabled(enable);
 		}
+
+		@Override
 		public void removeUpdate(DocumentEvent event) {
 			insertUpdate(event);
 		}
+
+		@Override
 		public void changedUpdate(DocumentEvent event) {
 			insertUpdate(event);
 		}
 
+		@Override
 		public void expressionChanged(OutputExpressionsEvent event) {
 			if (event.getType() == OutputExpressionsEvent.OUTPUT_EXPRESSION) {
 				String output = event.getVariable();
@@ -90,16 +95,16 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 			}
 		}
 
+		@Override
 		public void itemStateChanged(ItemEvent event) {
 			updateTab();
 		}
-		
+
 		private String getCurrentString() {
 			String output = getCurrentVariable();
-			return output == null ? ""
-					: model.getOutputExpressions().getExpressionString(output);
+			return output == null ? "" : model.getOutputExpressions().getExpressionString(output);
 		}
-		
+
 		private void currentStringChanged() {
 			String output = getCurrentVariable();
 			String exprString = model.getOutputExpressions().getExpressionString(output);
@@ -125,11 +130,11 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 	private AnalyzerModel model;
 	private int curExprStringLength = 0;
 	private StringGetter errorMessage;
-	
+
 	public ExpressionTab(AnalyzerModel model) {
 		this.model = model;
 		selector = new OutputSelector(model);
-		
+
 		model.getOutputExpressions().addOutputExpressionsListener(myListener);
 		selector.addItemListener(myListener);
 		clear.addActionListener(myListener);
@@ -145,7 +150,7 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		buttons.add(clear);
 		buttons.add(revert);
 		buttons.add(enter);
-		
+
 		GridBagLayout gb = new GridBagLayout();
 		GridBagConstraints gc = new GridBagConstraints();
 		setLayout(gb);
@@ -153,27 +158,31 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		gc.gridx = 0;
 		gc.gridy = GridBagConstraints.RELATIVE;
 		gc.fill = GridBagConstraints.BOTH;
-		
+
 		JPanel selectorPanel = selector.createPanel();
-		gb.setConstraints(selectorPanel, gc); add(selectorPanel);
-		gb.setConstraints(prettyView, gc); add(prettyView);
-		  Insets oldInsets = gc.insets;
-		  gc.insets = new Insets(10, 10, 0, 10);
-		  JScrollPane fieldPane = new JScrollPane(field,
-				  ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				  ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		gb.setConstraints(fieldPane, gc); add(fieldPane);
-		  gc.insets = oldInsets;
-		  gc.fill = GridBagConstraints.NONE;
-		  gc.anchor = GridBagConstraints.LINE_END;
-		gb.setConstraints(buttons, gc); add(buttons);
-		  gc.fill = GridBagConstraints.BOTH;
-		gb.setConstraints(error, gc); add(error);
-		
+		gb.setConstraints(selectorPanel, gc);
+		add(selectorPanel);
+		gb.setConstraints(prettyView, gc);
+		add(prettyView);
+		Insets oldInsets = gc.insets;
+		gc.insets = new Insets(10, 10, 0, 10);
+		JScrollPane fieldPane = new JScrollPane(field, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		gb.setConstraints(fieldPane, gc);
+		add(fieldPane);
+		gc.insets = oldInsets;
+		gc.fill = GridBagConstraints.NONE;
+		gc.anchor = GridBagConstraints.LINE_END;
+		gb.setConstraints(buttons, gc);
+		add(buttons);
+		gc.fill = GridBagConstraints.BOTH;
+		gb.setConstraints(error, gc);
+		add(error);
+
 		myListener.insertUpdate(null);
 		setError(null);
 	}
-	
+
 	@Override
 	void localeChanged() {
 		selector.localeChanged();
@@ -185,22 +194,22 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 			error.setText(errorMessage.get());
 		}
 	}
-	
+
 	@Override
 	void updateTab() {
 		String output = getCurrentVariable();
 		prettyView.setExpression(model.getOutputExpressions().getExpression(output));
 		myListener.currentStringChanged();
 	}
-	
+
 	void registerDefaultButtons(DefaultRegistry registry) {
 		registry.registerDefaultButton(field, enter);
 	}
-	
+
 	String getCurrentVariable() {
 		return selector.getSelectedOutput();
 	}
-	
+
 	private void setError(StringGetter msg) {
 		if (msg == null) {
 			errorMessage = null;
@@ -211,21 +220,25 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		}
 	}
 
+	@Override
 	public void copy() {
 		field.requestFocus();
 		field.copy();
 	}
 
+	@Override
 	public void paste() {
 		field.requestFocus();
 		field.paste();
 	}
 
+	@Override
 	public void delete() {
 		field.requestFocus();
 		field.replaceSelection("");
 	}
 
+	@Override
 	public void selectAll() {
 		field.requestFocus();
 		field.selectAll();

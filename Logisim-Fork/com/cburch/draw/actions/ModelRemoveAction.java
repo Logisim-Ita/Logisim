@@ -16,13 +16,13 @@ public class ModelRemoveAction extends ModelAction {
 
 	public ModelRemoveAction(CanvasModel model, CanvasObject removed) {
 		this(model, Collections.singleton(removed));
-	}	
-	
+	}
+
 	public ModelRemoveAction(CanvasModel model, Collection<CanvasObject> removed) {
 		super(model);
 		this.removed = ZOrder.getZIndex(removed, model);
 	}
-	
+
 	@Override
 	public Collection<CanvasObject> getObjects() {
 		return Collections.unmodifiableSet(removed.keySet());
@@ -32,12 +32,12 @@ public class ModelRemoveAction extends ModelAction {
 	public String getName() {
 		return Strings.get("actionRemove", getShapesName(removed.keySet()));
 	}
-	
+
 	@Override
 	void doSub(CanvasModel model) {
 		model.removeObjects(removed.keySet());
 	}
-	
+
 	@Override
 	void undoSub(CanvasModel model) {
 		model.addObjects(removed);

@@ -10,7 +10,7 @@ class PrefMonitorStringOpts extends AbstractPrefMonitor<String> {
 	private String[] opts;
 	private String value;
 	private String dflt;
-	
+
 	PrefMonitorStringOpts(String name, String[] opts, String dflt) {
 		super(name);
 		this.opts = opts;
@@ -20,11 +20,13 @@ class PrefMonitorStringOpts extends AbstractPrefMonitor<String> {
 		set(prefs.get(name, dflt));
 		prefs.addPreferenceChangeListener(this);
 	}
-	
+
+	@Override
 	public String get() {
 		return value;
 	}
-	
+
+	@Override
 	public void set(String newValue) {
 		String oldValue = value;
 		if (!isSame(oldValue, newValue)) {
@@ -32,6 +34,7 @@ class PrefMonitorStringOpts extends AbstractPrefMonitor<String> {
 		}
 	}
 
+	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		Preferences prefs = event.getNode();
 		String prop = event.getKey();
@@ -43,15 +46,19 @@ class PrefMonitorStringOpts extends AbstractPrefMonitor<String> {
 				String[] o = opts;
 				String chosen = null;
 				for (int i = 0; i < o.length; i++) {
-					if (isSame(o[i], newValue)) { chosen = o[i]; break; }
+					if (isSame(o[i], newValue)) {
+						chosen = o[i];
+						break;
+					}
 				}
-				if (chosen == null) chosen = dflt;
+				if (chosen == null)
+					chosen = dflt;
 				value = chosen;
 				AppPreferences.firePropertyChange(name, oldValue, chosen);
 			}
 		}
 	}
-	
+
 	private static boolean isSame(String a, String b) {
 		return a == null ? b == null : a.equals(b);
 	}

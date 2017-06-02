@@ -13,7 +13,7 @@ import com.cburch.draw.model.Handle;
 public class ModelDeleteHandleAction extends ModelAction {
 	private Handle handle;
 	private Handle previous;
-	
+
 	public ModelDeleteHandleAction(CanvasModel model, Handle handle) {
 		super(model);
 		this.handle = handle;
@@ -28,12 +28,12 @@ public class ModelDeleteHandleAction extends ModelAction {
 	public String getName() {
 		return Strings.get("actionDeleteHandle");
 	}
-	
+
 	@Override
 	void doSub(CanvasModel model) {
 		previous = model.deleteHandle(handle);
 	}
-	
+
 	@Override
 	void undoSub(CanvasModel model) {
 		model.insertHandle(handle, previous);

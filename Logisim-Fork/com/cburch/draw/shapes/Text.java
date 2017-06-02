@@ -24,27 +24,25 @@ import com.cburch.logisim.util.UnmodifiableList;
 
 public class Text extends AbstractCanvasObject {
 	private EditableLabel label;
-	
+
 	public Text(int x, int y, String text) {
-		this(x, y, EditableLabel.LEFT, EditableLabel.BASELINE, text,
-				DrawAttr.DEFAULT_FONT, Color.BLACK);
+		this(x, y, EditableLabel.LEFT, EditableLabel.BASELINE, text, DrawAttr.DEFAULT_FONT, Color.BLACK);
 	}
 
-	private Text(int x, int y, int halign, int valign, String text, Font font,
-		Color color) {
+	private Text(int x, int y, int halign, int valign, String text, Font font, Color color) {
 		label = new EditableLabel(x, y, text, font);
 		label.setColor(color);
 		label.setHorizontalAlignment(halign);
 		label.setVerticalAlignment(valign);
 	}
-	
+
 	@Override
 	public Text clone() {
 		Text ret = (Text) super.clone();
 		ret.label = this.label.clone();
 		return ret;
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof Text) {
@@ -54,12 +52,12 @@ public class Text extends AbstractCanvasObject {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public int matchesHashCode() {
 		return label.hashCode();
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		return SvgCreator.createText(doc, this);
@@ -68,19 +66,19 @@ public class Text extends AbstractCanvasObject {
 	public Location getLocation() {
 		return Location.create(label.getX(), label.getY());
 	}
-	
+
 	public String getText() {
 		return label.getText();
 	}
-	
+
 	public EditableLabel getLabel() {
 		return label;
 	}
-	
+
 	public void setText(String value) {
 		label.setText(value);
 	}
-	
+
 	@Override
 	public String getDisplayName() {
 		return Strings.get("shapeText");
@@ -90,7 +88,7 @@ public class Text extends AbstractCanvasObject {
 	public List<Attribute<?>> getAttributes() {
 		return DrawAttr.ATTRS_TEXT;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
@@ -113,7 +111,7 @@ public class Text extends AbstractCanvasObject {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public void updateValue(Attribute<?> attr, Object value) {
 		if (attr == DrawAttr.FONT) {
@@ -125,38 +123,37 @@ public class Text extends AbstractCanvasObject {
 			label.setHorizontalAlignment(intVal.intValue());
 		}
 	}
-	
+
 	@Override
 	public Bounds getBounds() {
 		return label.getBounds();
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, boolean assumeFilled) {
 		return label.contains(loc.getX(), loc.getY());
 	}
-	
+
 	@Override
 	public void translate(int dx, int dy) {
 		label.setLocation(label.getX() + dx, label.getY() + dy);
 	}
-	
+
 	public List<Handle> getHandles() {
 		Bounds bds = label.getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		int w = bds.getWidth();
 		int h = bds.getHeight();
-		return UnmodifiableList.create(new Handle[] {
-				new Handle(this, x, y), new Handle(this, x + w, y),
+		return UnmodifiableList.create(new Handle[] { new Handle(this, x, y), new Handle(this, x + w, y),
 				new Handle(this, x + w, y + h), new Handle(this, x, y + h) });
 	}
-	
+
 	@Override
 	public List<Handle> getHandles(HandleGesture gesture) {
 		return getHandles();
 	}
-	
+
 	@Override
 	public void paint(Graphics g, HandleGesture gesture) {
 		label.paint(g);

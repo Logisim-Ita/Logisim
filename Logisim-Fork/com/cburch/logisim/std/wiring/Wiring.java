@@ -17,46 +17,39 @@ import com.cburch.logisim.tools.Tool;
 
 public class Wiring extends Library {
 
-	static final AttributeOption GATE_TOP_LEFT
-		= new AttributeOption("tl", Strings.getter("wiringGateTopLeftOption"));
-	static final AttributeOption GATE_BOTTOM_RIGHT
-		= new AttributeOption("br", Strings.getter("wiringGateBottomRightOption"));
-	static final Attribute<AttributeOption> ATTR_GATE = Attributes.forOption("gate",
-			Strings.getter("wiringGateAttr"),
+	static final AttributeOption GATE_TOP_LEFT = new AttributeOption("tl", Strings.getter("wiringGateTopLeftOption"));
+	static final AttributeOption GATE_BOTTOM_RIGHT = new AttributeOption("br",
+			Strings.getter("wiringGateBottomRightOption"));
+	static final Attribute<AttributeOption> ATTR_GATE = Attributes.forOption("gate", Strings.getter("wiringGateAttr"),
 			new AttributeOption[] { GATE_TOP_LEFT, GATE_BOTTOM_RIGHT });
 
-	private static Tool[] ADD_TOOLS = {
-		new AddTool(SplitterFactory.instance),
-		new AddTool(Pin.FACTORY),
-		new AddTool(Probe.FACTORY),
-		new AddTool(Tunnel.FACTORY),
-		new AddTool(PullResistor.FACTORY),
-		new AddTool(Clock.FACTORY),
-		new AddTool(Constant.FACTORY),
-	};
-	
+	private static Tool[] ADD_TOOLS = { new AddTool(SplitterFactory.instance), new AddTool(Pin.FACTORY),
+			new AddTool(Probe.FACTORY), new AddTool(Tunnel.FACTORY), new AddTool(PullResistor.FACTORY),
+			new AddTool(Clock.FACTORY), new AddTool(Constant.FACTORY), };
+
 	private static FactoryDescription[] DESCRIPTIONS = {
-		new FactoryDescription("Power", Strings.getter("powerComponent"),
-				"power.gif", "Power"),
-		new FactoryDescription("Ground", Strings.getter("groundComponent"),
-				"ground.gif", "Ground"),
-		new FactoryDescription("Transistor", Strings.getter("transistorComponent"),
-				"trans0.gif", "Transistor"),
-		new FactoryDescription("Transmission Gate", Strings.getter("transmissionGateComponent"),
-				"transmis.gif", "TransmissionGate"),
-		new FactoryDescription("Bit Extender", Strings.getter("extenderComponent"),
-				"extender.gif", "BitExtender"),
-	};
+			new FactoryDescription("Power", Strings.getter("powerComponent"), "power.gif", "Power"),
+			new FactoryDescription("Ground", Strings.getter("groundComponent"), "ground.gif", "Ground"),
+			new FactoryDescription("Transistor", Strings.getter("transistorComponent"), "trans0.gif", "Transistor"),
+			new FactoryDescription("Transmission Gate", Strings.getter("transmissionGateComponent"), "transmis.gif",
+					"TransmissionGate"),
+			new FactoryDescription("Bit Extender", Strings.getter("extenderComponent"), "extender.gif",
+					"BitExtender"), };
 
 	private List<Tool> tools = null;
 
-	public Wiring() { }
+	public Wiring() {
+	}
 
 	@Override
-	public String getName() { return "Wiring"; }
+	public String getName() {
+		return "Wiring";
+	}
 
 	@Override
-	public String getDisplayName() { return Strings.get("wiringLibrary"); }
+	public String getDisplayName() {
+		return Strings.get("wiringLibrary");
+	}
 
 	@Override
 	public List<Tool> getTools() {

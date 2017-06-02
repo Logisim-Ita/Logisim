@@ -38,14 +38,12 @@ class NandGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height,
-			int inputs) {
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
 		PainterDin.paintAnd(painter, width, height, true);
 	}
 
 	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs,
-			InstanceState state) {
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
 		return GateFunctions.computeAnd(inputs, numInputs).not();
 	}
 
@@ -59,5 +57,7 @@ class NandGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.TRUE; }
+	protected Value getIdentity() {
+		return Value.TRUE;
+	}
 }

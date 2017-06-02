@@ -24,22 +24,23 @@ public class ListUtil {
 
 		@Override
 		public E get(int index) {
-			if (index < a.size())   return a.get(index);
-			else                    return b.get(index - a.size());
+			if (index < a.size())
+				return a.get(index);
+			else
+				return b.get(index - a.size());
 		}
 
 		@Override
 		public Iterator<E> iterator() {
-			return IteratorUtil.createJoinedIterator(a.iterator(),
-				b.iterator());
+			return IteratorUtil.createJoinedIterator(a.iterator(), b.iterator());
 		}
-				
+
 	}
 
-	private ListUtil() { }
+	private ListUtil() {
+	}
 
-	public static <E> List<E> joinImmutableLists(List<? extends E> a,
-			List<? extends E> b) {
+	public static <E> List<E> joinImmutableLists(List<? extends E> a, List<? extends E> b) {
 		return new JoinedList<E>(a, b);
 	}
 }

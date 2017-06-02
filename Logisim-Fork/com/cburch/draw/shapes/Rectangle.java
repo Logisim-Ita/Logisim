@@ -19,7 +19,7 @@ public class Rectangle extends Rectangular {
 	public Rectangle(int x, int y, int w, int h) {
 		super(x, y, w, h);
 	}
-	
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof Rectangle) {
@@ -33,7 +33,7 @@ public class Rectangle extends Rectangular {
 	public int matchesHashCode() {
 		return super.matchesHashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Rectangle:" + getBounds();
@@ -43,7 +43,7 @@ public class Rectangle extends Rectangular {
 	public String getDisplayName() {
 		return Strings.get("shapeRect");
 	}
-	
+
 	@Override
 	public Element toSvgElement(Document doc) {
 		return SvgCreator.createRectangle(doc, this);
@@ -53,7 +53,7 @@ public class Rectangle extends Rectangular {
 	public List<Attribute<?>> getAttributes() {
 		return DrawAttr.getFillAttributes(getPaintType());
 	}
-	
+
 	@Override
 	protected boolean contains(int x, int y, int w, int h, Location q) {
 		return isInRect(q.getX(), q.getY(), x, y, w, h);
@@ -88,10 +88,12 @@ public class Rectangle extends Rectangular {
 			return super.getRandomPoint(bds, rand);
 		}
 	}
-	
+
 	@Override
 	public void draw(Graphics g, int x, int y, int w, int h) {
-		if (setForFill(g)) g.fillRect(x, y, w, h);
-		if (setForStroke(g)) g.drawRect(x, y, w, h);
+		if (setForFill(g))
+			g.fillRect(x, y, w, h);
+		if (setForStroke(g))
+			g.drawRect(x, y, w, h);
 	}
 }

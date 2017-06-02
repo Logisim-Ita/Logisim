@@ -14,8 +14,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 		boolean is_read_only;
 		Node next;
 
-		Node(Attribute<?> attr, Object value, boolean is_read_only,
-				Node next) {
+		Node(Attribute<?> attr, Object value, boolean is_read_only, Node next) {
 			this.attr = attr;
 			this.value = value;
 			this.is_read_only = is_read_only;
@@ -33,18 +32,23 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	private class AttrIterator implements Iterator<Attribute<?>> {
 		Node n;
 
-		AttrIterator(Node n) { this.n = n; }
+		AttrIterator(Node n) {
+			this.n = n;
+		}
 
+		@Override
 		public boolean hasNext() {
 			return n != null;
 		}
 
+		@Override
 		public Attribute<?> next() {
 			Node ret = n;
 			n = n.next;
 			return ret.attr;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
@@ -65,8 +69,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 				--remaining;
 			}
 			if (remaining != 0 || n == null) {
-				throw new IndexOutOfBoundsException(i + " not in list "
-					+ " [" + count + " elements]");
+				throw new IndexOutOfBoundsException(i + " not in list " + " [" + count + " elements]");
 			}
 			return n.attr;
 		}
@@ -81,7 +84,8 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 			Node n = head;
 			int ret = 0;
 			while (n != null) {
-				if (o.equals(n.attr)) return ret;
+				if (o.equals(n.attr))
+					return ret;
 				n = n.next;
 				++ret;
 			}
@@ -99,7 +103,8 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	private Node tail = null;
 	private int count = 0;
 
-	public AttributeSetImpl() { }
+	public AttributeSetImpl() {
+	}
 
 	public AttributeSetImpl(Attribute<Object>[] attrs, Object[] values) {
 		if (attrs.length != values.length) {
@@ -142,13 +147,14 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 			throw new IllegalArgumentException("Adding null attribute");
 		}
 		if (findNode(attr) != null) {
-			throw new IllegalArgumentException("Attribute " + attr
-				+ " already created");
+			throw new IllegalArgumentException("Attribute " + attr + " already created");
 		}
 
 		Node n = new Node(attr, value, false, null);
-		if (head == null) head = n;
-		else             tail.next = n;
+		if (head == null)
+			head = n;
+		else
+			tail.next = n;
 		tail = n;
 		++count;
 		fireAttributeListChanged();
@@ -159,9 +165,12 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 		Node n = head;
 		while (n != null) {
 			if (n.attr.equals(attr)) {
-				if (tail == n)    tail = prev;
-				if (prev == null) head = n.next;
-				else             prev.next = n.next;
+				if (tail == n)
+					tail = prev;
+				if (prev == null)
+					head = n.next;
+				else
+					prev.next = n.next;
 				--count;
 				fireAttributeListChanged();
 				return;
@@ -169,8 +178,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 			prev = n;
 			n = n.next;
 		}
-		throw new IllegalArgumentException("Attribute " + attr
-			+ " absent");
+		throw new IllegalArgumentException("Attribute " + attr + " absent");
 	}
 
 	//
@@ -180,8 +188,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	public boolean isReadOnly(Attribute<?> attr) {
 		Node n = findNode(attr);
 		if (n == null) {
-			throw new IllegalArgumentException("Unknown attribute "
-				+ attr);
+			throw new IllegalArgumentException("Unknown attribute " + attr);
 		}
 		return n.is_read_only;
 	}
@@ -190,8 +197,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	public void setReadOnly(Attribute<?> attr, boolean value) {
 		Node n = findNode(attr);
 		if (n == null) {
-			throw new IllegalArgumentException("Unknown attribute "
-				+ attr);
+			throw new IllegalArgumentException("Unknown attribute " + attr);
 		}
 		n.is_read_only = value;
 	}
@@ -203,8 +209,7 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	public <V> V getValue(Attribute<V> attr) {
 		Node n = findNode(attr);
 		if (n == null) {
-			throw new IllegalArgumentException("Unknown attribute "
-				+ attr);
+			throw new IllegalArgumentException("Unknown attribute " + attr);
 		}
 		@SuppressWarnings("unchecked")
 		V ret = (V) n.value;
@@ -219,12 +224,10 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 
 		Node n = findNode(attr);
 		if (n == null) {
-			throw new IllegalArgumentException("Unknown attribute "
-				+ attr);
+			throw new IllegalArgumentException("Unknown attribute " + attr);
 		}
 		if (n.is_read_only) {
-			throw new IllegalArgumentException("Attribute "
-				+ attr + " is read-only");
+			throw new IllegalArgumentException("Attribute " + attr + " is read-only");
 		}
 		if (value.equals(n.value)) {
 			; // do nothing - why change what's already there?
@@ -239,7 +242,8 @@ public class AttributeSetImpl extends AbstractAttributeSet {
 	//
 	private Node findNode(Attribute<?> attr) {
 		for (Node n = head; n != null; n = n.next) {
-			if (n.attr.equals(attr)) return n;
+			if (n.attr.equals(attr))
+				return n;
 		}
 		return null;
 	}

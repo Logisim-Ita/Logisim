@@ -7,6 +7,8 @@ import com.cburch.logisim.tools.Library;
 
 interface LibraryLoader {
 	public Library loadLibrary(String desc);
+
 	public String getDescriptor(Library lib);
+
 	public void showError(String description);
 }

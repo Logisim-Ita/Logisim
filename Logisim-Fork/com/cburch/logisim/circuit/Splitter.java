@@ -27,8 +27,7 @@ import com.cburch.logisim.tools.WireRepair;
 import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.util.StringUtil;
 
-public class Splitter extends ManagedComponent
-		implements WireRepair, ToolTipMaker, MenuExtender, AttributeListener {
+public class Splitter extends ManagedComponent implements WireRepair, ToolTipMaker, MenuExtender, AttributeListener {
 	// basic data
 	byte[] bit_thread; // how each bit maps to thread within end
 
@@ -53,18 +52,16 @@ public class Splitter extends ManagedComponent
 	public void propagate(CircuitState state) {
 		; // handled by CircuitWires, nothing to do
 	}
-	
+
 	@Override
 	public boolean contains(Location loc) {
 		if (super.contains(loc)) {
 			Location myLoc = getLocation();
 			Direction facing = getAttributeSet().getValue(StdAttr.FACING);
 			if (facing == Direction.EAST || facing == Direction.WEST) {
-				return Math.abs(loc.getX() - myLoc.getX()) > 5
-					|| loc.manhattanDistanceTo(myLoc) <= 5; 
-			} else {                
-				return Math.abs(loc.getY() - myLoc.getY()) > 5
-					|| loc.manhattanDistanceTo(myLoc) <= 5; 
+				return Math.abs(loc.getX() - myLoc.getX()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
+			} else {
+				return Math.abs(loc.getY() - myLoc.getY()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
 			}
 		} else {
 			return false;
@@ -97,12 +94,11 @@ public class Splitter extends ManagedComponent
 		int y = origin.getY() + parms.getEnd0Y();
 		int dx = parms.getEndToEndDeltaX();
 		int dy = parms.getEndToEndDeltaY();
-		
+
 		EndData[] ends = new EndData[fanout + 1];
 		ends[0] = new EndData(origin, BitWidth.create(bit_end.length), EndData.INPUT_OUTPUT);
 		for (int i = 0; i < fanout; i++) {
-			ends[i + 1] = new EndData(Location.create(x, y),
-					BitWidth.create(end_width[i + 1]), EndData.INPUT_OUTPUT);
+			ends[i + 1] = new EndData(Location.create(x, y), BitWidth.create(end_width[i + 1]), EndData.INPUT_OUTPUT);
 			x += dx;
 			y += dy;
 		}
@@ -111,10 +107,11 @@ public class Splitter extends ManagedComponent
 		recomputeBounds();
 		fireComponentInvalidated(new ComponentEvent(this));
 	}
-	
+
 	//
 	// user interface methods
 	//
+	@Override
 	public void draw(ComponentDrawContext context) {
 		SplitterAttributes attrs = (SplitterAttributes) getAttributeSet();
 		if (attrs.appear == SplitterAttributes.APPEAR_LEGACY) {
@@ -126,19 +123,25 @@ public class Splitter extends ManagedComponent
 			context.drawPins(this);
 		}
 	}
-	
+
 	@Override
 	public Object getFeature(Object key) {
-		if (key == WireRepair.class) return this;
-		if (key == ToolTipMaker.class) return this;
-		if (key == MenuExtender.class) return this;
-		else return super.getFeature(key);
+		if (key == WireRepair.class)
+			return this;
+		if (key == ToolTipMaker.class)
+			return this;
+		if (key == MenuExtender.class)
+			return this;
+		else
+			return super.getFeature(key);
 	}
 
+	@Override
 	public boolean shouldRepairWire(WireRepairData data) {
 		return true;
 	}
-	
+
+	@Override
 	public String getToolTip(ComponentUserEvent e) {
 		int end = -1;
 		for (int i = getEnds().size() - 1; i >= 0; i--) {
@@ -147,10 +150,10 @@ public class Splitter extends ManagedComponent
 				break;
 			}
 		}
-		
+
 		if (end == 0) {
 			return Strings.get("splitterCombinedTip");
-		} else if (end > 0){
+		} else if (end > 0) {
 			int bits = 0;
 			StringBuilder buf = new StringBuilder();
 			SplitterAttributes attrs = (SplitterAttributes) getAttributeSet();
@@ -171,20 +174,29 @@ public class Splitter extends ManagedComponent
 					}
 				}
 			}
-			if (inString) appendBuf(buf, beginString, bit_end.length - 1);
+			if (inString)
+				appendBuf(buf, beginString, bit_end.length - 1);
 			String base;
 			switch (bits) {
-			case 0:  base = Strings.get("splitterSplit0Tip"); break;
-			case 1:  base = Strings.get("splitterSplit1Tip"); break;
-			default: base = Strings.get("splitterSplitManyTip"); break;
+			case 0:
+				base = Strings.get("splitterSplit0Tip");
+				break;
+			case 1:
+				base = Strings.get("splitterSplit1Tip");
+				break;
+			default:
+				base = Strings.get("splitterSplitManyTip");
+				break;
 			}
 			return StringUtil.format(base, buf.toString());
 		} else {
 			return null;
 		}
 	}
+
 	private static void appendBuf(StringBuilder buf, int start, int end) {
-		if (buf.length() > 0) buf.append(",");
+		if (buf.length() > 0)
+			buf.append(",");
 		if (start == end) {
 			buf.append(start);
 		} else {
@@ -192,6 +204,7 @@ public class Splitter extends ManagedComponent
 		}
 	}
 
+	@Override
 	public void configureMenu(JPopupMenu menu, Project proj) {
 		menu.addSeparator();
 		menu.add(new SplitterDistributeItem(proj, this, 1));
@@ -201,8 +214,11 @@ public class Splitter extends ManagedComponent
 	//
 	// AttributeListener methods
 	//
-	public void attributeListChanged(AttributeEvent e) { }
-	
+	@Override
+	public void attributeListChanged(AttributeEvent e) {
+	}
+
+	@Override
 	public void attributeValueChanged(AttributeEvent e) {
 		configureComponent();
 	}

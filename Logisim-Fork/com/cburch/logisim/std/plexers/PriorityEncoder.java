@@ -26,19 +26,16 @@ public class PriorityEncoder extends InstanceFactory {
 	private static final int EN_IN = 1;
 	private static final int EN_OUT = 2;
 	private static final int GS = 3;
-	
+
 	public PriorityEncoder() {
 		super("Priority Encoder", Strings.getter("priorityEncoderComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, Plexers.ATTR_SELECT, Plexers.ATTR_DISABLED
-			}, new Object[] {
-				Direction.EAST, BitWidth.create(3), Plexers.DISABLED_FLOATING
-			});
+		setAttributes(new Attribute[] { StdAttr.FACING, Plexers.ATTR_SELECT, Plexers.ATTR_DISABLED },
+				new Object[] { Direction.EAST, BitWidth.create(3), Plexers.DISABLED_FLOATING });
 		setKeyConfigurator(new BitWidthConfigurator(Plexers.ATTR_SELECT, 1, 5, 0));
 		setIconName("priencod.gif");
 		setFacingAttribute(StdAttr.FACING);
 	}
-	
+
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction dir = attrs.getValue(StdAttr.FACING);
@@ -47,11 +44,11 @@ public class PriorityEncoder extends InstanceFactory {
 		int offs = -5 * inputs;
 		int len = 10 * inputs + 10;
 		if (dir == Direction.NORTH) {
-			return Bounds.create(offs,   0, len, 40);
+			return Bounds.create(offs, 0, len, 40);
 		} else if (dir == Direction.SOUTH) {
 			return Bounds.create(offs, -40, len, 40);
 		} else if (dir == Direction.WEST) {
-			return Bounds.create(  0, offs, 40, len);
+			return Bounds.create(0, offs, 40, len);
 		} else { // dir == Direction.EAST
 			return Bounds.create(-40, offs, 40, len);
 		}
@@ -62,7 +59,7 @@ public class PriorityEncoder extends InstanceFactory {
 		instance.addAttributeListener();
 		updatePorts(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING || attr == Plexers.ATTR_SELECT) {
@@ -82,7 +79,7 @@ public class PriorityEncoder extends InstanceFactory {
 		Port[] ps = new Port[n + 4];
 		if (dir == Direction.NORTH || dir == Direction.SOUTH) {
 			int x = -5 * n + 10;
-			int y = dir == Direction.NORTH ? 40 : -40; 
+			int y = dir == Direction.NORTH ? 40 : -40;
 			for (int i = 0; i < n; i++) {
 				ps[i] = new Port(x + 10 * i, y, Port.INPUT, 1);
 			}
@@ -91,7 +88,7 @@ public class PriorityEncoder extends InstanceFactory {
 			ps[n + EN_OUT] = new Port(x - 10, y / 2, Port.OUTPUT, 1);
 			ps[n + GS] = new Port(10, 0, Port.OUTPUT, 1);
 		} else {
-			int x = dir == Direction.EAST ? -40 : 40; 
+			int x = dir == Direction.EAST ? -40 : 40;
 			int y = -5 * n + 10;
 			for (int i = 0; i < n; i++) {
 				ps[i] = new Port(x, y + 10 * i, Port.INPUT, 1);
@@ -118,7 +115,7 @@ public class PriorityEncoder extends InstanceFactory {
 		BitWidth select = state.getAttributeValue(Plexers.ATTR_SELECT);
 		int n = 1 << select.getWidth();
 		boolean enabled = state.getPort(n + EN_IN) != Value.FALSE;
-		
+
 		int out = -1;
 		Value outDefault;
 		if (enabled) {
@@ -175,10 +172,7 @@ public class PriorityEncoder extends InstanceFactory {
 		}
 		GraphicsUtil.drawText(g, "0", x0, y0, halign, GraphicsUtil.V_BASELINE);
 		g.setColor(Color.BLACK);
-		GraphicsUtil.drawCenteredText(g, "Pri",
-				bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 2);
+		GraphicsUtil.drawCenteredText(g, "Pri", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		painter.drawPorts();
 	}
 }
-

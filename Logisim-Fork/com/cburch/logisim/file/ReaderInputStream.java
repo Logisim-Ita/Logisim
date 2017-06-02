@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.io.Reader;
 
 /**
- * Adapts a <code>Reader</code> as an <code>InputStream</code>.
- * Adapted from <CODE>StringInputStream</CODE>.
+ * Adapts a <code>Reader</code> as an <code>InputStream</code>. Adapted from
+ * <CODE>StringInputStream</CODE>.
  *
  */
 public class ReaderInputStream extends InputStream {
@@ -37,22 +37,24 @@ public class ReaderInputStream extends InputStream {
 	private int begin;
 
 	/**
-	 * Construct a <CODE>ReaderInputStream</CODE>
-	 * for the specified <CODE>Reader</CODE>.
+	 * Construct a <CODE>ReaderInputStream</CODE> for the specified
+	 * <CODE>Reader</CODE>.
 	 *
-	 * @param reader   <CODE>Reader</CODE>.  Must not be <code>null</code>.
+	 * @param reader
+	 *            <CODE>Reader</CODE>. Must not be <code>null</code>.
 	 */
 	public ReaderInputStream(Reader reader) {
 		in = reader;
 	}
 
 	/**
-	 * Construct a <CODE>ReaderInputStream</CODE>
-	 * for the specified <CODE>Reader</CODE>,
-	 * with the specified encoding.
+	 * Construct a <CODE>ReaderInputStream</CODE> for the specified
+	 * <CODE>Reader</CODE>, with the specified encoding.
 	 *
-	 * @param reader     non-null <CODE>Reader</CODE>.
-	 * @param encoding   non-null <CODE>String</CODE> encoding.
+	 * @param reader
+	 *            non-null <CODE>Reader</CODE>.
+	 * @param encoding
+	 *            non-null <CODE>String</CODE> encoding.
 	 */
 	public ReaderInputStream(Reader reader, String encoding) {
 		this(reader);
@@ -68,7 +70,8 @@ public class ReaderInputStream extends InputStream {
 	 *
 	 * @return the value of the next character in the <CODE>Reader</CODE>.
 	 *
-	 * @exception IOException if the original <code>Reader</code> fails to be read
+	 * @exception IOException
+	 *                if the original <code>Reader</code> fails to be read
 	 */
 	@Override
 	public synchronized int read() throws IOException {
@@ -100,16 +103,19 @@ public class ReaderInputStream extends InputStream {
 	/**
 	 * Reads from the <code>Reader</code> into a byte array
 	 *
-	 * @param b  the byte array to read into
-	 * @param off the offset in the byte array
-	 * @param len the length in the byte array to fill
-	 * @return the actual number read into the byte array, -1 at
-	 *         the end of the stream
-	 * @exception IOException if an error occurs
+	 * @param b
+	 *            the byte array to read into
+	 * @param off
+	 *            the offset in the byte array
+	 * @param len
+	 *            the length in the byte array to fill
+	 * @return the actual number read into the byte array, -1 at the end of the
+	 *         stream
+	 * @exception IOException
+	 *                if an error occurs
 	 */
 	@Override
-	public synchronized int read(byte[] b, int off, int len)
-		throws IOException {
+	public synchronized int read(byte[] b, int off, int len) throws IOException {
 		if (in == null) {
 			throw new IOException("Stream Closed");
 		}
@@ -142,8 +148,9 @@ public class ReaderInputStream extends InputStream {
 	/**
 	 * Marks the read limit of the StringReader.
 	 *
-	 * @param limit the maximum limit of bytes that can be read before the
-	 *              mark position becomes invalid
+	 * @param limit
+	 *            the maximum limit of bytes that can be read before the mark
+	 *            position becomes invalid
 	 */
 	@Override
 	public synchronized void mark(final int limit) {
@@ -154,10 +161,10 @@ public class ReaderInputStream extends InputStream {
 		}
 	}
 
-
 	/**
-	 * @return   the current number of bytes ready for reading
-	 * @exception IOException if an error occurs
+	 * @return the current number of bytes ready for reading
+	 * @exception IOException
+	 *                if an error occurs
 	 */
 	@Override
 	public synchronized int available() throws IOException {
@@ -178,14 +185,15 @@ public class ReaderInputStream extends InputStream {
 	 * @return false - mark is not supported
 	 */
 	@Override
-	public boolean markSupported () {
-		return false;   // would be imprecise
+	public boolean markSupported() {
+		return false; // would be imprecise
 	}
 
 	/**
 	 * Resets the StringReader.
 	 *
-	 * @exception IOException if the StringReader fails to be reset
+	 * @exception IOException
+	 *                if the StringReader fails to be reset
 	 */
 	@Override
 	public synchronized void reset() throws IOException {
@@ -199,7 +207,8 @@ public class ReaderInputStream extends InputStream {
 	/**
 	 * Closes the Stringreader.
 	 *
-	 * @exception IOException if the original StringReader fails to be closed
+	 * @exception IOException
+	 *                if the original StringReader fails to be closed
 	 */
 	@Override
 	public synchronized void close() throws IOException {

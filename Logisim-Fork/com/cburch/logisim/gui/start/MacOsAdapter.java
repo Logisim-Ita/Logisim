@@ -15,9 +15,10 @@ import net.roydesign.mac.MRJAdapter;
 import com.cburch.logisim.gui.prefs.PreferencesFrame;
 import com.cburch.logisim.proj.ProjectActions;
 
-class MacOsAdapter { //MAC extends ApplicationAdapter {
-	
+class MacOsAdapter { // MAC extends ApplicationAdapter {
+
 	private static class MyListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			ApplicationEvent event2 = (ApplicationEvent) event;
 			int type = event2.getType();
@@ -40,31 +41,31 @@ class MacOsAdapter { //MAC extends ApplicationAdapter {
 			}
 		}
 	}
-	
+
 	static void addListeners(boolean added) {
 		MyListener myListener = new MyListener();
-		if (!added) MRJAdapter.addOpenDocumentListener(myListener);
-		if (!added) MRJAdapter.addPrintDocumentListener(myListener);
+		if (!added)
+			MRJAdapter.addOpenDocumentListener(myListener);
+		if (!added)
+			MRJAdapter.addPrintDocumentListener(myListener);
 		MRJAdapter.addPreferencesListener(myListener);
 		MRJAdapter.addQuitApplicationListener(myListener);
 		MRJAdapter.addAboutListener(myListener);
 	}
-	
-	/* MAC
-	public void handleOpenFile(com.apple.eawt.ApplicationEvent event) {
-		Startup.doOpen(new File(event.getFilename()));
-	}
-	
-	public void handlePrintFile(com.apple.eawt.ApplicationEvent event) {
-		Startup.doPrint(new File(event.getFilename()));
-	}
-	
-	public void handlePreferences(com.apple.eawt.ApplicationEvent event) {
-		PreferencesFrame.showPreferences();
-	}
-	*/
-	
+
+	/*
+	 * MAC public void handleOpenFile(com.apple.eawt.ApplicationEvent event) {
+	 * Startup.doOpen(new File(event.getFilename())); }
+	 * 
+	 * public void handlePrintFile(com.apple.eawt.ApplicationEvent event) {
+	 * Startup.doPrint(new File(event.getFilename())); }
+	 * 
+	 * public void handlePreferences(com.apple.eawt.ApplicationEvent event) {
+	 * PreferencesFrame.showPreferences(); }
+	 */
+
 	public static void register() {
-		//MAC Application.getApplication().addApplicationListener(new MacOsAdapter());
+		// MAC Application.getApplication().addApplicationListener(new
+		// MacOsAdapter());
 	}
 }

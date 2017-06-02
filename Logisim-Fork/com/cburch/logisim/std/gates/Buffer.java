@@ -33,25 +33,27 @@ class Buffer extends InstanceFactory {
 
 	private Buffer() {
 		super("Buffer", Strings.getter("bufferComponent"));
-		setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.WIDTH,
-					GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT },
-				new Object[] { Direction.EAST, BitWidth.ONE,
-					GateAttributes.OUTPUT_01, "", StdAttr.DEFAULT_LABEL_FONT });
+		setAttributes(
+				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL,
+						StdAttr.LABEL_FONT },
+				new Object[] { Direction.EAST, BitWidth.ONE, GateAttributes.OUTPUT_01, "",
+						StdAttr.DEFAULT_LABEL_FONT });
 		setIcon(Icons.getIcon("bufferGate.gif"));
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-		setPorts(new Port[] {
-				new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH),
-				new Port(0, -20, Port.INPUT, StdAttr.WIDTH),
-		});
+		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH),
+				new Port(0, -20, Port.INPUT, StdAttr.WIDTH), });
 	}
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		if (facing == Direction.SOUTH) return Bounds.create(-9, -20, 18, 20);
-		if (facing == Direction.NORTH) return Bounds.create(-9, 0, 18, 20);
-		if (facing == Direction.WEST) return Bounds.create(0, -9, 20, 18);
+		if (facing == Direction.SOUTH)
+			return Bounds.create(-9, -20, 18, 20);
+		if (facing == Direction.NORTH)
+			return Bounds.create(-9, 0, 18, 20);
+		if (facing == Direction.WEST)
+			return Bounds.create(0, -9, 20, 18);
 		return Bounds.create(-20, -9, 20, 18);
 	}
 
@@ -61,7 +63,7 @@ class Buffer extends InstanceFactory {
 		in = Buffer.repair(state, in);
 		state.setPort(0, in, GateAttributes.DELAY);
 	}
-	
+
 	//
 	// methods for instances
 	//
@@ -71,7 +73,7 @@ class Buffer extends InstanceFactory {
 		instance.addAttributeListener();
 		NotGate.configureLabel(instance, false, null);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
@@ -80,7 +82,7 @@ class Buffer extends InstanceFactory {
 			NotGate.configureLabel(instance, false, null);
 		}
 	}
-	
+
 	private void configurePorts(Instance instance) {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 
@@ -95,7 +97,8 @@ class Buffer extends InstanceFactory {
 	public Object getInstanceFeature(final Instance instance, Object key) {
 		if (key == ExpressionComputer.class) {
 			return new ExpressionComputer() {
-				public void computeExpression(Map<Location,Expression> expressionMap) {
+				@Override
+				public void computeExpression(Map<Location, Expression> expressionMap) {
 					Expression e = expressionMap.get(instance.getPortLocation(1));
 					if (e != null) {
 						expressionMap.put(instance.getPortLocation(0), e);
@@ -105,7 +108,7 @@ class Buffer extends InstanceFactory {
 		}
 		return super.getInstanceFeature(instance, key);
 	}
-		
+
 	//
 	// painting methods
 	//
@@ -113,7 +116,7 @@ class Buffer extends InstanceFactory {
 	public void paintGhost(InstancePainter painter) {
 		paintBase(painter);
 	}
-	
+
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
@@ -139,12 +142,16 @@ class Buffer extends InstanceFactory {
 		GraphicsUtil.switchToWidth(g, 2);
 		int[] xp = new int[4];
 		int[] yp = new int[4];
-		xp[0] = 0;   yp[0] =  0;
-		xp[1] = -19; yp[1] = -7;
-		xp[2] = -19; yp[2] =  7;
-		xp[3] = 0;   yp[3] =  0;
+		xp[0] = 0;
+		yp[0] = 0;
+		xp[1] = -19;
+		yp[1] = -7;
+		xp[2] = -19;
+		yp[2] = 7;
+		xp[3] = 0;
+		yp[3] = 0;
 		g.drawPolyline(xp, yp, 4);
-		
+
 		if (rotate != 0.0) {
 			((Graphics2D) g).rotate(-rotate);
 		}
@@ -163,7 +170,8 @@ class Buffer extends InstanceFactory {
 			int vw = v.getWidth();
 			BitWidth w = state.getAttributeValue(StdAttr.WIDTH);
 			int ww = w.getWidth();
-			if (vw == ww && v.isFullyDefined()) return v;
+			if (vw == ww && v.isFullyDefined())
+				return v;
 			Value[] vs = new Value[w.getWidth()];
 			for (int i = 0; i < vs.length; i++) {
 				Value ini = i < vw ? v.get(i) : Value.ERROR;

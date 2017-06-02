@@ -25,37 +25,33 @@ import com.cburch.logisim.tools.key.JoinedConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class BitSelector extends InstanceFactory {
-	public static final Attribute<BitWidth> GROUP_ATTR
-		= Attributes.forBitWidth("group", Strings.getter("bitSelectorGroupAttr"));
+	public static final Attribute<BitWidth> GROUP_ATTR = Attributes.forBitWidth("group",
+			Strings.getter("bitSelectorGroupAttr"));
 
 	public BitSelector() {
 		super("BitSelector", Strings.getter("bitSelectorComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, StdAttr.WIDTH, GROUP_ATTR
-			}, new Object[] {
-				Direction.EAST, BitWidth.create(8), BitWidth.ONE
-			});
-		setKeyConfigurator(JoinedConfigurator.create(
-				new BitWidthConfigurator(GROUP_ATTR, 1, Value.MAX_WIDTH, 0),
+		setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, GROUP_ATTR },
+				new Object[] { Direction.EAST, BitWidth.create(8), BitWidth.ONE });
+		setKeyConfigurator(JoinedConfigurator.create(new BitWidthConfigurator(GROUP_ATTR, 1, Value.MAX_WIDTH, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 
 		setIconName("bitSelector.gif");
 		setFacingAttribute(StdAttr.FACING);
 	}
-	
+
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
 		Bounds base = Bounds.create(-30, -15, 30, 30);
 		return base.rotate(Direction.EAST, facing, 0, 0);
 	}
-	
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
 		updatePorts(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
@@ -73,26 +69,29 @@ public class BitSelector extends InstanceFactory {
 		int groups = (data.getWidth() + group.getWidth() - 1) / group.getWidth() - 1;
 		int selectBits = 1;
 		if (groups > 0) {
-			while (groups != 1) { groups >>= 1; selectBits++; }
+			while (groups != 1) {
+				groups >>= 1;
+				selectBits++;
+			}
 		}
 		BitWidth select = BitWidth.create(selectBits);
 
 		Location inPt;
 		Location selPt;
 		if (facing == Direction.WEST) {
-			inPt  = Location.create(30, 0);
+			inPt = Location.create(30, 0);
 			selPt = Location.create(10, 10);
 		} else if (facing == Direction.NORTH) {
-			inPt  = Location.create(  0, 30);
+			inPt = Location.create(0, 30);
 			selPt = Location.create(-10, 10);
 		} else if (facing == Direction.SOUTH) {
-			inPt  = Location.create(  0, -30);
+			inPt = Location.create(0, -30);
 			selPt = Location.create(-10, -10);
 		} else {
-			inPt  = Location.create(-30, 0);
+			inPt = Location.create(-30, 0);
 			selPt = Location.create(-10, 10);
 		}
-		
+
 		Port[] ps = new Port[3];
 		ps[0] = new Port(0, 0, Port.OUTPUT, group.getWidth());
 		ps[1] = new Port(inPt.getX(), inPt.getY(), Port.INPUT, data.getWidth());
@@ -134,8 +133,7 @@ public class BitSelector extends InstanceFactory {
 
 	@Override
 	public void paintGhost(InstancePainter painter) {
-		Plexers.drawTrapezoid(painter.getGraphics(), painter.getBounds(),
-				painter.getAttributeValue(StdAttr.FACING), 9);
+		Plexers.drawTrapezoid(painter.getGraphics(), painter.getBounds(), painter.getAttributeValue(StdAttr.FACING), 9);
 	}
 
 	@Override
@@ -146,9 +144,7 @@ public class BitSelector extends InstanceFactory {
 		Plexers.drawTrapezoid(g, painter.getBounds(), facing, 9);
 		Bounds bds = painter.getBounds();
 		g.setColor(Color.BLACK);
-		GraphicsUtil.drawCenteredText(g, "Sel",
-				bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 2);
+		GraphicsUtil.drawCenteredText(g, "Sel", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		painter.drawPorts();
 	}
 }

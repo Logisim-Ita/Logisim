@@ -15,7 +15,7 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 	public static XmlIterator<Node> forChildren(Element node) {
 		return new XmlIterator<Node>(node.getChildNodes());
 	}
-	
+
 	public static Iterable<Element> forChildElements(Element node) {
 		NodeList nodes = node.getChildNodes();
 		ArrayList<Element> ret = new ArrayList<Element>();
@@ -35,24 +35,25 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 			Node sub = nodes.item(i);
 			if (sub.getNodeType() == Node.ELEMENT_NODE) {
 				Element elt = (Element) sub;
-				if (elt.getTagName().equals(tagName)) ret.add(elt);
+				if (elt.getTagName().equals(tagName))
+					ret.add(elt);
 			}
 		}
 		return ret;
 	}
-	
+
 	public static Iterable<Element> forDescendantElements(Element node, String tagName) {
 		return new XmlIterator<Element>(node.getElementsByTagName(tagName));
 	}
-	
+
 	private NodeList list;
 	private int index;
-	
+
 	public XmlIterator(NodeList nodes) {
 		list = nodes;
 		index = 0;
 	}
-	
+
 	@Override
 	public XmlIterator<E> clone() {
 		try {
@@ -64,16 +65,19 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 		}
 	}
 
+	@Override
 	public Iterator<E> iterator() {
 		XmlIterator<E> ret = this.clone();
 		ret.index = 0;
 		return ret;
 	}
 
+	@Override
 	public boolean hasNext() {
 		return list != null && index < list.getLength();
 	}
 
+	@Override
 	public E next() {
 		Node ret = list.item(index);
 		if (ret == null) {
@@ -86,6 +90,7 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 		}
 	}
 
+	@Override
 	public void remove() {
 		throw new UnsupportedOperationException("XmlChildIterator.remove");
 	}

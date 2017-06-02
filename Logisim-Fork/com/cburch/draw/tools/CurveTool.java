@@ -29,7 +29,7 @@ public class CurveTool extends AbstractTool {
 	private static final int BEFORE_CREATION = 0;
 	private static final int ENDPOINT_DRAG = 1;
 	private static final int CONTROL_DRAG = 2;
-	
+
 	private DrawingAttributeSet attrs;
 	private int state;
 	private Location end0;
@@ -38,13 +38,13 @@ public class CurveTool extends AbstractTool {
 	private boolean mouseDown;
 	private int lastMouseX;
 	private int lastMouseY;
-	
+
 	public CurveTool(DrawingAttributeSet attrs) {
 		this.attrs = attrs;
 		state = BEFORE_CREATION;
 		mouseDown = false;
 	}
-	
+
 	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawcurv.gif");
@@ -54,13 +54,13 @@ public class CurveTool extends AbstractTool {
 	public Cursor getCursor(Canvas canvas) {
 		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 	}
-	
+
 	@Override
 	public void toolDeselected(Canvas canvas) {
 		state = BEFORE_CREATION;
 		repaintArea(canvas);
 	}
-	
+
 	@Override
 	public void mousePressed(Canvas canvas, MouseEvent e) {
 		int mx = e.getX();
@@ -73,7 +73,7 @@ public class CurveTool extends AbstractTool {
 			mx = canvas.snapX(mx);
 			my = canvas.snapY(my);
 		}
-		
+
 		switch (state) {
 		case BEFORE_CREATION:
 		case CONTROL_DRAG:
@@ -88,13 +88,13 @@ public class CurveTool extends AbstractTool {
 		}
 		repaintArea(canvas);
 	}
-	
+
 	@Override
 	public void mouseDragged(Canvas canvas, MouseEvent e) {
 		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
 		repaintArea(canvas);
 	}
-	
+
 	@Override
 	public void mouseReleased(Canvas canvas, MouseEvent e) {
 		Curve c = updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
@@ -110,17 +110,16 @@ public class CurveTool extends AbstractTool {
 		}
 		repaintArea(canvas);
 	}
-	
+
 	@Override
 	public void keyPressed(Canvas canvas, KeyEvent e) {
 		int code = e.getKeyCode();
-		if (mouseDown && (code == KeyEvent.VK_SHIFT
-				|| code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_ALT)) {
+		if (mouseDown && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_ALT)) {
 			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
 			repaintArea(canvas);
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(Canvas canvas, KeyEvent e) {
 		keyPressed(canvas, e);
@@ -135,14 +134,14 @@ public class CurveTool extends AbstractTool {
 			canvas.toolGestureComplete(this, null);
 		}
 	}
-	
+
 	private Curve updateMouse(Canvas canvas, int mx, int my, int mods) {
 		lastMouseX = mx;
 		lastMouseY = my;
-		
-		boolean shiftDown = (mods & MouseEvent.SHIFT_DOWN_MASK) != 0;
-		boolean ctrlDown = (mods & MouseEvent.CTRL_DOWN_MASK) != 0;
-		boolean altDown = (mods & MouseEvent.ALT_DOWN_MASK) != 0;
+
+		boolean shiftDown = (mods & InputEvent.SHIFT_DOWN_MASK) != 0;
+		boolean ctrlDown = (mods & InputEvent.CTRL_DOWN_MASK) != 0;
+		boolean altDown = (mods & InputEvent.ALT_DOWN_MASK) != 0;
 		Curve ret = null;
 		switch (state) {
 		case ENDPOINT_DRAG:
@@ -176,8 +175,7 @@ public class CurveTool extends AbstractTool {
 					double midy = (y0 + y1) / 2;
 					double dx = x1 - x0;
 					double dy = y1 - y0;
-					double[] p = LineUtil.nearestPointInfinite(cx, cy,
-							midx, midy, midx - dy, midy + dx);
+					double[] p = LineUtil.nearestPointInfinite(cx, cy, midx, midy, midx - dy, midy + dx);
 					cx = (int) Math.round(p[0]);
 					cy = (int) Math.round(p[1]);
 				}
@@ -200,7 +198,7 @@ public class CurveTool extends AbstractTool {
 	private void repaintArea(Canvas canvas) {
 		canvas.repaint();
 	}
-	
+
 	@Override
 	public List<Attribute<?>> getAttributes() {
 		return DrawAttr.getFillAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));

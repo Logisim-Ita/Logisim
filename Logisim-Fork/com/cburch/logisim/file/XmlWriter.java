@@ -40,26 +40,26 @@ import com.cburch.logisim.util.StringUtil;
 
 class XmlWriter {
 	static void write(LogisimFile file, OutputStream out, LibraryLoader loader)
-			throws ParserConfigurationException,
-				TransformerConfigurationException, TransformerException {
+			throws ParserConfigurationException, TransformerConfigurationException, TransformerException {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 		Document doc = docBuilder.newDocument();
 		XmlWriter context = new XmlWriter(file, doc, loader);
 		context.fromLogisimFile();
-		
+
 		TransformerFactory tfFactory = TransformerFactory.newInstance();
 		try {
 			tfFactory.setAttribute("indent-number", Integer.valueOf(2));
-		} catch (IllegalArgumentException e) { }
+		} catch (IllegalArgumentException e) {
+		}
 		Transformer tf = tfFactory.newTransformer();
 		tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		tf.setOutputProperty(OutputKeys.INDENT, "yes");
 		try {
-			tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", 
-					"2");
-		} catch (IllegalArgumentException e) { }
+			tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+		} catch (IllegalArgumentException e) {
+		}
 
 		Source src = new DOMSource(doc);
 		Result dest = new StreamResult(out);
@@ -69,7 +69,7 @@ class XmlWriter {
 	private LogisimFile file;
 	private Document doc;
 	private LibraryLoader loader;
-	private HashMap<Library,String> libs = new HashMap<Library,String>();
+	private HashMap<Library, String> libs = new HashMap<Library, String>();
 
 	private XmlWriter(LogisimFile file, Document doc, LibraryLoader loader) {
 		this.file = file;
@@ -80,14 +80,15 @@ class XmlWriter {
 	Element fromLogisimFile() {
 		Element ret = doc.createElement("project");
 		doc.appendChild(ret);
-		ret.appendChild(doc.createTextNode("\nThis file is intended to be "
-				+ "loaded by Logisim (http://www.cburch.com/logisim/).\n"));
+		ret.appendChild(doc.createTextNode(
+				"\nThis file is intended to be " + "loaded by Logisim (http://www.cburch.com/logisim/).\n"));
 		ret.setAttribute("version", "1.0");
 		ret.setAttribute("source", Main.VERSION_NAME);
 
 		for (Library lib : file.getLibraries()) {
 			Element elt = fromLibrary(lib);
-			if (elt != null) ret.appendChild(elt);
+			if (elt != null)
+				ret.appendChild(elt);
 		}
 
 		if (file.getMainCircuit() != null) {
@@ -108,12 +109,12 @@ class XmlWriter {
 
 	Element fromLibrary(Library lib) {
 		Element ret = doc.createElement("lib");
-		if (libs.containsKey(lib)) return null;
+		if (libs.containsKey(lib))
+			return null;
 		String name = "" + libs.size();
 		String desc = loader.getDescriptor(lib);
 		if (desc == null) {
-			loader.showError("library location unknown: "
-				+ lib.getName());
+			loader.showError("library location unknown: " + lib.getName());
 			return null;
 		}
 		libs.put(lib, name);
@@ -142,7 +143,7 @@ class XmlWriter {
 	Element fromMouseMappings() {
 		Element elt = doc.createElement("mappings");
 		MouseMappings map = file.getOptions().getMouseMappings();
-		for (Map.Entry<Integer,Tool> entry : map.getMappings().entrySet()) {
+		for (Map.Entry<Integer, Tool> entry : map.getMappings().entrySet()) {
 			Integer mods = entry.getKey();
 			Tool tool = entry.getValue();
 			Element toolElt = fromTool(tool);
@@ -170,8 +171,7 @@ class XmlWriter {
 		Library lib = findLibrary(tool);
 		String lib_name;
 		if (lib == null) {
-			loader.showError(StringUtil.format("tool `%s' not found",
-				tool.getDisplayName()));
+			loader.showError(StringUtil.format("tool `%s' not found", tool.getDisplayName()));
 			return null;
 		} else if (lib == file) {
 			lib_name = null;
@@ -184,7 +184,8 @@ class XmlWriter {
 		}
 
 		Element elt = doc.createElement("tool");
-		if (lib_name != null) elt.setAttribute("lib", lib_name);
+		if (lib_name != null)
+			elt.setAttribute("lib", lib_name);
 		elt.setAttribute("name", tool.getName());
 		addAttributeSetContent(elt, tool.getAttributeSet(), tool);
 		return elt;
@@ -211,7 +212,8 @@ class XmlWriter {
 		}
 		for (Component comp : circuit.getNonWires()) {
 			Element elt = fromComponent(comp);
-			if (elt != null) ret.appendChild(elt);
+			if (elt != null)
+				ret.appendChild(elt);
 		}
 		return ret;
 	}
@@ -234,7 +236,8 @@ class XmlWriter {
 		}
 
 		Element ret = doc.createElement("comp");
-		if (lib_name != null) ret.setAttribute("lib", lib_name);
+		if (lib_name != null)
+			ret.setAttribute("lib", lib_name);
 		ret.setAttribute("name", source.getName());
 		ret.setAttribute("loc", comp.getLocation().toString());
 		addAttributeSetContent(ret, comp.getAttributeSet(), comp.getFactory());
@@ -248,11 +251,12 @@ class XmlWriter {
 		return ret;
 	}
 
-	void addAttributeSetContent(Element elt, AttributeSet attrs,
-			AttributeDefaultProvider source) {
-		if (attrs == null) return;
+	void addAttributeSetContent(Element elt, AttributeSet attrs, AttributeDefaultProvider source) {
+		if (attrs == null)
+			return;
 		LogisimVersion ver = Main.VERSION;
-		if (source != null && source.isAllDefaultValues(attrs, ver)) return;
+		if (source != null && source.isAllDefaultValues(attrs, ver))
+			return;
 		for (Attribute<?> attrBase : attrs.getAttributes()) {
 			@SuppressWarnings("unchecked")
 			Attribute<Object> attr = (Attribute<Object>) attrBase;
@@ -279,7 +283,8 @@ class XmlWriter {
 			return file;
 		}
 		for (Library lib : file.getLibraries()) {
-			if (libraryContains(lib, tool)) return lib;
+			if (libraryContains(lib, tool))
+				return lib;
 		}
 		return null;
 	}
@@ -289,14 +294,16 @@ class XmlWriter {
 			return file;
 		}
 		for (Library lib : file.getLibraries()) {
-			if (lib.contains(source)) return lib;
+			if (lib.contains(source))
+				return lib;
 		}
 		return null;
 	}
 
 	boolean libraryContains(Library lib, Tool query) {
 		for (Tool tool : lib.getTools()) {
-			if (tool.sharesSource(query)) return true;
+			if (tool.sharesSource(query))
+				return true;
 		}
 		return false;
 	}

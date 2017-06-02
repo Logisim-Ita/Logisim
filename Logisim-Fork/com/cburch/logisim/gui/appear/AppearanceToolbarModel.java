@@ -23,26 +23,16 @@ import com.cburch.draw.tools.RoundRectangleTool;
 import com.cburch.draw.tools.TextTool;
 import com.cburch.draw.tools.ToolbarToolItem;
 
-class AppearanceToolbarModel extends AbstractToolbarModel
-		implements PropertyChangeListener {
+class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyChangeListener {
 	private Canvas canvas;
 	private List<ToolbarItem> items;
-	
-	public AppearanceToolbarModel(AbstractTool selectTool, Canvas canvas,
-			DrawingAttributeSet attrs) {
+
+	public AppearanceToolbarModel(AbstractTool selectTool, Canvas canvas, DrawingAttributeSet attrs) {
 		this.canvas = canvas;
-		
-		AbstractTool[] tools = {
-				selectTool,
-				new TextTool(attrs),
-				new LineTool(attrs),
-				new CurveTool(attrs),
-				new PolyTool(false, attrs),
-				new RectangleTool(attrs),
-				new RoundRectangleTool(attrs),
-				new OvalTool(attrs),
-				new PolyTool(true, attrs),
-			};
+
+		AbstractTool[] tools = { selectTool, new TextTool(attrs), new LineTool(attrs), new CurveTool(attrs),
+				new PolyTool(false, attrs), new RectangleTool(attrs), new RoundRectangleTool(attrs),
+				new OvalTool(attrs), new PolyTool(true, attrs), };
 
 		ArrayList<ToolbarItem> rawItems = new ArrayList<ToolbarItem>();
 		for (AbstractTool tool : tools) {
@@ -51,7 +41,7 @@ class AppearanceToolbarModel extends AbstractToolbarModel
 		items = Collections.unmodifiableList(rawItems);
 		canvas.addPropertyChangeListener(Canvas.TOOL_PROPERTY, this);
 	}
-	
+
 	AbstractTool getFirstTool() {
 		ToolbarToolItem item = (ToolbarToolItem) items.get(0);
 		return item.getTool();
@@ -61,7 +51,7 @@ class AppearanceToolbarModel extends AbstractToolbarModel
 	public List<ToolbarItem> getItems() {
 		return items;
 	}
-	
+
 	@Override
 	public boolean isSelected(ToolbarItem item) {
 		if (item instanceof ToolbarToolItem) {
@@ -81,6 +71,7 @@ class AppearanceToolbarModel extends AbstractToolbarModel
 		}
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		String prop = e.getPropertyName();
 		if (Canvas.TOOL_PROPERTY.equals(prop)) {

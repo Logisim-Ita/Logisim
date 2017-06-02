@@ -14,10 +14,10 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 
 public class SubcircuitPoker extends InstancePoker {
-	
+
 	private static final Color MAGNIFYING_INTERIOR = new Color(200, 200, 255, 64);
 	private static final Color MAGNIFYING_INTERIOR_DOWN = new Color(128, 128, 255, 192);
-	
+
 	private boolean mouseDown;
 
 	@Override
@@ -27,15 +27,14 @@ public class SubcircuitPoker extends InstancePoker {
 		int cy = bds.getY() + bds.getHeight() / 2;
 		return Bounds.create(cx - 5, cy - 5, 15, 15);
 	}
-	
+
 	@Override
 	public void paint(InstancePainter painter) {
-		if (painter.getDestination() instanceof Canvas
-				&& painter.getData() instanceof CircuitState) {
+		if (painter.getDestination() instanceof Canvas && painter.getData() instanceof CircuitState) {
 			Bounds bds = painter.getInstance().getBounds();
 			int cx = bds.getX() + bds.getWidth() / 2;
 			int cy = bds.getY() + bds.getHeight() / 2;
-	
+
 			int tx = cx + 3;
 			int ty = cy + 3;
 			int[] xp = { tx - 1, cx + 8, cx + 10, tx + 1 };
@@ -52,7 +51,7 @@ public class SubcircuitPoker extends InstancePoker {
 			g.fillPolygon(xp, yp, xp.length);
 		}
 	}
-	
+
 	@Override
 	public void mousePressed(InstanceState state, MouseEvent e) {
 		if (isWithin(state, e)) {
@@ -60,21 +59,20 @@ public class SubcircuitPoker extends InstancePoker {
 			state.getInstance().fireInvalidated();
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(InstanceState state, MouseEvent e) {
 		if (mouseDown) {
 			mouseDown = false;
 			Object sub = state.getData();
-			if (e.getClickCount() == 2 && isWithin(state, e)
-					&& sub instanceof CircuitState) {
+			if (e.getClickCount() == 2 && isWithin(state, e) && sub instanceof CircuitState) {
 				state.getProject().setCircuitState((CircuitState) sub);
 			} else {
 				state.getInstance().fireInvalidated();
 			}
 		}
 	}
-	
+
 	private boolean isWithin(InstanceState state, MouseEvent e) {
 		Bounds bds = state.getInstance().getBounds();
 		int cx = bds.getX() + bds.getWidth() / 2;

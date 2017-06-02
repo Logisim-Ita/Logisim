@@ -38,19 +38,19 @@ public class TtyInterface {
 	public static final int FORMAT_STATISTICS = 16;
 
 	private static boolean lastIsNewline = true;
-	
+
 	public static void sendFromTty(char c) {
 		lastIsNewline = c == '\n';
-		System.out.print(c); //OK
+		System.out.print(c); // OK
 	}
-	
+
 	private static void ensureLineTerminated() {
 		if (!lastIsNewline) {
 			lastIsNewline = true;
-			System.out.print('\n'); //OK
+			System.out.print('\n'); // OK
 		}
 	}
-	
+
 	public static void run(Startup args) {
 		File fileToOpen = args.getFilesToOpen().get(0);
 		Loader loader = new Loader(null);
@@ -58,11 +58,11 @@ public class TtyInterface {
 		try {
 			file = loader.openLogisimFile(fileToOpen, args.getSubstitutions());
 		} catch (LoadFailedException e) {
-			System.err.println(Strings.get("ttyLoadError", fileToOpen.getName())); //OK
+			System.err.println(Strings.get("ttyLoadError", fileToOpen.getName())); // OK
 			System.exit(-1);
 			return;
 		}
-		
+
 		int format = args.getTtyFormat();
 		if ((format & FORMAT_STATISTICS) != 0) {
 			format &= ~FORMAT_STATISTICS;
@@ -71,7 +71,7 @@ public class TtyInterface {
 		if (format == 0) { // no simulation remaining to perform, so just exit
 			System.exit(0);
 		}
-		
+
 		Project proj = new Project(file);
 		Circuit circuit = file.getMainCircuit();
 		Map<Instance, String> pinNames = Analyze.getPinLabels(circuit);
@@ -87,7 +87,7 @@ public class TtyInterface {
 				}
 			}
 		}
-		
+
 		CircuitState circState = new CircuitState(proj, circuit);
 		// we have to do our initial propagation before the simulation starts -
 		// it's necessary to populate the circuit with substates.
@@ -96,11 +96,11 @@ public class TtyInterface {
 			try {
 				boolean loaded = loadRam(circState, args.getLoadFile());
 				if (!loaded) {
-					System.err.println(Strings.get("loadNoRamError")); //OK
+					System.err.println(Strings.get("loadNoRamError")); // OK
 					System.exit(-1);
 				}
 			} catch (IOException e) {
-				System.err.println(Strings.get("loadIoError") + ": " + e.toString()); //OK
+				System.err.println(Strings.get("loadIoError") + ": " + e.toString()); // OK
 				System.exit(-1);
 			}
 		}
@@ -108,37 +108,35 @@ public class TtyInterface {
 		int simCode = runSimulation(circState, outputPins, haltPin, ttyFormat);
 		System.exit(simCode);
 	}
-	
+
 	private static void displayStatistics(LogisimFile file) {
 		FileStatistics stats = FileStatistics.compute(file, file.getMainCircuit());
 		FileStatistics.Count total = stats.getTotalWithSubcircuits();
 		int maxName = 0;
 		for (FileStatistics.Count count : stats.getCounts()) {
 			int nameLength = count.getFactory().getDisplayName().length();
-			if (nameLength > maxName) maxName = nameLength;
+			if (nameLength > maxName)
+				maxName = nameLength;
 		}
-		String fmt = "%" + countDigits(total.getUniqueCount()) + "d\t"
-			+ "%" + countDigits(total.getRecursiveCount()) + "d\t";
+		String fmt = "%" + countDigits(total.getUniqueCount()) + "d\t" + "%" + countDigits(total.getRecursiveCount())
+				+ "d\t";
 		String fmtNormal = fmt + "%-" + maxName + "s\t%s\n";
 		for (FileStatistics.Count count : stats.getCounts()) {
 			Library lib = count.getLibrary();
 			String libName = lib == null ? "-" : lib.getDisplayName();
-			System.out.printf(fmtNormal, //OK
-					Integer.valueOf(count.getUniqueCount()),
-					Integer.valueOf(count.getRecursiveCount()),
+			System.out.printf(fmtNormal, // OK
+					Integer.valueOf(count.getUniqueCount()), Integer.valueOf(count.getRecursiveCount()),
 					count.getFactory().getDisplayName(), libName);
 		}
 		FileStatistics.Count totalWithout = stats.getTotalWithoutSubcircuits();
-		System.out.printf(fmt + "%s\n", //OK
-				Integer.valueOf(totalWithout.getUniqueCount()),
-				Integer.valueOf(totalWithout.getRecursiveCount()),
+		System.out.printf(fmt + "%s\n", // OK
+				Integer.valueOf(totalWithout.getUniqueCount()), Integer.valueOf(totalWithout.getRecursiveCount()),
 				Strings.get("statsTotalWithout"));
-		System.out.printf(fmt + "%s\n", //OK
-				Integer.valueOf(total.getUniqueCount()),
-				Integer.valueOf(total.getRecursiveCount()),
+		System.out.printf(fmt + "%s\n", // OK
+				Integer.valueOf(total.getUniqueCount()), Integer.valueOf(total.getRecursiveCount()),
 				Strings.get("statsTotalWith"));
 	}
-	
+
 	private static int countDigits(int num) {
 		int digits = 1;
 		int lessThan = 10;
@@ -148,11 +146,11 @@ public class TtyInterface {
 		}
 		return digits;
 	}
-	
-	private static boolean loadRam(CircuitState circState, File loadFile)
-			throws IOException {
-		if (loadFile == null) return false;
-		
+
+	private static boolean loadRam(CircuitState circState, File loadFile) throws IOException {
+		if (loadFile == null)
+			return false;
+
 		boolean found = false;
 		for (Component comp : circState.getCircuit().getNonWires()) {
 			if (comp.getFactory() instanceof Ram) {
@@ -162,15 +160,14 @@ public class TtyInterface {
 				found = true;
 			}
 		}
-		
+
 		for (CircuitState sub : circState.getSubstates()) {
 			found |= loadRam(sub, loadFile);
 		}
 		return found;
 	}
-	
-	private static boolean prepareForTty(CircuitState circState,
-			ArrayList<InstanceState> keybStates) {
+
+	private static boolean prepareForTty(CircuitState circState, ArrayList<InstanceState> keybStates) {
 		boolean found = false;
 		for (Component comp : circState.getCircuit().getNonWires()) {
 			Object factory = comp.getFactory();
@@ -184,27 +181,27 @@ public class TtyInterface {
 				found = true;
 			}
 		}
-		
+
 		for (CircuitState sub : circState.getSubstates()) {
 			found |= prepareForTty(sub, keybStates);
 		}
 		return found;
 	}
-	
-	private static int runSimulation(CircuitState circState,
-			ArrayList<Instance> outputPins, Instance haltPin, int format) {
+
+	private static int runSimulation(CircuitState circState, ArrayList<Instance> outputPins, Instance haltPin,
+			int format) {
 		boolean showTable = (format & FORMAT_TABLE) != 0;
 		boolean showSpeed = (format & FORMAT_SPEED) != 0;
 		boolean showTty = (format & FORMAT_TTY) != 0;
 		boolean showHalt = (format & FORMAT_HALT) != 0;
-		
+
 		ArrayList<InstanceState> keyboardStates = null;
 		StdinThread stdinThread = null;
 		if (showTty) {
 			keyboardStates = new ArrayList<InstanceState>();
 			boolean ttyFound = prepareForTty(circState, keyboardStates);
 			if (!ttyFound) {
-				System.err.println(Strings.get("ttyNoTtyError")); //OK
+				System.err.println(Strings.get("ttyNoTtyError")); // OK
 				System.exit(-1);
 			}
 			if (keyboardStates.isEmpty()) {
@@ -235,7 +232,7 @@ public class TtyInterface {
 			if (showTable) {
 				displayTableRow(prevOutputs, curOutputs);
 			}
-			
+
 			if (halted) {
 				retCode = 0; // normal exit
 				break;
@@ -258,12 +255,13 @@ public class TtyInterface {
 			prop.propagate();
 		}
 		long elapse = System.currentTimeMillis() - start;
-		if (showTty) ensureLineTerminated();
+		if (showTty)
+			ensureLineTerminated();
 		if (showHalt || retCode != 0) {
 			if (retCode == 0) {
-				System.out.println(Strings.get("ttyHaltReasonPin")); //OK
+				System.out.println(Strings.get("ttyHaltReasonPin")); // OK
 			} else if (retCode == 1) {
-				System.out.println(Strings.get("ttyHaltReasonOscillation")); //OK
+				System.out.println(Strings.get("ttyHaltReasonOscillation")); // OK
 			}
 		}
 		if (showSpeed) {
@@ -271,9 +269,8 @@ public class TtyInterface {
 		}
 		return retCode;
 	}
-	
-	private static void displayTableRow(ArrayList<Value> prevOutputs,
-			ArrayList<Value> curOutputs) {
+
+	private static void displayTableRow(ArrayList<Value> prevOutputs, ArrayList<Value> curOutputs) {
 		boolean shouldPrint = false;
 		if (prevOutputs == null) {
 			shouldPrint = true;
@@ -289,37 +286,44 @@ public class TtyInterface {
 		}
 		if (shouldPrint) {
 			for (int i = 0; i < curOutputs.size(); i++) {
-				if (i != 0) System.out.print("\t"); //OK
-				System.out.print(curOutputs.get(i)); //OK
+				if (i != 0)
+					System.out.print("\t"); // OK
+				System.out.print(curOutputs.get(i)); // OK
 			}
-			System.out.println(); //OK
+			System.out.println(); // OK
 		}
 	}
-	
+
 	private static void displaySpeed(long tickCount, long elapse) {
 		double hertz = (double) tickCount / elapse * 1000.0;
 		double precision;
-		if (hertz >= 100) precision = 1.0;
-		else if (hertz >= 10) precision = 0.1;
-		else if (hertz >= 1) precision = 0.01;
-		else if (hertz >= 0.01) precision = 0.0001;
-		else precision = 0.0000001;
+		if (hertz >= 100)
+			precision = 1.0;
+		else if (hertz >= 10)
+			precision = 0.1;
+		else if (hertz >= 1)
+			precision = 0.01;
+		else if (hertz >= 0.01)
+			precision = 0.0001;
+		else
+			precision = 0.0000001;
 		hertz = (int) (hertz / precision) * precision;
 		String hertzStr = hertz == (int) hertz ? "" + (int) hertz : "" + hertz;
-		System.out.println(StringUtil.format(Strings.get("ttySpeedMsg"), //OK
+		System.out.println(StringUtil.format(Strings.get("ttySpeedMsg"), // OK
 				hertzStr, "" + tickCount, "" + elapse));
 	}
 
-	// It's possible to avoid using the separate thread using System.in.available(),
+	// It's possible to avoid using the separate thread using
+	// System.in.available(),
 	// but this doesn't quite work because on some systems, the keyboard input
 	// is not interactively echoed until System.in.read() is invoked.
 	private static class StdinThread extends Thread {
 		private LinkedList<char[]> queue; // of char[]
-		
+
 		public StdinThread() {
 			queue = new LinkedList<char[]>();
 		}
-		
+
 		public char[] getBuffer() {
 			synchronized (queue) {
 				if (queue.isEmpty()) {
@@ -329,7 +333,7 @@ public class TtyInterface {
 				}
 			}
 		}
-		
+
 		@Override
 		public void run() {
 			InputStreamReader stdin = new InputStreamReader(System.in);
@@ -344,7 +348,8 @@ public class TtyInterface {
 							queue.addLast(add);
 						}
 					}
-				} catch (IOException e) { }
+				} catch (IOException e) {
+				}
 			}
 		}
 	}

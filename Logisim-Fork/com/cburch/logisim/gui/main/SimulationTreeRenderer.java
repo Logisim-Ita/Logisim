@@ -19,23 +19,25 @@ public class SimulationTreeRenderer extends DefaultTreeCellRenderer {
 	private static class RendererIcon implements Icon {
 		private ComponentFactory factory;
 		private boolean isCurrentView;
-		
+
 		RendererIcon(ComponentFactory factory, boolean isCurrentView) {
 			this.factory = factory;
 			this.isCurrentView = isCurrentView;
 		}
 
+		@Override
 		public int getIconHeight() {
 			return 20;
 		}
 
+		@Override
 		public int getIconWidth() {
 			return 20;
 		}
 
+		@Override
 		public void paintIcon(Component c, Graphics g, int x, int y) {
-			ComponentDrawContext context = new ComponentDrawContext(c,
-					null, null, g, g);
+			ComponentDrawContext context = new ComponentDrawContext(c, null, null, g, g);
 			factory.paintIcon(context, x, y, factory.createAttributeSet());
 
 			// draw magnifying glass if appropriate
@@ -52,13 +54,11 @@ public class SimulationTreeRenderer extends DefaultTreeCellRenderer {
 			}
 		}
 	}
-	
+
 	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value,
-			boolean selected, boolean expanded, boolean leaf, int row,
-			boolean hasFocus) {
-		Component ret = super.getTreeCellRendererComponent(tree, value,
-				selected, expanded, leaf, row, hasFocus);
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+			boolean leaf, int row, boolean hasFocus) {
+		Component ret = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 		SimulationTreeModel model = (SimulationTreeModel) tree.getModel();
 		if (ret instanceof JLabel) {
 			JLabel label = (JLabel) ret;

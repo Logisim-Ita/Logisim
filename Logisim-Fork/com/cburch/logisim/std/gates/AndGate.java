@@ -41,8 +41,7 @@ class AndGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs,
-			InstanceState state) {
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
 		return GateFunctions.computeAnd(inputs, numInputs);
 	}
 
@@ -56,5 +55,7 @@ class AndGate extends AbstractGate {
 	}
 
 	@Override
-	protected Value getIdentity() { return Value.TRUE; }
+	protected Value getIdentity() {
+		return Value.TRUE;
+	}
 }

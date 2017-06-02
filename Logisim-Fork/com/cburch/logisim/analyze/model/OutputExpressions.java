@@ -17,48 +17,50 @@ public class OutputExpressions {
 		String exprString = null;
 		List<Implicant> minimalImplicants = null;
 		Expression minimalExpr = null;
-		
+
 		OutputData(String output) {
 			this.output = output;
 			invalidate(true, false);
 		}
-		
+
 		boolean isExpressionMinimal() {
 			return expr == minimalExpr;
 		}
-		
+
 		Expression getExpression() {
 			return expr;
 		}
-		
+
 		String getExpressionString() {
 			if (exprString == null) {
-				if (expr == null) invalidate(false, false);
+				if (expr == null)
+					invalidate(false, false);
 				exprString = expr == null ? "" : expr.toString();
 			}
 			return exprString;
 		}
-		
+
 		Expression getMinimalExpression() {
-			if (minimalExpr == null) invalidate(false, false);
+			if (minimalExpr == null)
+				invalidate(false, false);
 			return minimalExpr;
 		}
-		
+
 		List<Implicant> getMinimalImplicants() {
 			return minimalImplicants;
 		}
-		
+
 		int getMinimizedFormat() {
 			return format;
 		}
-		
+
 		void setMinimizedFormat(int value) {
 			if (format != value) {
 				format = value;
 				this.invalidate(false, true);
 			}
 		}
-		
+
 		void setExpression(Expression newExpr, String newExprString) {
 			expr = newExpr;
 			exprString = newExprString;
@@ -74,15 +76,14 @@ public class OutputExpressions {
 				}
 			}
 
-			fireModelChanged(OutputExpressionsEvent.OUTPUT_EXPRESSION,
-					output, getExpression());
+			fireModelChanged(OutputExpressionsEvent.OUTPUT_EXPRESSION, output, getExpression());
 		}
 
 		private void removeInput(String input) {
 			Expression oldMinExpr = minimalExpr;
 			minimalImplicants = null;
 			minimalExpr = null;
-			
+
 			if (exprString != null) {
 				exprString = null; // invalidate it so it recomputes
 			}
@@ -102,7 +103,7 @@ public class OutputExpressions {
 			}
 			fireModelChanged(OutputExpressionsEvent.OUTPUT_MINIMAL, output, minimalExpr);
 		}
-		
+
 		private void replaceInput(String input, String newName) {
 			minimalExpr = null;
 
@@ -120,10 +121,12 @@ public class OutputExpressions {
 			}
 			fireModelChanged(OutputExpressionsEvent.OUTPUT_MINIMAL, output);
 		}
-	
+
 		private boolean invalidating = false;
+
 		private void invalidate(boolean initializing, boolean formatChanged) {
-			if (invalidating) return;
+			if (invalidating)
+				return;
 			invalidating = true;
 			try {
 				List<Implicant> oldImplicants = minimalImplicants;
@@ -133,15 +136,16 @@ public class OutputExpressions {
 				boolean minChanged = !implicantsSame(oldImplicants, minimalImplicants);
 
 				if (!updatingTable) {
-					// see whether the expression is still consistent with the truth table
+					// see whether the expression is still consistent with the
+					// truth table
 					TruthTable table = model.getTruthTable();
 					Entry[] outputColumn = computeColumn(model.getTruthTable(), expr);
 					int outputIndex = model.getOutputs().indexOf(output);
-					
+
 					Entry[] currentColumn = table.getOutputColumn(outputIndex);
-					if (!columnsMatch(currentColumn, outputColumn)
-							|| isAllUndefined(outputColumn) || formatChanged) {
-						// if not, then we need to change the expression to maintain consistency
+					if (!columnsMatch(currentColumn, outputColumn) || isAllUndefined(outputColumn) || formatChanged) {
+						// if not, then we need to change the expression to
+						// maintain consistency
 						boolean exprChanged = expr != oldMinExpr || minChanged;
 						expr = minimalExpr;
 						if (exprChanged) {
@@ -152,7 +156,7 @@ public class OutputExpressions {
 						}
 					}
 				}
-				
+
 				if (!initializing && minChanged) {
 					fireModelChanged(OutputExpressionsEvent.OUTPUT_MINIMAL, output);
 				}
@@ -161,13 +165,16 @@ public class OutputExpressions {
 			}
 		}
 	}
-	
+
 	private class MyListener implements VariableListListener, TruthTableListener {
+		@Override
 		public void listChanged(VariableListEvent event) {
-			if (event.getSource() == model.getInputs()) inputsChanged(event);
-			else outputsChanged(event);
+			if (event.getSource() == model.getInputs())
+				inputsChanged(event);
+			else
+				outputsChanged(event);
 		}
-		
+
 		private void inputsChanged(VariableListEvent event) {
 			int type = event.getType();
 			if (type == VariableListEvent.ALL_REPLACED && !outputData.isEmpty()) {
@@ -177,7 +184,8 @@ public class OutputExpressions {
 				String input = event.getVariable();
 				for (String output : outputData.keySet()) {
 					OutputData data = getOutputData(output, false);
-					if (data != null) data.removeInput(input);
+					if (data != null)
+						data.removeInput(input);
 				}
 			} else if (type == VariableListEvent.REPLACE) {
 				String input = event.getVariable();
@@ -185,16 +193,18 @@ public class OutputExpressions {
 				String newName = event.getSource().get(inputIndex);
 				for (String output : outputData.keySet()) {
 					OutputData data = getOutputData(output, false);
-					if (data != null) data.replaceInput(input, newName);
+					if (data != null)
+						data.replaceInput(input, newName);
 				}
 			} else if (type == VariableListEvent.MOVE || type == VariableListEvent.ADD) {
 				for (String output : outputData.keySet()) {
 					OutputData data = getOutputData(output, false);
-					if (data != null) data.invalidate(false, false);
+					if (data != null)
+						data.invalidate(false, false);
 				}
 			}
 		}
-		
+
 		private void outputsChanged(VariableListEvent event) {
 			int type = event.getType();
 			if (type == VariableListEvent.ALL_REPLACED && !outputData.isEmpty()) {
@@ -214,88 +224,94 @@ public class OutputExpressions {
 			}
 		}
 
+		@Override
 		public void cellsChanged(TruthTableEvent event) {
 			String output = model.getOutputs().get(event.getColumn());
 			invalidate(output, false);
 		}
 
+		@Override
 		public void structureChanged(TruthTableEvent event) {
 		}
 	}
-	
+
 	private MyListener myListener = new MyListener();
 	private AnalyzerModel model;
-	private HashMap<String,OutputData> outputData = new HashMap<String,OutputData>();
-	private ArrayList<OutputExpressionsListener> listeners
-		= new ArrayList<OutputExpressionsListener>();
+	private HashMap<String, OutputData> outputData = new HashMap<String, OutputData>();
+	private ArrayList<OutputExpressionsListener> listeners = new ArrayList<OutputExpressionsListener>();
 	private boolean updatingTable = false;
-	
+
 	public OutputExpressions(AnalyzerModel model) {
 		this.model = model;
 		model.getInputs().addVariableListListener(myListener);
 		model.getOutputs().addVariableListListener(myListener);
 		model.getTruthTable().addTruthTableListener(myListener);
 	}
-	
+
 	//
 	// listener methods
 	//
 	public void addOutputExpressionsListener(OutputExpressionsListener l) {
 		listeners.add(l);
 	}
-	
+
 	public void removeOutputExpressionsListener(OutputExpressionsListener l) {
 		listeners.remove(l);
 	}
-	
+
 	private void fireModelChanged(int type) {
 		fireModelChanged(type, null, null);
 	}
-	
+
 	private void fireModelChanged(int type, String variable) {
 		fireModelChanged(type, variable, null);
 	}
-	
+
 	private void fireModelChanged(int type, String variable, Object data) {
 		OutputExpressionsEvent event = new OutputExpressionsEvent(model, type, variable, data);
 		for (OutputExpressionsListener l : listeners) {
 			l.expressionChanged(event);
 		}
 	}
-	
+
 	//
 	// access methods
 	//
 	public Expression getExpression(String output) {
-		if (output == null) return null;
+		if (output == null)
+			return null;
 		return getOutputData(output, true).getExpression();
 	}
-	
+
 	public String getExpressionString(String output) {
-		if (output == null) return "";
+		if (output == null)
+			return "";
 		return getOutputData(output, true).getExpressionString();
 	}
-	
+
 	public boolean isExpressionMinimal(String output) {
 		OutputData data = getOutputData(output, false);
 		return data == null ? true : data.isExpressionMinimal();
 	}
-	
+
 	public Expression getMinimalExpression(String output) {
-		if (output == null) return Expressions.constant(0);
+		if (output == null)
+			return Expressions.constant(0);
 		return getOutputData(output, true).getMinimalExpression();
 	}
-	
+
 	public List<Implicant> getMinimalImplicants(String output) {
-		if (output == null) return Implicant.MINIMAL_LIST;
+		if (output == null)
+			return Implicant.MINIMAL_LIST;
 		return getOutputData(output, true).getMinimalImplicants();
 	}
-	
+
 	public int getMinimizedFormat(String output) {
-		if (output == null) return AnalyzerModel.FORMAT_SUM_OF_PRODUCTS;
+		if (output == null)
+			return AnalyzerModel.FORMAT_SUM_OF_PRODUCTS;
 		return getOutputData(output, true).getMinimizedFormat();
 	}
-	
+
 	//
 	// modifier methods
 	//
@@ -310,19 +326,22 @@ public class OutputExpressions {
 	public void setExpression(String output, Expression expr) {
 		setExpression(output, expr, null);
 	}
-	
+
 	public void setExpression(String output, Expression expr, String exprString) {
-		if (output == null) return;
+		if (output == null)
+			return;
 		getOutputData(output, true).setExpression(expr, exprString);
 	}
-	
+
 	private void invalidate(String output, boolean formatChanged) {
 		OutputData data = getOutputData(output, false);
-		if (data != null) data.invalidate(false, false);
+		if (data != null)
+			data.invalidate(false, false);
 	}
-	
+
 	private OutputData getOutputData(String output, boolean create) {
-		if (output == null) throw new IllegalArgumentException("null output name");
+		if (output == null)
+			throw new IllegalArgumentException("null output name");
 		OutputData ret = outputData.get(output);
 		if (ret == null && create) {
 			if (model.getOutputs().indexOf(output) < 0) {
@@ -333,7 +352,7 @@ public class OutputExpressions {
 		}
 		return ret;
 	}
-	
+
 	private static Entry[] computeColumn(TruthTable table, Expression expr) {
 		int rows = table.getRowCount();
 		int cols = table.getInputColumnCount();
@@ -344,34 +363,36 @@ public class OutputExpressions {
 			Assignments assn = new Assignments();
 			for (int i = 0; i < rows; i++) {
 				for (int j = 0; j < cols; j++) {
-					assn.put(table.getInputHeader(j),
-							TruthTable.isInputSet(i, j, cols));
+					assn.put(table.getInputHeader(j), TruthTable.isInputSet(i, j, cols));
 				}
 				values[i] = expr.evaluate(assn) ? Entry.ONE : Entry.ZERO;
 			}
 		}
 		return values;
 	}
-	
+
 	private static boolean columnsMatch(Entry[] a, Entry[] b) {
-		if (a.length != b.length) return false;
+		if (a.length != b.length)
+			return false;
 		for (int i = 0; i < a.length; i++) {
 			if (a[i] != b[i]) {
 				boolean bothDefined = (a[i] == Entry.ZERO || a[i] == Entry.ONE)
-									&& (b[i] == Entry.ZERO || b[i] == Entry.ONE);
-				if (bothDefined) return false;
+						&& (b[i] == Entry.ZERO || b[i] == Entry.ONE);
+				if (bothDefined)
+					return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private static boolean isAllUndefined(Entry[] a) {
 		for (int i = 0; i < a.length; i++) {
-			if (a[i] == Entry.ZERO || a[i] == Entry.ONE) return false;
+			if (a[i] == Entry.ZERO || a[i] == Entry.ONE)
+				return false;
 		}
 		return true;
 	}
-	
+
 	private static boolean implicantsSame(List<Implicant> a, List<Implicant> b) {
 		if (a == null) {
 			return b == null || b.size() == 0;
@@ -382,9 +403,11 @@ public class OutputExpressions {
 		} else {
 			Iterator<Implicant> ait = a.iterator();
 			for (Implicant bi : b) {
-				if (!ait.hasNext()) return false; // should never happen
+				if (!ait.hasNext())
+					return false; // should never happen
 				Implicant ai = ait.next();
-				if (!ai.equals(bi)) return false;
+				if (!ai.equals(bi))
+					return false;
 			}
 			return true;
 		}

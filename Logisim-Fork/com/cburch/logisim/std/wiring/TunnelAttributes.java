@@ -16,10 +16,8 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
 
 class TunnelAttributes extends AbstractAttributeSet {
-	private static final List<Attribute<?>> ATTRIBUTES
-		= Arrays.asList(new Attribute<?>[] {
-			StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT
-		});
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays
+			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT });
 
 	private Direction facing;
 	private BitWidth width;
@@ -30,7 +28,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	private int labelY;
 	private int labelHAlign;
 	private int labelVAlign;
-	
+
 	public TunnelAttributes() {
 		facing = Direction.WEST;
 		width = BitWidth.ONE;
@@ -43,24 +41,35 @@ class TunnelAttributes extends AbstractAttributeSet {
 	Direction getFacing() {
 		return facing;
 	}
-	
+
 	String getLabel() {
 		return label;
 	}
-	
+
 	Font getFont() {
 		return labelFont;
 	}
-	
+
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
-	
-	int getLabelX() { return labelX; }
-	int getLabelY() { return labelY; }
-	int getLabelHAlign() { return labelHAlign; }
-	int getLabelVAlign() { return labelVAlign; }
-	
+
+	int getLabelX() {
+		return labelX;
+	}
+
+	int getLabelY() {
+		return labelY;
+	}
+
+	int getLabelHAlign() {
+		return labelHAlign;
+	}
+
+	int getLabelVAlign() {
+		return labelVAlign;
+	}
+
 	boolean setOffsetBounds(Bounds value) {
 		Bounds old = offsetBounds;
 		boolean same = old == null ? value == null : old.equals(value);
@@ -83,10 +92,14 @@ class TunnelAttributes extends AbstractAttributeSet {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
-		if (attr == StdAttr.FACING) return (V) facing;
-		if (attr == StdAttr.WIDTH) return (V) width;
-		if (attr == StdAttr.LABEL) return (V) label;
-		if (attr == StdAttr.LABEL_FONT) return (V) labelFont;
+		if (attr == StdAttr.FACING)
+			return (V) facing;
+		if (attr == StdAttr.WIDTH)
+			return (V) width;
+		if (attr == StdAttr.LABEL)
+			return (V) label;
+		if (attr == StdAttr.LABEL_FONT)
+			return (V) labelFont;
 		return null;
 	}
 

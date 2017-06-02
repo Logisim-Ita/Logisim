@@ -22,18 +22,24 @@ import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.std.wiring.Pin;
 
 public class CircuitPins {
-	private class MyComponentListener
-			implements ComponentListener, AttributeListener {
+	private class MyComponentListener implements ComponentListener, AttributeListener {
+		@Override
 		public void endChanged(ComponentEvent e) {
 			appearanceManager.updatePorts();
 		}
-		public void componentInvalidated(ComponentEvent e) { }
 
-		public void attributeListChanged(AttributeEvent e) { }
+		@Override
+		public void componentInvalidated(ComponentEvent e) {
+		}
+
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			Attribute<?> attr = e.getAttribute();
-			if (attr == StdAttr.FACING || attr == StdAttr.LABEL
-					|| attr == Pin.ATTR_TYPE) {
+			if (attr == StdAttr.FACING || attr == StdAttr.LABEL || attr == Pin.ATTR_TYPE) {
 				appearanceManager.updatePorts();
 			}
 		}
@@ -48,12 +54,12 @@ public class CircuitPins {
 		myComponentListener = new MyComponentListener();
 		pins = new HashSet<Instance>();
 	}
-	
+
 	public void transactionCompleted(ReplacementMap repl) {
 		// determine the changes
 		Set<Instance> adds = new HashSet<Instance>();
 		Set<Instance> removes = new HashSet<Instance>();
-		Map<Instance, Instance> replaces = new HashMap<Instance, Instance>(); 
+		Map<Instance, Instance> replaces = new HashMap<Instance, Instance>();
 		for (Component comp : repl.getAdditions()) {
 			if (comp.getFactory() instanceof Pin) {
 				Instance in = Instance.getInstanceFor(comp);
@@ -87,7 +93,7 @@ public class CircuitPins {
 
 		appearanceManager.updatePorts(adds, removes, replaces, getPins());
 	}
-	
+
 	public Collection<Instance> getPins() {
 		return new ArrayList<Instance>(pins);
 	}

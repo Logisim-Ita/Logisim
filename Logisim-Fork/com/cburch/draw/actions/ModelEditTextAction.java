@@ -14,14 +14,14 @@ public class ModelEditTextAction extends ModelAction {
 	private Text text;
 	private String oldValue;
 	private String newValue;
-	
+
 	public ModelEditTextAction(CanvasModel model, Text text, String newValue) {
 		super(model);
 		this.text = text;
 		this.oldValue = text.getText();
 		this.newValue = newValue;
 	}
-	
+
 	@Override
 	public Collection<CanvasObject> getObjects() {
 		return Collections.singleton((CanvasObject) text);
@@ -31,12 +31,12 @@ public class ModelEditTextAction extends ModelAction {
 	public String getName() {
 		return Strings.get("actionEditText");
 	}
-	
+
 	@Override
 	void doSub(CanvasModel model) {
 		model.setText(text, newValue);
 	}
-	
+
 	@Override
 	void undoSub(CanvasModel model) {
 		model.setText(text, oldValue);

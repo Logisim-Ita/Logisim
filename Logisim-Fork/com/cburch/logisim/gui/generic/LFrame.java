@@ -22,7 +22,7 @@ public class LFrame extends JFrame implements WindowClosable {
 	private static List<Image> ICONS = null;
 	private static final int DEFAULT_SIZE = 48;
 	private static Image DEFAULT_ICON = null;
-	
+
 	public static void attachIcon(Window frame) {
 		if (ICONS == null) {
 			List<Image> loadedIcons = new ArrayList<Image>();
@@ -39,7 +39,7 @@ public class LFrame extends JFrame implements WindowClosable {
 			}
 			ICONS = loadedIcons;
 		}
-		
+
 		boolean success = false;
 		try {
 			if (ICONS != null && !ICONS.isEmpty()) {
@@ -47,8 +47,9 @@ public class LFrame extends JFrame implements WindowClosable {
 				set.invoke(frame, ICONS);
 				success = true;
 			}
-		} catch (Exception e) { }
-		
+		} catch (Exception e) {
+		}
+
 		if (!success && frame instanceof JFrame && DEFAULT_ICON != null) {
 			((JFrame) frame).setIconImage(DEFAULT_ICON);
 		}
@@ -58,6 +59,7 @@ public class LFrame extends JFrame implements WindowClosable {
 		LFrame.attachIcon(this);
 	}
 
+	@Override
 	public void requestClose() {
 		WindowEvent closing = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
 		processWindowEvent(closing);

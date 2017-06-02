@@ -73,8 +73,7 @@ public class TransmissionGate extends InstanceFactory {
 		}
 
 		Object powerLoc = instance.getAttributeValue(Wiring.ATTR_GATE);
-		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST)
-			== (powerLoc == Wiring.GATE_TOP_LEFT);
+		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST) == (powerLoc == Wiring.GATE_TOP_LEFT);
 
 		Port[] ports = new Port[4];
 		ports[OUTPUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
@@ -92,10 +91,9 @@ public class TransmissionGate extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		return Bounds.create(0, -20, 40, 40).rotate(Direction.WEST, facing, 0,
-				0);
+		return Bounds.create(0, -20, 40, 40).rotate(Direction.WEST, facing, 0, 0);
 	}
-	
+
 	@Override
 	public boolean contains(Location loc, AttributeSet attrs) {
 		if (super.contains(loc, attrs)) {
@@ -111,7 +109,7 @@ public class TransmissionGate extends InstanceFactory {
 	public void propagate(InstanceState state) {
 		state.setPort(OUTPUT, computeOutput(state), 1);
 	}
-	
+
 	private Value computeOutput(InstanceState state) {
 		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
 		Value input = state.getPort(INPUT);
@@ -154,18 +152,18 @@ public class TransmissionGate extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		Object powerLoc = painter.getAttributeValue(Wiring.ATTR_GATE);
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST)
-			== (powerLoc == Wiring.GATE_TOP_LEFT);
+		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST) == (powerLoc == Wiring.GATE_TOP_LEFT);
 
 		int degrees = Direction.WEST.toDegrees() - facing.toDegrees();
-		if (flip) degrees += 180;
+		if (flip)
+			degrees += 180;
 		double radians = Math.toRadians((degrees + 360) % 360);
 
 		Graphics2D g = (Graphics2D) painter.getGraphics().create();
 		g.rotate(radians, bds.getX() + 20, bds.getY() + 20);
 		g.translate(bds.getX(), bds.getY());
 		GraphicsUtil.switchToWidth(g, Wire.WIDTH);
-		
+
 		Color gate0 = g.getColor();
 		Color gate1 = gate0;
 		Color input = gate0;
@@ -178,15 +176,15 @@ public class TransmissionGate extends InstanceFactory {
 			output = painter.getPort(OUTPUT).getColor();
 			platform = computeOutput(painter).getColor();
 		}
-		
+
 		g.setColor(flip ? input : output);
 		g.drawLine(0, 20, 11, 20);
 		g.drawLine(11, 13, 11, 27);
-		
+
 		g.setColor(flip ? output : input);
 		g.drawLine(29, 20, 40, 20);
 		g.drawLine(29, 13, 29, 27);
-		
+
 		g.setColor(gate0);
 		g.drawLine(20, 35, 20, 40);
 		GraphicsUtil.switchToWidth(g, 1);

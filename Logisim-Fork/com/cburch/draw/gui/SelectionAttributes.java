@@ -28,6 +28,7 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		//
 		// SelectionListener
 		//
+		@Override
 		public void selectionChanged(SelectionEvent ex) {
 			Map<AttributeSet, CanvasObject> oldSel = selected;
 			Map<AttributeSet, CanvasObject> newSel = new HashMap<AttributeSet, CanvasObject>();
@@ -53,7 +54,7 @@ public class SelectionAttributes extends AbstractAttributeSet {
 				fireAttributeListChanged();
 			}
 		}
-		
+
 		private void computeAttributeList(Set<AttributeSet> attrsSet) {
 			Set<Attribute<?>> attrSet = new LinkedHashSet<Attribute<?>>();
 			Iterator<AttributeSet> sit = attrsSet.iterator();
@@ -62,7 +63,7 @@ public class SelectionAttributes extends AbstractAttributeSet {
 				attrSet.addAll(first.getAttributes());
 				while (sit.hasNext()) {
 					AttributeSet next = sit.next();
-					for (Iterator<Attribute<?>> ait = attrSet.iterator(); ait.hasNext(); ) {
+					for (Iterator<Attribute<?>> ait = attrSet.iterator(); ait.hasNext();) {
 						Attribute<?> attr = ait.next();
 						if (!next.containsAttribute(attr)) {
 							ait.remove();
@@ -81,19 +82,20 @@ public class SelectionAttributes extends AbstractAttributeSet {
 			}
 			SelectionAttributes.this.selAttrs = attrs;
 			SelectionAttributes.this.selValues = values;
-			SelectionAttributes.this.attrsView
-				= Collections.unmodifiableList(Arrays.asList(attrs));
+			SelectionAttributes.this.attrsView = Collections.unmodifiableList(Arrays.asList(attrs));
 			fireAttributeListChanged();
 		}
 
 		//
 		// AttributeSet listener
 		//
+		@Override
 		public void attributeListChanged(AttributeEvent e) {
 			// show selection attributes
 			computeAttributeList(selected.keySet());
 		}
 
+		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			if (selected.containsKey(e.getSource())) {
 				@SuppressWarnings("unchecked")
@@ -108,14 +110,14 @@ public class SelectionAttributes extends AbstractAttributeSet {
 			}
 		}
 	}
-	
+
 	private Selection selection;
 	private Listener listener;
 	private Map<AttributeSet, CanvasObject> selected;
 	private Attribute<?>[] selAttrs;
 	private Object[] selValues;
 	private List<Attribute<?>> attrsView;
-	
+
 	public SelectionAttributes(Selection selection) {
 		this.selection = selection;
 		this.listener = new Listener();
@@ -123,11 +125,11 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		this.selAttrs = new Attribute<?>[0];
 		this.selValues = new Object[0];
 		this.attrsView = Collections.unmodifiableList(Arrays.asList(selAttrs));
-		
+
 		selection.addSelectionListener(listener);
 		listener.selectionChanged(null);
 	}
-	
+
 	public Iterable<Map.Entry<AttributeSet, CanvasObject>> entries() {
 		Set<Map.Entry<AttributeSet, CanvasObject>> raw = selected.entrySet();
 		ArrayList<Map.Entry<AttributeSet, CanvasObject>> ret;
@@ -180,9 +182,8 @@ public class SelectionAttributes extends AbstractAttributeSet {
 			}
 		}
 	}
-	
-	private static Object getSelectionValue(Attribute<?> attr,
-			Set<AttributeSet> sel) {
+
+	private static Object getSelectionValue(Attribute<?> attr, Set<AttributeSet> sel) {
 		Object ret = null;
 		for (AttributeSet attrs : sel) {
 			if (attrs.containsAttribute(attr)) {

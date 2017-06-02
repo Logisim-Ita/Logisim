@@ -1,10 +1,10 @@
 # Logisim
 
 Logisim is a circuit simulator, [originally available here](http://www.cburch.com/logisim/).
-This is an italian fork based on original Logisim 2.7.1.
+This is an Eclipse italian fork based on original Logisim 2.7.1 version.
 ## Changelog
 * Italian translation!
-* Possibility to use french translations already done
+* Possibility to use french translations already done (not very well)
 * Default gates' attributes: narrow, 2 inputs
 * New components:
 	* I/O->Switch
@@ -16,6 +16,7 @@ This is an italian fork based on original Logisim 2.7.1.
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile
-To compile you have to set into compile&run.bat your jdk and 7zip's directories; before compiling make sure the project isn't in any folder with a name containing spaces because it gives problems, you can also delete the "set path" line and add the jdk's path in your system environment
+I recommend you to watch this [video] (https://www.youtube.com/watch?v=38JFCqi_X3c)
+You also have to add external libraries in the project (/libs/*.jar)
 ## Translation
 New strings are translated really bad (Google Translate) because i just know Italian and English so, if you want, please help me translating other languages or you can add a new one, contact me at logisimit@gmail.com

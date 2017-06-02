@@ -12,7 +12,7 @@ import com.cburch.draw.model.Handle;
 
 public class ModelInsertHandleAction extends ModelAction {
 	private Handle desired;
-	
+
 	public ModelInsertHandleAction(CanvasModel model, Handle desired) {
 		super(model);
 		this.desired = desired;
@@ -27,12 +27,12 @@ public class ModelInsertHandleAction extends ModelAction {
 	public String getName() {
 		return Strings.get("actionInsertHandle");
 	}
-	
+
 	@Override
 	void doSub(CanvasModel model) {
 		model.insertHandle(desired, null);
 	}
-	
+
 	@Override
 	void undoSub(CanvasModel model) {
 		model.deleteHandle(desired);

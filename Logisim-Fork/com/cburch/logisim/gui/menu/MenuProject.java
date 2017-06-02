@@ -13,8 +13,8 @@ import javax.swing.JMenuItem;
 import com.cburch.logisim.proj.Project;
 
 class MenuProject extends Menu {
-	private class MyListener
-			implements ActionListener {
+	private class MyListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			Project proj = menubar.getProject();
@@ -32,10 +32,10 @@ class MenuProject extends Menu {
 			}
 		}
 	}
-	
+
 	private LogisimMenuBar menubar;
 	private MyListener myListener = new MyListener();
-	
+
 	private MenuItemImpl addCircuit = new MenuItemImpl(this, LogisimMenuBar.ADD_CIRCUIT);
 	private JMenu loadLibrary = new JMenu();
 	private JMenuItem loadBuiltin = new JMenuItem();
@@ -75,11 +75,11 @@ class MenuProject extends Menu {
 		menubar.registerItem(LogisimMenuBar.ANALYZE_CIRCUIT, analyze);
 		menubar.registerItem(LogisimMenuBar.CIRCUIT_STATS, stats);
 		options.addActionListener(myListener);
-		
+
 		loadLibrary.add(loadBuiltin);
 		loadLibrary.add(loadLogisim);
 		loadLibrary.add(loadJar);
-		
+
 		add(addCircuit);
 		add(loadLibrary);
 		add(unload);
@@ -109,7 +109,7 @@ class MenuProject extends Menu {
 		options.setEnabled(known);
 		computeEnabled();
 	}
-	
+
 	public void localeChanged() {
 		setText(Strings.get("projectMenu"));
 		addCircuit.setText(Strings.get("projectAddCircuitItem"));
@@ -131,22 +131,13 @@ class MenuProject extends Menu {
 		stats.setText(Strings.get("projectGetCircuitStatisticsItem"));
 		options.setText(Strings.get("projectOptionsItem"));
 	}
-	
+
 	@Override
 	void computeEnabled() {
-		setEnabled(menubar.getProject() != null
-				|| addCircuit.hasListeners()
-				|| moveUp.hasListeners()
-				|| moveDown.hasListeners()
-				|| setAsMain.hasListeners()
-				|| remove.hasListeners()
-				|| layout.hasListeners()
-				|| revertAppearance.hasListeners()
-				|| appearance.hasListeners()
-				|| viewToolbox.hasListeners()
-				|| viewSimulation.hasListeners()
-				|| analyze.hasListeners()
-				|| stats.hasListeners());
+		setEnabled(menubar.getProject() != null || addCircuit.hasListeners() || moveUp.hasListeners()
+				|| moveDown.hasListeners() || setAsMain.hasListeners() || remove.hasListeners() || layout.hasListeners()
+				|| revertAppearance.hasListeners() || appearance.hasListeners() || viewToolbox.hasListeners()
+				|| viewSimulation.hasListeners() || analyze.hasListeners() || stats.hasListeners());
 		menubar.fireEnableChanged();
 	}
 }

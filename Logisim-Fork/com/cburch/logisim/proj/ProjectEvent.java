@@ -7,19 +7,19 @@ import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.file.LogisimFile;
 import com.cburch.logisim.tools.Tool;
 
-
 public class ProjectEvent {
-	public final static int ACTION_SET_FILE     = 0; // change file
-	public final static int ACTION_SET_CURRENT  = 1; // change current
-	public final static int ACTION_SET_TOOL     = 2; // change tool
-	public final static int ACTION_SELECTION    = 3; // selection alterd
-	public final static int ACTION_SET_STATE    = 4; // circuit state changed
-	public static final int ACTION_START        = 5; // action about to start
-	public static final int ACTION_COMPLETE     = 6; // action has completed
-	public static final int ACTION_MERGE        = 7; // one action has been appended to another
-	public static final int UNDO_START          = 8; // undo about to start
-	public static final int UNDO_COMPLETE       = 9; // undo has completed
-	public static final int REPAINT_REQUEST     = 10; // canvas should be repainted
+	public final static int ACTION_SET_FILE = 0; // change file
+	public final static int ACTION_SET_CURRENT = 1; // change current
+	public final static int ACTION_SET_TOOL = 2; // change tool
+	public final static int ACTION_SELECTION = 3; // selection alterd
+	public final static int ACTION_SET_STATE = 4; // circuit state changed
+	public static final int ACTION_START = 5; // action about to start
+	public static final int ACTION_COMPLETE = 6; // action has completed
+	public static final int ACTION_MERGE = 7; // one action has been appended to
+												// another
+	public static final int UNDO_START = 8; // undo about to start
+	public static final int UNDO_COMPLETE = 9; // undo has completed
+	public static final int REPAINT_REQUEST = 10; // canvas should be repainted
 
 	private int action;
 	private Project proj;

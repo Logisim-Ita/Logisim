@@ -4,9 +4,8 @@
 package com.cburch.logisim.data;
 
 /**
- * Represents the dimensions of a rectangle. This is analogous to
- * java.awt's <code>Dimension</code> class, except that objects of this type
- * are immutable.
+ * Represents the dimensions of a rectangle. This is analogous to java.awt's
+ * <code>Dimension</code> class, except that objects of this type are immutable.
  */
 public class Size {
 	public static Size create(int wid, int ht) {
@@ -23,7 +22,8 @@ public class Size {
 
 	@Override
 	public boolean equals(Object other_obj) {
-		if (!(other_obj instanceof Size)) return false;
+		if (!(other_obj instanceof Size))
+			return false;
 		Size other = (Size) other_obj;
 		return wid == other.wid && ht == other.ht;
 	}
@@ -44,7 +44,6 @@ public class Size {
 	public java.awt.Dimension toAwtDimension() {
 		return new java.awt.Dimension(wid, ht);
 	}
-
 
 	public boolean contains(Location p) {
 		return contains(p.getX(), p.getY());

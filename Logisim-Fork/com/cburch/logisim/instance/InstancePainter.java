@@ -23,26 +23,26 @@ public class InstancePainter implements InstanceState {
 	private InstanceFactory factory;
 	private AttributeSet attrs;
 
-	public InstancePainter(ComponentDrawContext context,
-			InstanceComponent instance) {
+	public InstancePainter(ComponentDrawContext context, InstanceComponent instance) {
 		this.context = context;
 		this.comp = instance;
 	}
-	
+
 	void setInstance(InstanceComponent value) {
 		this.comp = value;
 	}
-	
+
 	void setFactory(InstanceFactory factory, AttributeSet attrs) {
 		this.comp = null;
 		this.factory = factory;
 		this.attrs = attrs;
 	}
-	
+
+	@Override
 	public InstanceFactory getFactory() {
 		return comp == null ? factory : (InstanceFactory) comp.getFactory();
 	}
-	
+
 	//
 	// methods related to the context of the canvas
 	//
@@ -77,22 +77,26 @@ public class InstancePainter implements InstanceState {
 	public Object getGateShape() {
 		return context.getGateShape();
 	}
-	
+
+	@Override
 	public boolean isCircuitRoot() {
 		return !context.getCircuitState().isSubstate();
 	}
-	
+
+	@Override
 	public long getTickCount() {
 		return context.getCircuitState().getPropagator().getTickCount();
 	}
-	
+
 	//
 	// methods related to the circuit state
 	//
+	@Override
 	public Project getProject() {
 		return context.getCircuitState().getProject();
 	}
-	
+
+	@Override
 	public Value getPort(int portIndex) {
 		InstanceComponent c = comp;
 		CircuitState s = context.getCircuitState();
@@ -102,11 +106,13 @@ public class InstancePainter implements InstanceState {
 			return Value.UNKNOWN;
 		}
 	}
-	
+
+	@Override
 	public void setPort(int portIndex, Value value, int delay) {
 		throw new UnsupportedOperationException("setValue on InstancePainter");
 	}
-	
+
+	@Override
 	public InstanceData getData() {
 		CircuitState circState = context.getCircuitState();
 		if (circState == null || comp == null) {
@@ -115,7 +121,8 @@ public class InstancePainter implements InstanceState {
 			return (InstanceData) circState.getData(comp);
 		}
 	}
-	
+
+	@Override
 	public void setData(InstanceData value) {
 		CircuitState circState = context.getCircuitState();
 		if (circState == null || comp == null) {
@@ -124,26 +131,28 @@ public class InstancePainter implements InstanceState {
 			circState.setData(comp, value);
 		}
 	}
-	
+
 	//
 	// methods related to the instance
 	//
+	@Override
 	public Instance getInstance() {
 		InstanceComponent c = comp;
 		return c == null ? null : c.getInstance();
 	}
-	
+
 	public Location getLocation() {
 		InstanceComponent c = comp;
 		return c == null ? Location.create(0, 0) : c.getLocation();
 	}
-	
+
+	@Override
 	public boolean isPortConnected(int index) {
 		Circuit circ = context.getCircuit();
 		Location loc = comp.getEnd(index).getLocation();
 		return circ.isConnected(loc, comp);
 	}
-	
+
 	public Bounds getOffsetBounds() {
 		InstanceComponent c = comp;
 		if (c == null) {
@@ -153,23 +162,26 @@ public class InstancePainter implements InstanceState {
 			return c.getBounds().translate(-loc.getX(), -loc.getY());
 		}
 	}
-	
+
 	public Bounds getBounds() {
 		InstanceComponent c = comp;
 		return c == null ? factory.getOffsetBounds(attrs) : c.getBounds();
 	}
-	
+
+	@Override
 	public AttributeSet getAttributeSet() {
 		InstanceComponent c = comp;
 		return c == null ? attrs : c.getAttributeSet();
 	}
-	
+
+	@Override
 	public <E> E getAttributeValue(Attribute<E> attr) {
 		InstanceComponent c = comp;
 		AttributeSet as = c == null ? attrs : c.getAttributeSet();
 		return as.getValue(attr);
 	}
-	
+
+	@Override
 	public void fireInvalidated() {
 		comp.fireInvalidated();
 	}
@@ -180,14 +192,12 @@ public class InstancePainter implements InstanceState {
 	public void drawBounds() {
 		context.drawBounds(comp);
 	}
-	
+
 	public void drawRectangle(Bounds bds, String label) {
-		context.drawRectangle(bds.getX(), bds.getY(),
-				bds.getWidth(), bds.getHeight(), label);
+		context.drawRectangle(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), label);
 	}
 
-	public void drawRectangle(int x, int y,
-			int width, int height, String label) {
+	public void drawRectangle(int x, int y, int width, int height, String label) {
 		context.drawRectangle(x, y, width, height, label);
 	}
 
@@ -214,7 +224,7 @@ public class InstancePainter implements InstanceState {
 	public void drawHandles() {
 		context.drawHandles(comp);
 	}
-	
+
 	public void drawHandle(Location loc) {
 		context.drawHandle(loc);
 	}
@@ -222,7 +232,7 @@ public class InstancePainter implements InstanceState {
 	public void drawHandle(int x, int y) {
 		context.drawHandle(x, y);
 	}
-	
+
 	public void drawLabel() {
 		if (comp != null) {
 			comp.drawLabel(context);

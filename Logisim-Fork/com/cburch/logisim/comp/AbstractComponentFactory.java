@@ -24,28 +24,46 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 	private static final Icon toolIcon = Icons.getIcon("subcirc.gif");
 
 	private AttributeSet defaultSet;
-	
+
 	protected AbstractComponentFactory() {
 		defaultSet = null;
 	}
 
 	@Override
-	public String toString() { return getName(); }
+	public String toString() {
+		return getName();
+	}
 
+	@Override
 	public abstract String getName();
-	public String getDisplayName() { return getDisplayGetter().get(); }
-	public StringGetter getDisplayGetter() { return StringUtil.constantGetter(getName()); }
+
+	@Override
+	public String getDisplayName() {
+		return getDisplayGetter().get();
+	}
+
+	@Override
+	public StringGetter getDisplayGetter() {
+		return StringUtil.constantGetter(getName());
+	}
+
+	@Override
 	public abstract Component createComponent(Location loc, AttributeSet attrs);
+
+	@Override
 	public abstract Bounds getOffsetBounds(AttributeSet attrs);
 
+	@Override
 	public AttributeSet createAttributeSet() {
 		return AttributeSets.EMPTY;
 	}
-	
+
+	@Override
 	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
 		return false;
 	}
 
+	@Override
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
 		AttributeSet dfltSet = defaultSet;
 		if (dfltSet == null) {
@@ -58,18 +76,17 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 	//
 	// user interface methods
 	//
-	public void drawGhost(ComponentDrawContext context, Color color,
-				int x, int y, AttributeSet attrs) {
+	@Override
+	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs) {
 		Graphics g = context.getGraphics();
 		Bounds bds = getOffsetBounds(attrs);
 		g.setColor(color);
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(x + bds.getX(), y + bds.getY(),
-			bds.getWidth(), bds.getHeight());
+		g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
 	}
 
-	public void paintIcon(ComponentDrawContext context,
-			int x, int y, AttributeSet attrs) {
+	@Override
+	public void paintIcon(ComponentDrawContext context, int x, int y, AttributeSet attrs) {
 		Graphics g = context.getGraphics();
 		if (toolIcon != null) {
 			toolIcon.paintIcon(context.getDestination(), g, x + 2, y + 2);
@@ -85,7 +102,8 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 			}
 		}
 	}
-	
+
+	@Override
 	public Object getFeature(Object key, AttributeSet attrs) {
 		return null;
 	}

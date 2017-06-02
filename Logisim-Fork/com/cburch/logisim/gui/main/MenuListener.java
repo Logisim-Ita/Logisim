@@ -32,13 +32,14 @@ class MenuListener {
 	interface EnabledListener {
 		public void menuEnableChanged(MenuListener source);
 	}
-	
+
 	private class FileListener implements ActionListener {
 		private void register() {
 			menubar.addActionListener(LogisimMenuBar.EXPORT_IMAGE, this);
 			menubar.addActionListener(LogisimMenuBar.PRINT, this);
 		}
-		
+
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			Project proj = frame.getProject();
@@ -52,13 +53,13 @@ class MenuListener {
 
 	private class EditListener implements ActionListener, EditHandler.Listener {
 		private EditHandler handler = null;
-		
+
 		private void setHandler(EditHandler value) {
 			handler = value;
 			value.setListener(this);
 			handler.computeEnabled();
 		}
-		
+
 		private void register() {
 			menubar.addActionListener(LogisimMenuBar.CUT, this);
 			menubar.addActionListener(LogisimMenuBar.COPY, this);
@@ -72,41 +73,55 @@ class MenuListener {
 			menubar.addActionListener(LogisimMenuBar.LOWER_BOTTOM, this);
 			menubar.addActionListener(LogisimMenuBar.ADD_CONTROL, this);
 			menubar.addActionListener(LogisimMenuBar.REMOVE_CONTROL, this);
-			if (handler != null) handler.computeEnabled();
+			if (handler != null)
+				handler.computeEnabled();
 		}
-		
+
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
 			EditHandler h = handler;
 			if (src == LogisimMenuBar.CUT) {
-				if (h != null) h.cut();
+				if (h != null)
+					h.cut();
 			} else if (src == LogisimMenuBar.COPY) {
-				if (h != null) h.copy();
+				if (h != null)
+					h.copy();
 			} else if (src == LogisimMenuBar.PASTE) {
-				if (h != null) h.paste();
+				if (h != null)
+					h.paste();
 			} else if (src == LogisimMenuBar.DELETE) {
-				if (h != null) h.delete();
+				if (h != null)
+					h.delete();
 			} else if (src == LogisimMenuBar.DUPLICATE) {
-				if (h != null) h.duplicate();
+				if (h != null)
+					h.duplicate();
 			} else if (src == LogisimMenuBar.SELECT_ALL) {
-				if (h != null) h.selectAll();
+				if (h != null)
+					h.selectAll();
 			} else if (src == LogisimMenuBar.RAISE) {
-				if (h != null) h.raise();
+				if (h != null)
+					h.raise();
 			} else if (src == LogisimMenuBar.LOWER) {
-				if (h != null) h.lower();
+				if (h != null)
+					h.lower();
 			} else if (src == LogisimMenuBar.RAISE_TOP) {
-				if (h != null) h.raiseTop();
+				if (h != null)
+					h.raiseTop();
 			} else if (src == LogisimMenuBar.LOWER_BOTTOM) {
-				if (h != null) h.lowerBottom();
+				if (h != null)
+					h.lowerBottom();
 			} else if (src == LogisimMenuBar.ADD_CONTROL) {
-				if (h != null) h.addControlPoint();
+				if (h != null)
+					h.addControlPoint();
 			} else if (src == LogisimMenuBar.REMOVE_CONTROL) {
-				if (h != null) h.removeControlPoint();
+				if (h != null)
+					h.removeControlPoint();
 			}
 		}
 
-		public void enableChanged(EditHandler handler, LogisimMenuItem action,
-				boolean value) {
+		@Override
+		public void enableChanged(EditHandler handler, LogisimMenuItem action, boolean value) {
 			if (handler == this.handler) {
 				menubar.setEnabled(action, value);
 				fireEnableChanged();
@@ -114,8 +129,8 @@ class MenuListener {
 		}
 	}
 
-	class ProjectMenuListener implements ProjectListener, LibraryListener,
-				ActionListener, PropertyChangeListener, CanvasModelListener {
+	class ProjectMenuListener
+			implements ProjectListener, LibraryListener, ActionListener, PropertyChangeListener, CanvasModelListener {
 		void register() {
 			Project proj = frame.getProject();
 			if (proj == null) {
@@ -127,10 +142,10 @@ class MenuListener {
 			frame.addPropertyChangeListener(Frame.EDITOR_VIEW, this);
 			frame.addPropertyChangeListener(Frame.EXPLORER_VIEW, this);
 			Circuit circ = proj.getCurrentCircuit();
-			if (circ != null) { 
+			if (circ != null) {
 				circ.getAppearance().addCanvasModelListener(this);
 			}
-			
+
 			menubar.addActionListener(LogisimMenuBar.ADD_CIRCUIT, this);
 			menubar.addActionListener(LogisimMenuBar.MOVE_CIRCUIT_UP, this);
 			menubar.addActionListener(LogisimMenuBar.MOVE_CIRCUIT_DOWN, this);
@@ -143,14 +158,16 @@ class MenuListener {
 			menubar.addActionListener(LogisimMenuBar.REVERT_APPEARANCE, this);
 			menubar.addActionListener(LogisimMenuBar.ANALYZE_CIRCUIT, this);
 			menubar.addActionListener(LogisimMenuBar.CIRCUIT_STATS, this);
-			
+
 			computeEnabled();
 		}
 
+		@Override
 		public void modelChanged(CanvasModelEvent event) {
 			computeRevertEnabled();
 		}
 
+		@Override
 		public void projectChanged(ProjectEvent event) {
 			int action = event.getAction();
 			if (action == ProjectEvent.ACTION_SET_CURRENT) {
@@ -159,7 +176,7 @@ class MenuListener {
 					old.getAppearance().removeCanvasModelListener(this);
 				}
 				Circuit circ = (Circuit) event.getData();
-				if (circ != null) { 
+				if (circ != null) {
 					circ.getAppearance().addCanvasModelListener(this);
 				}
 				computeEnabled();
@@ -167,11 +184,13 @@ class MenuListener {
 				computeEnabled();
 			}
 		}
-		
+
+		@Override
 		public void libraryChanged(LibraryEvent event) {
 			computeEnabled();
 		}
-		
+
+		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			Project proj = frame.getProject();
@@ -202,7 +221,7 @@ class MenuListener {
 				StatisticsDialog.show(frame, proj.getLogisimFile(), cur);
 			}
 		}
-		
+
 		private void computeEnabled() {
 			Project proj = frame.getProject();
 			LogisimFile file = proj.getLogisimFile();
@@ -227,10 +246,9 @@ class MenuListener {
 				canMoveUp = curIndex > 0;
 				canMoveDown = curIndex < tools.size() - 1;
 				canRemove = tools.size() > 1;
-				canRevert = viewAppearance
-					&& !cur.getAppearance().isDefaultAppearance();
+				canRevert = viewAppearance && !cur.getAppearance().isDefaultAppearance();
 			}
-			
+
 			menubar.setEnabled(LogisimMenuBar.ADD_CIRCUIT, true);
 			menubar.setEnabled(LogisimMenuBar.MOVE_CIRCUIT_UP, canMoveUp);
 			menubar.setEnabled(LogisimMenuBar.MOVE_CIRCUIT_DOWN, canMoveDown);
@@ -245,7 +263,7 @@ class MenuListener {
 			menubar.setEnabled(LogisimMenuBar.CIRCUIT_STATS, true);
 			fireEnableChanged();
 		}
-		
+
 		private void computeRevertEnabled() {
 			// do this separately since it can happen rather often
 			Project proj = frame.getProject();
@@ -253,8 +271,7 @@ class MenuListener {
 			Circuit cur = proj.getCurrentCircuit();
 			boolean isProjectCircuit = file.contains(cur);
 			boolean viewAppearance = frame.getEditorView().equals(Frame.EDIT_APPEARANCE);
-			boolean canRevert = isProjectCircuit && viewAppearance
-				&& !cur.getAppearance().isDefaultAppearance();
+			boolean canRevert = isProjectCircuit && viewAppearance && !cur.getAppearance().isDefaultAppearance();
 			boolean oldValue = menubar.isEnabled(LogisimMenuBar.REVERT_APPEARANCE);
 			if (canRevert != oldValue) {
 				menubar.setEnabled(LogisimMenuBar.REVERT_APPEARANCE, canRevert);
@@ -262,11 +279,12 @@ class MenuListener {
 			}
 		}
 
+		@Override
 		public void propertyChange(PropertyChangeEvent e) {
 			computeEnabled();
 		}
 	}
-	
+
 	class SimulateMenuListener implements ProjectListener, SimulateListener {
 		void register() {
 			Project proj = frame.getProject();
@@ -274,19 +292,21 @@ class MenuListener {
 			menubar.setSimulateListener(this);
 			menubar.setCircuitState(proj.getSimulator(), proj.getCircuitState());
 		}
-		
+
+		@Override
 		public void projectChanged(ProjectEvent event) {
 			if (event.getAction() == ProjectEvent.ACTION_SET_STATE) {
-				menubar.setCircuitState(frame.getProject().getSimulator(),
-						frame.getProject().getCircuitState());
+				menubar.setCircuitState(frame.getProject().getSimulator(), frame.getProject().getCircuitState());
 			}
 		}
 
+		@Override
 		public void stateChangeRequested(Simulator sim, CircuitState state) {
-			if (state != null) frame.getProject().setCircuitState(state);
+			if (state != null)
+				frame.getProject().setCircuitState(state);
 		}
 	}
-	
+
 	private Frame frame;
 	private LogisimMenuBar menubar;
 	private ArrayList<EnabledListener> listeners;
@@ -300,11 +320,11 @@ class MenuListener {
 		this.menubar = menubar;
 		this.listeners = new ArrayList<EnabledListener>();
 	}
-	
+
 	LogisimMenuBar getMenuBar() {
 		return menubar;
 	}
-	
+
 	public void register(CardPanel mainPanel) {
 		fileListener.register();
 		editListener.register();
@@ -315,27 +335,26 @@ class MenuListener {
 	public void setEditHandler(EditHandler handler) {
 		editListener.setHandler(handler);
 	}
-	
+
 	public void addEnabledListener(EnabledListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public void removeEnabledListener(EnabledListener listener) {
 		listeners.remove(listener);
 	}
-	
+
 	public void doAction(LogisimMenuItem item) {
 		menubar.doAction(item);
 	}
-	
+
 	public boolean isEnabled(LogisimMenuItem item) {
 		return menubar.isEnabled(item);
 	}
-	
+
 	private void fireEnableChanged() {
 		for (EnabledListener listener : listeners) {
 			listener.menuEnableChanged(this);
 		}
 	}
 }
-

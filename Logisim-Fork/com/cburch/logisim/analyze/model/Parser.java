@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import com.cburch.logisim.util.StringGetter;
 
 public class Parser {
-	private Parser() { }
-	
+	private Parser() {
+	}
+
 	public static Expression parse(String in, AnalyzerModel model) throws ParserException {
 		ArrayList<Token> tokens = toTokens(in, false);
 
-		if (tokens.size() == 0) return null;
+		if (tokens.size() == 0)
+			return null;
 
 		for (Token token : tokens) {
 			if (token.type == TOKEN_ERROR) {
@@ -40,41 +42,24 @@ public class Parser {
 
 		return parse(tokens);
 	}
-	
-	/** I wrote this without thinking, and then realized that this is
-	 * quite complicated because of removing operators. I haven't
-	 * bothered to do it correctly; instead, it just regenerates a
-	 * string from the raw expression.
-	static String removeVariable(String in, String variable) {
-		StringBuilder ret = new StringBuilder();
-		ArrayList tokens = toTokens(in, true);
-		Token lastWhite = null;
-		for (int i = 0, n = tokens.size(); i < n; i++) {
-			Token token = (Token) tokens.get(i);
-			if (token.type == TOKEN_IDENT && token.text.equals(variable)) {
-				; // just ignore it 
-			} else if (token.type == TOKEN_WHITE) {
-				if (lastWhite != null) {
-					if (lastWhite.text.length() >= token.text.length()) {
-						; // don't repeat shorter whitespace
-					} else {
-						ret.replace(ret.length() - lastWhite.text.length(),
-								ret.length(), token.text);
-						lastWhite = token;
-					}
-				} else {
-					lastWhite = token;
-					ret.append(token.text);
-				}
-			} else {
-				lastWhite = null;
-				ret.append(token.text);
-			}
-		}
-		return ret.toString();
-	}
-	*/
-	
+
+	/**
+	 * I wrote this without thinking, and then realized that this is quite
+	 * complicated because of removing operators. I haven't bothered to do it
+	 * correctly; instead, it just regenerates a string from the raw expression.
+	 * static String removeVariable(String in, String variable) { StringBuilder
+	 * ret = new StringBuilder(); ArrayList tokens = toTokens(in, true); Token
+	 * lastWhite = null; for (int i = 0, n = tokens.size(); i < n; i++) { Token
+	 * token = (Token) tokens.get(i); if (token.type == TOKEN_IDENT &&
+	 * token.text.equals(variable)) { ; // just ignore it } else if (token.type
+	 * == TOKEN_WHITE) { if (lastWhite != null) { if (lastWhite.text.length() >=
+	 * token.text.length()) { ; // don't repeat shorter whitespace } else {
+	 * ret.replace(ret.length() - lastWhite.text.length(), ret.length(),
+	 * token.text); lastWhite = token; } } else { lastWhite = token;
+	 * ret.append(token.text); } } else { lastWhite = null;
+	 * ret.append(token.text); } } return ret.toString(); }
+	 */
+
 	static String replaceVariable(String in, String oldName, String newName) {
 		StringBuilder ret = new StringBuilder();
 		ArrayList<Token> tokens = toTokens(in, true);
@@ -102,80 +87,104 @@ public class Parser {
 	private static final int TOKEN_CONST = 8;
 	private static final int TOKEN_WHITE = 9;
 	private static final int TOKEN_ERROR = 10;
-	
+
 	private static class Token {
 		int type;
 		int offset;
 		int length;
 		String text;
-		
+
 		Token(int type, int offset, String text) {
 			this(type, offset, text.length(), text);
 		}
-		
+
 		Token(int type, int offset, int length, String text) {
 			this.type = type;
 			this.offset = offset;
 			this.length = length;
 			this.text = text;
 		}
-		
+
 		ParserException error(StringGetter message) {
 			return new ParserException(message, offset, length);
 		}
 	}
-	
+
 	private static ArrayList<Token> toTokens(String in, boolean includeWhite) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
-		
+
 		// Guarantee that we will stop just after reading whitespace,
 		// not in the middle of a token.
 		in = in + " ";
 		int pos = 0;
 		while (true) {
 			int whiteStart = pos;
-			while (pos < in.length() && Character.isWhitespace(in.charAt(pos))) pos++;
+			while (pos < in.length() && Character.isWhitespace(in.charAt(pos)))
+				pos++;
 			if (includeWhite && pos != whiteStart) {
 				tokens.add(new Token(TOKEN_WHITE, whiteStart, in.substring(whiteStart, pos)));
 			}
-			if (pos == in.length()) return tokens;
-			
+			if (pos == in.length())
+				return tokens;
+
 			int start = pos;
 			char startChar = in.charAt(pos);
 			pos++;
 			if (Character.isJavaIdentifierStart(startChar)) {
-				while (Character.isJavaIdentifierPart(in.charAt(pos))) pos++;
+				while (Character.isJavaIdentifierPart(in.charAt(pos)))
+					pos++;
 				tokens.add(new Token(TOKEN_IDENT, start, in.substring(start, pos)));
 			} else {
 				switch (startChar) {
-				case '(': tokens.add(new Token(TOKEN_LPAREN, start, "(")); break;
-				case ')': tokens.add(new Token(TOKEN_RPAREN, start, ")")); break;
-				case '0': case '1': tokens.add(new Token(TOKEN_CONST, start, "" + startChar)); break;
-				case '~': tokens.add(new Token(TOKEN_NOT, start, "~")); break;
-				case '\'': tokens.add(new Token(TOKEN_NOT_POSTFIX, start, "'")); break;
-				case '^': tokens.add(new Token(TOKEN_XOR, start, "^")); break;
-				case '+': tokens.add(new Token(TOKEN_OR, start, "+")); break;
-				case '!': tokens.add(new Token(TOKEN_NOT, start, "!")); break;
-				case '&':   if (in.charAt(pos) == '&') pos++;
-							tokens.add(new Token(TOKEN_AND, start, in.substring(start, pos)));
-							break;
-				case '|':   if (in.charAt(pos) == '|') pos++;
-							tokens.add(new Token(TOKEN_OR, start, in.substring(start, pos)));
-							break;
+				case '(':
+					tokens.add(new Token(TOKEN_LPAREN, start, "("));
+					break;
+				case ')':
+					tokens.add(new Token(TOKEN_RPAREN, start, ")"));
+					break;
+				case '0':
+				case '1':
+					tokens.add(new Token(TOKEN_CONST, start, "" + startChar));
+					break;
+				case '~':
+					tokens.add(new Token(TOKEN_NOT, start, "~"));
+					break;
+				case '\'':
+					tokens.add(new Token(TOKEN_NOT_POSTFIX, start, "'"));
+					break;
+				case '^':
+					tokens.add(new Token(TOKEN_XOR, start, "^"));
+					break;
+				case '+':
+					tokens.add(new Token(TOKEN_OR, start, "+"));
+					break;
+				case '!':
+					tokens.add(new Token(TOKEN_NOT, start, "!"));
+					break;
+				case '&':
+					if (in.charAt(pos) == '&')
+						pos++;
+					tokens.add(new Token(TOKEN_AND, start, in.substring(start, pos)));
+					break;
+				case '|':
+					if (in.charAt(pos) == '|')
+						pos++;
+					tokens.add(new Token(TOKEN_OR, start, in.substring(start, pos)));
+					break;
 				default:
-					while (!okCharacter(in.charAt(pos))) pos++;
+					while (!okCharacter(in.charAt(pos)))
+						pos++;
 					String errorText = in.substring(start, pos);
 					tokens.add(new Token(TOKEN_ERROR, start, errorText));
 				}
 			}
 		}
 	}
-		
+
 	private static boolean okCharacter(char c) {
-		return Character.isWhitespace(c) || Character.isJavaIdentifierStart(c)
-			|| "()01~^+!&|".indexOf(c) >= 0;
+		return Character.isWhitespace(c) || Character.isJavaIdentifierStart(c) || "()01~^+!&|".indexOf(c) >= 0;
 	}
-	
+
 	//
 	// parsing code
 	//
@@ -183,14 +192,14 @@ public class Parser {
 		int level;
 		Expression current;
 		Token cause;
-		
+
 		Context(Expression current, int level, Token cause) {
 			this.level = level;
 			this.current = current;
 			this.cause = cause;
 		}
 	}
-	
+
 	private static Expression parse(ArrayList<Token> tokens) throws ParserException {
 		ArrayList<Context> stack = new ArrayList<Context>();
 		Expression current = null;
@@ -219,7 +228,7 @@ public class Parser {
 			} else if (t.type == TOKEN_NOT) {
 				if (current != null) {
 					push(stack, current, Expression.AND_LEVEL,
-						new Token(TOKEN_AND, t.offset, Strings.get("implicitAndOperator")));
+							new Token(TOKEN_AND, t.offset, Strings.get("implicitAndOperator")));
 				}
 				push(stack, null, Expression.NOT_LEVEL, t);
 				current = null;
@@ -250,9 +259,15 @@ public class Parser {
 				}
 				int level = 0;
 				switch (t.type) {
-				case TOKEN_AND: level = Expression.AND_LEVEL; break;
-				case TOKEN_OR: level = Expression.OR_LEVEL; break;
-				case TOKEN_XOR: level = Expression.XOR_LEVEL; break;
+				case TOKEN_AND:
+					level = Expression.AND_LEVEL;
+					break;
+				case TOKEN_OR:
+					level = Expression.OR_LEVEL;
+					break;
+				case TOKEN_XOR:
+					level = Expression.XOR_LEVEL;
+					break;
 				}
 				push(stack, popTo(stack, level, current), level, t);
 				current = null;
@@ -265,29 +280,40 @@ public class Parser {
 		}
 		return current;
 	}
-	
-	private static void push(ArrayList<Context> stack, Expression expr,
-			int level, Token cause) {
+
+	private static void push(ArrayList<Context> stack, Expression expr, int level, Token cause) {
 		stack.add(new Context(expr, level, cause));
 	}
+
 	private static int peekLevel(ArrayList<Context> stack) {
-		if (stack.isEmpty()) return -3;
+		if (stack.isEmpty())
+			return -3;
 		Context context = stack.get(stack.size() - 1);
 		return context.level;
 	}
+
 	private static Context pop(ArrayList<Context> stack) {
 		return stack.remove(stack.size() - 1);
 	}
-	private static Expression popTo(ArrayList<Context> stack, int level,
-			Expression current) throws ParserException {
+
+	private static Expression popTo(ArrayList<Context> stack, int level, Expression current) throws ParserException {
 		while (!stack.isEmpty() && peekLevel(stack) >= level) {
 			Context top = pop(stack);
-			if (current == null) throw top.cause.error(Strings.getter("missingRightOperandError", top.cause.text));
+			if (current == null)
+				throw top.cause.error(Strings.getter("missingRightOperandError", top.cause.text));
 			switch (top.level) {
-			case Expression.AND_LEVEL: current = Expressions.and(top.current, current); break;
-			case Expression.OR_LEVEL: current = Expressions.or(top.current, current); break;
-			case Expression.XOR_LEVEL: current = Expressions.xor(top.current, current); break;
-			case Expression.NOT_LEVEL: current = Expressions.not(current); break;
+			case Expression.AND_LEVEL:
+				current = Expressions.and(top.current, current);
+				break;
+			case Expression.OR_LEVEL:
+				current = Expressions.or(top.current, current);
+				break;
+			case Expression.XOR_LEVEL:
+				current = Expressions.xor(top.current, current);
+				break;
+			case Expression.NOT_LEVEL:
+				current = Expressions.not(current);
+				break;
 			}
 		}
 		return current;

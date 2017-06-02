@@ -19,15 +19,13 @@ class ExperimentalOptions extends OptionsPanel {
 
 	public ExperimentalOptions(PreferencesFrame window) {
 		super(window);
-		
-		accel = new PrefOptionList(AppPreferences.GRAPHICS_ACCELERATION,
-			Strings.getter("accelLabel"), new PrefOption[] {
-				new PrefOption(AppPreferences.ACCEL_DEFAULT, Strings.getter("accelDefault")),
-				new PrefOption(AppPreferences.ACCEL_NONE, Strings.getter("accelNone")),
-				new PrefOption(AppPreferences.ACCEL_OPENGL, Strings.getter("accelOpenGL")),
-				new PrefOption(AppPreferences.ACCEL_D3D, Strings.getter("accelD3D")),
-			});
-		
+
+		accel = new PrefOptionList(AppPreferences.GRAPHICS_ACCELERATION, Strings.getter("accelLabel"),
+				new PrefOption[] { new PrefOption(AppPreferences.ACCEL_DEFAULT, Strings.getter("accelDefault")),
+						new PrefOption(AppPreferences.ACCEL_NONE, Strings.getter("accelNone")),
+						new PrefOption(AppPreferences.ACCEL_OPENGL, Strings.getter("accelOpenGL")),
+						new PrefOption(AppPreferences.ACCEL_D3D, Strings.getter("accelD3D")), });
+
 		JPanel accelPanel = new JPanel(new BorderLayout());
 		accelPanel.add(accel.getJLabel(), BorderLayout.LINE_START);
 		accelPanel.add(accel.getJComboBox(), BorderLayout.CENTER);
@@ -35,7 +33,7 @@ class ExperimentalOptions extends OptionsPanel {
 		accelRestart.setFont(accelRestart.getFont().deriveFont(Font.ITALIC));
 		JPanel accelPanel2 = new JPanel();
 		accelPanel2.add(accelPanel);
-		
+
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		add(Box.createGlue());
 		add(accelPanel2);
@@ -51,7 +49,7 @@ class ExperimentalOptions extends OptionsPanel {
 	public String getHelpText() {
 		return Strings.get("experimentHelp");
 	}
-	
+
 	@Override
 	public void localeChanged() {
 		accel.localeChanged();

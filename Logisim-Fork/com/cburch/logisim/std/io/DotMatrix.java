@@ -25,43 +25,31 @@ import com.cburch.logisim.util.GraphicsUtil;
 // TODO repropagate when rows/cols change
 
 public class DotMatrix extends InstanceFactory {
-	static final AttributeOption INPUT_SELECT
-		= new AttributeOption("select", Strings.getter("ioInputSelect"));
-	static final AttributeOption INPUT_COLUMN
-		= new AttributeOption("column", Strings.getter("ioInputColumn"));
-	static final AttributeOption INPUT_ROW
-		= new AttributeOption("row", Strings.getter("ioInputRow"));
+	static final AttributeOption INPUT_SELECT = new AttributeOption("select", Strings.getter("ioInputSelect"));
+	static final AttributeOption INPUT_COLUMN = new AttributeOption("column", Strings.getter("ioInputColumn"));
+	static final AttributeOption INPUT_ROW = new AttributeOption("row", Strings.getter("ioInputRow"));
 
-	static final AttributeOption SHAPE_CIRCLE
-		= new AttributeOption("circle", Strings.getter("ioShapeCircle"));
-	static final AttributeOption SHAPE_SQUARE
-		= new AttributeOption("square", Strings.getter("ioShapeSquare"));
-	
-	static final Attribute<AttributeOption> ATTR_INPUT_TYPE
-		= Attributes.forOption("inputtype", Strings.getter("ioMatrixInput"),
-			new AttributeOption[] { INPUT_COLUMN, INPUT_ROW, INPUT_SELECT });
-	static final Attribute<Integer> ATTR_MATRIX_COLS
-		= Attributes.forIntegerRange("matrixcols",
-				Strings.getter("ioMatrixCols"), 1, Value.MAX_WIDTH);
-	static final Attribute<Integer> ATTR_MATRIX_ROWS
-		= Attributes.forIntegerRange("matrixrows",
-				Strings.getter("ioMatrixRows"), 1, Value.MAX_WIDTH);
-	static final Attribute<AttributeOption> ATTR_DOT_SHAPE
-		= Attributes.forOption("dotshape", Strings.getter("ioMatrixShape"),
-			new AttributeOption[] { SHAPE_CIRCLE, SHAPE_SQUARE });
+	static final AttributeOption SHAPE_CIRCLE = new AttributeOption("circle", Strings.getter("ioShapeCircle"));
+	static final AttributeOption SHAPE_SQUARE = new AttributeOption("square", Strings.getter("ioShapeSquare"));
+
+	static final Attribute<AttributeOption> ATTR_INPUT_TYPE = Attributes.forOption("inputtype",
+			Strings.getter("ioMatrixInput"), new AttributeOption[] { INPUT_COLUMN, INPUT_ROW, INPUT_SELECT });
+	static final Attribute<Integer> ATTR_MATRIX_COLS = Attributes.forIntegerRange("matrixcols",
+			Strings.getter("ioMatrixCols"), 1, Value.MAX_WIDTH);
+	static final Attribute<Integer> ATTR_MATRIX_ROWS = Attributes.forIntegerRange("matrixrows",
+			Strings.getter("ioMatrixRows"), 1, Value.MAX_WIDTH);
+	static final Attribute<AttributeOption> ATTR_DOT_SHAPE = Attributes.forOption("dotshape",
+			Strings.getter("ioMatrixShape"), new AttributeOption[] { SHAPE_CIRCLE, SHAPE_SQUARE });
 	static final Attribute<Integer> ATTR_PERSIST = new DurationAttribute("persist",
 			Strings.getter("ioMatrixPersistenceAttr"), 0, Integer.MAX_VALUE);
 
 	public DotMatrix() {
 		super("DotMatrix", Strings.getter("dotMatrixComponent"));
-		setAttributes(new Attribute<?>[] {
-				ATTR_INPUT_TYPE, ATTR_MATRIX_COLS, ATTR_MATRIX_ROWS,
-				Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR,
-				ATTR_PERSIST, ATTR_DOT_SHAPE
-			}, new Object[] {
-				INPUT_COLUMN, Integer.valueOf(5), Integer.valueOf(7),
-				Color.GREEN, Color.DARK_GRAY, Integer.valueOf(0), SHAPE_SQUARE
-			});
+		setAttributes(
+				new Attribute<?>[] { ATTR_INPUT_TYPE, ATTR_MATRIX_COLS, ATTR_MATRIX_ROWS, Io.ATTR_ON_COLOR,
+						Io.ATTR_OFF_COLOR, ATTR_PERSIST, ATTR_DOT_SHAPE },
+				new Object[] { INPUT_COLUMN, Integer.valueOf(5), Integer.valueOf(7), Color.GREEN, Color.DARK_GRAY,
+						Integer.valueOf(0), SHAPE_SQUARE });
 		setIconName("dotmat.gif");
 	}
 
@@ -91,13 +79,12 @@ public class DotMatrix extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_MATRIX_ROWS || attr == ATTR_MATRIX_COLS
-				|| attr == ATTR_INPUT_TYPE) {
+		if (attr == ATTR_MATRIX_ROWS || attr == ATTR_MATRIX_COLS || attr == ATTR_INPUT_TYPE) {
 			instance.recomputeBounds();
 			updatePorts(instance);
 		}
 	}
-	
+
 	private void updatePorts(Instance instance) {
 		Object input = instance.getAttributeValue(ATTR_INPUT_TYPE);
 		int rows = instance.getAttributeValue(ATTR_MATRIX_ROWS).intValue();
@@ -119,20 +106,17 @@ public class DotMatrix extends InstanceFactory {
 			} else if (cols <= 1) {
 				ps = new Port[] { new Port(0, 0, Port.INPUT, rows) };
 			} else {
-				ps = new Port[] {
-						new Port(0, 0, Port.INPUT, cols),
-						new Port(0, 10, Port.INPUT, rows)
-				};
+				ps = new Port[] { new Port(0, 0, Port.INPUT, cols), new Port(0, 10, Port.INPUT, rows) };
 			}
 		}
 		instance.setPorts(ps);
 	}
-	
+
 	private State getState(InstanceState state) {
 		int rows = state.getAttributeValue(ATTR_MATRIX_ROWS).intValue();
 		int cols = state.getAttributeValue(ATTR_MATRIX_COLS).intValue();
 		long clock = state.getTickCount();
-		
+
 		State data = (State) state.getData();
 		if (data == null) {
 			data = new State(rows, cols, clock);
@@ -150,7 +134,7 @@ public class DotMatrix extends InstanceFactory {
 		int cols = state.getAttributeValue(ATTR_MATRIX_COLS).intValue();
 		long clock = state.getTickCount();
 		long persist = clock + state.getAttributeValue(ATTR_PERSIST).intValue();
-		
+
 		State data = getState(state);
 		if (type == INPUT_ROW) {
 			for (int i = 0; i < rows; i++) {
@@ -187,13 +171,18 @@ public class DotMatrix extends InstanceFactory {
 				if (showState) {
 					Value val = data.get(j, i, ticks);
 					Color c;
-					if (val == Value.TRUE) c = onColor;
-					else if (val == Value.FALSE) c = offColor;
-					else c = Value.ERROR_COLOR;
+					if (val == Value.TRUE)
+						c = onColor;
+					else if (val == Value.FALSE)
+						c = offColor;
+					else
+						c = Value.ERROR_COLOR;
 					g.setColor(c);
-					
-					if (drawSquare) g.fillRect(x, y, 10, 10);
-					else g.fillOval(x + 1, y + 1, 8, 8);
+
+					if (drawSquare)
+						g.fillRect(x, y, 10, 10);
+					else
+						g.fillOval(x + 1, y + 1, 8, 8);
 				} else {
 					g.setColor(Color.GRAY);
 					g.fillOval(x + 1, y + 1, 8, 8);
@@ -206,19 +195,19 @@ public class DotMatrix extends InstanceFactory {
 		GraphicsUtil.switchToWidth(g, 1);
 		painter.drawPorts();
 	}
-	
+
 	private static class State implements InstanceData, Cloneable {
 		private int rows;
 		private int cols;
 		private Value[] grid;
 		private long[] persistTo;
-		
+
 		public State(int rows, int cols, long curClock) {
 			this.rows = -1;
 			this.cols = -1;
 			updateSize(rows, cols, curClock);
 		}
-		
+
 		@Override
 		public Object clone() {
 			try {
@@ -230,7 +219,7 @@ public class DotMatrix extends InstanceFactory {
 				return null;
 			}
 		}
-		
+
 		private void updateSize(int rows, int cols, long curClock) {
 			if (this.rows != rows || this.cols != cols) {
 				this.rows = rows;
@@ -242,7 +231,7 @@ public class DotMatrix extends InstanceFactory {
 				Arrays.fill(persistTo, curClock - 1);
 			}
 		}
-		
+
 		private Value get(int row, int col, long curTick) {
 			int index = row * cols + col;
 			Value ret = grid[index];
@@ -251,7 +240,7 @@ public class DotMatrix extends InstanceFactory {
 			}
 			return ret;
 		}
-		
+
 		private void setRow(int index, Value rowVector, long persist) {
 			int gridloc = (index + 1) * cols - 1;
 			int stride = -1;
@@ -267,7 +256,7 @@ public class DotMatrix extends InstanceFactory {
 				}
 			}
 		}
-		
+
 		private void setColumn(int index, Value colVector, long persist) {
 			int gridloc = (rows - 1) * cols + index;
 			int stride = -cols;
@@ -283,7 +272,7 @@ public class DotMatrix extends InstanceFactory {
 				}
 			}
 		}
-		
+
 		private void setSelect(Value rowVector, Value colVector, long persist) {
 			Value[] rowVals = rowVector.getAll();
 			Value[] colVals = colVector.getAll();
@@ -302,7 +291,8 @@ public class DotMatrix extends InstanceFactory {
 						}
 					}
 				} else {
-					if (wholeRow != Value.FALSE) wholeRow = Value.ERROR;
+					if (wholeRow != Value.FALSE)
+						wholeRow = Value.ERROR;
 					for (int j = colVals.length - 1; j >= 0; j--, gridloc++) {
 						if (grid[gridloc] == Value.TRUE) {
 							persistTo[gridloc] = persist - 1;

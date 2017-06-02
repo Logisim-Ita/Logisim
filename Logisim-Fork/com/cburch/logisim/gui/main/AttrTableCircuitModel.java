@@ -13,7 +13,7 @@ import com.cburch.logisim.proj.Project;
 public class AttrTableCircuitModel extends AttributeSetTableModel {
 	private Project proj;
 	private Circuit circ;
-	
+
 	public AttrTableCircuitModel(Project proj, Circuit circ) {
 		super(circ.getStaticAttributes());
 		this.proj = proj;
@@ -24,10 +24,9 @@ public class AttrTableCircuitModel extends AttributeSetTableModel {
 	public String getTitle() {
 		return Strings.get("circuitAttrTitle", circ.getName());
 	}
-	
+
 	@Override
-	public void setValueRequested(Attribute<Object> attr, Object value)
-			throws AttrTableSetException {
+	public void setValueRequested(Attribute<Object> attr, Object value) throws AttrTableSetException {
 		if (!proj.getLogisimFile().contains(circ)) {
 			String msg = Strings.get("cannotModifyCircuitError");
 			throw new AttrTableSetException(msg);
@@ -38,4 +37,3 @@ public class AttrTableCircuitModel extends AttributeSetTableModel {
 		}
 	}
 }
-

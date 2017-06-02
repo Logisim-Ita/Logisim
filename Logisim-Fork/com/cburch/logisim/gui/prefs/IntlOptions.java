@@ -30,19 +30,14 @@ class IntlOptions extends OptionsPanel {
 
 	public IntlOptions(PreferencesFrame window) {
 		super(window);
-		
+
 		locale = Strings.createLocaleSelector();
-		replAccents = new PrefBoolean(AppPreferences.ACCENTS_REPLACE,
-				Strings.getter("intlReplaceAccents"));
-		gateShape = new PrefOptionList(AppPreferences.GATE_SHAPE,
-				Strings.getter("intlGateShape"), new PrefOption[] {
-					new PrefOption(AppPreferences.SHAPE_SHAPED,
-							Strings.getter("shapeShaped")),
-					new PrefOption(AppPreferences.SHAPE_RECTANGULAR,
-							Strings.getter("shapeRectangular")),
-					new PrefOption(AppPreferences.SHAPE_DIN40700,
-							Strings.getter("shapeDIN40700")) });
-		
+		replAccents = new PrefBoolean(AppPreferences.ACCENTS_REPLACE, Strings.getter("intlReplaceAccents"));
+		gateShape = new PrefOptionList(AppPreferences.GATE_SHAPE, Strings.getter("intlGateShape"),
+				new PrefOption[] { new PrefOption(AppPreferences.SHAPE_SHAPED, Strings.getter("shapeShaped")),
+						new PrefOption(AppPreferences.SHAPE_RECTANGULAR, Strings.getter("shapeRectangular")),
+						new PrefOption(AppPreferences.SHAPE_DIN40700, Strings.getter("shapeDIN40700")) });
+
 		Box localePanel = new Box(BoxLayout.X_AXIS);
 		localePanel.add(Box.createGlue());
 		localePanel.add(localeLabel);
@@ -51,11 +46,11 @@ class IntlOptions extends OptionsPanel {
 		localePanel.add(locale);
 		locale.setAlignmentY(Component.TOP_ALIGNMENT);
 		localePanel.add(Box.createGlue());
-		
+
 		JPanel shapePanel = new JPanel();
 		shapePanel.add(gateShape.getJLabel());
 		shapePanel.add(gateShape.getJComboBox());
-		
+
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		add(Box.createGlue());
 		add(shapePanel);
@@ -63,7 +58,7 @@ class IntlOptions extends OptionsPanel {
 		add(replAccents);
 		add(Box.createGlue());
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return Strings.get("intlTitle");
@@ -73,7 +68,7 @@ class IntlOptions extends OptionsPanel {
 	public String getHelpText() {
 		return Strings.get("intlHelp");
 	}
-	
+
 	@Override
 	public void localeChanged() {
 		gateShape.localeChanged();

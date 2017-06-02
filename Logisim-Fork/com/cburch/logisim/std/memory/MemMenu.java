@@ -36,12 +36,13 @@ class MemMenu implements ActionListener, MenuExtender {
 		this.factory = factory;
 		this.instance = instance;
 	}
-		
+
+	@Override
 	public void configureMenu(JPopupMenu menu, Project proj) {
 		this.proj = proj;
 		this.frame = proj.getFrame();
-		this.circState = proj.getCircuitState();    
-		
+		this.circState = proj.getCircuitState();
+
 		Object attrs = instance.getAttributeSet();
 		if (attrs instanceof RomAttributes) {
 			((RomAttributes) attrs).setProject(proj);
@@ -67,17 +68,23 @@ class MemMenu implements ActionListener, MenuExtender {
 		return ret;
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent evt) {
 		Object src = evt.getSource();
-		if (src == edit) doEdit();
-		else if (src == clear) doClear();
-		else if (src == load) doLoad();
-		else if (src == save) doSave();
+		if (src == edit)
+			doEdit();
+		else if (src == clear)
+			doClear();
+		else if (src == load)
+			doLoad();
+		else if (src == save)
+			doSave();
 	}
 
 	private void doEdit() {
 		MemState s = factory.getState(instance, circState);
-		if (s == null) return;
+		if (s == null)
+			return;
 		HexFrame frame = factory.getHexFrame(proj, instance, circState);
 		frame.setVisible(true);
 		frame.toFront();
@@ -86,12 +93,11 @@ class MemMenu implements ActionListener, MenuExtender {
 	private void doClear() {
 		MemState s = factory.getState(instance, circState);
 		boolean isAllZero = s.getContents().isClear();
-		if (isAllZero) return;
+		if (isAllZero)
+			return;
 
-		int choice = JOptionPane.showConfirmDialog(frame,
-				Strings.get("ramConfirmClearMsg"),
-				Strings.get("ramConfirmClearTitle"),
-				JOptionPane.YES_NO_OPTION);
+		int choice = JOptionPane.showConfirmDialog(frame, Strings.get("ramConfirmClearMsg"),
+				Strings.get("ramConfirmClearTitle"), JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
 			s.getContents().clear();
 		}
@@ -100,7 +106,8 @@ class MemMenu implements ActionListener, MenuExtender {
 	private void doLoad() {
 		JFileChooser chooser = proj.createChooser();
 		File oldSelected = factory.getCurrentImage(instance);
-		if (oldSelected != null) chooser.setSelectedFile(oldSelected);
+		if (oldSelected != null)
+			chooser.setSelectedFile(oldSelected);
 		chooser.setDialogTitle(Strings.get("ramLoadDialogTitle"));
 		int choice = chooser.showOpenDialog(frame);
 		if (choice == JFileChooser.APPROVE_OPTION) {
@@ -108,8 +115,8 @@ class MemMenu implements ActionListener, MenuExtender {
 			try {
 				factory.loadImage(circState.getInstanceState(instance), f);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(frame, e.getMessage(),
-						Strings.get("ramLoadErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(frame, e.getMessage(), Strings.get("ramLoadErrorTitle"),
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -119,7 +126,8 @@ class MemMenu implements ActionListener, MenuExtender {
 
 		JFileChooser chooser = proj.createChooser();
 		File oldSelected = factory.getCurrentImage(instance);
-		if (oldSelected != null) chooser.setSelectedFile(oldSelected);
+		if (oldSelected != null)
+			chooser.setSelectedFile(oldSelected);
 		chooser.setDialogTitle(Strings.get("ramSaveDialogTitle"));
 		int choice = chooser.showSaveDialog(frame);
 		if (choice == JFileChooser.APPROVE_OPTION) {
@@ -128,8 +136,8 @@ class MemMenu implements ActionListener, MenuExtender {
 				HexFile.save(f, s.getContents());
 				factory.setCurrentImage(instance, f);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(frame, e.getMessage(),
-					Strings.get("ramSaveErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(frame, e.getMessage(), Strings.get("ramSaveErrorTitle"),
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

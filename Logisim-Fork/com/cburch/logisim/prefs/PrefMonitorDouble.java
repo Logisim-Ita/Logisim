@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
 class PrefMonitorDouble extends AbstractPrefMonitor<Double> {
 	private double dflt;
 	private double value;
-	
+
 	PrefMonitorDouble(String name, double dflt) {
 		super(name);
 		this.dflt = dflt;
@@ -18,11 +18,13 @@ class PrefMonitorDouble extends AbstractPrefMonitor<Double> {
 		set(Double.valueOf(prefs.getDouble(name, dflt)));
 		prefs.addPreferenceChangeListener(this);
 	}
-	
+
+	@Override
 	public Double get() {
 		return Double.valueOf(value);
 	}
-	
+
+	@Override
 	public void set(Double newValue) {
 		double newVal = newValue.doubleValue();
 		if (value != newVal) {
@@ -30,6 +32,7 @@ class PrefMonitorDouble extends AbstractPrefMonitor<Double> {
 		}
 	}
 
+	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		Preferences prefs = event.getNode();
 		String prop = event.getKey();
@@ -39,8 +42,7 @@ class PrefMonitorDouble extends AbstractPrefMonitor<Double> {
 			double newValue = prefs.getDouble(name, dflt);
 			if (newValue != oldValue) {
 				value = newValue;
-				AppPreferences.firePropertyChange(name,
-						Double.valueOf(oldValue), Double.valueOf(newValue));
+				AppPreferences.firePropertyChange(name, Double.valueOf(oldValue), Double.valueOf(newValue));
 			}
 		}
 	}

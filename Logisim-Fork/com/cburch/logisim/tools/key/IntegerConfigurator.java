@@ -9,12 +9,11 @@ public class IntegerConfigurator extends NumericConfigurator<Integer> {
 	public IntegerConfigurator(Attribute<Integer> attr, int min, int max, int modifiersEx) {
 		super(attr, min, max, modifiersEx);
 	}
-	
-	public IntegerConfigurator(Attribute<Integer> attr, int min, int max,
-			int modifiersEx, int radix) {
+
+	public IntegerConfigurator(Attribute<Integer> attr, int min, int max, int modifiersEx, int radix) {
 		super(attr, min, max, modifiersEx, radix);
 	}
-	
+
 	@Override
 	protected Integer createValue(int val) {
 		return Integer.valueOf(val);

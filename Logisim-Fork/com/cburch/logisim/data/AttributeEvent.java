@@ -8,8 +8,7 @@ public class AttributeEvent {
 	private Attribute<?> attr;
 	private Object value;
 
-	public AttributeEvent(AttributeSet source, Attribute<?> attr,
-			Object value) {
+	public AttributeEvent(AttributeSet source, Attribute<?> attr, Object value) {
 		this.source = source;
 		this.attr = attr;
 		this.value = value;
@@ -19,9 +18,15 @@ public class AttributeEvent {
 		this(source, null, null);
 	}
 
-	public Attribute<?> getAttribute() { return attr; }
+	public Attribute<?> getAttribute() {
+		return attr;
+	}
 
-	public AttributeSet getSource() { return source; }
+	public AttributeSet getSource() {
+		return source;
+	}
 
-	public Object getValue() { return value; }
+	public Object getValue() {
+		return value;
+	}
 }

@@ -13,6 +13,7 @@ import javax.swing.JPopupMenu;
 
 public abstract class EditPopup extends JPopupMenu {
 	private class Listener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object source = e.getSource();
 			for (Map.Entry<LogisimMenuItem, JMenuItem> entry : items.entrySet()) {
@@ -23,38 +24,50 @@ public abstract class EditPopup extends JPopupMenu {
 			}
 		}
 	}
-	
+
 	private Listener listener;
 	private Map<LogisimMenuItem, JMenuItem> items;
-	
+
 	public EditPopup() {
 		this(false);
 	}
-	
+
 	public EditPopup(boolean waitForInitialize) {
 		listener = new Listener();
 		items = new HashMap<LogisimMenuItem, JMenuItem>();
-		if (!waitForInitialize) initialize();
+		if (!waitForInitialize)
+			initialize();
 	}
-	
+
 	protected void initialize() {
 		boolean x = false;
 		x |= add(LogisimMenuBar.CUT, Strings.get("editCutItem"));
 		x |= add(LogisimMenuBar.COPY, Strings.get("editCopyItem"));
-		if (x) { addSeparator(); x = false; }
+		if (x) {
+			addSeparator();
+			x = false;
+		}
 		x |= add(LogisimMenuBar.DELETE, Strings.get("editClearItem"));
 		x |= add(LogisimMenuBar.DUPLICATE, Strings.get("editDuplicateItem"));
-		if (x) { addSeparator(); x = false; }
+		if (x) {
+			addSeparator();
+			x = false;
+		}
 		x |= add(LogisimMenuBar.RAISE, Strings.get("editRaiseItem"));
 		x |= add(LogisimMenuBar.LOWER, Strings.get("editLowerItem"));
 		x |= add(LogisimMenuBar.RAISE_TOP, Strings.get("editRaiseTopItem"));
 		x |= add(LogisimMenuBar.LOWER_BOTTOM, Strings.get("editLowerBottomItem"));
-		if (x) { addSeparator(); x = false; }
+		if (x) {
+			addSeparator();
+			x = false;
+		}
 		x |= add(LogisimMenuBar.ADD_CONTROL, Strings.get("editAddControlItem"));
 		x |= add(LogisimMenuBar.REMOVE_CONTROL, Strings.get("editRemoveControlItem"));
-		if (!x && getComponentCount() > 0) { remove(getComponentCount() - 1); }
+		if (!x && getComponentCount() > 0) {
+			remove(getComponentCount() - 1);
+		}
 	}
-	
+
 	private boolean add(LogisimMenuItem item, String display) {
 		if (shouldShow(item)) {
 			JMenuItem menu = new JMenuItem(display);
@@ -67,10 +80,10 @@ public abstract class EditPopup extends JPopupMenu {
 			return false;
 		}
 	}
-	
+
 	protected abstract boolean shouldShow(LogisimMenuItem item);
-	
+
 	protected abstract boolean isEnabled(LogisimMenuItem item);
-	
+
 	protected abstract void fire(LogisimMenuItem item);
 }

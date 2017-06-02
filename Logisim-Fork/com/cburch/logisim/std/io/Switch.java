@@ -24,21 +24,18 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
+
 //all based on normal button
 public class Switch extends InstanceFactory {
 	private static final int DEPTH = 3;
 
 	public Switch() {
 		super("Switch", Strings.getter("switchComponent"));
-		setAttributes(new Attribute[] {
-				StdAttr.FACING, Io.ATTR_COLOR,
-				StdAttr.LABEL, Io.ATTR_LABEL_LOC,
-				StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR
-			}, new Object[] {
-				Direction.EAST, Color.WHITE,
-				"", Io.LABEL_CENTER,
-				StdAttr.DEFAULT_LABEL_FONT, Color.BLACK
-			});
+		setAttributes(
+				new Attribute[] { StdAttr.FACING, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
+						Io.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, Color.WHITE, "", Io.LABEL_CENTER, StdAttr.DEFAULT_LABEL_FONT,
+						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("switch.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -49,7 +46,7 @@ public class Switch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		//changed to a rectangle
+		// changed to a rectangle
 		return Bounds.create(-20, -15, 20, 30).rotate(Direction.EAST, facing, 0, 0);
 	}
 
@@ -58,7 +55,7 @@ public class Switch extends InstanceFactory {
 		instance.addAttributeListener();
 		computeTextField(instance);
 	}
-	
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
@@ -103,9 +100,8 @@ public class Switch extends InstanceFactory {
 				valign = GraphicsUtil.V_BOTTOM;
 			}
 		}
-		
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT,
-				x, y, halign, valign);
+
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
 	}
 
 	@Override
@@ -114,16 +110,16 @@ public class Switch extends InstanceFactory {
 		Value val = data == null ? Value.FALSE : (Value) data.getValue();
 		state.setPort(0, val, 1);
 	}
-	
+
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		//draw
+		// draw
 		Bounds bds = painter.getBounds();
-		int x = bds.getX(); //x position
-		int y = bds.getY(); //y position
-		int w = bds.getWidth(); //width
-		int h = bds.getHeight(); //height
-		int circle=4; //0 symbol radius
+		int x = bds.getX(); // x position
+		int y = bds.getY(); // y position
+		int w = bds.getWidth(); // width
+		int h = bds.getHeight(); // height
+		int circle = 4; // 0 symbol radius
 		int[] xp;
 		int[] yp;
 		int[] xr;
@@ -136,47 +132,59 @@ public class Switch extends InstanceFactory {
 		} else {
 			val = Value.FALSE;
 		}
-		
+
 		Color color = painter.getAttributeValue(Io.ATTR_COLOR);
 		if (!painter.shouldDrawColor()) {
 			int hue = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
 			color = new Color(hue, hue, hue);
 		}
-		
+
 		Graphics g = painter.getGraphics();
 		int depress;
-		if (val == Value.TRUE) { //case true output
+		if (val == Value.TRUE) { // case true output
 			Object labelLoc = painter.getAttributeValue(Io.ATTR_LABEL_LOC);
-			if (labelLoc == Io.LABEL_CENTER || labelLoc == Direction.NORTH
-					|| labelLoc == Direction.WEST) {
+			if (labelLoc == Io.LABEL_CENTER || labelLoc == Direction.NORTH || labelLoc == Direction.WEST) {
 				depress = DEPTH;
 			} else {
 				depress = 0;
 			}
-			
+
 			if (facing == Direction.NORTH || facing == Direction.WEST) {
 				Location p = painter.getLocation();
 				int px = p.getX();
 				int py = p.getY();
 				GraphicsUtil.switchToWidth(g, Wire.WIDTH);
 				g.setColor(Value.TRUE_COLOR);
-				if (facing == Direction.NORTH) g.drawLine(px, py, px, py + 10);
-				else                          g.drawLine(px, py, px + 10, py);
+				if (facing == Direction.NORTH)
+					g.drawLine(px, py, px, py + 10);
+				else
+					g.drawLine(px, py, px + 10, py);
 				GraphicsUtil.switchToWidth(g, 1);
 			}
-			
-			if(facing==Direction.NORTH||facing==Direction.SOUTH){//horizontal
-				xp = new int[] {x, x + w - DEPTH, x + w, x + w, x};//grey polygon x points
-				yp = new int[] {y + DEPTH, y, y + DEPTH, y + h, y + h}; // grey poligon y points
-				xr = new int[] {x, x + w - DEPTH, x + w - DEPTH, x}; //white polygon x points
-				yr = new int[] {y + DEPTH, y, y + h - DEPTH, y + h}; //white poligon y points
 
-			}
-			else{//vertical
-				xp = new int[] {x + DEPTH, x + w, x + w, x + DEPTH, x};
-				yp = new int[] {y, y, y + h, y + h, y + DEPTH};
-				xr = new int[] {x, x + w - DEPTH, x + w, x + DEPTH};
-				yr = new int[] {y + DEPTH, y + DEPTH, y + h, y + h};
+			if (facing == Direction.NORTH || facing == Direction.SOUTH) {// horizontal
+				xp = new int[] { x, x + w - DEPTH, x + w, x + w, x };// grey
+																		// polygon
+																		// x
+																		// points
+				yp = new int[] { y + DEPTH, y, y + DEPTH, y + h, y + h }; // grey
+																			// poligon
+																			// y
+																			// points
+				xr = new int[] { x, x + w - DEPTH, x + w - DEPTH, x }; // white
+																		// polygon
+																		// x
+																		// points
+				yr = new int[] { y + DEPTH, y, y + h - DEPTH, y + h }; // white
+																		// poligon
+																		// y
+																		// points
+
+			} else {// vertical
+				xp = new int[] { x + DEPTH, x + w, x + w, x + DEPTH, x };
+				yp = new int[] { y, y, y + h, y + h, y + DEPTH };
+				xr = new int[] { x, x + w - DEPTH, x + w, x + DEPTH };
+				yr = new int[] { y + DEPTH, y + DEPTH, y + h, y + h };
 			}
 			g.setColor(color.darker());
 			g.fillPolygon(xp, yp, xp.length);
@@ -185,31 +193,34 @@ public class Switch extends InstanceFactory {
 			g.setColor(Color.BLACK);
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
-			if(facing==Direction.NORTH||facing==Direction.SOUTH){
-				g.drawLine(x + ((w-DEPTH)/2) ,y + (DEPTH/2) , x + ((w-DEPTH)/2), y + h - (DEPTH/2));
+			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+				g.drawLine(x + ((w - DEPTH) / 2), y + (DEPTH / 2), x + ((w - DEPTH) / 2), y + h - (DEPTH / 2));
 				g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);
-				g.drawLine(x + ((w-DEPTH)/6), y + ((h-DEPTH)/2) + (DEPTH-DEPTH/6), x + ((w-DEPTH)/3),y + ((h-DEPTH)/2)+(DEPTH-DEPTH/3));
-				g.drawOval(x+((w-DEPTH)*3/4)-(circle/2), y+((h-DEPTH)/2-(circle/2))+ (DEPTH/4), circle, circle);
-			}
-			else{
+				g.drawLine(x + ((w - DEPTH) / 6), y + ((h - DEPTH) / 2) + (DEPTH - DEPTH / 6), x + ((w - DEPTH) / 3),
+						y + ((h - DEPTH) / 2) + (DEPTH - DEPTH / 3));
+				g.drawOval(x + ((w - DEPTH) * 3 / 4) - (circle / 2), y + ((h - DEPTH) / 2 - (circle / 2)) + (DEPTH / 4),
+						circle, circle);
+			} else {
 				g.drawLine(x + w - DEPTH, y + DEPTH, x + w, y);
-				g.drawLine(x + (DEPTH/2), y + ((h-DEPTH)/2)+DEPTH, x + w - (DEPTH/2), y + ((h-DEPTH)/2)+DEPTH);
-				g.drawLine(x + ((w-DEPTH)/2)+ (DEPTH-DEPTH/6), y + ((h-DEPTH)*5/6) + DEPTH, x + ((w-DEPTH)/2)+ (DEPTH-DEPTH/3), y + ((h-DEPTH)*2/3) + DEPTH);
-				g.drawOval(x+(DEPTH/4)+((w-DEPTH-circle)/2), y+((h-DEPTH)/4-(circle/2))+ DEPTH, circle, circle);
+				g.drawLine(x + (DEPTH / 2), y + ((h - DEPTH) / 2) + DEPTH, x + w - (DEPTH / 2),
+						y + ((h - DEPTH) / 2) + DEPTH);
+				g.drawLine(x + ((w - DEPTH) / 2) + (DEPTH - DEPTH / 6), y + ((h - DEPTH) * 5 / 6) + DEPTH,
+						x + ((w - DEPTH) / 2) + (DEPTH - DEPTH / 3), y + ((h - DEPTH) * 2 / 3) + DEPTH);
+				g.drawOval(x + (DEPTH / 4) + ((w - DEPTH - circle) / 2), y + ((h - DEPTH) / 4 - (circle / 2)) + DEPTH,
+						circle, circle);
 			}
-		} else { //csse false output
+		} else { // csse false output
 			depress = 0;
-			if(facing==Direction.NORTH||facing==Direction.SOUTH){
-				xp = new int[] {x, x + DEPTH, x + w, x + w, x};
-				yp = new int[] {y + DEPTH, y, y + DEPTH, y + h, y + h};
-				xr = new int[] {x + DEPTH, x + w, x + w, x + DEPTH};
-				yr = new int[] {y, y + DEPTH, y + h, y + h - DEPTH};
-			}
-			else{
-				xp = new int[] {x + DEPTH, x + w, x + w, x + DEPTH, x};
-				yp = new int[] {y, y, y + h, y + h, y + h - DEPTH};
-				xr = new int[] {x + DEPTH, x + w, x + w - DEPTH, x};
-				yr = new int[] {y, y, y + h - DEPTH, y + h - DEPTH};	
+			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+				xp = new int[] { x, x + DEPTH, x + w, x + w, x };
+				yp = new int[] { y + DEPTH, y, y + DEPTH, y + h, y + h };
+				xr = new int[] { x + DEPTH, x + w, x + w, x + DEPTH };
+				yr = new int[] { y, y + DEPTH, y + h, y + h - DEPTH };
+			} else {
+				xp = new int[] { x + DEPTH, x + w, x + w, x + DEPTH, x };
+				yp = new int[] { y, y, y + h, y + h, y + h - DEPTH };
+				xr = new int[] { x + DEPTH, x + w, x + w - DEPTH, x };
+				yr = new int[] { y, y, y + h - DEPTH, y + h - DEPTH };
 			}
 			g.setColor(color.darker());
 			g.fillPolygon(xp, yp, xp.length);
@@ -218,36 +229,51 @@ public class Switch extends InstanceFactory {
 			g.setColor(Color.BLACK);
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
-			if(facing==Direction.NORTH||facing==Direction.SOUTH){
+			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
 				g.drawLine(x + DEPTH, y + h - DEPTH, x, y + h);
-				g.drawLine(x + ((w-DEPTH)/2) + DEPTH, y + (DEPTH/2) , x + ((w-DEPTH)/2) + DEPTH, y + h - (DEPTH/2));
-				g.drawLine(x + DEPTH + (w/6),y + ((h-DEPTH)/2) + (DEPTH/6),x + DEPTH + (w/3),y + ((h-DEPTH)/2) + (DEPTH/3));
-				g.drawOval(x+((w-DEPTH)*3/4)-(circle/2)+DEPTH, y+((h-DEPTH)/2-(circle/2))+ (DEPTH*3/4), circle, circle);
-			}
-			else{
-				g.drawLine(x + (DEPTH/2), y + ((h-DEPTH)/2), x + w - (DEPTH/2), y + ((h-DEPTH)/2));
-				g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);	
-				g.drawLine(x + ((w-DEPTH)/2)+ (DEPTH/6), y + ((h-DEPTH)*5/6), x + ((w-DEPTH)/2)+ (DEPTH/3), y + ((h-DEPTH)*2/3));
-				g.drawOval(x+(DEPTH*3/4)+((w-DEPTH-circle)/2), y+((h-DEPTH)/4-(circle/2)), circle, circle);
+				g.drawLine(x + ((w - DEPTH) / 2) + DEPTH, y + (DEPTH / 2), x + ((w - DEPTH) / 2) + DEPTH,
+						y + h - (DEPTH / 2));
+				g.drawLine(x + DEPTH + (w / 6), y + ((h - DEPTH) / 2) + (DEPTH / 6), x + DEPTH + (w / 3),
+						y + ((h - DEPTH) / 2) + (DEPTH / 3));
+				g.drawOval(x + ((w - DEPTH) * 3 / 4) - (circle / 2) + DEPTH,
+						y + ((h - DEPTH) / 2 - (circle / 2)) + (DEPTH * 3 / 4), circle, circle);
+			} else {
+				g.drawLine(x + (DEPTH / 2), y + ((h - DEPTH) / 2), x + w - (DEPTH / 2), y + ((h - DEPTH) / 2));
+				g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);
+				g.drawLine(x + ((w - DEPTH) / 2) + (DEPTH / 6), y + ((h - DEPTH) * 5 / 6),
+						x + ((w - DEPTH) / 2) + (DEPTH / 3), y + ((h - DEPTH) * 2 / 3));
+				g.drawOval(x + (DEPTH * 3 / 4) + ((w - DEPTH - circle) / 2), y + ((h - DEPTH) / 4 - (circle / 2)),
+						circle, circle);
 			}
 		}
-		
+
 		g.translate(depress, depress);
 		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		g.translate(-depress, -depress);
 		painter.drawPorts();
 	}
-	
+
 	public static class Poker extends InstancePoker {
 		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) { //on mouse released check the value and set the opposite
+		public void mouseReleased(InstanceState state, MouseEvent e) { // on
+																		// mouse
+																		// released
+																		// check
+																		// the
+																		// value
+																		// and
+																		// set
+																		// the
+																		// opposite
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			Value val = data == null ? Value.FALSE : (Value) data.getValue();
-			if(val==Value.TRUE) setValue(state, Value.FALSE);
-			else setValue(state, Value.TRUE);
+			if (val == Value.TRUE)
+				setValue(state, Value.FALSE);
+			else
+				setValue(state, Value.TRUE);
 		}
-		
+
 		private void setValue(InstanceState state, Value val) {
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			if (data == null) {

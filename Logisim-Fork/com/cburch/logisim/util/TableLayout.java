@@ -18,14 +18,14 @@ public class TableLayout implements LayoutManager2 {
 	private int[] prefRow;
 	private int[] prefCol;
 	private double[] rowWeight;
-	
+
 	public TableLayout(int colCount) {
 		this.colCount = colCount;
 		this.contents = new ArrayList<Component[]>();
 		this.curRow = 0;
 		this.curCol = 0;
 	}
-	
+
 	public void setRowWeight(int rowIndex, double weight) {
 		if (weight < 0) {
 			throw new IllegalArgumentException("weight must be nonnegative");
@@ -35,12 +35,14 @@ public class TableLayout implements LayoutManager2 {
 		}
 		if ((rowWeight == null || rowIndex >= rowWeight.length) && weight != 0.0) {
 			double[] a = new double[rowIndex + 10];
-			if (rowWeight != null) System.arraycopy(rowWeight, 0, a, 0, rowWeight.length);
+			if (rowWeight != null)
+				System.arraycopy(rowWeight, 0, a, 0, rowWeight.length);
 			rowWeight = a;
 		}
 		rowWeight[rowIndex] = weight;
 	}
 
+	@Override
 	public void addLayoutComponent(String name, Component comp) {
 		while (curRow >= contents.size()) {
 			contents.add(new Component[colCount]);
@@ -55,15 +57,19 @@ public class TableLayout implements LayoutManager2 {
 		prefs = null;
 	}
 
+	@Override
 	public void addLayoutComponent(Component comp, Object constraints) {
 		if (constraints instanceof TableConstraints) {
 			TableConstraints con = (TableConstraints) constraints;
-			if (con.getRow() >= 0) curRow = con.getRow();
-			if (con.getCol() >= 0) curCol = con.getCol();
+			if (con.getRow() >= 0)
+				curRow = con.getRow();
+			if (con.getCol() >= 0)
+				curCol = con.getCol();
 		}
 		addLayoutComponent("", comp);
 	}
 
+	@Override
 	public void removeLayoutComponent(Component comp) {
 		for (int i = 0, n = contents.size(); i < n; i++) {
 			Component[] row = contents.get(i);
@@ -77,10 +83,11 @@ public class TableLayout implements LayoutManager2 {
 		prefs = null;
 	}
 
+	@Override
 	public Dimension preferredLayoutSize(Container parent) {
 		if (prefs == null) {
 			int[] prefCol = new int[colCount];
-			int[] prefRow = new int[contents.size()]; 
+			int[] prefRow = new int[contents.size()];
 			int height = 0;
 			for (int i = 0; i < prefRow.length; i++) {
 				Component[] row = contents.get(i);
@@ -88,8 +95,10 @@ public class TableLayout implements LayoutManager2 {
 				for (int j = 0; j < row.length; j++) {
 					if (row[j] != null) {
 						Dimension dim = row[j].getPreferredSize();
-						if (dim.height > rowHeight) rowHeight = dim.height;
-						if (dim.width > prefCol[j]) prefCol[j] = dim.width;
+						if (dim.height > rowHeight)
+							rowHeight = dim.height;
+						if (dim.width > prefCol[j])
+							prefCol[j] = dim.width;
 					}
 				}
 				prefRow[i] = rowHeight;
@@ -106,28 +115,33 @@ public class TableLayout implements LayoutManager2 {
 		return new Dimension(prefs);
 	}
 
+	@Override
 	public Dimension minimumLayoutSize(Container parent) {
 		return preferredLayoutSize(parent);
 	}
 
+	@Override
 	public Dimension maximumLayoutSize(Container parent) {
 		return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 
+	@Override
 	public float getLayoutAlignmentX(Container parent) {
 		return 0.5f;
 	}
 
+	@Override
 	public float getLayoutAlignmentY(Container parent) {
 		return 0.5f;
 	}
 
+	@Override
 	public void layoutContainer(Container parent) {
 		Dimension pref = preferredLayoutSize(parent);
 		int[] prefRow = this.prefRow;
 		int[] prefCol = this.prefCol;
 		Dimension size = parent.getSize();
-		
+
 		double y0;
 		int yRemaining = size.height - pref.height;
 		double rowWeightTotal = 0.0;
@@ -141,9 +155,10 @@ public class TableLayout implements LayoutManager2 {
 		} else {
 			y0 = 0;
 		}
-		
+
 		int x0 = (size.width - pref.width) / 2;
-		if (x0 < 0) x0 = 0;
+		if (x0 < 0)
+			x0 = 0;
 		double y = y0;
 		int i = -1;
 		for (Component[] row : contents) {
@@ -162,12 +177,12 @@ public class TableLayout implements LayoutManager2 {
 				y += yRemaining * rowWeight[i] / rowWeightTotal;
 			}
 		}
-		
-		
+
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
 	public void invalidateLayout(Container parent) {
 		prefs = null;
 	}

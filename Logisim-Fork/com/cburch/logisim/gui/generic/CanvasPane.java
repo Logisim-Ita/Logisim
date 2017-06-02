@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
 import com.cburch.logisim.util.MacCompatibility;
@@ -22,14 +23,24 @@ public class CanvasPane extends JScrollPane {
 		//
 		// ComponentListener methods
 		//
+		@Override
 		public void componentResized(ComponentEvent e) {
 			contents.recomputeSize();
 		}
 
-		public void componentMoved(ComponentEvent e) { }
-		public void componentShown(ComponentEvent e) { }
-		public void componentHidden(ComponentEvent e) { }
+		@Override
+		public void componentMoved(ComponentEvent e) {
+		}
 
+		@Override
+		public void componentShown(ComponentEvent e) {
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
+		}
+
+		@Override
 		public void propertyChange(PropertyChangeEvent e) {
 			String prop = e.getPropertyName();
 			if (prop.equals(ZoomModel.ZOOM)) {
@@ -37,7 +48,6 @@ public class CanvasPane extends JScrollPane {
 				Rectangle r = getViewport().getViewRect();
 				double cx = (r.x + r.width / 2) / oldZoom;
 				double cy = (r.y + r.height / 2) / oldZoom;
-
 
 				double newZoom = ((Double) e.getNewValue()).doubleValue();
 				contents.recomputeSize();
@@ -53,21 +63,21 @@ public class CanvasPane extends JScrollPane {
 	private CanvasPaneContents contents;
 	private Listener listener;
 	private ZoomModel zoomModel;
-	
+
 	public CanvasPane(CanvasPaneContents contents) {
 		super((Component) contents);
 		this.contents = contents;
 		this.listener = new Listener();
 		this.zoomModel = null;
 		if (MacCompatibility.mrjVersion >= 0.0) {
-			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+			setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+			setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		}
 
 		addComponentListener(listener);
 		contents.setCanvasPane(this);
 	}
-	
+
 	public void setZoomModel(ZoomModel model) {
 		ZoomModel oldModel = zoomModel;
 		if (oldModel != null) {
@@ -78,22 +88,20 @@ public class CanvasPane extends JScrollPane {
 			model.addPropertyChangeListener(ZoomModel.ZOOM, listener);
 		}
 	}
-	
+
 	public double getZoomFactor() {
 		ZoomModel model = zoomModel;
 		return model == null ? 1.0 : model.getZoomFactor();
 	}
-	
+
 	public Dimension getViewportSize() {
 		Dimension size = new Dimension();
 		getViewport().getSize(size);
 		return size;
 	}
 
-	public int supportScrollableBlockIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
-		int unit = supportScrollableUnitIncrement(visibleRect, orientation,
-			direction);
+	public int supportScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		int unit = supportScrollableUnitIncrement(visibleRect, orientation, direction);
 		if (direction == SwingConstants.VERTICAL) {
 			return visibleRect.height / unit * unit;
 		} else {
@@ -101,12 +109,11 @@ public class CanvasPane extends JScrollPane {
 		}
 	}
 
-	public int supportScrollableUnitIncrement(Rectangle visibleRect,
-			int orientation, int direction) {
+	public int supportScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
 		double zoom = getZoomFactor();
 		return (int) Math.round(10 * zoom);
 	}
-	
+
 	public Dimension supportPreferredSize(int width, int height) {
 		double zoom = getZoomFactor();
 		if (zoom != 1.0) {
@@ -114,8 +121,10 @@ public class CanvasPane extends JScrollPane {
 			height = (int) Math.ceil(height * zoom);
 		}
 		Dimension minSize = getViewportSize();
-		if (minSize.width > width) width = minSize.width;
-		if (minSize.height > height) height = minSize.height;
+		if (minSize.width > width)
+			width = minSize.width;
+		if (minSize.height > height)
+			height = minSize.height;
 		return new Dimension(width, height);
 	}
 }

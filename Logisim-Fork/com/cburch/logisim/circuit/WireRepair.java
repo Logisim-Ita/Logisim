@@ -19,12 +19,12 @@ import com.cburch.logisim.data.Location;
 class WireRepair extends CircuitTransaction {
 
 	private static class MergeSets {
-		private final HashMap<Wire,ArrayList<Wire>> map;
-		
+		private final HashMap<Wire, ArrayList<Wire>> map;
+
 		MergeSets() {
-			map = new HashMap<Wire,ArrayList<Wire>>();
+			map = new HashMap<Wire, ArrayList<Wire>>();
 		}
-		
+
 		void merge(Wire a, Wire b) {
 			ArrayList<Wire> set0 = map.get(a);
 			ArrayList<Wire> set1 = map.get(b);
@@ -40,7 +40,8 @@ class WireRepair extends CircuitTransaction {
 			} else if (set0 != null && set1 == null) {
 				set0.add(b);
 				map.put(b, set0);
-			} else if (set0 != set1) { // neither is null, and they are different
+			} else if (set0 != set1) { // neither is null, and they are
+										// different
 				if (set0.size() > set1.size()) { // ensure set1 is the larger
 					ArrayList<Wire> temp = set0;
 					set0 = set1;
@@ -52,10 +53,10 @@ class WireRepair extends CircuitTransaction {
 				}
 			}
 		}
-		
+
 		Collection<ArrayList<Wire>> getMergeSets() {
-			IdentityHashMap<ArrayList<Wire>,Boolean> lists;
-			lists = new IdentityHashMap<ArrayList<Wire>,Boolean>();
+			IdentityHashMap<ArrayList<Wire>, Boolean> lists;
+			lists = new IdentityHashMap<ArrayList<Wire>, Boolean>();
 			for (ArrayList<Wire> list : map.values()) {
 				lists.put(list, Boolean.TRUE);
 			}
@@ -64,13 +65,13 @@ class WireRepair extends CircuitTransaction {
 	}
 
 	private Circuit circuit;
-	
+
 	public WireRepair(Circuit circuit) {
 		this.circuit = circuit;
 	}
 
 	@Override
-	protected Map<Circuit,Integer> getAccessedCircuits() {
+	protected Map<Circuit, Integer> getAccessedCircuits() {
 		return Collections.singletonMap(circuit, READ_WRITE);
 	}
 
@@ -80,22 +81,14 @@ class WireRepair extends CircuitTransaction {
 		doOverlaps(mutator);
 		doSplits(mutator);
 	}
-	
-	/* for debugging:
-	private void printWires(String prefix, PrintStream out) {
-		boolean first = true;
-		for (Wire w : circuit.getWires()) {
-			if (first) {
-				out.println(prefix + ": " + w);
-				first = false;
-			} else {
-				out.println("      " + w);
-			}
-		}
-		out.println(prefix + ": none");
-	}
-	*/
-	
+
+	/*
+	 * for debugging: private void printWires(String prefix, PrintStream out) {
+	 * boolean first = true; for (Wire w : circuit.getWires()) { if (first) {
+	 * out.println(prefix + ": " + w); first = false; } else { out.println(
+	 * "      " + w); } } out.println(prefix + ": none"); }
+	 */
+
 	private void doMerges(CircuitMutator mutator) {
 		MergeSets sets = new MergeSets();
 		for (Location loc : circuit.wires.points.getSplitLocations()) {
@@ -137,10 +130,10 @@ class WireRepair extends CircuitTransaction {
 		}
 		mutator.replace(circuit, repl);
 	}
-	
+
 	private void doOverlaps(CircuitMutator mutator) {
-		HashMap<Location,ArrayList<Wire>> wirePoints;
-		wirePoints = new HashMap<Location,ArrayList<Wire>>();
+		HashMap<Location, ArrayList<Wire>> wirePoints;
+		wirePoints = new HashMap<Location, ArrayList<Wire>>();
 		for (Wire w : circuit.getWires()) {
 			for (Location loc : w) {
 				ArrayList<Wire> locWires = wirePoints.get(loc);
@@ -151,7 +144,7 @@ class WireRepair extends CircuitTransaction {
 				locWires.add(w);
 			}
 		}
-		
+
 		MergeSets mergeSets = new MergeSets();
 		for (ArrayList<Wire> locWires : wirePoints.values()) {
 			if (locWires.size() > 1) {
@@ -176,9 +169,8 @@ class WireRepair extends CircuitTransaction {
 		}
 		mutator.replace(circuit, replacements);
 	}
-	
-	private void doMergeSet(ArrayList<Wire> mergeSet, ReplacementMap replacements,
-			Set<Location> splitLocs) {
+
+	private void doMergeSet(ArrayList<Wire> mergeSet, ReplacementMap replacements, Set<Location> splitLocs) {
 		TreeSet<Location> ends = new TreeSet<Location>();
 		for (Wire w : mergeSet) {
 			ends.add(w.getEnd0());
@@ -199,7 +191,7 @@ class WireRepair extends CircuitTransaction {
 				}
 			}
 		}
-		
+
 		ArrayList<Wire> mergeResult = new ArrayList<Wire>();
 		if (mids.size() == 2) {
 			mergeResult.add(whole);
@@ -210,7 +202,7 @@ class WireRepair extends CircuitTransaction {
 				e0 = e1;
 			}
 		}
-		
+
 		for (Wire w : mergeSet) {
 			ArrayList<Component> wRepl = new ArrayList<Component>(2);
 			for (Wire w2 : mergeResult) {
@@ -221,7 +213,7 @@ class WireRepair extends CircuitTransaction {
 			replacements.put(w, wRepl);
 		}
 	}
-	
+
 	private void doSplits(CircuitMutator mutator) {
 		Set<Location> splitLocs = circuit.wires.points.getSplitLocations();
 		ReplacementMap repl = new ReplacementMap();
@@ -231,7 +223,8 @@ class WireRepair extends CircuitTransaction {
 			ArrayList<Location> splits = null;
 			for (Location loc : splitLocs) {
 				if (w.contains(loc) && !loc.equals(w0) && !loc.equals(w1)) {
-					if (splits == null) splits = new ArrayList<Location>();
+					if (splits == null)
+						splits = new ArrayList<Location>();
 					splits.add(loc);
 				}
 			}
