@@ -35,6 +35,7 @@ public class BitWidth implements Comparable<BitWidth> {
 			return BitWidth.parse(value);
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public java.awt.Component getCellEditor(BitWidth value) {
 			JComboBox combo = new JComboBox(choices);

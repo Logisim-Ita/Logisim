@@ -27,6 +27,11 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.TableSorter;
 
 public class StatisticsDialog extends JDialog implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9150207567359379809L;
+
 	public static void show(JFrame parent, LogisimFile file, Circuit circuit) {
 		FileStatistics stats = FileStatistics.compute(file, circuit);
 		StatisticsDialog dlog = new StatisticsDialog(parent, circuit.getName(), new StatisticsTableModel(stats));
@@ -34,6 +39,10 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 	}
 
 	private static class StatisticsTableModel extends AbstractTableModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5034046697656011267L;
 		private FileStatistics stats;
 
 		StatisticsTableModel(FileStatistics stats) {
@@ -135,6 +144,11 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 	}
 
 	private static class StatisticsTable extends JTable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 7642943145759369950L;
+
 		@Override
 		public void setBounds(int x, int y, int width, int height) {
 			super.setBounds(x, y, width, height);

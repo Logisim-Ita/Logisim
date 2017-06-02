@@ -9,6 +9,10 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 class ScrollPanel extends LogPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5413692326374455650L;
 	private TablePanel table;
 
 	public ScrollPanel(LogFrame frame) {

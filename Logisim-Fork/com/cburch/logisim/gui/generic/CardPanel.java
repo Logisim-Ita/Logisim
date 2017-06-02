@@ -12,6 +12,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class CardPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5304317088778345821L;
 	private ArrayList<ChangeListener> listeners;
 	private String current;
 

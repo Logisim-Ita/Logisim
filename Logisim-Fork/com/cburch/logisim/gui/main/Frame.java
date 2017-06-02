@@ -61,6 +61,10 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.VerticalSplitPane;
 
 public class Frame extends LFrame implements LocaleListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4910555080088957933L;
 	public static final String EDITOR_VIEW = "editorView";
 	public static final String EXPLORER_VIEW = "explorerView";
 	public static final String EDIT_LAYOUT = "layout";

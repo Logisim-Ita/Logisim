@@ -12,6 +12,10 @@ import com.cburch.logisim.file.Options;
 import com.cburch.logisim.proj.Project;
 
 abstract class OptionsPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8712917074469641323L;
 	private OptionsFrame optionsFrame;
 
 	public OptionsPanel(OptionsFrame frame) {

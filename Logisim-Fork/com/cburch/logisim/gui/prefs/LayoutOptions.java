@@ -10,6 +10,10 @@ import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.TableLayout;
 
 class LayoutOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4543671231475592735L;
 	private PrefBoolean[] checks;
 	private PrefOptionList afterAdd;
 	private PrefOptionList radix1;

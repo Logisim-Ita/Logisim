@@ -21,6 +21,10 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenu;
 
 public class LogisimMenuBar extends JMenuBar {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5280023864382450859L;
 	public static final LogisimMenuItem PRINT = new LogisimMenuItem("Print");
 	public static final LogisimMenuItem EXPORT_IMAGE = new LogisimMenuItem("ExportImage");
 	public static final LogisimMenuItem CUT = new LogisimMenuItem("Cut");

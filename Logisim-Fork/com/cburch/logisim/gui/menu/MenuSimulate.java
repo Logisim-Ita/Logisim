@@ -29,7 +29,16 @@ import com.cburch.logisim.util.StringUtil;
 import java.util.ArrayList;
 
 class MenuSimulate extends Menu {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8099735759353154681L;
+
 	private class TickFrequencyChoice extends JRadioButtonMenuItem implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4765228670969063276L;
 		private double freq;
 
 		public TickFrequencyChoice(double value) {
@@ -67,6 +76,10 @@ class MenuSimulate extends Menu {
 	}
 
 	private class CircuitStateMenuItem extends JMenuItem implements CircuitListener, ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -9015014443997361478L;
 		private CircuitState circuitState;
 
 		public CircuitStateMenuItem(CircuitState circuitState) {

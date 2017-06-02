@@ -23,6 +23,11 @@ import com.cburch.logisim.std.wiring.Pin;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class LayoutThumbnail extends JComponent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1659138624954855802L;
+
 	private static final int BORDER = 10;
 
 	private CircuitState circuitState;

@@ -116,6 +116,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			}
 		}
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
 			int index = value.intValue();

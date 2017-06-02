@@ -35,9 +35,6 @@ public class About {
 			long start = System.currentTimeMillis();
 			while (running) {
 				long elapse = System.currentTimeMillis() - start;
-				int count = (int) (elapse / 500) % 4;
-				panel.upper = (count == 2 || count == 3) ? Value.TRUE : Value.FALSE;
-				panel.lower = (count == 1 || count == 2) ? Value.TRUE : Value.FALSE;
 				panel.credits.setScroll((int) elapse);
 				panel.repaint();
 				try {
@@ -49,13 +46,15 @@ public class About {
 	}
 
 	private static class MyPanel extends JPanel implements AncestorListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1104782885051596715L;
 		private final Color fadeColor = new Color(240, 240, 240);
 		private final Color headerColor = Value.TRUE_COLOR;
 		private final Font headerFont = new Font("Sans Serif", Font.BOLD, 60);
 		private final Font versionFont = new Font("Sans Serif", Font.BOLD, 25);
 		private final Font copyrightFont = new Font("Sans Serif", Font.ITALIC, 18);
-		private Value upper = Value.FALSE;
-		private Value lower = Value.TRUE;
 		private AboutCredits credits;
 		private PanelThread thread = null;
 

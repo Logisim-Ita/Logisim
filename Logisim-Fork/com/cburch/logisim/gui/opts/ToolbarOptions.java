@@ -24,6 +24,11 @@ import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.TableLayout;
 
 class ToolbarOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8520398012707734655L;
+
 	private class Listener implements ProjectExplorer.Listener, ActionListener, ListSelectionListener {
 		@Override
 		public void selectionChanged(Event event) {

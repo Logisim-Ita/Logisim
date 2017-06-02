@@ -471,15 +471,12 @@ public class Startup {
 			conn = xmlURL.openConnection();
 			in = conn.getInputStream();
 		} catch (MalformedURLException e) {
-			System.err.println("The URL of the XML file for the auto-updater is malformed.");
-			System.err.println("Please report this error to the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println(
+					"The URL of the XML file for the auto-updater is malformed.\nPlease report this error to the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		} catch (IOException e) {
 			System.err.println(
-					"Although an Internet connection should be available, the system couldn't connect to the URL requested by the auto-updater");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+					"Although an Internet connection should be available, the system couldn't connect to the URL requested by the auto-updater\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 		ArgonXML logisimData = new ArgonXML(in, "logisim");
@@ -491,9 +488,9 @@ public class Startup {
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
 
-			String changelog = logisimData.child("changelog").content();
 			int answer = JOptionPane.showConfirmDialog(null,
-					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(), changelog),
+					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
+							logisimData.child("changelog").content()),
 					Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
 			if (answer == 1) {
@@ -510,9 +507,8 @@ public class Startup {
 			} catch (URISyntaxException e) {
 				System.err.println("Error in the syntax of the URI for the path of the executed Logisim file!");
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(null,
-						"An error occurred while updating to the new Logisim version.\nPlease check the console for log information.",
-						"Update failed", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailedMessage"), Strings.get("UpdateFailed"),
+						JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
 
@@ -560,9 +556,8 @@ public class Startup {
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
-			System.err.println("The URL of the requested update file is malformed.");
-			System.err.println("Please report this error to the software maintainer.");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println(
+					"The URL of the requested update file is malformed.\nPlease report this error to the software maintainer.\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 		URLConnection conn;
@@ -570,18 +565,15 @@ public class Startup {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
 			System.err.println(
-					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
-			System.err.println("Cannot retrieve the file containing the updated version.");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println(
+					"Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 
@@ -590,9 +582,8 @@ public class Startup {
 		try {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
-			System.err.println("Cannot get remote file stream.");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println(
+					"Cannot get remote file stream.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 
@@ -616,9 +607,8 @@ public class Startup {
 				deplacement += currentBit;
 			}
 		} catch (IOException e) {
-			System.err.println("An error occured while retrieving remote file (remote peer hung up).");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println(
+					"An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 		// Close remote stream
@@ -632,9 +622,7 @@ public class Startup {
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
 			System.err.println(
-					"An error occured while retrieving remote file (local size != remote size), download corrupted.");
-			System.err.println("If the error persist, please contact the software maintainer");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+					"An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 
@@ -643,25 +631,21 @@ public class Startup {
 		try {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
-			System.err.println("An error occured while opening the local Jar file.");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
+			System.err.println("An error occured while opening the local Jar file.\n-- AUTO-UPDATE ABORTED --");
 			return (false);
 		}
 		try {
 			destinationFile.write(data);
 			destinationFile.flush();
 		} catch (IOException e) {
-			System.err.println("An error occured while writing to the local Jar file.");
-			System.err.println("-- AUTO-UPDATE ABORTED --");
 			System.err.println(
-					"The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+					"An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 		} finally {
 			try {
 				destinationFile.close();
 			} catch (IOException e) {
-				System.err.println("Error encountered while closing the local destination file!");
 				System.err.println(
-						"The local file might be corrupted. If this is the case, please download a new copy of Logisim.");
+						"Error encountered while closing the local destination file!\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 				return (false);
 			}
 		}

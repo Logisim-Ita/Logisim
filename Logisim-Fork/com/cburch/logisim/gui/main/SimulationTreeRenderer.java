@@ -16,6 +16,11 @@ import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.comp.ComponentFactory;
 
 public class SimulationTreeRenderer extends DefaultTreeCellRenderer {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8684077218381962683L;
+
 	private static class RendererIcon implements Icon {
 		private ComponentFactory factory;
 		private boolean isCurrentView;

@@ -218,6 +218,11 @@ public class Caret {
 		InputMap imap = hex.getInputMap();
 		ActionMap amap = hex.getActionMap();
 		AbstractAction nullAction = new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 3859667024369145469L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			}

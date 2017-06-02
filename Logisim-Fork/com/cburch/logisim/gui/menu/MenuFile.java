@@ -19,6 +19,10 @@ import com.cburch.logisim.proj.ProjectActions;
 import com.cburch.logisim.util.MacCompatibility;
 
 class MenuFile extends Menu implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6347260537760285114L;
 	private LogisimMenuBar menubar;
 	private JMenuItem newi = new JMenuItem();
 	private JMenuItem open = new JMenuItem();

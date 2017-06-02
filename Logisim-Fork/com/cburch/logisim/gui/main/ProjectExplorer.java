@@ -60,6 +60,11 @@ import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 
 public class ProjectExplorer extends JTree implements LocaleListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2042462291816718805L;
+
 	private static final String DIRTY_MARKER = "*";
 
 	static final Color MAGNIFYING_INTERIOR = new Color(200, 200, 255, 64);
@@ -272,6 +277,11 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 	}
 
 	private class MyCellRenderer extends DefaultTreeCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3479316549221679039L;
+
 		@Override
 		public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
 				boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -303,6 +313,11 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 	}
 
 	private class MySelectionModel extends DefaultTreeSelectionModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5683156318947814968L;
+
 		@Override
 		public void addSelectionPath(TreePath path) {
 			if (isPathValid(path))
@@ -412,6 +427,11 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 	}
 
 	private class DeleteAction extends AbstractAction {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5854907291919888339L;
+
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			TreePath path = getSelectionPath();

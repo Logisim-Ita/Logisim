@@ -52,6 +52,11 @@ class TableTabCaret {
 		InputMap imap = table.getInputMap();
 		ActionMap amap = table.getActionMap();
 		AbstractAction nullAction = new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 7932515593155479627L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			}

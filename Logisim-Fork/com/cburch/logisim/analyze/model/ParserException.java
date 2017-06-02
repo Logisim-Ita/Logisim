@@ -6,6 +6,10 @@ package com.cburch.logisim.analyze.model;
 import com.cburch.logisim.util.StringGetter;
 
 public class ParserException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1799451362463233363L;
 	private StringGetter message;
 	private int start;
 	private int length;

@@ -35,6 +35,7 @@ class ComboOption {
 		return value;
 	}
 
+	@SuppressWarnings("rawtypes")
 	static void setSelected(JComboBox combo, Object value) {
 		for (int i = combo.getItemCount() - 1; i >= 0; i--) {
 			ComboOption opt = (ComboOption) combo.getItemAt(i);

@@ -15,6 +15,11 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
 public class HexEditor extends JComponent implements Scrollable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -688232359841362298L;
+
 	private class Listener implements HexModelListener {
 		@Override
 		public void metainfoChanged(HexModel source) {

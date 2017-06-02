@@ -14,6 +14,10 @@ import com.cburch.logisim.prefs.PrefMonitor;
 import com.cburch.logisim.util.StringGetter;
 
 class PrefBoolean extends JCheckBox implements ActionListener, PropertyChangeListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9000012188783024433L;
 	private PrefMonitor<Boolean> pref;
 	private StringGetter title;
 

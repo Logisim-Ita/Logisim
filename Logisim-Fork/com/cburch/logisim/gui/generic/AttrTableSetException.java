@@ -4,6 +4,11 @@
 package com.cburch.logisim.gui.generic;
 
 public class AttrTableSetException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5683854951973474530L;
+
 	public AttrTableSetException(String msg) {
 		super(msg);
 	}

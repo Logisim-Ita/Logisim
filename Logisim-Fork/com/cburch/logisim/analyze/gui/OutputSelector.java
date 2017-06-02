@@ -17,7 +17,12 @@ import com.cburch.logisim.analyze.model.VariableListEvent;
 import com.cburch.logisim.analyze.model.VariableListListener;
 
 class OutputSelector {
+	@SuppressWarnings("rawtypes")
 	private class Model extends AbstractListModel implements ComboBoxModel, VariableListListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2649106261241267059L;
 		private Object selected;
 
 		@Override
@@ -99,9 +104,11 @@ class OutputSelector {
 
 	private VariableList source;
 	private JLabel label = new JLabel();
+	@SuppressWarnings("rawtypes")
 	private JComboBox select = new JComboBox();
 	private String prototypeValue = null;
 
+	@SuppressWarnings("unchecked")
 	public OutputSelector(AnalyzerModel model) {
 		this.source = model.getOutputs();
 
@@ -121,6 +128,7 @@ class OutputSelector {
 		return label;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public JComboBox getComboBox() {
 		return select;
 	}
@@ -150,6 +158,7 @@ class OutputSelector {
 		return value;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void computePrototypeValue() {
 		String newValue;
 		if (source.isEmpty()) {

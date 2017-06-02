@@ -4,6 +4,10 @@
 package com.cburch.logisim.file;
 
 public class LoaderException extends RuntimeException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -238740660638099114L;
 	private boolean shown;
 
 	LoaderException(String desc) {

@@ -10,6 +10,10 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButtonMenuItem;
 
 class WindowMenuItem extends JRadioButtonMenuItem {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3278632701872758005L;
 	private WindowMenuItemManager manager;
 
 	WindowMenuItem(WindowMenuItemManager manager) {

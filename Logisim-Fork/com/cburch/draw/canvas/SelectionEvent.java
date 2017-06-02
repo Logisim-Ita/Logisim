@@ -9,6 +9,10 @@ import java.util.EventObject;
 import com.cburch.draw.model.CanvasObject;
 
 public class SelectionEvent extends EventObject {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8393080300617029020L;
 	public static final int ACTION_ADDED = 0;
 	public static final int ACTION_REMOVED = 1;
 	public static final int ACTION_HANDLE = 2;

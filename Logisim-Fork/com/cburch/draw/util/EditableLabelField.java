@@ -10,6 +10,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 
 public class EditableLabelField extends JTextField {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5262273703386928333L;
 	static final int FIELD_BORDER = 2;
 
 	public EditableLabelField() {

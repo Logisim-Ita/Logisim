@@ -31,7 +31,17 @@ import com.cburch.logisim.analyze.model.VariableListListener;
 import com.cburch.logisim.util.StringUtil;
 
 class VariableTab extends AnalyzerTab implements TabInterface {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5549146127134246159L;
+
+	@SuppressWarnings("rawtypes")
 	private static class VariableListModel extends AbstractListModel implements VariableListListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3099969233885603766L;
 		private VariableList list;
 		private String[] listCopy;
 
@@ -149,36 +159,12 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		public void valueChanged(ListSelectionEvent event) {
 			computeEnabled();
 		}
-
-		public void listChanged(VariableListEvent event) {
-			switch (event.getType()) {
-			case VariableListEvent.ALL_REPLACED:
-				list.setSelectedIndices(new int[0]);
-				break;
-			case VariableListEvent.REMOVE:
-				if (event.getVariable().equals(list.getSelectedValue())) {
-					int index = ((Integer) event.getData()).intValue();
-					if (index >= data.size()) {
-						if (data.isEmpty()) {
-							list.setSelectedIndices(new int[0]);
-						}
-						index = data.size() - 1;
-					}
-					list.setSelectedValue(data.get(index), true);
-				}
-				break;
-			case VariableListEvent.ADD:
-			case VariableListEvent.MOVE:
-			case VariableListEvent.REPLACE:
-				break;
-			}
-			list.validate();
-		}
 	}
 
 	private VariableList data;
 	private MyListener myListener = new MyListener();
 
+	@SuppressWarnings("rawtypes")
 	private JList list = new JList();
 	private JTextField field = new JTextField();
 	private JButton remove = new JButton();
@@ -188,6 +174,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 	private JButton rename = new JButton();
 	private JLabel error = new JLabel(" ");
 
+	@SuppressWarnings("unchecked")
 	VariableTab(VariableList data) {
 		this.data = data;
 

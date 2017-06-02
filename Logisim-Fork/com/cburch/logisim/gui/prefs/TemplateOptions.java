@@ -32,6 +32,11 @@ import com.cburch.logisim.util.JFileChoosers;
 import com.cburch.logisim.util.StringUtil;
 
 class TemplateOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -591966003927175665L;
+
 	private class MyListener implements ActionListener, PropertyChangeListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {

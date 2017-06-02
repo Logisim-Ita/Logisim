@@ -8,6 +8,10 @@ import java.awt.LayoutManager;
 import javax.swing.JPanel;
 
 abstract class OptionsPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4286711003852860911L;
 	private PreferencesFrame optionsFrame;
 
 	public OptionsPanel(PreferencesFrame frame) {

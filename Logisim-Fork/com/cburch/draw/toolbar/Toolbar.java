@@ -10,6 +10,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class Toolbar extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2835943209904957622L;
 	public static final Object VERTICAL = new Object();
 	public static final Object HORIZONTAL = new Object();
 

@@ -10,13 +10,11 @@ import java.util.Iterator;
 
 public class Dag {
 	private static class Node {
-		Object data;
 		HashSet<Node> succs = new HashSet<Node>(); // of Nodes
 		int numPreds = 0;
 		boolean mark;
 
 		Node(Object data) {
-			this.data = data;
 		}
 	}
 

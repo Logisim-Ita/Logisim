@@ -32,8 +32,17 @@ import com.cburch.logisim.analyze.model.ParserException;
 import com.cburch.logisim.util.StringGetter;
 
 class ExpressionTab extends AnalyzerTab implements TabInterface {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4349747751518665612L;
+
 	private class MyListener extends AbstractAction
 			implements DocumentListener, OutputExpressionsListener, ItemListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5687049125095561035L;
 		boolean edited = false;
 
 		@Override

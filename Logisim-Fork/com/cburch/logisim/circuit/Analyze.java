@@ -219,6 +219,10 @@ public class Analyze {
 	}
 
 	private static class ExpressionMap extends HashMap<Location, Expression> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1947923788805279096L;
 		private Circuit circuit;
 		private Set<Location> dirtyPoints = new HashSet<Location>();
 		private Map<Location, Component> causes = new HashMap<Location, Component>();

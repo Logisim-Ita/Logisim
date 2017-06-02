@@ -24,6 +24,11 @@ import com.cburch.logisim.tools.*;
 import com.cburch.logisim.util.*;
 
 public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4680658517189289645L;
+
 	static final Color HALO_COLOR = new Color(192, 255, 255);
 
 	private static final int BOUNDS_BUFFER = 70;
@@ -361,6 +366,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	private class MyViewport extends JViewport {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7658870263931307849L;
 		StringGetter errorMessage = null;
 		Color errorColor = DEFAULT_ERROR_COLOR;
 		String widthMessage = null;

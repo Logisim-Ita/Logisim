@@ -73,12 +73,17 @@ public class Print {
 	}
 
 	private static class ParmsPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3413198957333746370L;
 		JCheckBox rotateToFit;
 		JCheckBox printerView;
 		JTextField header;
 		GridBagLayout gridbag;
 		GridBagConstraints gbc;
 
+		@SuppressWarnings("rawtypes")
 		ParmsPanel(JList list) {
 			// set up components
 			rotateToFit = new JCheckBox();

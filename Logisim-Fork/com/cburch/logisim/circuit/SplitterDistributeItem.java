@@ -12,6 +12,10 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.StringGetter;
 
 class SplitterDistributeItem extends JMenuItem implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2422183810637132114L;
 	private Project proj;
 	private Splitter splitter;
 	private int order;

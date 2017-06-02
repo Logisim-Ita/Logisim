@@ -34,6 +34,11 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class LogFrame extends LFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1483284271691290378L;
+
 	// TODO should automatically repaint icons when component attr change
 	// TODO ? moving a component using Select tool removes it from selection
 	private class WindowMenuManager extends WindowMenuItemManager

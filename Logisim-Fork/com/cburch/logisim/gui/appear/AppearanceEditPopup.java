@@ -12,6 +12,10 @@ import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.gui.menu.LogisimMenuItem;
 
 public class AppearanceEditPopup extends EditPopup implements EditHandler.Listener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7006842518551735721L;
 	private AppearanceCanvas canvas;
 	private EditHandler handler;
 	private Map<LogisimMenuItem, Boolean> enabled;

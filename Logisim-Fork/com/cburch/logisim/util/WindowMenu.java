@@ -20,6 +20,11 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 public class WindowMenu extends JMenu {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 356839702149085338L;
+
 	private class MyListener implements LocaleListener, ActionListener {
 		@Override
 		public void localeChanged() {

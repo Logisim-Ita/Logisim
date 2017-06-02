@@ -180,6 +180,10 @@ public class Rom extends Mem {
 	}
 
 	private static class ContentsCell extends JLabel implements MouseListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -53754819096800664L;
 		Window source;
 		MemContents contents;
 

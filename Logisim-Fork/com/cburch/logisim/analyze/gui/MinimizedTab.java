@@ -25,7 +25,18 @@ import com.cburch.logisim.analyze.model.OutputExpressionsEvent;
 import com.cburch.logisim.analyze.model.OutputExpressionsListener;
 
 class MinimizedTab extends AnalyzerTab {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9156728023775005564L;
+
+	@SuppressWarnings("rawtypes")
 	private static class FormatModel extends AbstractListModel implements ComboBoxModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6757581889327666480L;
+
 		static int getFormatIndex(int choice) {
 			switch (choice) {
 			case AnalyzerModel.FORMAT_PRODUCT_OF_SUMS:
@@ -120,16 +131,15 @@ class MinimizedTab extends AnalyzerTab {
 	private OutputSelector selector;
 	private KarnaughMapPanel karnaughMap;
 	private JLabel formatLabel = new JLabel();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private JComboBox formatChoice = new JComboBox(new FormatModel());
 	private ExpressionView minimizedExpr = new ExpressionView();
 	private JButton setAsExpr = new JButton();
 
 	private MyListener myListener = new MyListener();
-	private AnalyzerModel model;
 	private OutputExpressions outputExprs;
 
 	public MinimizedTab(AnalyzerModel model) {
-		this.model = model;
 		this.outputExprs = model.getOutputExpressions();
 		outputExprs.addOutputExpressionsListener(myListener);
 
@@ -176,6 +186,7 @@ class MinimizedTab extends AnalyzerTab {
 		setAsExpr.setEnabled(selected != null && !outputExprs.isExpressionMinimal(selected));
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void addRow(GridBagLayout gb, GridBagConstraints gc, JLabel label, JComboBox choice) {
 		Insets oldInsets = gc.insets;
 		gc.weightx = 0.0;

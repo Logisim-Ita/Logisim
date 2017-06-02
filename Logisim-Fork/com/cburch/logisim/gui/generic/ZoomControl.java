@@ -18,7 +18,17 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 public class ZoomControl extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7823904346559070108L;
+
 	public class SpinnerModel extends AbstractSpinnerModel implements PropertyChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2283318939208459104L;
+
 		@Override
 		public Object getNextValue() {
 			double zoom = model.getZoomFactor();
@@ -81,6 +91,10 @@ public class ZoomControl extends JPanel {
 	}
 
 	private class GridIcon extends JComponent implements MouseListener, PropertyChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3780961019640263926L;
 		boolean state = true;
 
 		public GridIcon() {

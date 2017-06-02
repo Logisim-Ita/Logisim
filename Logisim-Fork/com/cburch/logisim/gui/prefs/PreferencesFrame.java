@@ -22,6 +22,11 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class PreferencesFrame extends LFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -569043750049698759L;
+
 	private static WindowMenuManager MENU_MANAGER = null;
 
 	public static void initializeManager() {

@@ -15,6 +15,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class VerticalSplitPane extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5640950675611320914L;
+
 	private class MyLayout implements LayoutManager {
 		@Override
 		public void addLayoutComponent(String name, Component comp) {
@@ -74,6 +79,11 @@ public class VerticalSplitPane extends JPanel {
 	}
 
 	private class MyDragbar extends HorizontalSplitPane.Dragbar {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6973366305961644799L;
+
 		MyDragbar() {
 			setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 		}

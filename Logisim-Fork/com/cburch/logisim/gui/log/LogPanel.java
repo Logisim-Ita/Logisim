@@ -10,6 +10,10 @@ import javax.swing.JPanel;
 import com.cburch.logisim.proj.Project;
 
 abstract class LogPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6666769652787945987L;
 	private LogFrame logFrame;
 
 	public LogPanel(LogFrame frame) {

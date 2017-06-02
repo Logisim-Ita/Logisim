@@ -41,11 +41,9 @@ class PainterDin {
 
 	private static void paint(InstancePainter painter, int width, int height, boolean drawBubble, int dinType) {
 		Graphics g = painter.getGraphics();
-		int x = 0;
 		int xMid = -width;
 		int y0 = -height / 2;
 		if (drawBubble) {
-			x -= 4;
 			width -= 8;
 		}
 		int diam = Math.min(height, 2 * width);

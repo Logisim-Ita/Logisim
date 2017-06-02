@@ -23,6 +23,11 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 class SelectionPanel extends LogPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8028350381641630757L;
+
 	private class Listener extends MouseAdapter
 			implements ActionListener, TreeSelectionListener, ListSelectionListener {
 		@Override
@@ -61,6 +66,7 @@ class SelectionPanel extends LogPanel {
 				doMove(1);
 			} else if (src == remove) {
 				Selection sel = getSelection();
+				@SuppressWarnings("deprecation")
 				Object[] toRemove = list.getSelectedValues();
 				boolean changed = false;
 				for (int i = 0; i < toRemove.length; i++) {

@@ -16,7 +16,17 @@ import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.LocaleManager;
 
 class IntlOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4744314745082121590L;
+
 	private static class RestrictedLabel extends JLabel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7771599114039528476L;
+
 		@Override
 		public Dimension getMaximumSize() {
 			return getPreferredSize();

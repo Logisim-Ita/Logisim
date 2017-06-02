@@ -15,7 +15,14 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.file.LogisimFile;
 import com.cburch.logisim.proj.Project;
 
+@SuppressWarnings("rawtypes")
 class CircuitJList extends JList {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6391602315972092350L;
+
+	@SuppressWarnings("unchecked")
 	public CircuitJList(Project proj, boolean includeEmpty) {
 		LogisimFile file = proj.getLogisimFile();
 		Circuit current = proj.getCurrentCircuit();
@@ -36,6 +43,7 @@ class CircuitJList extends JList {
 	}
 
 	public List<Circuit> getSelectedCircuits() {
+		@SuppressWarnings("deprecation")
 		Object[] selected = getSelectedValues();
 		if (selected != null && selected.length > 0) {
 			ArrayList<Circuit> ret = new ArrayList<Circuit>(selected.length);

@@ -285,31 +285,8 @@ public class DisplayDecoder extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-
 		painter.drawBounds();
 		Bounds bds = painter.getBounds();
-		g.setColor(Color.GRAY);
-		int x0;
-		int y0;
-		int halign;
-		if (facing == Direction.WEST) {
-			x0 = bds.getX() + bds.getWidth() - 3;
-			y0 = bds.getY() + 15;
-			halign = GraphicsUtil.H_RIGHT;
-		} else if (facing == Direction.NORTH) {
-			x0 = bds.getX() + 10;
-			y0 = bds.getY() + bds.getHeight() - 2;
-			halign = GraphicsUtil.H_CENTER;
-		} else if (facing == Direction.SOUTH) {
-			x0 = bds.getX() + 10;
-			y0 = bds.getY() + 12;
-			halign = GraphicsUtil.H_CENTER;
-		} else {
-			x0 = bds.getX() + 3;
-			y0 = bds.getY() + 15;
-			halign = GraphicsUtil.H_LEFT;
-		}
 		g.setColor(Color.BLACK);
 		painter.drawPorts();
 		if (decval != -1) {// draw the dec number on the component

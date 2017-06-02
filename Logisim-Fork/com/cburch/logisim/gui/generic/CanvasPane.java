@@ -18,6 +18,11 @@ import javax.swing.SwingConstants;
 import com.cburch.logisim.util.MacCompatibility;
 
 public class CanvasPane extends JScrollPane {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 404622249632842787L;
+
 	private class Listener implements ComponentListener, PropertyChangeListener {
 
 		//

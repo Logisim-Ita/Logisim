@@ -33,6 +33,11 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class HexFrame extends LFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3382498162653014279L;
+
 	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
 		WindowMenuManager() {
 			super(Strings.get("hexFrameMenuItem"), false);

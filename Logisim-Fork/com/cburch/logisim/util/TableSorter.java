@@ -63,6 +63,11 @@ import java.lang.reflect.InvocationTargetException;
  */
 
 public class TableSorter extends AbstractTableModel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5754112666386152075L;
+
 	protected TableModel tableModel;
 
 	public static final int DESCENDING = -1;

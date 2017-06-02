@@ -16,6 +16,10 @@ import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.ExpressionVisitor;
 
 class ExpressionView extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4343114997424679659L;
 	private static final int BADNESS_IDENT_BREAK = 10000;
 	private static final int BADNESS_BEFORE_SPACE = 500;
 	private static final int BADNESS_BEFORE_AND = 50;
@@ -381,9 +385,7 @@ class ExpressionView extends JPanel {
 				g.drawString(line, x, y + lineY[i] + fm.getAscent());
 
 				ArrayList<NotData> nots = lineNots.get(i);
-				int j = -1;
 				for (NotData nd : nots) {
-					j++;
 					int notY = y + lineY[i] - nd.depth * NOT_SEP;
 					int startX = x + fm.stringWidth(line.substring(0, nd.startIndex));
 					int stopX = x + fm.stringWidth(line.substring(0, nd.stopIndex));

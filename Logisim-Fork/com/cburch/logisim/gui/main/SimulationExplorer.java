@@ -20,6 +20,10 @@ import com.cburch.logisim.proj.ProjectEvent;
 import com.cburch.logisim.proj.ProjectListener;
 
 class SimulationExplorer extends JPanel implements ProjectListener, MouseListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8414281898752383249L;
 	private Project project;
 	private SimulationTreeModel model;
 	private JTree tree;

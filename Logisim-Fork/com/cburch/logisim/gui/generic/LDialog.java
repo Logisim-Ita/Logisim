@@ -8,6 +8,11 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 
 public class LDialog extends JDialog {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5517656909498133793L;
+
 	public LDialog(Frame owner, String title, boolean modal) {
 		super(owner, title, modal);
 		init();

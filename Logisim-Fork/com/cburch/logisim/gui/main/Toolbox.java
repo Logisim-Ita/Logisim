@@ -13,6 +13,10 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Tool;
 
 class Toolbox extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5713124867071121331L;
 	private ProjectExplorer toolbox;
 
 	Toolbox(Project proj, MenuListener menu) {

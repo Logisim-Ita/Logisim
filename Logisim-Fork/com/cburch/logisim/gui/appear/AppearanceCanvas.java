@@ -36,6 +36,10 @@ import com.cburch.logisim.gui.generic.GridPainter;
 import com.cburch.logisim.proj.Project;
 
 public class AppearanceCanvas extends Canvas implements CanvasPaneContents, ActionDispatcher {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2997341273503780021L;
 	private static final int BOUNDS_BUFFER = 70;
 	// pixels shown in canvas beyond outermost boundaries
 	private static final int THRESH_SIZE_UPDATE = 10;

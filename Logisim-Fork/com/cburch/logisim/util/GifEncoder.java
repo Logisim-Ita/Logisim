@@ -88,7 +88,6 @@ public class GifEncoder {
 		}
 
 		void WriteBits(int bits, int numbits) throws IOException {
-			int bitsWritten = 0;
 			int numBytes = 255;
 			do {
 				if ((index_ == 254 && bitsLeft_ == 0) || index_ > 254) {
@@ -102,12 +101,10 @@ public class GifEncoder {
 
 				if (numbits <= bitsLeft_) {
 					buffer_[index_] |= (bits & ((1 << numbits) - 1)) << (8 - bitsLeft_);
-					bitsWritten += numbits;
 					bitsLeft_ -= numbits;
 					numbits = 0;
 				} else {
 					buffer_[index_] |= (bits & ((1 << bitsLeft_) - 1)) << (8 - bitsLeft_);
-					bitsWritten += bitsLeft_;
 					bits >>= bitsLeft_;
 					numbits -= bitsLeft_;
 					buffer_[++index_] = 0;

@@ -34,6 +34,11 @@ import com.cburch.logisim.util.Icons;
 
 public class TextTool extends AbstractTool {
 	private class FieldListener extends AbstractAction implements AttributeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3933088047129702955L;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			commitText(curCanvas);
@@ -56,6 +61,11 @@ public class TextTool extends AbstractTool {
 	}
 
 	private class CancelListener extends AbstractAction {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4185682496263546969L;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			cancelText(curCanvas);

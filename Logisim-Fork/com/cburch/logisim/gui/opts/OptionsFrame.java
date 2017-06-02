@@ -29,6 +29,11 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class OptionsFrame extends LFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -384355708919544617L;
+
 	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
 		WindowMenuManager() {
 			super(Strings.get("optionsFrameMenuItem"), false);

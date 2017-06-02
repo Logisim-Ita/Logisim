@@ -23,7 +23,13 @@ import com.cburch.logisim.file.ToolbarData.ToolbarListener;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.tools.Tool;
 
+@SuppressWarnings("rawtypes")
 class ToolbarList extends JList {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8608509296085108835L;
+
 	private static class ToolIcon implements Icon {
 		private Tool tool;
 
@@ -50,6 +56,11 @@ class ToolbarList extends JList {
 	}
 
 	private static class ListRenderer extends DefaultListCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5678102048496064873L;
+
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
@@ -75,6 +86,11 @@ class ToolbarList extends JList {
 
 	private class Model extends AbstractListModel
 			implements ToolbarListener, AttributeListener, PropertyChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1346121772272500171L;
+
 		@Override
 		public int getSize() {
 			return base.size();
@@ -110,6 +126,7 @@ class ToolbarList extends JList {
 	private ToolbarData base;
 	private Model model;
 
+	@SuppressWarnings("unchecked")
 	public ToolbarList(ToolbarData base) {
 		this.base = base;
 		this.model = new Model();

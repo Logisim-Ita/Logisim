@@ -21,6 +21,10 @@ class TableTabClip implements ClipboardOwner {
 	private static final DataFlavor binaryFlavor = new DataFlavor(Data.class, "Binary data");
 
 	private static class Data implements Transferable, Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1146539358952248443L;
 		private String[] headers;
 		private String[][] contents;
 

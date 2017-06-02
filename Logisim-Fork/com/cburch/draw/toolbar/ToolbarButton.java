@@ -14,6 +14,11 @@ import javax.swing.JComponent;
 import com.cburch.logisim.util.GraphicsUtil;
 
 class ToolbarButton extends JComponent implements MouseListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4971644167730175116L;
+
 	private static final int BORDER = 2;
 
 	private Toolbar toolbar;

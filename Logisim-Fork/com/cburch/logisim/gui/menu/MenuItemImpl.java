@@ -9,6 +9,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 
 class MenuItemImpl extends JMenuItem implements MenuItem {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1045330005196255936L;
 	private MenuItemHelper helper;
 
 	public MenuItemImpl(Menu menu, LogisimMenuItem menuItem) {

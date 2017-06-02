@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 class XmlReaderException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8185235093673186621L;
 	private List<String> messages;
 
 	public XmlReaderException(String message) {

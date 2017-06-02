@@ -25,6 +25,11 @@ import com.cburch.logisim.util.JFileChoosers;
 import com.cburch.logisim.util.StringUtil;
 
 class FilePanel extends LogPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7780727837324383844L;
+
 	private class Listener implements ActionListener, ModelListener {
 		@Override
 		public void selectionChanged(ModelEvent event) {

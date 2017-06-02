@@ -10,6 +10,10 @@ import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.TableLayout;
 
 class WindowOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1043476425449770400L;
 	private PrefBoolean[] checks;
 	private PrefOptionList toolbarPlacement;
 

@@ -20,8 +20,10 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 	private StringGetter labelStr;
 
 	private JLabel label;
+	@SuppressWarnings("rawtypes")
 	private JComboBox combo;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public PrefOptionList(PrefMonitor<String> pref, StringGetter labelStr, PrefOption[] options) {
 		this.pref = pref;
 		this.labelStr = labelStr;
@@ -48,6 +50,7 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 		return label;
 	}
 
+	@SuppressWarnings("rawtypes")
 	JComboBox getJComboBox() {
 		return combo;
 	}

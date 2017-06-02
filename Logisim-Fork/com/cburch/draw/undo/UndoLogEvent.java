@@ -6,6 +6,10 @@ package com.cburch.draw.undo;
 import java.util.EventObject;
 
 public class UndoLogEvent extends EventObject {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1720439196398246575L;
 	public static final int ACTION_DONE = 0;
 	public static final int ACTION_UNDONE = 1;
 

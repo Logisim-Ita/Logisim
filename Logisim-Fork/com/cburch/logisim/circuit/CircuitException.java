@@ -4,6 +4,11 @@
 package com.cburch.logisim.circuit;
 
 public class CircuitException extends RuntimeException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8658590612197911522L;
+
 	public CircuitException(String msg) {
 		super(msg);
 	}

@@ -42,6 +42,10 @@ import java.util.EventObject;
 import java.util.LinkedList;
 
 public class AttrTable extends JPanel implements LocaleListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -529960152633563125L;
 	private static final AttrTableModel NULL_ATTR_MODEL = new NullAttrModel();
 
 	private static class NullAttrModel implements AttrTableModel {
@@ -70,6 +74,11 @@ public class AttrTable extends JPanel implements LocaleListener {
 	}
 
 	private static class TitleLabel extends JLabel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8599788843622700019L;
+
 		@Override
 		public Dimension getMinimumSize() {
 			Dimension ret = super.getMinimumSize();
@@ -78,6 +87,10 @@ public class AttrTable extends JPanel implements LocaleListener {
 	}
 
 	private static class MyDialog extends JDialogOk {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7689633170900231085L;
 		JInputComponent input;
 		Object value;
 
@@ -238,7 +251,6 @@ public class AttrTable extends JPanel implements LocaleListener {
 
 	private class CellEditor implements TableCellEditor, FocusListener, ActionListener {
 		LinkedList<CellEditorListener> listeners = new LinkedList<CellEditorListener>();
-		AttrTableModelRow currentRow;
 		Component currentEditor;
 
 		//
@@ -289,6 +301,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 			return true;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Object getCellEditorValue() {
 			// Returns the value contained in the editor.
@@ -315,6 +328,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 			return true;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int rowIndex,
 				int columnIndex) {
@@ -352,7 +366,6 @@ public class AttrTable extends JPanel implements LocaleListener {
 				} else {
 					editor.addFocusListener(this);
 				}
-				currentRow = row;
 				currentEditor = editor;
 				return editor;
 			}

@@ -18,6 +18,11 @@ import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.util.StringUtil;
 
 class MenuEdit extends Menu {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4037758443151508591L;
+
 	private class MyListener implements ProjectListener, ActionListener {
 		@Override
 		public void projectChanged(ProjectEvent e) {

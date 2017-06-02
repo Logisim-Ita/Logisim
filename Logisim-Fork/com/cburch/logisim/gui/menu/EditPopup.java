@@ -12,6 +12,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 public abstract class EditPopup extends JPopupMenu {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2388513486007265587L;
+
 	private class Listener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {

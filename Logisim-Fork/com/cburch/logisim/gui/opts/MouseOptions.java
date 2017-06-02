@@ -42,7 +42,17 @@ import com.cburch.logisim.util.InputEventUtil;
 import com.cburch.logisim.util.StringUtil;
 
 class MouseOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5531075371121923273L;
+
 	private class AddArea extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7477957315391568723L;
+
 		public AddArea() {
 			setPreferredSize(new Dimension(75, 60));
 			setMinimumSize(new Dimension(75, 60));
@@ -190,6 +200,10 @@ class MouseOptions extends OptionsPanel {
 	}
 
 	private class MappingsModel extends AbstractTableModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6685941567119691116L;
 		ArrayList<Integer> cur_keys;
 
 		MappingsModel() {

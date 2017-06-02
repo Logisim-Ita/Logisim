@@ -13,7 +13,13 @@ import javax.swing.event.ListSelectionListener;
 
 import com.cburch.logisim.prefs.AppPreferences;
 
+@SuppressWarnings("rawtypes")
 class LocaleSelector extends JList implements LocaleListener, ListSelectionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 865977125223322100L;
+
 	private static class LocaleOption implements Runnable {
 		private Locale locale;
 		private String text;
@@ -47,6 +53,7 @@ class LocaleSelector extends JList implements LocaleListener, ListSelectionListe
 
 	private LocaleOption[] items;
 
+	@SuppressWarnings({ "unchecked" })
 	LocaleSelector(Locale[] locales) {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		DefaultListModel model = new DefaultListModel();

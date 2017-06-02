@@ -82,9 +82,7 @@ public class Circuit {
 			if (val instanceof List) {
 				@SuppressWarnings("unchecked")
 				List<EndData> valList = (List<EndData>) val;
-				int i = -1;
 				for (EndData end : valList) {
-					i++;
 					if (end != null) {
 						map.put(end.getLocation(), end);
 					}

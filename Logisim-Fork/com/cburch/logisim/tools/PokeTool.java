@@ -34,7 +34,6 @@ public class PokeTool extends Tool {
 	private static final Color caretColor = new Color(255, 255, 150);
 
 	private static class WireCaret extends AbstractCaret {
-		AttributeSet opts;
 		Canvas canvas;
 		Wire wire;
 		int x;
@@ -45,7 +44,6 @@ public class PokeTool extends Tool {
 			wire = w;
 			this.x = x;
 			this.y = y;
-			this.opts = opts;
 		}
 
 		@Override

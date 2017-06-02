@@ -21,6 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 class MenuHelp extends JMenu implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 155555694453015305L;
 	private LogisimMenuBar menubar;
 	private JMenuItem tutorial = new JMenuItem();
 	private JMenuItem guide = new JMenuItem();

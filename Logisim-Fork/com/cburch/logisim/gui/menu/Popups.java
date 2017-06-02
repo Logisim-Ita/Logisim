@@ -25,6 +25,10 @@ import com.cburch.logisim.tools.Tool;
 
 public class Popups {
 	private static class ProjectPopup extends JPopupMenu implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3870428754125453126L;
 		Project proj;
 		JMenuItem add = new JMenuItem(Strings.get("projectAddCircuitItem"));
 		JMenu load = new JMenu(Strings.get("projectLoadLibraryItem"));
@@ -64,6 +68,10 @@ public class Popups {
 	}
 
 	private static class LibraryPopup extends JPopupMenu implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6092802444073293277L;
 		Project proj;
 		Library lib;
 		JMenuItem unload = new JMenuItem(Strings.get("projectUnloadLibraryItem"));
@@ -95,8 +103,11 @@ public class Popups {
 	}
 
 	private static class CircuitPopup extends JPopupMenu implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6732558230542650705L;
 		Project proj;
-		Tool tool;
 		Circuit circuit;
 		JMenuItem analyze = new JMenuItem(Strings.get("projectAnalyzeCircuitItem"));
 		JMenuItem stats = new JMenuItem(Strings.get("projectGetCircuitStatisticsItem"));
@@ -108,7 +119,6 @@ public class Popups {
 		CircuitPopup(Project proj, Tool tool, Circuit circuit) {
 			super(Strings.get("circuitMenu"));
 			this.proj = proj;
-			this.tool = tool;
 			this.circuit = circuit;
 
 			add(editLayout);

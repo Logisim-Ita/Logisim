@@ -30,6 +30,11 @@ import com.cburch.logisim.std.gates.CircuitBuilder;
 import com.cburch.logisim.util.StringUtil;
 
 class BuildCircuitButton extends JButton {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8892619562183369771L;
+
 	private static class ProjectItem {
 		Project project;
 
@@ -44,13 +49,19 @@ class BuildCircuitButton extends JButton {
 	}
 
 	private class DialogPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5325461232777384226L;
 		private JLabel projectLabel = new JLabel();
+		@SuppressWarnings("rawtypes")
 		private JComboBox project;
 		private JLabel nameLabel = new JLabel();
 		private JTextField name = new JTextField(10);
 		private JCheckBox twoInputs = new JCheckBox();
 		private JCheckBox nands = new JCheckBox();
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		DialogPanel() {
 			List<Project> projects = Projects.getOpenProjects();
 			Object[] options = new Object[projects.size()];

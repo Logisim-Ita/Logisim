@@ -12,6 +12,10 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class CanvasModelEvent extends EventObject {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7991012928929959908L;
 	public static final int ACTION_ADDED = 0;
 	public static final int ACTION_REMOVED = 1;
 	public static final int ACTION_TRANSLATED = 2;

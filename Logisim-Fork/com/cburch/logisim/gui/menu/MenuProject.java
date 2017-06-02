@@ -13,6 +13,11 @@ import javax.swing.JMenuItem;
 import com.cburch.logisim.proj.Project;
 
 class MenuProject extends Menu {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6329011866349027157L;
+
 	private class MyListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {

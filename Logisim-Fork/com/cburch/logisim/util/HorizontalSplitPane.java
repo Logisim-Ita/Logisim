@@ -19,10 +19,18 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class HorizontalSplitPane extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8977009017954942590L;
 	static final int DRAG_TOLERANCE = 3;
 	private static final Color DRAG_COLOR = new Color(0, 0, 0, 128);
 
 	abstract static class Dragbar extends JComponent implements MouseListener, MouseMotionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5690944093101041181L;
 		private boolean dragging = false;
 		private int curValue;
 
@@ -147,6 +155,11 @@ public class HorizontalSplitPane extends JPanel {
 	}
 
 	private class MyDragbar extends Dragbar {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4604417196024325079L;
+
 		MyDragbar() {
 			setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
 		}

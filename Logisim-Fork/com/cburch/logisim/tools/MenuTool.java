@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 
@@ -26,6 +25,10 @@ import java.util.Collection;
 
 public class MenuTool extends Tool {
 	private class MenuComponent extends JPopupMenu implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6436885039502514176L;
 		Project proj;
 		Circuit circ;
 		Component comp;
@@ -61,6 +64,10 @@ public class MenuTool extends Tool {
 	}
 
 	private class MenuSelection extends JPopupMenu implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1370838533837437939L;
 		Project proj;
 		JMenuItem del = new JMenuItem(Strings.get("selDeleteItem"));
 		JMenuItem cut = new JMenuItem(Strings.get("selCutItem"));
@@ -90,10 +97,6 @@ public class MenuTool extends Tool {
 			} else if (src == copy) {
 				proj.doAction(SelectionActions.copy(sel));
 			}
-		}
-
-		public void show(JComponent parent, int x, int y) {
-			super.show(this, x, y);
 		}
 	}
 

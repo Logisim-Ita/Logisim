@@ -21,9 +21,17 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
 
 class OpenRecent extends JMenu implements PropertyChangeListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1981330127729616152L;
 	private static final int MAX_ITEM_LENGTH = 50;
 
 	private class RecentItem extends JMenuItem implements ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6716216074109494873L;
 		private File file;
 
 		RecentItem(File file) {

@@ -19,6 +19,11 @@ public class JFileChoosers {
 	 * opens up under. (23 Feb 2010)
 	 */
 	private static class LogisimFileChooser extends JFileChooser {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5952302672094549503L;
+
 		LogisimFileChooser() {
 			super();
 		}

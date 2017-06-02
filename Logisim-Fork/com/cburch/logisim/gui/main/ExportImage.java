@@ -142,6 +142,10 @@ class ExportImage {
 	}
 
 	private static class OptionsPanel extends JPanel implements ChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4328671325626354785L;
 		JSlider slider;
 		JLabel curScale;
 		JCheckBox printerView;
@@ -152,6 +156,7 @@ class ExportImage {
 		GridBagConstraints gbc;
 		Dimension curScaleDim;
 
+		@SuppressWarnings("rawtypes")
 		OptionsPanel(JList list) {
 			// set up components
 			formatPng = new JRadioButton("PNG");

@@ -18,6 +18,11 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 
 public abstract class JDialogOk extends JDialog {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7432361627841272787L;
+
 	private class MyListener extends WindowAdapter implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {

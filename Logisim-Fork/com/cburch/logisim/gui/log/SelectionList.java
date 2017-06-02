@@ -12,8 +12,20 @@ import javax.swing.ListSelectionModel;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Value;
 
+@SuppressWarnings("rawtypes")
 class SelectionList extends JList {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3343339830472123692L;
+
 	private class Model extends AbstractListModel implements ModelListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6084476713875063923L;
+
 		@Override
 		public int getSize() {
 			return selection == null ? 0 : selection.size();
@@ -39,6 +51,11 @@ class SelectionList extends JList {
 	}
 
 	private class MyCellRenderer extends DefaultListCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4073277461206824795L;
+
 		@Override
 		public java.awt.Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
 				boolean hasFocus) {
@@ -56,6 +73,7 @@ class SelectionList extends JList {
 
 	private Selection selection;
 
+	@SuppressWarnings("unchecked")
 	public SelectionList() {
 		selection = null;
 		setModel(new Model());

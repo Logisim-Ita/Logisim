@@ -25,6 +25,11 @@ import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.instance.StdAttr;
 
 class ComponentSelector extends JTree {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -966670821979919612L;
+
 	private static class CompareByName implements Comparator<Object> {
 		@Override
 		public int compare(Object a, Object b) {
@@ -317,6 +322,11 @@ class ComponentSelector extends JTree {
 	}
 
 	private class MyCellRenderer extends DefaultTreeCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 7961310548426901198L;
+
 		@Override
 		public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
 				boolean expanded, boolean leaf, int row, boolean hasFocus) {

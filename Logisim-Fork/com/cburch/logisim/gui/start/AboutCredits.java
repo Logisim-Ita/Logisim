@@ -19,6 +19,11 @@ import com.cburch.logisim.data.Value;
 import javax.swing.JComponent;
 
 class AboutCredits extends JComponent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9079743833961968776L;
+
 	/** Time to spend freezing the credits before after after scrolling */
 	private static final int MILLIS_FREEZE = 2000;
 

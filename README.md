@@ -13,10 +13,13 @@ This is an Eclipse italian fork based on original Logisim 2.7.1 version.
 * Zoom in and out using mouse wheel
 * Autoupdates!
 * Some small graphic editing
+## Features we want to add
+*Download progress bar while updating
+*Timing Diagram Component
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile
 I recommend you to watch this [video] (https://www.youtube.com/watch?v=38JFCqi_X3c)
 You also have to add external libraries in the project (/libs/*.jar)
 ## Translation
-New strings are translated really bad (Google Translate) because i just know Italian and English so, if you want, please help me translating other languages or you can add a new one, contact me at logisimit@gmail.com
+New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one,if you want so contact me at logisimit@gmail.com

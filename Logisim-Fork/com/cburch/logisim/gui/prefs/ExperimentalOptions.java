@@ -14,6 +14,10 @@ import javax.swing.JPanel;
 import com.cburch.logisim.prefs.AppPreferences;
 
 class ExperimentalOptions extends OptionsPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3383815234719208494L;
 	private JLabel accelRestart = new JLabel();
 	private PrefOptionList accel;
 

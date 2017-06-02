@@ -21,6 +21,10 @@ import com.cburch.logisim.analyze.model.TruthTableListener;
 import com.cburch.logisim.util.GraphicsUtil;
 
 class TableTab extends JPanel implements TruthTablePanel, TabInterface {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8687487329361908314L;
 	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
 	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
 	private static final int COLUMN_SEP = 8;
@@ -280,6 +284,11 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 
 	JScrollBar getVerticalScrollBar() {
 		return new JScrollBar() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 7084235376262867690L;
+
 			@Override
 			public int getUnitIncrement(int direction) {
 				int curY = getValue();

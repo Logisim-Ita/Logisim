@@ -166,12 +166,17 @@ public class Attributes {
 	}
 
 	private static class OptionComboRenderer<V> extends BasicComboBoxRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1123437012896240412L;
 		Attribute<V> attr;
 
 		OptionComboRenderer(Attribute<V> attr) {
 			this.attr = attr;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
 				boolean cellHasFocus) {
@@ -212,6 +217,7 @@ public class Attributes {
 			throw new NumberFormatException("value not among choices");
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public java.awt.Component getCellEditor(Object value) {
 			JComboBox combo = new JComboBox(vals);
@@ -324,6 +330,7 @@ public class Attributes {
 			return Integer.valueOf(v);
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
 			if (end - start + 1 > 32) {
@@ -392,6 +399,11 @@ public class Attributes {
 	}
 
 	private static class FontChooser extends JFontChooser implements JInputComponent {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5212740178994736166L;
+
 		FontChooser(Font initial) {
 			super(initial);
 		}
@@ -462,6 +474,11 @@ public class Attributes {
 	}
 
 	private static class ColorChooser extends ColorPicker implements JInputComponent {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3057718778843120638L;
+
 		ColorChooser(Color initial) {
 			if (initial != null)
 				setColor(initial);

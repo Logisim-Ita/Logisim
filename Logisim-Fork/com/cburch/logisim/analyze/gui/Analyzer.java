@@ -28,6 +28,10 @@ import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 
 public class Analyzer extends LFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5392356049016488231L;
 	// used by circuit analysis to select the relevant tab automatically.
 	public static final int INPUTS_TAB = 0;
 	public static final int OUTPUTS_TAB = 1;

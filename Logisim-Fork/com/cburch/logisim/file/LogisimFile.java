@@ -321,6 +321,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	public LogisimFile cloneLogisimFile(Loader newloader) {
 		PipedInputStream reader = new PipedInputStream();
 		PipedOutputStream writer = new PipedOutputStream();
