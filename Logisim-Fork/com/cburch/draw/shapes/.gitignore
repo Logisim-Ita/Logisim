@@ -1,0 +1,17 @@
+/Curve.class
+/CurveUtil.class
+/DrawAttr.class
+/FillableCanvasObject.class
+/Line.class
+/LineUtil.class
+/Oval.class
+/Poly.class
+/PolyUtil$ClosestResult.class
+/PolyUtil.class
+/Rectangle.class
+/Rectangular.class
+/RoundRectangle.class
+/Strings.class
+/SvgCreator.class
+/SvgReader.class
+/Text.class

@@ -51,7 +51,7 @@ public class Main {
 		}
 	}
 
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 4, "exe");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 5, "jar");
 
 	public static final String VERSION_NAME = VERSION.toString();
 	public static final int COPYRIGHT_YEAR = 2017;

@@ -1,0 +1,14 @@
+/AppearanceAnchor.class
+/AppearanceElement.class
+/AppearancePort.class
+/AppearanceSvgReader.class
+/CircuitAppearance$MyListener.class
+/CircuitAppearance.class
+/CircuitAppearanceEvent.class
+/CircuitAppearanceListener.class
+/CircuitPins$MyComponentListener.class
+/CircuitPins.class
+/DefaultAppearance$CompareLocations.class
+/DefaultAppearance.class
+/PortManager.class
+/Strings.class
