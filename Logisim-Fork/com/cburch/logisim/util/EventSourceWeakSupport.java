@@ -4,8 +4,8 @@
 package com.cburch.logisim.util;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class EventSourceWeakSupport<L> implements Iterable<L> {

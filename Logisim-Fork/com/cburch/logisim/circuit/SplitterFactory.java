@@ -3,14 +3,13 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.InputEvent;
 
 import javax.swing.Icon;
 
 import com.cburch.logisim.LogisimVersion;
-import com.cburch.logisim.circuit.Strings;
 import com.cburch.logisim.comp.AbstractComponentFactory;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;

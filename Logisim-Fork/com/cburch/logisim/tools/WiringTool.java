@@ -3,12 +3,15 @@
 
 package com.cburch.logisim.tools;
 
-import java.awt.Cursor;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.swing.Icon;
 
@@ -23,10 +26,6 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.StringGetter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Set;
 
 public class WiringTool extends Tool {
 	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);

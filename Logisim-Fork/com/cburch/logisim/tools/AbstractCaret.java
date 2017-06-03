@@ -4,11 +4,11 @@
 package com.cburch.logisim.tools;
 
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 import com.cburch.logisim.data.Bounds;
 

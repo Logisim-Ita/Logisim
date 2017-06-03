@@ -5,8 +5,8 @@ package com.cburch.draw.shapes;
 
 import java.awt.Color;
 
-import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.model.AbstractCanvasObject;
+import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
 

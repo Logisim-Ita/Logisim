@@ -14,9 +14,9 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.util.ArrayList;
 
-import com.cburch.logisim.data.Value;
-
 import javax.swing.JComponent;
+
+import com.cburch.logisim.data.Value;
 
 class AboutCredits extends JComponent {
 	/**

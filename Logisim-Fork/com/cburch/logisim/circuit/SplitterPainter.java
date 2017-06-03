@@ -8,8 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-import com.cburch.logisim.circuit.CircuitState;
-import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;

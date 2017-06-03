@@ -4,8 +4,8 @@
 package com.cburch.logisim.std.base;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 
 import com.cburch.logisim.comp.TextField;

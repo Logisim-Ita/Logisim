@@ -5,11 +5,9 @@ package com.cburch.logisim.circuit;
 
 import javax.swing.JPopupMenu;
 
-import com.cburch.logisim.circuit.CircuitState;
-import com.cburch.logisim.circuit.CircuitWires;
+import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.comp.ComponentEvent;
 import com.cburch.logisim.comp.ComponentFactory;
-import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.comp.ComponentUserEvent;
 import com.cburch.logisim.comp.EndData;
 import com.cburch.logisim.comp.ManagedComponent;

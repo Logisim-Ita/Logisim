@@ -3,9 +3,6 @@
 
 package com.cburch.logisim.util;
 
-import com.cburch.logisim.util.LocaleManager;
-import com.cburch.logisim.util.StringGetter;
-
 class Strings {
 	static LocaleManager source = new LocaleManager("resources/logisim", "util");
 

@@ -3,8 +3,16 @@
 
 package com.cburch.draw.tools;
 
-import com.cburch.draw.model.CanvasObject;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 import com.cburch.draw.model.AbstractCanvasObject;
+import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.shapes.DrawAttr;
 import com.cburch.logisim.data.AbstractAttributeSet;
 import com.cburch.logisim.data.Attribute;
@@ -13,14 +21,6 @@ import com.cburch.logisim.data.AttributeListener;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.util.EventSourceWeakSupport;
 import com.cburch.logisim.util.UnmodifiableList;
-
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 public class DrawingAttributeSet implements AttributeSet, Cloneable {
 	static final List<Attribute<?>> ATTRS_ALL = UnmodifiableList

@@ -4,6 +4,7 @@
 package com.cburch.logisim.util;
 
 import java.util.Locale;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;

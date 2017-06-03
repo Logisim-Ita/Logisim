@@ -7,13 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //MAC import java.io.File;
 
-import net.roydesign.event.ApplicationEvent;
-import net.roydesign.mac.MRJAdapter;
-
 //MAC import com.apple.eawt.Application;
 //MAC import com.apple.eawt.ApplicationAdapter;
 import com.cburch.logisim.gui.prefs.PreferencesFrame;
 import com.cburch.logisim.proj.ProjectActions;
+
+import net.roydesign.event.ApplicationEvent;
+import net.roydesign.mac.MRJAdapter;
 
 class MacOsAdapter { // MAC extends ApplicationAdapter {
 

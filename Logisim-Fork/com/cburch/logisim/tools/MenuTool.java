@@ -3,13 +3,15 @@
 
 package com.cburch.logisim.tools;
 
-import java.awt.Graphics;
 import java.awt.Color;
-import java.awt.event.ActionListener;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import javax.swing.JPopupMenu;
+import java.util.Collection;
+
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitMutation;
@@ -20,8 +22,6 @@ import com.cburch.logisim.gui.main.Canvas;
 import com.cburch.logisim.gui.main.Selection;
 import com.cburch.logisim.gui.main.SelectionActions;
 import com.cburch.logisim.proj.Project;
-
-import java.util.Collection;
 
 public class MenuTool extends Tool {
 	private class MenuComponent extends JPopupMenu implements ActionListener {

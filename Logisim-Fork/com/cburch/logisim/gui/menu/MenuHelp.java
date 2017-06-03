@@ -3,11 +3,6 @@
 
 package com.cburch.logisim.gui.menu;
 
-import com.cburch.logisim.gui.generic.LFrame;
-import com.cburch.logisim.gui.start.About;
-import com.cburch.logisim.gui.start.Startup;
-import com.cburch.logisim.util.MacCompatibility;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -20,6 +15,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
+import com.cburch.logisim.gui.generic.LFrame;
+import com.cburch.logisim.gui.start.About;
+import com.cburch.logisim.util.MacCompatibility;
+
 class MenuHelp extends JMenu implements ActionListener {
 	/**
 	 * 
@@ -29,7 +28,6 @@ class MenuHelp extends JMenu implements ActionListener {
 	private JMenuItem tutorial = new JMenuItem();
 	private JMenuItem guide = new JMenuItem();
 	private JMenuItem library = new JMenuItem();
-	private JMenuItem update = new JMenuItem();
 	private JMenuItem about = new JMenuItem();
 	private HelpSet helpSet;
 	private String helpSetUrl = "";
@@ -42,7 +40,6 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.addActionListener(this);
 		guide.addActionListener(this);
 		library.addActionListener(this);
-		update.addActionListener(this);
 		about.addActionListener(this);
 
 		add(tutorial);
@@ -50,7 +47,6 @@ class MenuHelp extends JMenu implements ActionListener {
 		add(library);
 		if (!MacCompatibility.isAboutAutomaticallyPresent()) {
 			addSeparator();
-			add(update);
 			add(about);
 		}
 	}
@@ -63,7 +59,6 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.setText(Strings.get("helpTutorialItem"));
 		guide.setText(Strings.get("helpGuideItem"));
 		library.setText(Strings.get("helpLibraryItem"));
-		update.setText(Strings.get("CheckUpdates"));
 		about.setText(Strings.get("helpAboutItem"));
 		if (helpFrame != null) {
 			helpFrame.setLocale(Locale.getDefault());
@@ -80,9 +75,6 @@ class MenuHelp extends JMenu implements ActionListener {
 			showHelp("tutorial");
 		} else if (src == library) {
 			showHelp("libs");
-		} else if (src == update) {
-			Startup startup = new Startup(true);
-			startup.autoUpdate(true);
 		} else if (src == about) {
 			About.showAboutDialog(menubar.getParentWindow());
 		}

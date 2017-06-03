@@ -6,13 +6,13 @@ package com.cburch.logisim.std.base;
 import java.util.Arrays;
 import java.util.List;
 
+import com.cburch.logisim.tools.AddTool;
+import com.cburch.logisim.tools.EditTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.MenuTool;
 import com.cburch.logisim.tools.PokeTool;
 import com.cburch.logisim.tools.SelectTool;
 import com.cburch.logisim.tools.TextTool;
-import com.cburch.logisim.tools.AddTool;
-import com.cburch.logisim.tools.EditTool;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.tools.WiringTool;
 

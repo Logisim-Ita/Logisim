@@ -3,10 +3,10 @@
 
 package com.cburch.logisim.tools;
 
-import java.awt.Cursor;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Cursor;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 

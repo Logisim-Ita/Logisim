@@ -24,9 +24,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
+import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.OutputExpressionsEvent;
 import com.cburch.logisim.analyze.model.OutputExpressionsListener;
-import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.Parser;
 import com.cburch.logisim.analyze.model.ParserException;
 import com.cburch.logisim.util.StringGetter;

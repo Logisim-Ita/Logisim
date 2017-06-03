@@ -18,8 +18,8 @@ import com.cburch.logisim.circuit.CircuitException;
 import com.cburch.logisim.circuit.CircuitMutation;
 import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.comp.Component;
-import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.comp.ComponentDrawContext;
+import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeEvent;
 import com.cburch.logisim.data.AttributeListener;
@@ -35,8 +35,8 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Dependencies;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.key.KeyConfigurationEvent;
-import com.cburch.logisim.tools.key.KeyConfigurator;
 import com.cburch.logisim.tools.key.KeyConfigurationResult;
+import com.cburch.logisim.tools.key.KeyConfigurator;
 import com.cburch.logisim.util.StringUtil;
 
 public class AddTool extends Tool {

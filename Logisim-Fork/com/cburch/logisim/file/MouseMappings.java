@@ -6,8 +6,8 @@ package com.cburch.logisim.file;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.AttributeSets;

@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 

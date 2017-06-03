@@ -3,6 +3,8 @@
 
 package com.cburch.logisim.gui.start;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,8 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.swing.UIManager;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.Main;
@@ -97,6 +99,7 @@ public class Startup {
 	private boolean templPlain = false;
 	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
+	private boolean updatecanceled = false;
 	private File loadFile;
 	private HashMap<File, File> substitutions = new HashMap<File, File>();
 	private int ttyFormat = 0;
@@ -487,7 +490,6 @@ public class Startup {
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
-
 			int answer = JOptionPane.showConfirmDialog(null,
 					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
 							logisimData.child("changelog").content()),
@@ -516,14 +518,14 @@ public class Startup {
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
 
-			boolean updateOk = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
+			byte updateOk = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
-			if (updateOk) {
+			if (updateOk == 1) {
 				JOptionPane.showMessageDialog(null,
 						StringUtil.format(Strings.get("UpdateSucceededMessage"), remoteVersion.toString()),
 						Strings.get("UpdateSucceeded"), JOptionPane.INFORMATION_MESSAGE);
 				return (true);
-			} else {
+			} else if (updateOk == 0) {
 				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailedMessage"), Strings.get("UpdateFailed"),
 						JOptionPane.ERROR_MESSAGE);
 				return (false);
@@ -551,14 +553,14 @@ public class Startup {
 	 *         otherwise
 	 * @throws IOException
 	 */
-	private boolean downloadInstallUpdatedVersion(String filePath, String destination) {
+	private byte downloadInstallUpdatedVersion(String filePath, String destination) {
 		URL fileURL;
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
 			System.err.println(
 					"The URL of the requested update file is malformed.\nPlease report this error to the software maintainer.\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 		URLConnection conn;
 		try {
@@ -566,7 +568,7 @@ public class Startup {
 		} catch (IOException e) {
 			System.err.println(
 					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 
 		// Get remote file size
@@ -574,7 +576,7 @@ public class Startup {
 		if (length == -1) {
 			System.err.println(
 					"Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 
 		// Get remote file stream
@@ -584,7 +586,7 @@ public class Startup {
 		} catch (IOException e) {
 			System.err.println(
 					"Cannot get remote file stream.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 
 		// Local file buffer
@@ -596,20 +598,44 @@ public class Startup {
 		int deplacement = 0;
 
 		// Download remote content
+		UpdateScreen updatescreen = null;
+		try {
+			updatescreen = new UpdateScreen(length);
+
+			updatescreen.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent evt) {
+					updatecanceled = true;
+				}
+			});
+			updatescreen.setVisible(true);
+		} catch (Throwable t) {
+			updatescreen = null;
+		}
 		try {
 			while (deplacement < length) {
+				if (updatescreen != null)
+					updatescreen.setProgress(deplacement);
+
 				currentBit = is.read(data, deplacement, data.length - deplacement);
 
-				if (currentBit == -1) {
+				if (currentBit == -1)
 					// Reached EOF
 					break;
+
+				if (updatecanceled) {
+					updatescreen.close();
+					return 2;
 				}
+
 				deplacement += currentBit;
 			}
+			if (updatescreen != null)
+				updatescreen.close();
 		} catch (IOException e) {
 			System.err.println(
 					"An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 		// Close remote stream
 		try {
@@ -623,7 +649,7 @@ public class Startup {
 		if (deplacement != length) {
 			System.err.println(
 					"An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 
 		// Open stream for local Jar and write data
@@ -632,7 +658,7 @@ public class Startup {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
 			System.err.println("An error occured while opening the local Jar file.\n-- AUTO-UPDATE ABORTED --");
-			return (false);
+			return 0;
 		}
 		try {
 			destinationFile.write(data);
@@ -646,11 +672,11 @@ public class Startup {
 			} catch (IOException e) {
 				System.err.println(
 						"Error encountered while closing the local destination file!\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
-				return (false);
+				return 0;
 			}
 		}
 
-		return (true);
+		return 1;
 	}
 
 	/**

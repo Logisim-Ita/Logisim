@@ -6,8 +6,8 @@ package com.cburch.logisim.util;
 import java.awt.Event;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 public class InputEventUtil {
 	public static String CTRL = "Ctrl";

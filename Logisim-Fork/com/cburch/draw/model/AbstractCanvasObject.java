@@ -3,6 +3,14 @@
 
 package com.cburch.draw.model;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.List;
+import java.util.Random;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import com.cburch.draw.shapes.DrawAttr;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeEvent;
@@ -12,14 +20,6 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.EventSourceWeakSupport;
 import com.cburch.logisim.util.GraphicsUtil;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.List;
-import java.util.Random;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject, Cloneable {
 	private static final int OVERLAP_TRIES = 50;

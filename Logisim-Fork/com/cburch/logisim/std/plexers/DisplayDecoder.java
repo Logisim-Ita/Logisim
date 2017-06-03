@@ -5,6 +5,7 @@ package com.cburch.logisim.std.plexers;
 
 import java.awt.Color;
 import java.awt.Graphics;
+
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Bounds;

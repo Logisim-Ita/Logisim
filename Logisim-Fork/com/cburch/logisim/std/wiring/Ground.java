@@ -9,9 +9,6 @@ package com.cburch.logisim.std.wiring;
 
 import java.awt.Graphics2D;
 
-import com.cburch.logisim.tools.key.BitWidthConfigurator;
-import com.cburch.logisim.util.GraphicsUtil;
-
 import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
@@ -26,6 +23,8 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.tools.key.BitWidthConfigurator;
+import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ground extends InstanceFactory {
 	public Ground() {

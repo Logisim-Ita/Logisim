@@ -5,14 +5,15 @@ package com.cburch.logisim.file;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;

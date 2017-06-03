@@ -3,12 +3,15 @@
 
 package com.cburch.logisim.gui.main;
 
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
@@ -24,10 +27,6 @@ import com.cburch.logisim.proj.ProjectEvent;
 import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.InputEventUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 class LayoutToolbarModel extends AbstractToolbarModel {
 	private class ToolItem implements ToolbarItem {

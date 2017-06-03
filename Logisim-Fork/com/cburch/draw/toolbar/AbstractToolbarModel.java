@@ -3,11 +3,6 @@
 
 package com.cburch.draw.toolbar;
 
-import com.cburch.draw.toolbar.ToolbarItem;
-import com.cburch.draw.toolbar.ToolbarModel;
-import com.cburch.draw.toolbar.ToolbarModelEvent;
-import com.cburch.draw.toolbar.ToolbarModelListener;
-
 import java.util.ArrayList;
 import java.util.List;
 

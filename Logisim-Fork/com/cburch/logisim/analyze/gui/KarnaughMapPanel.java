@@ -15,10 +15,10 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
-import com.cburch.logisim.analyze.model.OutputExpressionsEvent;
-import com.cburch.logisim.analyze.model.OutputExpressionsListener;
 import com.cburch.logisim.analyze.model.Entry;
 import com.cburch.logisim.analyze.model.Implicant;
+import com.cburch.logisim.analyze.model.OutputExpressionsEvent;
+import com.cburch.logisim.analyze.model.OutputExpressionsListener;
 import com.cburch.logisim.analyze.model.TruthTable;
 import com.cburch.logisim.analyze.model.TruthTableEvent;
 import com.cburch.logisim.analyze.model.TruthTableListener;

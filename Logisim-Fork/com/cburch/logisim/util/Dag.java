@@ -5,8 +5,8 @@ package com.cburch.logisim.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Dag {
 	private static class Node {

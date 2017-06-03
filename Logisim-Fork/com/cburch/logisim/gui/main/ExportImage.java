@@ -3,15 +3,6 @@
 
 package com.cburch.logisim.gui.main;
 
-import com.cburch.logisim.circuit.Circuit;
-import com.cburch.logisim.circuit.CircuitState;
-import com.cburch.logisim.comp.ComponentDrawContext;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.file.Loader;
-import com.cburch.logisim.proj.Project;
-import com.cburch.logisim.util.GifEncoder;
-import com.cburch.logisim.util.StringGetter;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -42,6 +33,15 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+
+import com.cburch.logisim.circuit.Circuit;
+import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.comp.ComponentDrawContext;
+import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.file.Loader;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.util.GifEncoder;
+import com.cburch.logisim.util.StringGetter;
 
 class ExportImage {
 	private static final int SLIDER_DIVISIONS = 6;
