@@ -14,7 +14,7 @@ This is an Eclipse italian fork based on original Logisim 2.7.1 version.
 * Autoupdates!
 * Some small graphic editing
 ## Features we want to add
-*Timing Diagram Component
+* Timing Diagram Component
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile
