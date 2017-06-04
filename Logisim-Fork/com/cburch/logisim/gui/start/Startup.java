@@ -609,21 +609,24 @@ public class Startup {
 				}
 			});
 			updatescreen.setVisible(true);
+			
 		} catch (Throwable t) {
 			updatescreen = null;
 		}
+		
 		try {
 			while (deplacement < length) {
-				if (updatescreen != null)
-					updatescreen.setProgress(deplacement);
+				if (!updatecanceled) {
+					if (updatescreen != null)
+						updatescreen.setProgress(deplacement);
 
-				currentBit = is.read(data, deplacement, data.length - deplacement);
+					currentBit = is.read(data, deplacement, data.length - deplacement);
 
-				if (currentBit == -1)
-					// Reached EOF
-					break;
+					if (currentBit == -1)
+						// Reached EOF
+						break;
 
-				if (updatecanceled) {
+				} else {
 					updatescreen.close();
 					return 2;
 				}

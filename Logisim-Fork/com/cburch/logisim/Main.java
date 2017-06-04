@@ -47,11 +47,11 @@ public class Main {
 					JOptionPane.showMessageDialog(null, result.toString());
 					System.exit(-1);
 				}
-			}
+			} else System.exit(0);
 		}
 	}
 
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 8, "exe");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 9, "exe");
 
 	public static final String VERSION_NAME = VERSION.toString();
 	public static final int COPYRIGHT_YEAR = 2017;

@@ -9,14 +9,18 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.net.URL;
 
-import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 import javax.swing.border.EmptyBorder;
+
+import com.cburch.logisim.gui.generic.LFrame;
 
 public class UpdateScreen extends JWindow {
 	/**
@@ -28,6 +32,7 @@ public class UpdateScreen extends JWindow {
 
 	long startTime = System.currentTimeMillis();
 
+	JFrame f;
 	JButton cancel = new JButton(Strings.get("startupCancelButton"));
 	JProgressBar progress;
 	JLabel label;
@@ -37,10 +42,11 @@ public class UpdateScreen extends JWindow {
 		MAX = n;
 
 		JPanel labelPanel = new JPanel(new FlowLayout());
-		label = new JLabel("Download...");
+		label = new JLabel("Downloading...");
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 12));
 		label.setBorder(new EmptyBorder(8, 0, 8, 0));
 		labelPanel.add(label);
+		labelPanel.setBackground(Color.WHITE);
 
 		JPanel progressPanel = new JPanel(new BorderLayout());
 		progressPanel.setPreferredSize(new Dimension(300, 30));
@@ -48,21 +54,28 @@ public class UpdateScreen extends JWindow {
 		progress = new JProgressBar(0, MAX);
 		progress.setStringPainted(true);
 		progressPanel.add(progress);
+		progressPanel.setBackground(Color.WHITE);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout());
 		buttonPanel.add(cancel);
+		buttonPanel.setBackground(Color.WHITE);
 
 		JPanel updatePanel = new JPanel(new BorderLayout());
 		updatePanel.add(labelPanel, BorderLayout.NORTH);
 		updatePanel.add(progressPanel, BorderLayout.CENTER);
 		updatePanel.add(buttonPanel, BorderLayout.SOUTH);
-		updatePanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
-		labelPanel.setBackground(Color.WHITE);
-		progressPanel.setBackground(Color.WHITE);
-		buttonPanel.setBackground(Color.WHITE);
-		setBackground(Color.WHITE);
-		setContentPane(updatePanel);
+		ClassLoader loader = LFrame.class.getClassLoader();
+		URL url = loader.getResource("resources/logisim/img/update-icon.png");
+		ImageIcon icon = null;
+		if (url != null)
+			icon = new ImageIcon(url);
+
+		f = new JFrame("Downloading");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.getContentPane().add(updatePanel, BorderLayout.CENTER);
+		f.setResizable(false);
+		if(icon!=null) f.setIconImage(icon.getImage());
 	}
 
 	public void setProgress(int n) {
@@ -75,20 +88,20 @@ public class UpdateScreen extends JWindow {
 	@Override
 	public void setVisible(boolean value) {
 		if (value) {
-			pack();
+			f.pack();
 			Dimension dim = getToolkit().getScreenSize();
-			int x = (int) (dim.getWidth() - getWidth()) / 2;
-			int y = (int) (dim.getHeight() - getHeight()) / 2;
-			setLocation(x, y);
+			int x = (int) (dim.getWidth() - f.getWidth()) / 2;
+			int y = (int) (dim.getHeight() - f.getHeight()) / 2;
+			f.setLocation(x, y);
 		}
-		super.setVisible(value);
+		f.setVisible(value);
 	}
 
 	public void close() {
 		if (inClose)
 			return;
 		inClose = true;
-		setVisible(false);
+		f.setVisible(false);
 		inClose = false;
 	}
 
