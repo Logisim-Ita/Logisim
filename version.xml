@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.7.1.8</jar_version>
+  <jar_version>2.7.1.9</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.7.1.8</exe_version>
+  <exe_version>2.7.1.9</exe_version>
   <changelog>
-*From 2.7.1.8 download progressbar while updating
+*Reduced a little file size and little changes
   </changelog>
 </logisim>
