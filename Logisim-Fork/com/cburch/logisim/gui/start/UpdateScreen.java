@@ -38,7 +38,22 @@ public class UpdateScreen extends JWindow {
 	JLabel label;
 	int MAX = 0;
 
-	public UpdateScreen(int n) {
+	public UpdateScreen() {
+
+		ClassLoader loader = LFrame.class.getClassLoader();
+		URL url = loader.getResource("resources/logisim/img/update-icon.png");
+		ImageIcon icon = null;
+		if (url != null)
+			icon = new ImageIcon(url);
+
+		f = new JFrame("Downloading");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setResizable(false);
+		if (icon != null)
+			f.setIconImage(icon.getImage());
+	}
+
+	public void Downloading(int n) {
 		MAX = n;
 
 		JPanel labelPanel = new JPanel(new FlowLayout());
@@ -65,17 +80,15 @@ public class UpdateScreen extends JWindow {
 		updatePanel.add(progressPanel, BorderLayout.CENTER);
 		updatePanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		ClassLoader loader = LFrame.class.getClassLoader();
-		URL url = loader.getResource("resources/logisim/img/update-icon.png");
-		ImageIcon icon = null;
-		if (url != null)
-			icon = new ImageIcon(url);
-
-		f = new JFrame("Downloading");
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.getContentPane().add(updatePanel, BorderLayout.CENTER);
-		f.setResizable(false);
-		if(icon!=null) f.setIconImage(icon.getImage());
+	}
+
+	public void ClearWindow() {
+		f.getContentPane().removeAll();
+	}
+
+	public void Repaint() {
+		f.getContentPane().repaint();
 	}
 
 	public void setProgress(int n) {
