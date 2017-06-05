@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
@@ -46,7 +47,7 @@ public class UpdateScreen extends JWindow {
 		if (url != null)
 			icon = new ImageIcon(url);
 
-		f = new JFrame("Downloading");
+		f = new JFrame(Strings.get("Update"));
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setResizable(false);
 		if (icon != null)
@@ -58,13 +59,12 @@ public class UpdateScreen extends JWindow {
 
 		JPanel labelPanel = new JPanel(new FlowLayout());
 		label = new JLabel("Downloading...");
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 12));
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 14));
 		label.setBorder(new EmptyBorder(8, 0, 8, 0));
 		labelPanel.add(label);
 		labelPanel.setBackground(Color.WHITE);
 
 		JPanel progressPanel = new JPanel(new BorderLayout());
-		progressPanel.setPreferredSize(new Dimension(300, 30));
 		progressPanel.setBorder(new EmptyBorder(0, 10, 8, 10));
 		progress = new JProgressBar(0, MAX);
 		progress.setStringPainted(true);
@@ -82,12 +82,24 @@ public class UpdateScreen extends JWindow {
 
 		f.getContentPane().add(updatePanel, BorderLayout.CENTER);
 	}
+	
+	
+	public void Message(String s) {
+		label = new JLabel(s);
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 13));
+		JPanel j = new JPanel(new GridBagLayout());
+		j.add(label);
+		j.setPreferredSize(new Dimension(305,105));
+		f.getContentPane().add(j, BorderLayout.CENTER);
+	}
 
-	public void ClearWindow() {
+	public void Clear() {
+		f.invalidate();
 		f.getContentPane().removeAll();
 	}
 
 	public void Repaint() {
+		f.validate();
 		f.getContentPane().repaint();
 	}
 

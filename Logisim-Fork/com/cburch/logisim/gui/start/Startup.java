@@ -107,6 +107,7 @@ public class Startup {
 	// from other sources
 	private boolean initialized = false;
 	private SplashScreen monitor = null;
+	UpdateScreen updatescreen = null;
 	private ArrayList<File> filesToPrint = new ArrayList<File>();
 
 	public Startup(boolean isTty) {
@@ -498,7 +499,14 @@ public class Startup {
 				// annoyed by the message that he finally updates!
 				return (false);
 			}
+			try {
+				updatescreen = new UpdateScreen();
+				updatescreen.Message(Strings.get("Connectioncheck")+"...");
+				updatescreen.setVisible(true);
 
+			} catch (Throwable t) {
+				updatescreen = null;
+			}
 			// Obtain the base directory of the archive
 			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();
 			File jarFile = null;
@@ -552,10 +560,12 @@ public class Startup {
 	 * @throws IOException
 	 */
 	private byte downloadInstallUpdatedVersion(String filePath, String destination) {
+
 		URL fileURL;
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
+			updatescreen.close();
 			System.err.println(
 					"The URL of the requested update file is malformed.\nPlease report this error to the software maintainer.\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -564,6 +574,7 @@ public class Startup {
 		try {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
+			updatescreen.close();
 			System.err.println(
 					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -572,6 +583,7 @@ public class Startup {
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
+			updatescreen.close();
 			System.err.println(
 					"Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -582,6 +594,7 @@ public class Startup {
 		try {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
+			updatescreen.close();
 			System.err.println(
 					"Cannot get remote file stream.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -596,27 +609,22 @@ public class Startup {
 		int deplacement = 0;
 
 		// Download remote content
-		UpdateScreen updatescreen = null;
-		try {
-			updatescreen = new UpdateScreen();
-			updatescreen.Downloading(length);
-			updatescreen.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent evt) {
-					updatecanceled = true;
-				}
-			});
-			updatescreen.setVisible(true);
-
-		} catch (Throwable t) {
-			updatescreen = null;
-		}
 
 		try {
+			if (updatescreen != null) {
+				updatescreen.Clear();
+				updatescreen.Downloading(length);
+				updatescreen.Repaint();
+				updatescreen.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent evt) {
+						updatecanceled = true;
+					}
+				});
+			}
 			while (deplacement < length) {
 				if (!updatecanceled) {
-					if (updatescreen != null)
-						updatescreen.setProgress(deplacement);
+					updatescreen.setProgress(deplacement);
 
 					currentBit = is.read(data, deplacement, data.length - deplacement);
 
@@ -631,9 +639,12 @@ public class Startup {
 
 				deplacement += currentBit;
 			}
-			if (updatescreen != null)
-				updatescreen.close();
+			updatescreen.Clear();
+			updatescreen.Message(Strings.get("Installing")+"...");
+			updatescreen.Repaint();
+
 		} catch (IOException e) {
+			updatescreen.close();
 			System.err.println(
 					"An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -642,12 +653,14 @@ public class Startup {
 		try {
 			is.close();
 		} catch (IOException e) {
+			updatescreen.close();
 			System.err.println("Error encountered while closing the remote stream!");
 			e.printStackTrace();
 		}
 
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
+			updatescreen.close();
 			System.err.println(
 					"An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
 			return 0;
@@ -658,6 +671,7 @@ public class Startup {
 		try {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
+			updatescreen.close();
 			System.err.println("An error occured while opening the local Jar file.\n-- AUTO-UPDATE ABORTED --");
 			return 0;
 		}
@@ -665,18 +679,20 @@ public class Startup {
 			destinationFile.write(data);
 			destinationFile.flush();
 		} catch (IOException e) {
+			updatescreen.close();
 			System.err.println(
 					"An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 		} finally {
 			try {
 				destinationFile.close();
 			} catch (IOException e) {
+				updatescreen.close();
 				System.err.println(
 						"Error encountered while closing the local destination file!\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
 				return 0;
 			}
 		}
-
+		updatescreen.close();
 		return 1;
 	}
 
