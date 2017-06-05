@@ -598,8 +598,8 @@ public class Startup {
 		// Download remote content
 		UpdateScreen updatescreen = null;
 		try {
-			updatescreen = new UpdateScreen(length);
-
+			updatescreen = new UpdateScreen();
+			updatescreen.Downloading(length);
 			updatescreen.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent evt) {
@@ -607,11 +607,11 @@ public class Startup {
 				}
 			});
 			updatescreen.setVisible(true);
-			
+
 		} catch (Throwable t) {
 			updatescreen = null;
 		}
-		
+
 		try {
 			while (deplacement < length) {
 				if (!updatecanceled) {
