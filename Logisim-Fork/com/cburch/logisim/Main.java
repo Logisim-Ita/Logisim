@@ -56,7 +56,6 @@ public class Main {
 	public static final String VERSION_NAME = VERSION.toString();
 	public static final int COPYRIGHT_YEAR = 2017;
 
-	public static boolean ANALYZE = false;
 	/**
 	 * This flag enables auto-updates. It is true by default, so that users
 	 * normally check for updates at startup. On the other hand, this might be
@@ -65,8 +64,7 @@ public class Main {
 	 */
 	public static boolean UPDATE = true;
 
-	/**
-	 * URL for the automatic updater
-	 */
+	/* URL for the automatic updater*/
+	
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 }

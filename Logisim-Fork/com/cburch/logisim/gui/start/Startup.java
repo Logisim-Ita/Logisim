@@ -407,8 +407,6 @@ public class Startup {
 				ret.showSplash = false;
 			} else if (arg.equals("-clearprefs")) {
 				// already handled above
-			} else if (arg.equals("-analyze")) {
-				Main.ANALYZE = true;
 			} else if (arg.equals("-noupdates")) {
 				Main.UPDATE = false;
 			} else if (arg.charAt(0) == '-') {
