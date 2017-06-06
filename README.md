@@ -8,6 +8,7 @@ This is an Eclipse italian fork based on original Logisim 2.7.1 version.
 * Default gates' attributes: narrow, 2 inputs
 * New components:
 	* I/O->Switch
+	* I/O->RGB LED
 	* Plexers->7-Segment Display Decoder
 * Added 7-Segment Display input names
 * Zoom in and out using mouse wheel

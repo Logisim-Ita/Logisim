@@ -36,6 +36,7 @@ public class Io extends Library {
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
 			new FactoryDescription("LED", Strings.getter("ledComponent"), "led.gif", "Led"),
+			new FactoryDescription("RGB Led", Strings.getter("RGB LED"), "rgbled.gif", "RGBLed"),
 			new FactoryDescription("7-Segment Display", Strings.getter("sevenSegmentComponent"), "7seg.gif",
 					"SevenSegment"),
 			new FactoryDescription("Hex Digit Display", Strings.getter("hexDigitComponent"), "hexdig.gif", "HexDigit"),

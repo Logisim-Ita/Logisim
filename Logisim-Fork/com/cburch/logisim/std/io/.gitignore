@@ -20,3 +20,5 @@
 /Switch.class
 /Tty.class
 /TtyState.class
+/RGBLed$Logger.class
+/RGBLed.class
