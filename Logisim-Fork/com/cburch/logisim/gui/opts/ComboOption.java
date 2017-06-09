@@ -9,32 +9,6 @@ import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.util.StringGetter;
 
 class ComboOption {
-	private Object value;
-	private StringGetter getter;
-
-	ComboOption(String value, StringGetter getter) {
-		this.value = value;
-		this.getter = getter;
-	}
-
-	ComboOption(AttributeOption value) {
-		this.value = value;
-		this.getter = null;
-	}
-
-	@Override
-	public String toString() {
-		if (getter != null)
-			return getter.get();
-		if (value instanceof AttributeOption)
-			return ((AttributeOption) value).toDisplayString();
-		return "???";
-	}
-
-	public Object getValue() {
-		return value;
-	}
-
 	@SuppressWarnings("rawtypes")
 	static void setSelected(JComboBox combo, Object value) {
 		for (int i = combo.getItemCount() - 1; i >= 0; i--) {
@@ -45,6 +19,32 @@ class ComboOption {
 			}
 		}
 		combo.setSelectedItem(combo.getItemAt(0));
+	}
+	private Object value;
+
+	private StringGetter getter;
+
+	ComboOption(AttributeOption value) {
+		this.value = value;
+		this.getter = null;
+	}
+
+	ComboOption(String value, StringGetter getter) {
+		this.value = value;
+		this.getter = getter;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	@Override
+	public String toString() {
+		if (getter != null)
+			return getter.get();
+		if (value instanceof AttributeOption)
+			return ((AttributeOption) value).toDisplayString();
+		return "???";
 	}
 
 }

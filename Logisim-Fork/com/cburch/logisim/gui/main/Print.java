@@ -36,110 +36,6 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.StringUtil;
 
 public class Print {
-	private Print() {
-	}
-
-	public static void doPrint(Project proj) {
-		CircuitJList list = new CircuitJList(proj, true);
-		Frame frame = proj.getFrame();
-		if (list.getModel().getSize() == 0) {
-			JOptionPane.showMessageDialog(proj.getFrame(), Strings.get("printEmptyCircuitsMessage"),
-					Strings.get("printEmptyCircuitsTitle"), JOptionPane.YES_NO_OPTION);
-			return;
-		}
-		ParmsPanel parmsPanel = new ParmsPanel(list);
-		int action = JOptionPane.showConfirmDialog(frame, parmsPanel, Strings.get("printParmsTitle"),
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (action != JOptionPane.OK_OPTION)
-			return;
-		List<Circuit> circuits = list.getSelectedCircuits();
-		if (circuits.isEmpty())
-			return;
-
-		PageFormat format = new PageFormat();
-		Printable print = new MyPrintable(proj, circuits, parmsPanel.getHeader(), parmsPanel.getRotateToFit(),
-				parmsPanel.getPrinterView());
-
-		PrinterJob job = PrinterJob.getPrinterJob();
-		job.setPrintable(print, format);
-		if (job.printDialog() == false)
-			return;
-		try {
-			job.print();
-		} catch (PrinterException e) {
-			JOptionPane.showMessageDialog(proj.getFrame(), StringUtil.format(Strings.get("printError"), e.toString()),
-					Strings.get("printErrorTitle"), JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-	private static class ParmsPanel extends JPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3413198957333746370L;
-		JCheckBox rotateToFit;
-		JCheckBox printerView;
-		JTextField header;
-		GridBagLayout gridbag;
-		GridBagConstraints gbc;
-
-		@SuppressWarnings("rawtypes")
-		ParmsPanel(JList list) {
-			// set up components
-			rotateToFit = new JCheckBox();
-			rotateToFit.setSelected(true);
-			printerView = new JCheckBox();
-			printerView.setSelected(true);
-			header = new JTextField(20);
-			header.setText("%n (%p of %P)");
-
-			// set up panel
-			gridbag = new GridBagLayout();
-			gbc = new GridBagConstraints();
-			setLayout(gridbag);
-
-			// now add components into panel
-			gbc.gridy = 0;
-			gbc.gridx = GridBagConstraints.RELATIVE;
-			gbc.anchor = GridBagConstraints.NORTHWEST;
-			gbc.insets = new Insets(5, 0, 5, 0);
-			gbc.fill = GridBagConstraints.NONE;
-			addGb(new JLabel(Strings.get("labelCircuits") + " "));
-			gbc.fill = GridBagConstraints.HORIZONTAL;
-			addGb(new JScrollPane(list));
-			gbc.fill = GridBagConstraints.NONE;
-
-			gbc.gridy++;
-			addGb(new JLabel(Strings.get("labelHeader") + " "));
-			addGb(header);
-
-			gbc.gridy++;
-			addGb(new JLabel(Strings.get("labelRotateToFit") + " "));
-			addGb(rotateToFit);
-
-			gbc.gridy++;
-			addGb(new JLabel(Strings.get("labelPrinterView") + " "));
-			addGb(printerView);
-		}
-
-		private void addGb(JComponent comp) {
-			gridbag.setConstraints(comp, gbc);
-			add(comp);
-		}
-
-		boolean getRotateToFit() {
-			return rotateToFit.isSelected();
-		}
-
-		boolean getPrinterView() {
-			return printerView.isSelected();
-		}
-
-		String getHeader() {
-			return header.getText();
-		}
-	}
-
 	private static class MyPrintable implements Printable {
 		Project proj;
 		List<Circuit> circuits;
@@ -234,6 +130,107 @@ public class Print {
 		}
 	}
 
+	private static class ParmsPanel extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3413198957333746370L;
+		JCheckBox rotateToFit;
+		JCheckBox printerView;
+		JTextField header;
+		GridBagLayout gridbag;
+		GridBagConstraints gbc;
+
+		@SuppressWarnings("rawtypes")
+		ParmsPanel(JList list) {
+			// set up components
+			rotateToFit = new JCheckBox();
+			rotateToFit.setSelected(true);
+			printerView = new JCheckBox();
+			printerView.setSelected(true);
+			header = new JTextField(20);
+			header.setText("%n (%p of %P)");
+
+			// set up panel
+			gridbag = new GridBagLayout();
+			gbc = new GridBagConstraints();
+			setLayout(gridbag);
+
+			// now add components into panel
+			gbc.gridy = 0;
+			gbc.gridx = GridBagConstraints.RELATIVE;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			gbc.insets = new Insets(5, 0, 5, 0);
+			gbc.fill = GridBagConstraints.NONE;
+			addGb(new JLabel(Strings.get("labelCircuits") + " "));
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			addGb(new JScrollPane(list));
+			gbc.fill = GridBagConstraints.NONE;
+
+			gbc.gridy++;
+			addGb(new JLabel(Strings.get("labelHeader") + " "));
+			addGb(header);
+
+			gbc.gridy++;
+			addGb(new JLabel(Strings.get("labelRotateToFit") + " "));
+			addGb(rotateToFit);
+
+			gbc.gridy++;
+			addGb(new JLabel(Strings.get("labelPrinterView") + " "));
+			addGb(printerView);
+		}
+
+		private void addGb(JComponent comp) {
+			gridbag.setConstraints(comp, gbc);
+			add(comp);
+		}
+
+		String getHeader() {
+			return header.getText();
+		}
+
+		boolean getPrinterView() {
+			return printerView.isSelected();
+		}
+
+		boolean getRotateToFit() {
+			return rotateToFit.isSelected();
+		}
+	}
+
+	public static void doPrint(Project proj) {
+		CircuitJList list = new CircuitJList(proj, true);
+		Frame frame = proj.getFrame();
+		if (list.getModel().getSize() == 0) {
+			JOptionPane.showMessageDialog(proj.getFrame(), Strings.get("printEmptyCircuitsMessage"),
+					Strings.get("printEmptyCircuitsTitle"), JOptionPane.YES_NO_OPTION);
+			return;
+		}
+		ParmsPanel parmsPanel = new ParmsPanel(list);
+		int action = JOptionPane.showConfirmDialog(frame, parmsPanel, Strings.get("printParmsTitle"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (action != JOptionPane.OK_OPTION)
+			return;
+		List<Circuit> circuits = list.getSelectedCircuits();
+		if (circuits.isEmpty())
+			return;
+
+		PageFormat format = new PageFormat();
+		Printable print = new MyPrintable(proj, circuits, parmsPanel.getHeader(), parmsPanel.getRotateToFit(),
+				parmsPanel.getPrinterView());
+
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPrintable(print, format);
+		if (job.printDialog() == false)
+			return;
+		try {
+			job.print();
+		} catch (PrinterException e) {
+			JOptionPane.showMessageDialog(proj.getFrame(), StringUtil.format(Strings.get("printError"), e.toString()),
+					Strings.get("printErrorTitle"), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	private static String format(String header, int index, int max, String circName) {
 		int mark = header.indexOf('%');
 		if (mark < 0)
@@ -263,5 +260,8 @@ public class Print {
 			ret.append(header.substring(start));
 		}
 		return ret.toString();
+	}
+
+	private Print() {
 	}
 }

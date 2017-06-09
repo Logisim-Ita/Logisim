@@ -31,9 +31,78 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 		}
 	}
 
+	static void copyAttributes(AttributeSet dest, AttributeSet src) {
+		for (Attribute<?> destAttr : dest.getAttributes()) {
+			Attribute<?> srcAttr = src.getAttribute(destAttr.getName());
+			if (srcAttr != null) {
+				@SuppressWarnings("unchecked")
+				Attribute<Object> destAttr2 = (Attribute<Object>) destAttr;
+				dest.setValue(destAttr2, src.getValue(srcAttr));
+			}
+		}
+	}
+	private static AttributeSet createAttributes(ComponentFactory factory, AttributeSet src) {
+		AttributeSet dest = factory.createAttributeSet();
+		copyAttributes(dest, src);
+		return dest;
+	}
+	private static void replaceAll(Circuit circuit, Map<ComponentFactory, ComponentFactory> compMap) {
+		ArrayList<Component> toReplace = null;
+		for (Component comp : circuit.getNonWires()) {
+			if (compMap.containsKey(comp.getFactory())) {
+				if (toReplace == null)
+					toReplace = new ArrayList<Component>();
+				toReplace.add(comp);
+			}
+		}
+		if (toReplace != null) {
+			CircuitMutation xn = new CircuitMutation(circuit);
+			for (Component comp : toReplace) {
+				xn.remove(comp);
+				ComponentFactory factory = compMap.get(comp.getFactory());
+				if (factory != null) {
+					AttributeSet newAttrs = createAttributes(factory, comp.getAttributeSet());
+					xn.add(factory.createComponent(comp.getLocation(), newAttrs));
+				}
+			}
+			xn.execute();
+		}
+	}
+	private static void replaceAll(LogisimFile file, Map<ComponentFactory, ComponentFactory> compMap,
+			Map<Tool, Tool> toolMap) {
+		file.getOptions().getToolbarData().replaceAll(toolMap);
+		file.getOptions().getMouseMappings().replaceAll(toolMap);
+		for (Circuit circuit : file.getCircuits()) {
+			replaceAll(circuit, compMap);
+		}
+	}
+
+	private static void replaceAll(Map<ComponentFactory, ComponentFactory> compMap, Map<Tool, Tool> toolMap) {
+		for (Project proj : Projects.getOpenProjects()) {
+			Tool oldTool = proj.getTool();
+			Circuit oldCircuit = proj.getCurrentCircuit();
+			if (toolMap.containsKey(oldTool)) {
+				proj.setTool(toolMap.get(oldTool));
+			}
+			SubcircuitFactory oldFactory = oldCircuit.getSubcircuitFactory();
+			if (compMap.containsKey(oldFactory)) {
+				SubcircuitFactory newFactory;
+				newFactory = (SubcircuitFactory) compMap.get(oldFactory);
+				proj.setCurrentCircuit(newFactory.getSubcircuit());
+			}
+			replaceAll(proj.getLogisimFile(), compMap, toolMap);
+		}
+		for (LogisimFile file : LibraryManager.instance.getLogisimLibraries()) {
+			replaceAll(file, compMap, toolMap);
+		}
+	}
+
 	private Library base;
+
 	private boolean dirty;
+
 	private MyListener myListener;
+
 	private EventSourceWeakSupport<LibraryListener> listeners;
 
 	LoadedLibrary(Library base) {
@@ -54,59 +123,6 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 		listeners.add(l);
 	}
 
-	@Override
-	public void removeLibraryListener(LibraryListener l) {
-		listeners.remove(l);
-	}
-
-	@Override
-	public String getName() {
-		return base.getName();
-	}
-
-	@Override
-	public String getDisplayName() {
-		return base.getDisplayName();
-	}
-
-	@Override
-	public boolean isDirty() {
-		return dirty || base.isDirty();
-	}
-
-	@Override
-	public List<? extends Tool> getTools() {
-		return base.getTools();
-	}
-
-	@Override
-	public List<Library> getLibraries() {
-		return base.getLibraries();
-	}
-
-	void setDirty(boolean value) {
-		if (dirty != value) {
-			dirty = value;
-			fireLibraryEvent(LibraryEvent.DIRTY_STATE, isDirty() ? Boolean.TRUE : Boolean.FALSE);
-		}
-	}
-
-	Library getBase() {
-		return base;
-	}
-
-	void setBase(Library value) {
-		if (base instanceof LibraryEventSource) {
-			((LibraryEventSource) base).removeLibraryListener(myListener);
-		}
-		Library old = base;
-		base = value;
-		resolveChanges(old);
-		if (base instanceof LibraryEventSource) {
-			((LibraryEventSource) base).addLibraryListener(myListener);
-		}
-	}
-
 	private void fireLibraryEvent(int action, Object data) {
 		fireLibraryEvent(new LibraryEvent(this, action, data));
 	}
@@ -118,6 +134,40 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 		for (LibraryListener l : listeners) {
 			l.libraryChanged(event);
 		}
+	}
+
+	Library getBase() {
+		return base;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return base.getDisplayName();
+	}
+
+	@Override
+	public List<Library> getLibraries() {
+		return base.getLibraries();
+	}
+
+	@Override
+	public String getName() {
+		return base.getName();
+	}
+
+	@Override
+	public List<? extends Tool> getTools() {
+		return base.getTools();
+	}
+
+	@Override
+	public boolean isDirty() {
+		return dirty || base.isDirty();
+	}
+
+	@Override
+	public void removeLibraryListener(LibraryListener l) {
+		listeners.remove(l);
 	}
 
 	private void resolveChanges(Library old) {
@@ -173,72 +223,22 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 		}
 	}
 
-	private static void replaceAll(Map<ComponentFactory, ComponentFactory> compMap, Map<Tool, Tool> toolMap) {
-		for (Project proj : Projects.getOpenProjects()) {
-			Tool oldTool = proj.getTool();
-			Circuit oldCircuit = proj.getCurrentCircuit();
-			if (toolMap.containsKey(oldTool)) {
-				proj.setTool(toolMap.get(oldTool));
-			}
-			SubcircuitFactory oldFactory = oldCircuit.getSubcircuitFactory();
-			if (compMap.containsKey(oldFactory)) {
-				SubcircuitFactory newFactory;
-				newFactory = (SubcircuitFactory) compMap.get(oldFactory);
-				proj.setCurrentCircuit(newFactory.getSubcircuit());
-			}
-			replaceAll(proj.getLogisimFile(), compMap, toolMap);
+	void setBase(Library value) {
+		if (base instanceof LibraryEventSource) {
+			((LibraryEventSource) base).removeLibraryListener(myListener);
 		}
-		for (LogisimFile file : LibraryManager.instance.getLogisimLibraries()) {
-			replaceAll(file, compMap, toolMap);
+		Library old = base;
+		base = value;
+		resolveChanges(old);
+		if (base instanceof LibraryEventSource) {
+			((LibraryEventSource) base).addLibraryListener(myListener);
 		}
 	}
 
-	private static void replaceAll(LogisimFile file, Map<ComponentFactory, ComponentFactory> compMap,
-			Map<Tool, Tool> toolMap) {
-		file.getOptions().getToolbarData().replaceAll(toolMap);
-		file.getOptions().getMouseMappings().replaceAll(toolMap);
-		for (Circuit circuit : file.getCircuits()) {
-			replaceAll(circuit, compMap);
-		}
-	}
-
-	private static void replaceAll(Circuit circuit, Map<ComponentFactory, ComponentFactory> compMap) {
-		ArrayList<Component> toReplace = null;
-		for (Component comp : circuit.getNonWires()) {
-			if (compMap.containsKey(comp.getFactory())) {
-				if (toReplace == null)
-					toReplace = new ArrayList<Component>();
-				toReplace.add(comp);
-			}
-		}
-		if (toReplace != null) {
-			CircuitMutation xn = new CircuitMutation(circuit);
-			for (Component comp : toReplace) {
-				xn.remove(comp);
-				ComponentFactory factory = compMap.get(comp.getFactory());
-				if (factory != null) {
-					AttributeSet newAttrs = createAttributes(factory, comp.getAttributeSet());
-					xn.add(factory.createComponent(comp.getLocation(), newAttrs));
-				}
-			}
-			xn.execute();
-		}
-	}
-
-	private static AttributeSet createAttributes(ComponentFactory factory, AttributeSet src) {
-		AttributeSet dest = factory.createAttributeSet();
-		copyAttributes(dest, src);
-		return dest;
-	}
-
-	static void copyAttributes(AttributeSet dest, AttributeSet src) {
-		for (Attribute<?> destAttr : dest.getAttributes()) {
-			Attribute<?> srcAttr = src.getAttribute(destAttr.getName());
-			if (srcAttr != null) {
-				@SuppressWarnings("unchecked")
-				Attribute<Object> destAttr2 = (Attribute<Object>) destAttr;
-				dest.setValue(destAttr2, src.getValue(srcAttr));
-			}
+	void setDirty(boolean value) {
+		if (dirty != value) {
+			dirty = value;
+			fireLibraryEvent(LibraryEvent.DIRTY_STATE, isDirty() ? Boolean.TRUE : Boolean.FALSE);
 		}
 	}
 }

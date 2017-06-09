@@ -13,42 +13,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class CircuitLocker {
-	private static AtomicInteger NEXT_SERIAL_NUMBER = new AtomicInteger(0);
-
-	private int serialNumber;
-	private ReadWriteLock circuitLock;
-	private transient Thread mutatingThread;
-	private CircuitMutatorImpl mutatingMutator;
-
-	CircuitLocker() {
-		serialNumber = NEXT_SERIAL_NUMBER.getAndIncrement();
-		circuitLock = new ReentrantReadWriteLock();
-		mutatingThread = null;
-		mutatingMutator = null;
-	}
-
-	public boolean hasWriteLock() {
-		return mutatingThread == Thread.currentThread();
-	}
-
-	CircuitMutatorImpl getMutator() {
-		return mutatingMutator;
-	}
-
-	void checkForWritePermission(String operationName) {
-		if (mutatingThread != Thread.currentThread()) {
-			throw new IllegalStateException(operationName + " outside transaction");
-		}
-	}
-
-	void execute(CircuitTransaction xn) {
-		if (mutatingThread == Thread.currentThread()) {
-			xn.run(mutatingMutator);
-		} else {
-			xn.execute();
-		}
-	}
-
 	private static class CircuitComparator implements Comparator<Circuit> {
 		@Override
 		public int compare(Circuit a, Circuit b) {
@@ -58,6 +22,7 @@ class CircuitLocker {
 		}
 	}
 
+	private static AtomicInteger NEXT_SERIAL_NUMBER = new AtomicInteger(0);
 	static Map<Circuit, Lock> acquireLocks(CircuitTransaction xn, CircuitMutatorImpl mutator) {
 		Map<Circuit, Integer> requests = xn.getAccessedCircuits();
 		Map<Circuit, Lock> circuitLocks = new HashMap<Circuit, Lock>();
@@ -94,7 +59,6 @@ class CircuitLocker {
 		}
 		return circuitLocks;
 	}
-
 	static void releaseLocks(Map<Circuit, Lock> locks) {
 		Thread curThread = Thread.currentThread();
 		for (Map.Entry<Circuit, Lock> entry : locks.entrySet()) {
@@ -107,5 +71,41 @@ class CircuitLocker {
 			}
 			lock.unlock();
 		}
+	}
+	private int serialNumber;
+
+	private ReadWriteLock circuitLock;
+
+	private transient Thread mutatingThread;
+
+	private CircuitMutatorImpl mutatingMutator;
+
+	CircuitLocker() {
+		serialNumber = NEXT_SERIAL_NUMBER.getAndIncrement();
+		circuitLock = new ReentrantReadWriteLock();
+		mutatingThread = null;
+		mutatingMutator = null;
+	}
+
+	void checkForWritePermission(String operationName) {
+		if (mutatingThread != Thread.currentThread()) {
+			throw new IllegalStateException(operationName + " outside transaction");
+		}
+	}
+
+	void execute(CircuitTransaction xn) {
+		if (mutatingThread == Thread.currentThread()) {
+			xn.run(mutatingMutator);
+		} else {
+			xn.execute();
+		}
+	}
+
+	CircuitMutatorImpl getMutator() {
+		return mutatingMutator;
+	}
+
+	public boolean hasWriteLock() {
+		return mutatingThread == Thread.currentThread();
 	}
 }

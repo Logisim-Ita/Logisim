@@ -66,6 +66,65 @@ public class ReaderInputStream extends InputStream {
 	}
 
 	/**
+	 * @return the current number of bytes ready for reading
+	 * @exception IOException
+	 *                if an error occurs
+	 */
+	@Override
+	public synchronized int available() throws IOException {
+		if (in == null) {
+			throw new IOException("Stream Closed");
+		}
+		if (slack != null) {
+			return slack.length - begin;
+		}
+		if (in.ready()) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * Closes the Stringreader.
+	 *
+	 * @exception IOException
+	 *                if the original StringReader fails to be closed
+	 */
+	@Override
+	public synchronized void close() throws IOException {
+		if (in != null) {
+			in.close();
+			slack = null;
+			in = null;
+		}
+	}
+
+	/**
+	 * Marks the read limit of the StringReader.
+	 *
+	 * @param limit
+	 *            the maximum limit of bytes that can be read before the mark
+	 *            position becomes invalid
+	 */
+	@Override
+	public synchronized void mark(final int limit) {
+		try {
+			in.mark(limit);
+		} catch (IOException ioe) {
+			throw new RuntimeException(ioe.getMessage());
+		}
+	}
+
+	/**
+	 * @return false - mark is not supported
+	 */
+	@Override
+	public boolean markSupported() {
+		return false; // would be imprecise
+	}
+
+	/**
 	 * Reads from the <CODE>Reader</CODE>, returning the same value.
 	 *
 	 * @return the value of the next character in the <CODE>Reader</CODE>.
@@ -146,50 +205,6 @@ public class ReaderInputStream extends InputStream {
 	}
 
 	/**
-	 * Marks the read limit of the StringReader.
-	 *
-	 * @param limit
-	 *            the maximum limit of bytes that can be read before the mark
-	 *            position becomes invalid
-	 */
-	@Override
-	public synchronized void mark(final int limit) {
-		try {
-			in.mark(limit);
-		} catch (IOException ioe) {
-			throw new RuntimeException(ioe.getMessage());
-		}
-	}
-
-	/**
-	 * @return the current number of bytes ready for reading
-	 * @exception IOException
-	 *                if an error occurs
-	 */
-	@Override
-	public synchronized int available() throws IOException {
-		if (in == null) {
-			throw new IOException("Stream Closed");
-		}
-		if (slack != null) {
-			return slack.length - begin;
-		}
-		if (in.ready()) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-
-	/**
-	 * @return false - mark is not supported
-	 */
-	@Override
-	public boolean markSupported() {
-		return false; // would be imprecise
-	}
-
-	/**
 	 * Resets the StringReader.
 	 *
 	 * @exception IOException
@@ -202,20 +217,5 @@ public class ReaderInputStream extends InputStream {
 		}
 		slack = null;
 		in.reset();
-	}
-
-	/**
-	 * Closes the Stringreader.
-	 *
-	 * @exception IOException
-	 *                if the original StringReader fails to be closed
-	 */
-	@Override
-	public synchronized void close() throws IOException {
-		if (in != null) {
-			in.close();
-			slack = null;
-			in = null;
-		}
 	}
 }

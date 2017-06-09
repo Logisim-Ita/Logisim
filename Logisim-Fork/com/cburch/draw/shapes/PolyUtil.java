@@ -7,9 +7,6 @@ import com.cburch.draw.model.Handle;
 import com.cburch.logisim.data.Location;
 
 public class PolyUtil {
-	private PolyUtil() {
-	}
-
 	public static class ClosestResult {
 		private double dist;
 		private Location loc;
@@ -24,12 +21,12 @@ public class PolyUtil {
 			return loc;
 		}
 
-		public Handle getPreviousHandle() {
-			return prevHandle;
-		}
-
 		public Handle getNextHandle() {
 			return nextHandle;
+		}
+
+		public Handle getPreviousHandle() {
+			return prevHandle;
 		}
 	}
 
@@ -67,5 +64,8 @@ public class PolyUtil {
 			ret.loc = Location.create((int) Math.round(p[0]), (int) Math.round(p[1]));
 			return ret;
 		}
+	}
+
+	private PolyUtil() {
 	}
 }

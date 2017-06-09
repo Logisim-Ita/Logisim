@@ -20,8 +20,8 @@ public class ModelDeleteHandleAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.singleton(handle.getObject());
+	void doSub(CanvasModel model) {
+		previous = model.deleteHandle(handle);
 	}
 
 	@Override
@@ -30,8 +30,8 @@ public class ModelDeleteHandleAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		previous = model.deleteHandle(handle);
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(handle.getObject());
 	}
 
 	@Override

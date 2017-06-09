@@ -49,92 +49,51 @@ public class TextField {
 		listeners.add(l);
 	}
 
-	public void removeTextFieldListener(TextFieldListener l) {
-		listeners.remove(l);
+	public void draw(Graphics g) {
+		Font old = g.getFont();
+		if (font != null)
+			g.setFont(font);
+
+		int x = this.x;
+		int y = this.y;
+		FontMetrics fm = g.getFontMetrics();
+		int width = fm.stringWidth(text);
+		int ascent = fm.getAscent();
+		int descent = fm.getDescent();
+		switch (halign) {
+		case TextField.H_CENTER:
+			x -= width / 2;
+			break;
+		case TextField.H_RIGHT:
+			x -= width;
+			break;
+		default:
+			break;
+		}
+		switch (valign) {
+		case TextField.V_TOP:
+			y += ascent;
+			break;
+		case TextField.V_CENTER:
+			y += ascent / 2;
+			break;
+		case TextField.V_CENTER_OVERALL:
+			y += (ascent - descent) / 2;
+			break;
+		case TextField.V_BOTTOM:
+			y -= descent;
+			break;
+		default:
+			break;
+		}
+		g.drawString(text, x, y);
+		g.setFont(old);
 	}
 
 	public void fireTextChanged(TextFieldEvent e) {
 		for (TextFieldListener l : new ArrayList<TextFieldListener>(listeners)) {
 			l.textChanged(e);
 		}
-	}
-
-	//
-	// access methods
-	//
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public int getHAlign() {
-		return halign;
-	}
-
-	public int getVAlign() {
-		return valign;
-	}
-
-	public Font getFont() {
-		return font;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public TextFieldCaret getCaret(Graphics g, int pos) {
-		return new TextFieldCaret(this, g, pos);
-	}
-
-	//
-	// modification methods
-	//
-	public void setText(String text) {
-		if (!text.equals(this.text)) {
-			TextFieldEvent e = new TextFieldEvent(this, this.text, text);
-			this.text = text;
-			fireTextChanged(e);
-		}
-	}
-
-	public void setLocation(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public void setLocation(int x, int y, int halign, int valign) {
-		this.x = x;
-		this.y = y;
-		this.halign = halign;
-		this.valign = valign;
-	}
-
-	public void setAlign(int halign, int valign) {
-		this.halign = halign;
-		this.valign = valign;
-	}
-
-	public void setHorzAlign(int halign) {
-		this.halign = halign;
-	}
-
-	public void setVertAlign(int valign) {
-		this.valign = valign;
-	}
-
-	public void setFont(Font font) {
-		this.font = font;
-	}
-
-	//
-	// graphics methods
-	//
-	public TextFieldCaret getCaret(Graphics g, int x, int y) {
-		return new TextFieldCaret(this, g, x, y);
 	}
 
 	public Bounds getBounds(Graphics g) {
@@ -177,45 +136,86 @@ public class TextField {
 		return Bounds.create(x, y - ascent, width, ascent + descent);
 	}
 
-	public void draw(Graphics g) {
-		Font old = g.getFont();
-		if (font != null)
-			g.setFont(font);
+	public TextFieldCaret getCaret(Graphics g, int pos) {
+		return new TextFieldCaret(this, g, pos);
+	}
 
-		int x = this.x;
-		int y = this.y;
-		FontMetrics fm = g.getFontMetrics();
-		int width = fm.stringWidth(text);
-		int ascent = fm.getAscent();
-		int descent = fm.getDescent();
-		switch (halign) {
-		case TextField.H_CENTER:
-			x -= width / 2;
-			break;
-		case TextField.H_RIGHT:
-			x -= width;
-			break;
-		default:
-			break;
+	//
+	// graphics methods
+	//
+	public TextFieldCaret getCaret(Graphics g, int x, int y) {
+		return new TextFieldCaret(this, g, x, y);
+	}
+
+	public Font getFont() {
+		return font;
+	}
+
+	public int getHAlign() {
+		return halign;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public int getVAlign() {
+		return valign;
+	}
+
+	//
+	// access methods
+	//
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void removeTextFieldListener(TextFieldListener l) {
+		listeners.remove(l);
+	}
+
+	public void setAlign(int halign, int valign) {
+		this.halign = halign;
+		this.valign = valign;
+	}
+
+	public void setFont(Font font) {
+		this.font = font;
+	}
+
+	public void setHorzAlign(int halign) {
+		this.halign = halign;
+	}
+
+	public void setLocation(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public void setLocation(int x, int y, int halign, int valign) {
+		this.x = x;
+		this.y = y;
+		this.halign = halign;
+		this.valign = valign;
+	}
+
+	//
+	// modification methods
+	//
+	public void setText(String text) {
+		if (!text.equals(this.text)) {
+			TextFieldEvent e = new TextFieldEvent(this, this.text, text);
+			this.text = text;
+			fireTextChanged(e);
 		}
-		switch (valign) {
-		case TextField.V_TOP:
-			y += ascent;
-			break;
-		case TextField.V_CENTER:
-			y += ascent / 2;
-			break;
-		case TextField.V_CENTER_OVERALL:
-			y += (ascent - descent) / 2;
-			break;
-		case TextField.V_BOTTOM:
-			y -= descent;
-			break;
-		default:
-			break;
-		}
-		g.drawString(text, x, y);
-		g.setFont(old);
+	}
+
+	public void setVertAlign(int valign) {
+		this.valign = valign;
 	}
 
 }

@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Implicant implements Comparable<Implicant> {
-	static Implicant MINIMAL_IMPLICANT = new Implicant(0, -1);
-	static List<Implicant> MINIMAL_LIST = Arrays.asList(new Implicant[] { MINIMAL_IMPLICANT });
-
 	private static class TermIterator implements Iterable<Implicant>, Iterator<Implicant> {
 		Implicant source;
 		int currentMask = 0;
@@ -25,13 +22,13 @@ public class Implicant implements Comparable<Implicant> {
 		}
 
 		@Override
-		public Iterator<Implicant> iterator() {
-			return this;
+		public boolean hasNext() {
+			return currentMask >= 0;
 		}
 
 		@Override
-		public boolean hasNext() {
-			return currentMask >= 0;
+		public Iterator<Implicant> iterator() {
+			return this;
 		}
 
 		@Override
@@ -51,107 +48,9 @@ public class Implicant implements Comparable<Implicant> {
 		public void remove() {
 		}
 	}
+	static Implicant MINIMAL_IMPLICANT = new Implicant(0, -1);
 
-	private int unknowns;
-	private int values;
-
-	private Implicant(int unknowns, int values) {
-		this.unknowns = unknowns;
-		this.values = values;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (!(other instanceof Implicant))
-			return false;
-		Implicant o = (Implicant) other;
-		return this.unknowns == o.unknowns && this.values == o.values;
-	}
-
-	@Override
-	public int compareTo(Implicant o) {
-		if (this.values < o.values)
-			return -1;
-		if (this.values > o.values)
-			return 1;
-		if (this.unknowns < o.unknowns)
-			return -1;
-		if (this.unknowns > o.unknowns)
-			return 1;
-		return 0;
-	}
-
-	@Override
-	public int hashCode() {
-		return (unknowns << 16) | values;
-	}
-
-	public int getUnknownCount() {
-		int ret = 0;
-		int n = unknowns;
-		while (n != 0) {
-			n &= (n - 1);
-			ret++;
-		}
-		return ret;
-	}
-
-	public Iterable<Implicant> getTerms() {
-		return new TermIterator(this);
-	}
-
-	public int getRow() {
-		if (unknowns != 0)
-			return -1;
-		return values;
-	}
-
-	private Expression toProduct(TruthTable source) {
-		Expression term = null;
-		int cols = source.getInputColumnCount();
-		for (int i = cols - 1; i >= 0; i--) {
-			if ((unknowns & (1 << i)) == 0) {
-				Expression literal = Expressions.variable(source.getInputHeader(cols - 1 - i));
-				if ((values & (1 << i)) == 0)
-					literal = Expressions.not(literal);
-				term = Expressions.and(term, literal);
-			}
-		}
-		return term == null ? Expressions.constant(1) : term;
-	}
-
-	private Expression toSum(TruthTable source) {
-		Expression term = null;
-		int cols = source.getInputColumnCount();
-		for (int i = cols - 1; i >= 0; i--) {
-			if ((unknowns & (1 << i)) == 0) {
-				Expression literal = Expressions.variable(source.getInputHeader(cols - 1 - i));
-				if ((values & (1 << i)) != 0)
-					literal = Expressions.not(literal);
-				term = Expressions.or(term, literal);
-			}
-		}
-		return term == null ? Expressions.constant(1) : term;
-	}
-
-	static Expression toExpression(int format, AnalyzerModel model, List<Implicant> implicants) {
-		if (implicants == null)
-			return null;
-		TruthTable table = model.getTruthTable();
-		if (format == AnalyzerModel.FORMAT_PRODUCT_OF_SUMS) {
-			Expression product = null;
-			for (Implicant imp : implicants) {
-				product = Expressions.and(product, imp.toSum(table));
-			}
-			return product == null ? Expressions.constant(1) : product;
-		} else {
-			Expression sum = null;
-			for (Implicant imp : implicants) {
-				sum = Expressions.or(sum, imp.toProduct(table));
-			}
-			return sum == null ? Expressions.constant(0) : sum;
-		}
-	}
+	static List<Implicant> MINIMAL_LIST = Arrays.asList(new Implicant[] { MINIMAL_IMPLICANT });
 
 	static List<Implicant> computeMinimal(int format, AnalyzerModel model, String variable) {
 		TruthTable table = model.getTruthTable();
@@ -307,5 +206,106 @@ public class Implicant implements Comparable<Implicant> {
 		ArrayList<Implicant> ret = new ArrayList<Implicant>(retSet);
 		Collections.sort(ret);
 		return ret;
+	}
+	static Expression toExpression(int format, AnalyzerModel model, List<Implicant> implicants) {
+		if (implicants == null)
+			return null;
+		TruthTable table = model.getTruthTable();
+		if (format == AnalyzerModel.FORMAT_PRODUCT_OF_SUMS) {
+			Expression product = null;
+			for (Implicant imp : implicants) {
+				product = Expressions.and(product, imp.toSum(table));
+			}
+			return product == null ? Expressions.constant(1) : product;
+		} else {
+			Expression sum = null;
+			for (Implicant imp : implicants) {
+				sum = Expressions.or(sum, imp.toProduct(table));
+			}
+			return sum == null ? Expressions.constant(0) : sum;
+		}
+	}
+
+	private int unknowns;
+
+	private int values;
+
+	private Implicant(int unknowns, int values) {
+		this.unknowns = unknowns;
+		this.values = values;
+	}
+
+	@Override
+	public int compareTo(Implicant o) {
+		if (this.values < o.values)
+			return -1;
+		if (this.values > o.values)
+			return 1;
+		if (this.unknowns < o.unknowns)
+			return -1;
+		if (this.unknowns > o.unknowns)
+			return 1;
+		return 0;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof Implicant))
+			return false;
+		Implicant o = (Implicant) other;
+		return this.unknowns == o.unknowns && this.values == o.values;
+	}
+
+	public int getRow() {
+		if (unknowns != 0)
+			return -1;
+		return values;
+	}
+
+	public Iterable<Implicant> getTerms() {
+		return new TermIterator(this);
+	}
+
+	public int getUnknownCount() {
+		int ret = 0;
+		int n = unknowns;
+		while (n != 0) {
+			n &= (n - 1);
+			ret++;
+		}
+		return ret;
+	}
+
+	@Override
+	public int hashCode() {
+		return (unknowns << 16) | values;
+	}
+
+	private Expression toProduct(TruthTable source) {
+		Expression term = null;
+		int cols = source.getInputColumnCount();
+		for (int i = cols - 1; i >= 0; i--) {
+			if ((unknowns & (1 << i)) == 0) {
+				Expression literal = Expressions.variable(source.getInputHeader(cols - 1 - i));
+				if ((values & (1 << i)) == 0)
+					literal = Expressions.not(literal);
+				term = Expressions.and(term, literal);
+			}
+		}
+		return term == null ? Expressions.constant(1) : term;
+	}
+
+	private Expression toSum(TruthTable source) {
+		Expression term = null;
+		int cols = source.getInputColumnCount();
+		for (int i = cols - 1; i >= 0; i--) {
+			if ((unknowns & (1 << i)) == 0) {
+				Expression literal = Expressions.variable(source.getInputHeader(cols - 1 - i));
+				if ((values & (1 << i)) != 0)
+					literal = Expressions.not(literal);
+				term = Expressions.or(term, literal);
+			}
+		}
+		return term == null ? Expressions.constant(1) : term;
 	}
 }

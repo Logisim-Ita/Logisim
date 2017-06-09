@@ -47,6 +47,13 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
+	public void addControlPoint() {
+		Selection sel = canvas.getSelection();
+		Handle handle = sel.getSelectedHandle();
+		canvas.doAction(new ModelInsertHandleAction(canvas.getModel(), handle));
+	}
+
+	@Override
 	public void computeEnabled() {
 		Project proj = canvas.getProject();
 		Circuit circ = canvas.getCircuit();
@@ -113,13 +120,6 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
-	public void cut() {
-		if (!canvas.getSelection().isEmpty()) {
-			canvas.getProject().doAction(ClipboardActions.cut(canvas));
-		}
-	}
-
-	@Override
 	public void copy() {
 		if (!canvas.getSelection().isEmpty()) {
 			canvas.getProject().doAction(ClipboardActions.copy(canvas));
@@ -127,47 +127,10 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
-	public void paste() {
-		ClipboardContents clip = Clipboard.get();
-		Collection<CanvasObject> contents = clip.getElements();
-		List<CanvasObject> add = new ArrayList<CanvasObject>(contents.size());
-		for (CanvasObject o : contents) {
-			add.add(o.clone());
+	public void cut() {
+		if (!canvas.getSelection().isEmpty()) {
+			canvas.getProject().doAction(ClipboardActions.cut(canvas));
 		}
-		if (add.isEmpty())
-			return;
-
-		// find how far we have to translate shapes so that at least one of the
-		// pasted shapes doesn't match what's already in the model
-		Collection<CanvasObject> raw = canvas.getModel().getObjectsFromBottom();
-		MatchingSet<CanvasObject> cur = new MatchingSet<CanvasObject>(raw);
-		int dx = 0;
-		while (true) {
-			// if any shapes in "add" aren't in canvas, we are done
-			boolean allMatch = true;
-			for (CanvasObject o : add) {
-				if (!cur.contains(o)) {
-					allMatch = false;
-					break;
-				}
-			}
-			if (!allMatch)
-				break;
-
-			// otherwise translate everything by 10 pixels and repeat test
-			for (CanvasObject o : add) {
-				o.translate(10, 10);
-			}
-			dx += 10;
-		}
-
-		Location anchorLocation = clip.getAnchorLocation();
-		if (anchorLocation != null && dx != 0) {
-			anchorLocation = anchorLocation.translate(dx, dx);
-		}
-
-		canvas.getProject().doAction(new SelectionAction(canvas, Strings.getter("pasteClipboardAction"), null, add, add,
-				anchorLocation, clip.getAnchorFacing()));
 	}
 
 	@Override
@@ -221,32 +184,8 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
-	public void selectAll() {
-		Selection sel = canvas.getSelection();
-		sel.setSelected(canvas.getModel().getObjectsFromBottom(), true);
-		canvas.repaint();
-	}
-
-	@Override
-	public void raise() {
-		ModelReorderAction act = ModelReorderAction.createRaise(canvas.getModel(), canvas.getSelection().getSelected());
-		if (act != null) {
-			canvas.doAction(act);
-		}
-	}
-
-	@Override
 	public void lower() {
 		ModelReorderAction act = ModelReorderAction.createLower(canvas.getModel(), canvas.getSelection().getSelected());
-		if (act != null) {
-			canvas.doAction(act);
-		}
-	}
-
-	@Override
-	public void raiseTop() {
-		ModelReorderAction act = ModelReorderAction.createRaiseTop(canvas.getModel(),
-				canvas.getSelection().getSelected());
 		if (act != null) {
 			canvas.doAction(act);
 		}
@@ -262,22 +201,52 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
-	public void addControlPoint() {
-		Selection sel = canvas.getSelection();
-		Handle handle = sel.getSelectedHandle();
-		canvas.doAction(new ModelInsertHandleAction(canvas.getModel(), handle));
-	}
-
-	@Override
-	public void removeControlPoint() {
-		Selection sel = canvas.getSelection();
-		Handle handle = sel.getSelectedHandle();
-		canvas.doAction(new ModelDeleteHandleAction(canvas.getModel(), handle));
-	}
-
-	@Override
-	public void selectionChanged(SelectionEvent e) {
+	public void modelChanged(CanvasModelEvent event) {
 		computeEnabled();
+	}
+
+	@Override
+	public void paste() {
+		ClipboardContents clip = Clipboard.get();
+		Collection<CanvasObject> contents = clip.getElements();
+		List<CanvasObject> add = new ArrayList<CanvasObject>(contents.size());
+		for (CanvasObject o : contents) {
+			add.add(o.clone());
+		}
+		if (add.isEmpty())
+			return;
+
+		// find how far we have to translate shapes so that at least one of the
+		// pasted shapes doesn't match what's already in the model
+		Collection<CanvasObject> raw = canvas.getModel().getObjectsFromBottom();
+		MatchingSet<CanvasObject> cur = new MatchingSet<CanvasObject>(raw);
+		int dx = 0;
+		while (true) {
+			// if any shapes in "add" aren't in canvas, we are done
+			boolean allMatch = true;
+			for (CanvasObject o : add) {
+				if (!cur.contains(o)) {
+					allMatch = false;
+					break;
+				}
+			}
+			if (!allMatch)
+				break;
+
+			// otherwise translate everything by 10 pixels and repeat test
+			for (CanvasObject o : add) {
+				o.translate(10, 10);
+			}
+			dx += 10;
+		}
+
+		Location anchorLocation = clip.getAnchorLocation();
+		if (anchorLocation != null && dx != 0) {
+			anchorLocation = anchorLocation.translate(dx, dx);
+		}
+
+		canvas.getProject().doAction(new SelectionAction(canvas, Strings.getter("pasteClipboardAction"), null, add, add,
+				anchorLocation, clip.getAnchorFacing()));
 	}
 
 	@Override
@@ -296,7 +265,38 @@ public class AppearanceEditHandler extends EditHandler
 	}
 
 	@Override
-	public void modelChanged(CanvasModelEvent event) {
+	public void raise() {
+		ModelReorderAction act = ModelReorderAction.createRaise(canvas.getModel(), canvas.getSelection().getSelected());
+		if (act != null) {
+			canvas.doAction(act);
+		}
+	}
+
+	@Override
+	public void raiseTop() {
+		ModelReorderAction act = ModelReorderAction.createRaiseTop(canvas.getModel(),
+				canvas.getSelection().getSelected());
+		if (act != null) {
+			canvas.doAction(act);
+		}
+	}
+
+	@Override
+	public void removeControlPoint() {
+		Selection sel = canvas.getSelection();
+		Handle handle = sel.getSelectedHandle();
+		canvas.doAction(new ModelDeleteHandleAction(canvas.getModel(), handle));
+	}
+
+	@Override
+	public void selectAll() {
+		Selection sel = canvas.getSelection();
+		sel.setSelected(canvas.getModel().getObjectsFromBottom(), true);
+		canvas.repaint();
+	}
+
+	@Override
+	public void selectionChanged(SelectionEvent e) {
 		computeEnabled();
 	}
 }

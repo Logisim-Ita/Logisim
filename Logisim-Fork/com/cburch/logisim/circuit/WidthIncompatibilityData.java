@@ -26,18 +26,6 @@ public class WidthIncompatibilityData {
 		widths.add(w);
 	}
 
-	public int size() {
-		return points.size();
-	}
-
-	public Location getPoint(int i) {
-		return points.get(i);
-	}
-
-	public BitWidth getBitWidth(int i) {
-		return widths.get(i);
-	}
-
 	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof WidthIncompatibilityData))
@@ -64,5 +52,17 @@ public class WidthIncompatibilityData {
 				return false;
 		}
 		return true;
+	}
+
+	public BitWidth getBitWidth(int i) {
+		return widths.get(i);
+	}
+
+	public Location getPoint(int i) {
+		return points.get(i);
+	}
+
+	public int size() {
+		return points.size();
 	}
 }

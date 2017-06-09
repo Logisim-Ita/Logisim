@@ -13,6 +13,27 @@ public class JoinedAction extends Action {
 		todo = actions;
 	}
 
+	@Override
+	public Action append(Action other) {
+		int oldLen = todo.length;
+		Action[] newToDo = new Action[oldLen + 1];
+		System.arraycopy(todo, 0, newToDo, 0, oldLen);
+		newToDo[oldLen] = other;
+		todo = newToDo;
+		return this;
+	}
+
+	@Override
+	public void doIt(Project proj) {
+		for (Action act : todo) {
+			act.doIt(proj);
+		}
+	}
+
+	public List<Action> getActions() {
+		return Arrays.asList(todo);
+	}
+
 	public Action getFirstAction() {
 		return todo[0];
 	}
@@ -21,8 +42,9 @@ public class JoinedAction extends Action {
 		return todo[todo.length - 1];
 	}
 
-	public List<Action> getActions() {
-		return Arrays.asList(todo);
+	@Override
+	public String getName() {
+		return todo[0].getName();
 	}
 
 	@Override
@@ -35,31 +57,9 @@ public class JoinedAction extends Action {
 	}
 
 	@Override
-	public String getName() {
-		return todo[0].getName();
-	}
-
-	@Override
-	public void doIt(Project proj) {
-		for (Action act : todo) {
-			act.doIt(proj);
-		}
-	}
-
-	@Override
 	public void undo(Project proj) {
 		for (int i = todo.length - 1; i >= 0; i--) {
 			todo[i].undo(proj);
 		}
-	}
-
-	@Override
-	public Action append(Action other) {
-		int oldLen = todo.length;
-		Action[] newToDo = new Action[oldLen + 1];
-		System.arraycopy(todo, 0, newToDo, 0, oldLen);
-		newToDo[oldLen] = other;
-		todo = newToDo;
-		return this;
 	}
 }

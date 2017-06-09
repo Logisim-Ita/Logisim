@@ -18,8 +18,6 @@ import com.cburch.logisim.analyze.model.Entry;
 import com.cburch.logisim.analyze.model.TruthTable;
 
 class TableTabClip implements ClipboardOwner {
-	private static final DataFlavor binaryFlavor = new DataFlavor(Data.class, "Binary data");
-
 	private static class Data implements Transferable, Serializable {
 		/**
 		 * 
@@ -31,16 +29,6 @@ class TableTabClip implements ClipboardOwner {
 		Data(String[] headers, String[][] contents) {
 			this.headers = headers;
 			this.contents = contents;
-		}
-
-		@Override
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[] { binaryFlavor, DataFlavor.stringFlavor };
-		}
-
-		@Override
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
 		}
 
 		@Override
@@ -64,12 +52,30 @@ class TableTabClip implements ClipboardOwner {
 				throw new UnsupportedFlavorException(flavor);
 			}
 		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { binaryFlavor, DataFlavor.stringFlavor };
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
+		}
 	}
+
+	private static final DataFlavor binaryFlavor = new DataFlavor(Data.class, "Binary data");
 
 	private TableTab table;
 
 	TableTabClip(TableTab table) {
 		this.table = table;
+	}
+
+	public boolean canPaste() {
+		Clipboard clip = table.getToolkit().getSystemClipboard();
+		Transferable xfer = clip.getContents(this);
+		return xfer.isDataFlavorSupported(binaryFlavor);
 	}
 
 	public void copy() {
@@ -114,10 +120,8 @@ class TableTabClip implements ClipboardOwner {
 		clip.setContents(new Data(header, contents), this);
 	}
 
-	public boolean canPaste() {
-		Clipboard clip = table.getToolkit().getSystemClipboard();
-		Transferable xfer = clip.getContents(this);
-		return xfer.isDataFlavorSupported(binaryFlavor);
+	@Override
+	public void lostOwnership(Clipboard clip, Transferable transfer) {
 	}
 
 	public void paste() {
@@ -238,10 +242,6 @@ class TableTabClip implements ClipboardOwner {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void lostOwnership(Clipboard clip, Transferable transfer) {
 	}
 
 }

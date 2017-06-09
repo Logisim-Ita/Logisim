@@ -61,29 +61,6 @@ public class Register extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		RegisterData data = (RegisterData) state.getData();
-		if (data == null) {
-			data = new RegisterData();
-			state.setData(data);
-		}
-
-		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-		Object triggerType = state.getAttributeValue(StdAttr.TRIGGER);
-		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
-
-		if (state.getPort(CLR) == Value.TRUE) {
-			data.value = 0;
-		} else if (triggered && state.getPort(EN) != Value.FALSE) {
-			Value in = state.getPort(IN);
-			if (in.isFullyDefined())
-				data.value = in.toIntValue();
-		}
-
-		state.setPort(OUT, Value.createKnown(dataWidth, data.value), DELAY);
-	}
-
-	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		Bounds bds = painter.getBounds();
@@ -134,5 +111,28 @@ public class Register extends InstanceFactory {
 			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		RegisterData data = (RegisterData) state.getData();
+		if (data == null) {
+			data = new RegisterData();
+			state.setData(data);
+		}
+
+		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
+		Object triggerType = state.getAttributeValue(StdAttr.TRIGGER);
+		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
+
+		if (state.getPort(CLR) == Value.TRUE) {
+			data.value = 0;
+		} else if (triggered && state.getPort(EN) != Value.FALSE) {
+			Value in = state.getPort(IN);
+			if (in.isFullyDefined())
+				data.value = in.toIntValue();
+		}
+
+		state.setPort(OUT, Value.createKnown(dataWidth, data.value), DELAY);
 	}
 }

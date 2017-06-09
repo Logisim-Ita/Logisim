@@ -29,20 +29,38 @@ public abstract class ManagedComponent extends AbstractComponent {
 		this.endsView = Collections.unmodifiableList(ends);
 	}
 
-	//
-	// abstract AbstractComponent methods
-	//
-	@Override
-	public abstract ComponentFactory getFactory();
-
 	@Override
 	public void addComponentListener(ComponentListener l) {
 		listeners.add(l);
 	}
 
+	//
+	// methods for altering data
+	//
+	public void clearManager() {
+		for (EndData end : ends) {
+			fireEndChanged(new ComponentEvent(this, end, null));
+		}
+		ends.clear();
+		bounds = null;
+	}
+
+	//
+	// user interface methods
+	//
 	@Override
-	public void removeComponentListener(ComponentListener l) {
-		listeners.remove(l);
+	public void expose(ComponentDrawContext context) {
+		Bounds bounds = getBounds();
+		java.awt.Component dest = context.getDestination();
+		if (bounds != null) {
+			dest.repaint(bounds.getX() - 5, bounds.getY() - 5, bounds.getWidth() + 10, bounds.getHeight() + 10);
+		}
+	}
+
+	protected void fireComponentInvalidated(ComponentEvent e) {
+		for (ComponentListener l : listeners) {
+			l.componentInvalidated(e);
+		}
 	}
 
 	protected void fireEndChanged(ComponentEvent e) {
@@ -65,17 +83,6 @@ public abstract class ManagedComponent extends AbstractComponent {
 		}
 	}
 
-	protected void fireComponentInvalidated(ComponentEvent e) {
-		for (ComponentListener l : listeners) {
-			l.componentInvalidated(e);
-		}
-	}
-
-	@Override
-	public Location getLocation() {
-		return loc;
-	}
-
 	@Override
 	public AttributeSet getAttributeSet() {
 		return attrs;
@@ -91,8 +98,12 @@ public abstract class ManagedComponent extends AbstractComponent {
 		return bounds;
 	}
 
-	protected void recomputeBounds() {
-		bounds = null;
+	public int getEndCount() {
+		return ends.size();
+	}
+
+	public Location getEndLocation(int i) {
+		return getEnd(i).getLocation();
 	}
 
 	@Override
@@ -100,34 +111,44 @@ public abstract class ManagedComponent extends AbstractComponent {
 		return endsView;
 	}
 
-	public int getEndCount() {
-		return ends.size();
+	//
+	// abstract AbstractComponent methods
+	//
+	@Override
+	public abstract ComponentFactory getFactory();
+
+	@Override
+	public Object getFeature(Object key) {
+		return null;
+	}
+
+	@Override
+	public Location getLocation() {
+		return loc;
 	}
 
 	@Override
 	public abstract void propagate(CircuitState state);
 
-	//
-	// methods for altering data
-	//
-	public void clearManager() {
-		for (EndData end : ends) {
-			fireEndChanged(new ComponentEvent(this, end, null));
-		}
-		ends.clear();
+	protected void recomputeBounds() {
 		bounds = null;
 	}
 
-	public void setBounds(Bounds bounds) {
-		this.bounds = bounds;
+	@Override
+	public void removeComponentListener(ComponentListener l) {
+		listeners.remove(l);
+	}
+
+	public void removeEnd(int index) {
+		ends.remove(index);
 	}
 
 	public void setAttributeSet(AttributeSet value) {
 		attrs = value;
 	}
 
-	public void removeEnd(int index) {
-		ends.remove(index);
+	public void setBounds(Bounds bounds) {
+		this.bounds = bounds;
 	}
 
 	public void setEnd(int i, EndData data) {
@@ -174,26 +195,5 @@ public abstract class ManagedComponent extends AbstractComponent {
 			changesNew.add(newEnds[i]);
 		}
 		fireEndsChanged(changesOld, changesNew);
-	}
-
-	public Location getEndLocation(int i) {
-		return getEnd(i).getLocation();
-	}
-
-	//
-	// user interface methods
-	//
-	@Override
-	public void expose(ComponentDrawContext context) {
-		Bounds bounds = getBounds();
-		java.awt.Component dest = context.getDestination();
-		if (bounds != null) {
-			dest.repaint(bounds.getX() - 5, bounds.getY() - 5, bounds.getWidth() + 10, bounds.getHeight() + 10);
-		}
-	}
-
-	@Override
-	public Object getFeature(Object key) {
-		return null;
 	}
 }

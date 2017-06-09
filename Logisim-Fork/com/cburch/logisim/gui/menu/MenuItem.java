@@ -7,15 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 interface MenuItem {
-	boolean hasListeners();
+	public void actionPerformed(ActionEvent event);
 
 	public void addActionListener(ActionListener l);
 
-	public void removeActionListener(ActionListener l);
+	boolean hasListeners();
 
 	public boolean isEnabled();
 
-	public void setEnabled(boolean value);
+	public void removeActionListener(ActionListener l);
 
-	public void actionPerformed(ActionEvent event);
+	public void setEnabled(boolean value);
 }

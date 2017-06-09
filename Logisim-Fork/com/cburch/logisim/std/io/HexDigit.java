@@ -26,6 +26,11 @@ public class HexDigit extends InstanceFactory {
 	}
 
 	@Override
+	public void paintInstance(InstancePainter painter) {
+		SevenSegment.drawBase(painter);
+	}
+
+	@Override
 	public void propagate(InstanceState state) {
 		int summary = 0;
 		Value baseVal = state.getPort(0);
@@ -110,10 +115,5 @@ public class HexDigit extends InstanceFactory {
 		} else {
 			data.setValue(value);
 		}
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		SevenSegment.drawBase(painter);
 	}
 }

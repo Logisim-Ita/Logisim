@@ -15,15 +15,15 @@ import com.cburch.logisim.tools.key.KeyConfigurationEvent;
 import com.cburch.logisim.tools.key.KeyConfigurationResult;
 
 public class ToolAttributeAction extends Action {
+	public static Action create(KeyConfigurationResult results) {
+		return new ToolAttributeAction(results);
+	}
+
 	public static Action create(Tool tool, Attribute<?> attr, Object value) {
 		AttributeSet attrs = tool.getAttributeSet();
 		KeyConfigurationEvent e = new KeyConfigurationEvent(0, attrs, null, null);
 		KeyConfigurationResult r = new KeyConfigurationResult(e, attr, value);
 		return new ToolAttributeAction(r);
-	}
-
-	public static Action create(KeyConfigurationResult results) {
-		return new ToolAttributeAction(results);
 	}
 
 	private KeyConfigurationResult config;
@@ -32,11 +32,6 @@ public class ToolAttributeAction extends Action {
 	private ToolAttributeAction(KeyConfigurationResult config) {
 		this.config = config;
 		this.oldValues = new HashMap<Attribute<?>, Object>(2);
-	}
-
-	@Override
-	public String getName() {
-		return Strings.get("changeToolAttrAction");
 	}
 
 	@Override
@@ -51,6 +46,11 @@ public class ToolAttributeAction extends Action {
 			attrs.setValue(attr, entry.getValue());
 		}
 		this.oldValues = oldValues;
+	}
+
+	@Override
+	public String getName() {
+		return Strings.get("changeToolAttrAction");
 	}
 
 	@Override

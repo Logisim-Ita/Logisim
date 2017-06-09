@@ -10,26 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 public class CollectionUtil {
-	private static class UnionSet<E> extends AbstractSet<E> {
-		private Set<? extends E> a;
-		private Set<? extends E> b;
-
-		UnionSet(Set<? extends E> a, Set<? extends E> b) {
-			this.a = a;
-			this.b = b;
-		}
-
-		@Override
-		public int size() {
-			return a.size() + b.size();
-		}
-
-		@Override
-		public Iterator<E> iterator() {
-			return IteratorUtil.createJoinedIterator(a.iterator(), b.iterator());
-		}
-	}
-
 	private static class UnionList<E> extends AbstractList<E> {
 		private List<? extends E> a;
 		private List<? extends E> b;
@@ -37,11 +17,6 @@ public class CollectionUtil {
 		UnionList(List<? extends E> a, List<? extends E> b) {
 			this.a = a;
 			this.b = b;
-		}
-
-		@Override
-		public int size() {
-			return a.size() + b.size();
 		}
 
 		@Override
@@ -54,16 +29,41 @@ public class CollectionUtil {
 			}
 			return ret;
 		}
+
+		@Override
+		public int size() {
+			return a.size() + b.size();
+		}
 	}
 
-	private CollectionUtil() {
+	private static class UnionSet<E> extends AbstractSet<E> {
+		private Set<? extends E> a;
+		private Set<? extends E> b;
+
+		UnionSet(Set<? extends E> a, Set<? extends E> b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public Iterator<E> iterator() {
+			return IteratorUtil.createJoinedIterator(a.iterator(), b.iterator());
+		}
+
+		@Override
+		public int size() {
+			return a.size() + b.size();
+		}
+	}
+
+	public static <E> List<E> createUnmodifiableListUnion(List<? extends E> a, List<? extends E> b) {
+		return new UnionList<E>(a, b);
 	}
 
 	public static <E> Set<E> createUnmodifiableSetUnion(Set<? extends E> a, Set<? extends E> b) {
 		return new UnionSet<E>(a, b);
 	}
 
-	public static <E> List<E> createUnmodifiableListUnion(List<? extends E> a, List<? extends E> b) {
-		return new UnionList<E>(a, b);
+	private CollectionUtil() {
 	}
 }

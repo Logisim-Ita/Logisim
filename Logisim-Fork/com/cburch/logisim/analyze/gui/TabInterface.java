@@ -6,9 +6,9 @@ package com.cburch.logisim.analyze.gui;
 interface TabInterface {
 	public void copy();
 
-	public void paste();
-
 	public void delete();
+
+	public void paste();
 
 	public void selectAll();
 }

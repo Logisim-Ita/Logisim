@@ -10,13 +10,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class Toolbar extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2835943209904957622L;
-	public static final Object VERTICAL = new Object();
-	public static final Object HORIZONTAL = new Object();
-
 	private class MyListener implements ToolbarModelListener {
 		@Override
 		public void toolbarAppearanceChanged(ToolbarModelEvent event) {
@@ -28,6 +21,13 @@ public class Toolbar extends JPanel {
 			computeContents();
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2835943209904957622L;
+	public static final Object VERTICAL = new Object();
+
+	public static final Object HORIZONTAL = new Object();
 
 	private ToolbarModel model;
 	private JPanel subpanel;
@@ -51,20 +51,28 @@ public class Toolbar extends JPanel {
 			model.addToolbarModelListener(myListener);
 	}
 
-	public ToolbarModel getToolbarModel() {
-		return model;
+	private void computeContents() {
+		subpanel.removeAll();
+		ToolbarModel m = model;
+		if (m != null) {
+			for (ToolbarItem item : m.getItems()) {
+				subpanel.add(new ToolbarButton(this, item));
+			}
+			subpanel.add(Box.createGlue());
+		}
+		revalidate();
 	}
 
-	public void setToolbarModel(ToolbarModel value) {
-		ToolbarModel oldValue = model;
-		if (value != oldValue) {
-			if (oldValue != null)
-				oldValue.removeToolbarModelListener(myListener);
-			if (value != null)
-				value.addToolbarModelListener(myListener);
-			model = value;
-			computeContents();
-		}
+	Object getOrientation() {
+		return orientation;
+	}
+
+	ToolbarButton getPressed() {
+		return curPressed;
+	}
+
+	public ToolbarModel getToolbarModel() {
+		return model;
 	}
 
 	public void setOrientation(Object value) {
@@ -85,22 +93,6 @@ public class Toolbar extends JPanel {
 		this.orientation = value;
 	}
 
-	private void computeContents() {
-		subpanel.removeAll();
-		ToolbarModel m = model;
-		if (m != null) {
-			for (ToolbarItem item : m.getItems()) {
-				subpanel.add(new ToolbarButton(this, item));
-			}
-			subpanel.add(Box.createGlue());
-		}
-		revalidate();
-	}
-
-	ToolbarButton getPressed() {
-		return curPressed;
-	}
-
 	void setPressed(ToolbarButton value) {
 		ToolbarButton oldValue = curPressed;
 		if (oldValue != value) {
@@ -112,7 +104,15 @@ public class Toolbar extends JPanel {
 		}
 	}
 
-	Object getOrientation() {
-		return orientation;
+	public void setToolbarModel(ToolbarModel value) {
+		ToolbarModel oldValue = model;
+		if (value != oldValue) {
+			if (oldValue != null)
+				oldValue.removeToolbarModelListener(myListener);
+			if (value != null)
+				value.addToolbarModelListener(myListener);
+			model = value;
+			computeContents();
+		}
 	}
 }

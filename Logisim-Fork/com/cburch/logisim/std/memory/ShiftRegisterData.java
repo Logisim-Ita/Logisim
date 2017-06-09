@@ -21,6 +21,11 @@ class ShiftRegisterData extends ClockState implements InstanceData {
 		this.vsPos = 0;
 	}
 
+	public void clear() {
+		Arrays.fill(vs, Value.createKnown(width, 0));
+		vsPos = 0;
+	}
+
 	@Override
 	public ShiftRegisterData clone() {
 		ShiftRegisterData ret = (ShiftRegisterData) super.clone();
@@ -28,8 +33,30 @@ class ShiftRegisterData extends ClockState implements InstanceData {
 		return ret;
 	}
 
+	public Value get(int index) {
+		int i = vsPos + index;
+		Value[] v = vs;
+		if (i >= v.length)
+			i -= v.length;
+		return v[i];
+	}
+
 	public int getLength() {
 		return vs.length;
+	}
+
+	public void push(Value v) {
+		int pos = vsPos;
+		vs[pos] = v;
+		vsPos = pos >= vs.length - 1 ? 0 : pos + 1;
+	}
+
+	public void set(int index, Value val) {
+		int i = vsPos + index;
+		Value[] v = vs;
+		if (i >= v.length)
+			i -= v.length;
+		v[i] = val;
 	}
 
 	public void setDimensions(BitWidth newWidth, int newLength) {
@@ -61,32 +88,5 @@ class ShiftRegisterData extends ClockState implements InstanceData {
 			}
 			width = newWidth;
 		}
-	}
-
-	public void clear() {
-		Arrays.fill(vs, Value.createKnown(width, 0));
-		vsPos = 0;
-	}
-
-	public void push(Value v) {
-		int pos = vsPos;
-		vs[pos] = v;
-		vsPos = pos >= vs.length - 1 ? 0 : pos + 1;
-	}
-
-	public Value get(int index) {
-		int i = vsPos + index;
-		Value[] v = vs;
-		if (i >= v.length)
-			i -= v.length;
-		return v[i];
-	}
-
-	public void set(int index, Value val) {
-		int i = vsPos + index;
-		Value[] v = vs;
-		if (i >= v.length)
-			i -= v.length;
-		v[i] = val;
 	}
 }

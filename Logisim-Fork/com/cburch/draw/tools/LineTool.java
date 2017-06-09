@@ -26,11 +26,24 @@ import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class LineTool extends AbstractTool {
+	static Location snapTo4Cardinals(Location from, int mx, int my) {
+		int px = from.getX();
+		int py = from.getY();
+		if (mx != px && my != py) {
+			if (Math.abs(my - py) < Math.abs(mx - px)) {
+				return Location.create(mx, py);
+			} else {
+				return Location.create(px, my);
+			}
+		}
+		return Location.create(mx, my); // should never happen
+	}
 	private DrawingAttributeSet attrs;
 	private boolean active;
 	private Location mouseStart;
 	private Location mouseEnd;
 	private int lastMouseX;
+
 	private int lastMouseY;
 
 	public LineTool(DrawingAttributeSet attrs) {
@@ -39,13 +52,13 @@ public class LineTool extends AbstractTool {
 	}
 
 	@Override
-	public Icon getIcon() {
-		return Icons.getIcon("drawline.gif");
-	}
-
-	@Override
-	public Cursor getCursor(Canvas canvas) {
-		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	public void draw(Canvas canvas, Graphics g) {
+		if (active) {
+			Location start = mouseStart;
+			Location end = mouseEnd;
+			g.setColor(Color.GRAY);
+			g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+		}
 	}
 
 	@Override
@@ -54,9 +67,31 @@ public class LineTool extends AbstractTool {
 	}
 
 	@Override
-	public void toolDeselected(Canvas canvas) {
-		active = false;
-		repaintArea(canvas);
+	public Cursor getCursor(Canvas canvas) {
+		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	}
+
+	@Override
+	public Icon getIcon() {
+		return Icons.getIcon("drawline.gif");
+	}
+
+	@Override
+	public void keyPressed(Canvas canvas, KeyEvent e) {
+		int code = e.getKeyCode();
+		if (active && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_CONTROL)) {
+			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
+		}
+	}
+
+	@Override
+	public void keyReleased(Canvas canvas, KeyEvent e) {
+		keyPressed(canvas, e);
+	}
+
+	@Override
+	public void mouseDragged(Canvas canvas, MouseEvent e) {
+		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
 	}
 
 	@Override
@@ -75,11 +110,6 @@ public class LineTool extends AbstractTool {
 		lastMouseY = loc.getY();
 		active = canvas.getModel() != null;
 		repaintArea(canvas);
-	}
-
-	@Override
-	public void mouseDragged(Canvas canvas, MouseEvent e) {
-		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
 	}
 
 	@Override
@@ -103,17 +133,14 @@ public class LineTool extends AbstractTool {
 		}
 	}
 
-	@Override
-	public void keyPressed(Canvas canvas, KeyEvent e) {
-		int code = e.getKeyCode();
-		if (active && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_CONTROL)) {
-			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
-		}
+	private void repaintArea(Canvas canvas) {
+		canvas.repaint();
 	}
 
 	@Override
-	public void keyReleased(Canvas canvas, KeyEvent e) {
-		keyPressed(canvas, e);
+	public void toolDeselected(Canvas canvas) {
+		active = false;
+		repaintArea(canvas);
 	}
 
 	private void updateMouse(Canvas canvas, int mx, int my, int mods) {
@@ -141,32 +168,5 @@ public class LineTool extends AbstractTool {
 		}
 		lastMouseX = mx;
 		lastMouseY = my;
-	}
-
-	private void repaintArea(Canvas canvas) {
-		canvas.repaint();
-	}
-
-	@Override
-	public void draw(Canvas canvas, Graphics g) {
-		if (active) {
-			Location start = mouseStart;
-			Location end = mouseEnd;
-			g.setColor(Color.GRAY);
-			g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-		}
-	}
-
-	static Location snapTo4Cardinals(Location from, int mx, int my) {
-		int px = from.getX();
-		int py = from.getY();
-		if (mx != px && my != py) {
-			if (Math.abs(my - py) < Math.abs(mx - px)) {
-				return Location.create(mx, py);
-			} else {
-				return Location.create(px, my);
-			}
-		}
-		return Location.create(mx, my); // should never happen
 	}
 }

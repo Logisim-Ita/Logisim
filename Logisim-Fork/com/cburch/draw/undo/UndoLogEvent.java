@@ -22,15 +22,15 @@ public class UndoLogEvent extends EventObject {
 		this.actionObject = actionObject;
 	}
 
-	public UndoLog getUndoLog() {
-		return (UndoLog) getSource();
-	}
-
 	public int getAction() {
 		return action;
 	}
 
 	public Action getActionObject() {
 		return actionObject;
+	}
+
+	public UndoLog getUndoLog() {
+		return (UndoLog) getSource();
 	}
 }

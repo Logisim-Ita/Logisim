@@ -43,6 +43,87 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		this.fontAttr = null;
 	}
 
+	@Override
+	public void attributeListChanged(AttributeEvent e) {
+	}
+
+	@Override
+	public void attributeValueChanged(AttributeEvent e) {
+		Attribute<?> attr = e.getAttribute();
+		if (attr == labelAttr) {
+			updateField(comp.getAttributeSet());
+		} else if (attr == fontAttr) {
+			if (field != null)
+				field.setFont((Font) e.getValue());
+		}
+	}
+
+	private void createField(AttributeSet attrs, String text) {
+		Font font = attrs.getValue(fontAttr);
+		field = new TextField(fieldX, fieldY, halign, valign, font);
+		field.setText(text);
+		field.addTextFieldListener(this);
+	}
+
+	void draw(Component comp, ComponentDrawContext context) {
+		if (field != null) {
+			Graphics g = context.getGraphics().create();
+			field.draw(g);
+			g.dispose();
+		}
+	}
+
+	Bounds getBounds(Graphics g) {
+		return field == null ? Bounds.EMPTY_BOUNDS : field.getBounds(g);
+	}
+
+	@Override
+	public Action getCommitAction(Circuit circuit, String oldText, String newText) {
+		SetAttributeAction act = new SetAttributeAction(circuit, Strings.getter("changeLabelAction"));
+		act.set(comp, labelAttr, newText);
+		return act;
+	}
+
+	@Override
+	public Caret getTextCaret(ComponentUserEvent event) {
+		canvas = event.getCanvas();
+		Graphics g = canvas.getGraphics();
+
+		// if field is absent, create it empty
+		// and if it is empty, just return a caret at its beginning
+		if (field == null)
+			createField(comp.getAttributeSet(), "");
+		String text = field.getText();
+		if (text == null || text.equals(""))
+			return field.getCaret(g, 0);
+
+		Bounds bds = field.getBounds(g);
+		if (bds.getWidth() < 4 || bds.getHeight() < 4) {
+			Location loc = comp.getLocation();
+			bds = bds.add(Bounds.create(loc).expand(2));
+		}
+
+		int x = event.getX();
+		int y = event.getY();
+		if (bds.contains(x, y))
+			return field.getCaret(g, x, y);
+		else
+			return null;
+	}
+
+	private boolean shouldRegister() {
+		return labelAttr != null || fontAttr != null;
+	}
+
+	@Override
+	public void textChanged(TextFieldEvent e) {
+		String prev = e.getOldText();
+		String next = e.getText();
+		if (!next.equals(prev)) {
+			comp.getAttributeSet().setValue(labelAttr, next);
+		}
+	}
+
 	void update(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign, int valign) {
 		boolean wasReg = shouldRegister();
 		this.labelAttr = labelAttr;
@@ -79,86 +160,5 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 				field.setText(text);
 			}
 		}
-	}
-
-	private void createField(AttributeSet attrs, String text) {
-		Font font = attrs.getValue(fontAttr);
-		field = new TextField(fieldX, fieldY, halign, valign, font);
-		field.setText(text);
-		field.addTextFieldListener(this);
-	}
-
-	private boolean shouldRegister() {
-		return labelAttr != null || fontAttr != null;
-	}
-
-	Bounds getBounds(Graphics g) {
-		return field == null ? Bounds.EMPTY_BOUNDS : field.getBounds(g);
-	}
-
-	void draw(Component comp, ComponentDrawContext context) {
-		if (field != null) {
-			Graphics g = context.getGraphics().create();
-			field.draw(g);
-			g.dispose();
-		}
-	}
-
-	@Override
-	public void attributeListChanged(AttributeEvent e) {
-	}
-
-	@Override
-	public void attributeValueChanged(AttributeEvent e) {
-		Attribute<?> attr = e.getAttribute();
-		if (attr == labelAttr) {
-			updateField(comp.getAttributeSet());
-		} else if (attr == fontAttr) {
-			if (field != null)
-				field.setFont((Font) e.getValue());
-		}
-	}
-
-	@Override
-	public void textChanged(TextFieldEvent e) {
-		String prev = e.getOldText();
-		String next = e.getText();
-		if (!next.equals(prev)) {
-			comp.getAttributeSet().setValue(labelAttr, next);
-		}
-	}
-
-	@Override
-	public Action getCommitAction(Circuit circuit, String oldText, String newText) {
-		SetAttributeAction act = new SetAttributeAction(circuit, Strings.getter("changeLabelAction"));
-		act.set(comp, labelAttr, newText);
-		return act;
-	}
-
-	@Override
-	public Caret getTextCaret(ComponentUserEvent event) {
-		canvas = event.getCanvas();
-		Graphics g = canvas.getGraphics();
-
-		// if field is absent, create it empty
-		// and if it is empty, just return a caret at its beginning
-		if (field == null)
-			createField(comp.getAttributeSet(), "");
-		String text = field.getText();
-		if (text == null || text.equals(""))
-			return field.getCaret(g, 0);
-
-		Bounds bds = field.getBounds(g);
-		if (bds.getWidth() < 4 || bds.getHeight() < 4) {
-			Location loc = comp.getLocation();
-			bds = bds.add(Bounds.create(loc).expand(2));
-		}
-
-		int x = event.getX();
-		int y = event.getY();
-		if (bds.contains(x, y))
-			return field.getCaret(g, x, y);
-		else
-			return null;
 	}
 }

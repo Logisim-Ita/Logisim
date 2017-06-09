@@ -31,29 +31,24 @@ class ToolboxManip implements ProjectExplorer.Listener {
 	private class MyListener implements ProjectListener, LibraryListener, AttributeListener {
 		private LogisimFile curFile = null;
 
-		@Override
-		public void projectChanged(ProjectEvent event) {
-			int action = event.getAction();
-			if (action == ProjectEvent.ACTION_SET_FILE) {
-				setFile((LogisimFile) event.getOldData(), (LogisimFile) event.getData());
-				explorer.repaint();
+		private void addLibrary(Library lib) {
+			if (lib instanceof LibraryEventSource) {
+				((LibraryEventSource) lib).addLibraryListener(this);
+			}
+			for (Tool tool : lib.getTools()) {
+				AttributeSet attrs = tool.getAttributeSet();
+				if (attrs != null)
+					attrs.addAttributeListener(this);
 			}
 		}
 
-		private void setFile(LogisimFile oldFile, LogisimFile newFile) {
-			if (oldFile != null) {
-				removeLibrary(oldFile);
-				for (Library lib : oldFile.getLibraries()) {
-					removeLibrary(lib);
-				}
-			}
-			curFile = newFile;
-			if (newFile != null) {
-				addLibrary(newFile);
-				for (Library lib : newFile.getLibraries()) {
-					addLibrary(lib);
-				}
-			}
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
+		public void attributeValueChanged(AttributeEvent e) {
+			explorer.repaint();
 		}
 
 		@Override
@@ -81,14 +76,12 @@ class ToolboxManip implements ProjectExplorer.Listener {
 			explorer.repaint();
 		}
 
-		private void addLibrary(Library lib) {
-			if (lib instanceof LibraryEventSource) {
-				((LibraryEventSource) lib).addLibraryListener(this);
-			}
-			for (Tool tool : lib.getTools()) {
-				AttributeSet attrs = tool.getAttributeSet();
-				if (attrs != null)
-					attrs.addAttributeListener(this);
+		@Override
+		public void projectChanged(ProjectEvent event) {
+			int action = event.getAction();
+			if (action == ProjectEvent.ACTION_SET_FILE) {
+				setFile((LogisimFile) event.getOldData(), (LogisimFile) event.getData());
+				explorer.repaint();
 			}
 		}
 
@@ -103,13 +96,20 @@ class ToolboxManip implements ProjectExplorer.Listener {
 			}
 		}
 
-		@Override
-		public void attributeListChanged(AttributeEvent e) {
-		}
-
-		@Override
-		public void attributeValueChanged(AttributeEvent e) {
-			explorer.repaint();
+		private void setFile(LogisimFile oldFile, LogisimFile newFile) {
+			if (oldFile != null) {
+				removeLibrary(oldFile);
+				for (Library lib : oldFile.getLibraries()) {
+					removeLibrary(lib);
+				}
+			}
+			curFile = newFile;
+			if (newFile != null) {
+				addLibrary(newFile);
+				for (Library lib : newFile.getLibraries()) {
+					addLibrary(lib);
+				}
+			}
 		}
 
 	}
@@ -127,27 +127,16 @@ class ToolboxManip implements ProjectExplorer.Listener {
 	}
 
 	@Override
-	public void selectionChanged(ProjectExplorer.Event event) {
-		Object selected = event.getTarget();
-		if (selected instanceof Tool) {
-			if (selected instanceof AddTool) {
-				AddTool addTool = (AddTool) selected;
-				ComponentFactory source = addTool.getFactory();
-				if (source instanceof SubcircuitFactory) {
-					SubcircuitFactory circFact = (SubcircuitFactory) source;
-					Circuit circ = circFact.getSubcircuit();
-					if (proj.getCurrentCircuit() == circ) {
-						AttrTableModel m = new AttrTableCircuitModel(proj, circ);
-						proj.getFrame().setAttrTableModel(m);
-						return;
-					}
-				}
+	public void deleteRequested(ProjectExplorer.Event event) {
+		Object request = event.getTarget();
+		if (request instanceof Library) {
+			ProjectLibraryActions.doUnloadLibrary(proj, (Library) request);
+		} else if (request instanceof AddTool) {
+			ComponentFactory factory = ((AddTool) request).getFactory();
+			if (factory instanceof SubcircuitFactory) {
+				SubcircuitFactory circFact = (SubcircuitFactory) factory;
+				ProjectCircuitActions.doRemoveCircuit(proj, circFact.getSubcircuit());
 			}
-
-			lastSelected = proj.getTool();
-			Tool tool = (Tool) selected;
-			proj.setTool(tool);
-			proj.getFrame().viewAttributes(tool);
 		}
 	}
 
@@ -163,30 +152,6 @@ class ToolboxManip implements ProjectExplorer.Listener {
 				proj.getFrame().setEditorView(Frame.EDIT_LAYOUT);
 				if (lastSelected != null)
 					proj.setTool(lastSelected);
-			}
-		}
-	}
-
-	@Override
-	public void moveRequested(ProjectExplorer.Event event, AddTool dragged, AddTool target) {
-		LogisimFile file = proj.getLogisimFile();
-		int draggedIndex = file.getTools().indexOf(dragged);
-		int targetIndex = file.getTools().indexOf(target);
-		if (targetIndex > draggedIndex)
-			targetIndex++;
-		proj.doAction(LogisimFileActions.moveCircuit(dragged, targetIndex));
-	}
-
-	@Override
-	public void deleteRequested(ProjectExplorer.Event event) {
-		Object request = event.getTarget();
-		if (request instanceof Library) {
-			ProjectLibraryActions.doUnloadLibrary(proj, (Library) request);
-		} else if (request instanceof AddTool) {
-			ComponentFactory factory = ((AddTool) request).getFactory();
-			if (factory instanceof SubcircuitFactory) {
-				SubcircuitFactory circFact = (SubcircuitFactory) factory;
-				ProjectCircuitActions.doRemoveCircuit(proj, circFact.getSubcircuit());
 			}
 		}
 	}
@@ -212,6 +177,41 @@ class ToolboxManip implements ProjectExplorer.Listener {
 			return Popups.forLibrary(proj, (Library) clicked, is_top);
 		} else {
 			return null;
+		}
+	}
+
+	@Override
+	public void moveRequested(ProjectExplorer.Event event, AddTool dragged, AddTool target) {
+		LogisimFile file = proj.getLogisimFile();
+		int draggedIndex = file.getTools().indexOf(dragged);
+		int targetIndex = file.getTools().indexOf(target);
+		if (targetIndex > draggedIndex)
+			targetIndex++;
+		proj.doAction(LogisimFileActions.moveCircuit(dragged, targetIndex));
+	}
+
+	@Override
+	public void selectionChanged(ProjectExplorer.Event event) {
+		Object selected = event.getTarget();
+		if (selected instanceof Tool) {
+			if (selected instanceof AddTool) {
+				AddTool addTool = (AddTool) selected;
+				ComponentFactory source = addTool.getFactory();
+				if (source instanceof SubcircuitFactory) {
+					SubcircuitFactory circFact = (SubcircuitFactory) source;
+					Circuit circ = circFact.getSubcircuit();
+					if (proj.getCurrentCircuit() == circ) {
+						AttrTableModel m = new AttrTableCircuitModel(proj, circ);
+						proj.getFrame().setAttrTableModel(m);
+						return;
+					}
+				}
+			}
+
+			lastSelected = proj.getTool();
+			Tool tool = (Tool) selected;
+			proj.setTool(tool);
+			proj.getFrame().viewAttributes(tool);
 		}
 	}
 

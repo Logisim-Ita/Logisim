@@ -27,24 +27,6 @@ import com.cburch.logisim.util.Cache;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public final class Wire implements Component, AttributeSet, CustomHandles, Iterable<Location> {
-	/** Stroke width when drawing wires. */
-	public static final int WIDTH = 3;
-
-	public static final AttributeOption VALUE_HORZ = new AttributeOption("horz",
-			Strings.getter("wireDirectionHorzOption"));
-	public static final AttributeOption VALUE_VERT = new AttributeOption("vert",
-			Strings.getter("wireDirectionVertOption"));
-	public static final Attribute<AttributeOption> dir_attr = Attributes.forOption("direction",
-			Strings.getter("wireDirectionAttr"), new AttributeOption[] { VALUE_HORZ, VALUE_VERT });
-	public static final Attribute<Integer> len_attr = Attributes.forInteger("length", Strings.getter("wireLengthAttr"));
-
-	private static final List<Attribute<?>> ATTRIBUTES = Arrays.asList(new Attribute<?>[] { dir_attr, len_attr });
-	private static final Cache cache = new Cache();
-
-	public static Wire create(Location e0, Location e1) {
-		return (Wire) cache.get(new Wire(e0, e1));
-	}
-
 	private class EndList extends AbstractList<EndData> {
 		@Override
 		public EndData get(int i) {
@@ -55,6 +37,24 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 		public int size() {
 			return 2;
 		}
+	}
+
+	/** Stroke width when drawing wires. */
+	public static final int WIDTH = 3;
+	public static final AttributeOption VALUE_HORZ = new AttributeOption("horz",
+			Strings.getter("wireDirectionHorzOption"));
+	public static final AttributeOption VALUE_VERT = new AttributeOption("vert",
+			Strings.getter("wireDirectionVertOption"));
+	public static final Attribute<AttributeOption> dir_attr = Attributes.forOption("direction",
+			Strings.getter("wireDirectionAttr"), new AttributeOption[] { VALUE_HORZ, VALUE_VERT });
+
+	public static final Attribute<Integer> len_attr = Attributes.forInteger("length", Strings.getter("wireLengthAttr"));
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays.asList(new Attribute<?>[] { dir_attr, len_attr });
+
+	private static final Cache cache = new Cache();
+
+	public static Wire create(Location e0, Location e1) {
+		return (Wire) cache.get(new Wire(e0, e1));
 	}
 
 	final Location e0;
@@ -83,25 +83,7 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		if (!(other instanceof Wire))
-			return false;
-		Wire w = (Wire) other;
-		return w.e0.equals(this.e0) && w.e1.equals(this.e1);
-	}
-
-	@Override
-	public int hashCode() {
-		return e0.hashCode() * 31 + e1.hashCode();
-	}
-
-	public int getLength() {
-		return (e1.getY() - e0.getY()) + (e1.getX() - e0.getX());
-	}
-
-	@Override
-	public String toString() {
-		return "Wire[" + e0 + "-" + e1 + "]";
+	public void addAttributeListener(AttributeListener l) {
 	}
 
 	//
@@ -112,36 +94,15 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	public void addComponentListener(ComponentListener e) {
 	}
 
+	//
+	// AttributeSet methods
+	//
+	// It makes some sense for a wire to be its own attribute, since
+	// after all it is immutable.
+	//
 	@Override
-	public void removeComponentListener(ComponentListener e) {
-	}
-
-	@Override
-	public ComponentFactory getFactory() {
-		return WireFactory.instance;
-	}
-
-	@Override
-	public AttributeSet getAttributeSet() {
+	public Object clone() {
 		return this;
-	}
-
-	// location/extent methods
-	@Override
-	public Location getLocation() {
-		return e0;
-	}
-
-	@Override
-	public Bounds getBounds() {
-		int x0 = e0.getX();
-		int y0 = e0.getY();
-		return Bounds.create(x0 - 2, y0 - 2, e1.getX() - x0 + 5, e1.getY() - y0 + 5);
-	}
-
-	@Override
-	public Bounds getBounds(Graphics g) {
-		return getBounds();
 	}
 
 	@Override
@@ -162,18 +123,25 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 		return contains(pt);
 	}
 
-	//
-	// propagation methods
-	//
 	@Override
-	public List<EndData> getEnds() {
-		return new EndList();
+	public boolean containsAttribute(Attribute<?> attr) {
+		return ATTRIBUTES.contains(attr);
 	}
 
 	@Override
-	public EndData getEnd(int index) {
-		Location loc = getEndLocation(index);
-		return new EndData(loc, BitWidth.UNKNOWN, EndData.INPUT_OUTPUT);
+	public void draw(ComponentDrawContext context) {
+		CircuitState state = context.getCircuitState();
+		Graphics g = context.getGraphics();
+
+		GraphicsUtil.switchToWidth(g, WIDTH);
+		g.setColor(state.getValue(e0).getColor());
+		g.drawLine(e0.getX(), e0.getY(), e1.getX(), e1.getY());
+	}
+
+	@Override
+	public void drawHandles(ComponentDrawContext context) {
+		context.drawHandle(e0);
+		context.drawHandle(e1);
 	}
 
 	@Override
@@ -182,11 +150,11 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	public void propagate(CircuitState state) {
-		// Normally this is handled by CircuitWires, and so it won't get
-		// called. The exception is when a wire is added or removed
-		state.markPointAsDirty(e0);
-		state.markPointAsDirty(e1);
+	public boolean equals(Object other) {
+		if (!(other instanceof Wire))
+			return false;
+		Wire w = (Wire) other;
+		return w.e0.equals(this.e0) && w.e1.equals(this.e1);
 	}
 
 	//
@@ -201,52 +169,6 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	public void draw(ComponentDrawContext context) {
-		CircuitState state = context.getCircuitState();
-		Graphics g = context.getGraphics();
-
-		GraphicsUtil.switchToWidth(g, WIDTH);
-		g.setColor(state.getValue(e0).getColor());
-		g.drawLine(e0.getX(), e0.getY(), e1.getX(), e1.getY());
-	}
-
-	@Override
-	public Object getFeature(Object key) {
-		if (key == CustomHandles.class)
-			return this;
-		return null;
-	}
-
-	//
-	// AttributeSet methods
-	//
-	// It makes some sense for a wire to be its own attribute, since
-	// after all it is immutable.
-	//
-	@Override
-	public Object clone() {
-		return this;
-	}
-
-	@Override
-	public void addAttributeListener(AttributeListener l) {
-	}
-
-	@Override
-	public void removeAttributeListener(AttributeListener l) {
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return ATTRIBUTES;
-	}
-
-	@Override
-	public boolean containsAttribute(Attribute<?> attr) {
-		return ATTRIBUTES.contains(attr);
-	}
-
-	@Override
 	public Attribute<?> getAttribute(String name) {
 		for (Attribute<?> attr : ATTRIBUTES) {
 			if (name.equals(attr.getName()))
@@ -256,18 +178,77 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	public boolean isReadOnly(Attribute<?> attr) {
-		return true;
+	public List<Attribute<?>> getAttributes() {
+		return ATTRIBUTES;
 	}
 
 	@Override
-	public void setReadOnly(Attribute<?> attr, boolean value) {
-		throw new UnsupportedOperationException();
+	public AttributeSet getAttributeSet() {
+		return this;
 	}
 
 	@Override
-	public boolean isToSave(Attribute<?> attr) {
-		return false;
+	public Bounds getBounds() {
+		int x0 = e0.getX();
+		int y0 = e0.getY();
+		return Bounds.create(x0 - 2, y0 - 2, e1.getX() - x0 + 5, e1.getY() - y0 + 5);
+	}
+
+	@Override
+	public Bounds getBounds(Graphics g) {
+		return getBounds();
+	}
+
+	@Override
+	public EndData getEnd(int index) {
+		Location loc = getEndLocation(index);
+		return new EndData(loc, BitWidth.UNKNOWN, EndData.INPUT_OUTPUT);
+	}
+
+	public Location getEnd0() {
+		return e0;
+	}
+
+	public Location getEnd1() {
+		return e1;
+	}
+
+	public Location getEndLocation(int index) {
+		return index == 0 ? e0 : e1;
+	}
+
+	//
+	// propagation methods
+	//
+	@Override
+	public List<EndData> getEnds() {
+		return new EndList();
+	}
+
+	@Override
+	public ComponentFactory getFactory() {
+		return WireFactory.instance;
+	}
+
+	@Override
+	public Object getFeature(Object key) {
+		if (key == CustomHandles.class)
+			return this;
+		return null;
+	}
+
+	public int getLength() {
+		return (e1.getY() - e0.getY()) + (e1.getX() - e0.getX());
+	}
+
+	// location/extent methods
+	@Override
+	public Location getLocation() {
+		return e0;
+	}
+
+	public Location getOtherEnd(Location loc) {
+		return (loc.equals(e0) ? e1 : e0);
 	}
 
 	@Override
@@ -283,8 +264,22 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	public <V> void setValue(Attribute<V> attr, V value) {
-		throw new IllegalArgumentException("read only attribute");
+	public int hashCode() {
+		return e0.hashCode() * 31 + e1.hashCode();
+	}
+
+	public boolean isParallel(Wire other) {
+		return this.is_x_equal == other.is_x_equal;
+	}
+
+	@Override
+	public boolean isReadOnly(Attribute<?> attr) {
+		return true;
+	}
+
+	@Override
+	public boolean isToSave(Attribute<?> attr) {
+		return false;
 	}
 
 	//
@@ -294,29 +289,9 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 		return is_x_equal;
 	}
 
-	public Location getEndLocation(int index) {
-		return index == 0 ? e0 : e1;
-	}
-
-	public Location getEnd0() {
-		return e0;
-	}
-
-	public Location getEnd1() {
-		return e1;
-	}
-
-	public Location getOtherEnd(Location loc) {
-		return (loc.equals(e0) ? e1 : e0);
-	}
-
-	public boolean sharesEnd(Wire other) {
-		return this.e0.equals(other.e0) || this.e1.equals(other.e0) || this.e0.equals(other.e1)
-				|| this.e1.equals(other.e1);
-	}
-
-	public boolean overlaps(Wire other, boolean includeEnds) {
-		return overlaps(other.e0, other.e1, includeEnds);
+	@Override
+	public Iterator<Location> iterator() {
+		return new WireIterator(e0, e1);
 	}
 
 	private boolean overlaps(Location q0, Location q1, boolean includeEnds) {
@@ -341,18 +316,43 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 		}
 	}
 
-	public boolean isParallel(Wire other) {
-		return this.is_x_equal == other.is_x_equal;
+	public boolean overlaps(Wire other, boolean includeEnds) {
+		return overlaps(other.e0, other.e1, includeEnds);
 	}
 
 	@Override
-	public Iterator<Location> iterator() {
-		return new WireIterator(e0, e1);
+	public void propagate(CircuitState state) {
+		// Normally this is handled by CircuitWires, and so it won't get
+		// called. The exception is when a wire is added or removed
+		state.markPointAsDirty(e0);
+		state.markPointAsDirty(e1);
 	}
 
 	@Override
-	public void drawHandles(ComponentDrawContext context) {
-		context.drawHandle(e0);
-		context.drawHandle(e1);
+	public void removeAttributeListener(AttributeListener l) {
+	}
+
+	@Override
+	public void removeComponentListener(ComponentListener e) {
+	}
+
+	@Override
+	public void setReadOnly(Attribute<?> attr, boolean value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public <V> void setValue(Attribute<V> attr, V value) {
+		throw new IllegalArgumentException("read only attribute");
+	}
+
+	public boolean sharesEnd(Wire other) {
+		return this.e0.equals(other.e0) || this.e1.equals(other.e0) || this.e0.equals(other.e1)
+				|| this.e1.equals(other.e1);
+	}
+
+	@Override
+	public String toString() {
+		return "Wire[" + e0 + "-" + e1 + "]";
 	}
 }

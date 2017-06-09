@@ -14,8 +14,14 @@ class MoveRequest {
 		this.dy = dy;
 	}
 
-	public MoveGesture getMoveGesture() {
-		return gesture;
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof MoveRequest) {
+			MoveRequest o = (MoveRequest) other;
+			return this.gesture == o.gesture && this.dx == o.dx && this.dy == o.dy;
+		} else {
+			return false;
+		}
 	}
 
 	public int getDeltaX() {
@@ -26,14 +32,8 @@ class MoveRequest {
 		return dy;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof MoveRequest) {
-			MoveRequest o = (MoveRequest) other;
-			return this.gesture == o.gesture && this.dx == o.dx && this.dy == o.dy;
-		} else {
-			return false;
-		}
+	public MoveGesture getMoveGesture() {
+		return gesture;
 	}
 
 	@Override

@@ -50,13 +50,6 @@ class Highlighter {
 		return entry;
 	}
 
-	public synchronized void remove(Object tag) {
-		if (entries.remove(tag)) {
-			Entry entry = (Entry) tag;
-			expose(entry);
-		}
-	}
-
 	public synchronized void clear() {
 		ArrayList<Entry> oldEntries = entries;
 		entries = new ArrayList<Entry>();
@@ -108,6 +101,13 @@ class Highlighter {
 					g.fillRect(lineStart, y1, x1 + cellWidth - lineStart, cellHeight);
 				}
 			}
+		}
+	}
+
+	public synchronized void remove(Object tag) {
+		if (entries.remove(tag)) {
+			Entry entry = (Entry) tag;
+			expose(entry);
 		}
 	}
 }

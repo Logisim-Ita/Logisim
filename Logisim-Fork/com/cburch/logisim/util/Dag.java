@@ -23,14 +23,42 @@ public class Dag {
 	public Dag() {
 	}
 
-	public boolean hasPredecessors(Object data) {
-		Node from = findNode(data);
-		return from != null && from.numPreds != 0;
+	public boolean addEdge(Object srcData, Object dstData) {
+		if (!canFollow(dstData, srcData))
+			return false;
+
+		Node src = createNode(srcData);
+		Node dst = createNode(dstData);
+		if (src.succs.add(dst))
+			++dst.numPreds; // add since not already present
+		return true;
 	}
 
-	public boolean hasSuccessors(Object data) {
-		Node to = findNode(data);
-		return to != null && !to.succs.isEmpty();
+	private boolean canFollow(Node query, Node base) {
+		if (base == query)
+			return false;
+
+		// mark all as unvisited
+		for (Node n : nodes.values()) {
+			n.mark = false; // will become true once reached
+		}
+
+		// Search starting at query: If base is found, then it follows
+		// the query already, and so query cannot follow base.
+		LinkedList<Node> fringe = new LinkedList<Node>();
+		fringe.add(query);
+		while (!fringe.isEmpty()) {
+			Node n = fringe.removeFirst();
+			for (Node next : n.succs) {
+				if (!next.mark) {
+					if (next == base)
+						return false;
+					next.mark = true;
+					fringe.addLast(next);
+				}
+			}
+		}
+		return true;
 	}
 
 	public boolean canFollow(Object query, Object base) {
@@ -43,15 +71,32 @@ public class Dag {
 		}
 	}
 
-	public boolean addEdge(Object srcData, Object dstData) {
-		if (!canFollow(dstData, srcData))
-			return false;
+	private Node createNode(Object data) {
+		Node ret = findNode(data);
+		if (ret != null)
+			return ret;
+		if (data == null)
+			return null;
 
-		Node src = createNode(srcData);
-		Node dst = createNode(dstData);
-		if (src.succs.add(dst))
-			++dst.numPreds; // add since not already present
-		return true;
+		ret = new Node(data);
+		nodes.put(data, ret);
+		return ret;
+	}
+
+	private Node findNode(Object data) {
+		if (data == null)
+			return null;
+		return nodes.get(data);
+	}
+
+	public boolean hasPredecessors(Object data) {
+		Node from = findNode(data);
+		return from != null && from.numPreds != 0;
+	}
+
+	public boolean hasSuccessors(Object data) {
+		Node to = findNode(data);
+		return to != null && !to.succs.isEmpty();
 	}
 
 	public boolean removeEdge(Object srcData, Object dstData) {
@@ -90,50 +135,5 @@ public class Dag {
 					it.remove();
 			}
 		}
-	}
-
-	private Node findNode(Object data) {
-		if (data == null)
-			return null;
-		return nodes.get(data);
-	}
-
-	private Node createNode(Object data) {
-		Node ret = findNode(data);
-		if (ret != null)
-			return ret;
-		if (data == null)
-			return null;
-
-		ret = new Node(data);
-		nodes.put(data, ret);
-		return ret;
-	}
-
-	private boolean canFollow(Node query, Node base) {
-		if (base == query)
-			return false;
-
-		// mark all as unvisited
-		for (Node n : nodes.values()) {
-			n.mark = false; // will become true once reached
-		}
-
-		// Search starting at query: If base is found, then it follows
-		// the query already, and so query cannot follow base.
-		LinkedList<Node> fringe = new LinkedList<Node>();
-		fringe.add(query);
-		while (!fringe.isEmpty()) {
-			Node n = fringe.removeFirst();
-			for (Node next : n.succs) {
-				if (!next.mark) {
-					if (next == base)
-						return false;
-					next.mark = true;
-					fringe.addLast(next);
-				}
-			}
-		}
-		return true;
 	}
 }

@@ -20,11 +20,11 @@ class Strings {
 		return StringUtil.format(source.get(key), arg);
 	}
 
-	public static StringGetter getter(String key) {
-		return source.getter(key);
-	}
-
 	public static Locale[] getLocaleOptions() {
 		return source.getLocaleOptions();
+	}
+
+	public static StringGetter getter(String key) {
+		return source.getter(key);
 	}
 }

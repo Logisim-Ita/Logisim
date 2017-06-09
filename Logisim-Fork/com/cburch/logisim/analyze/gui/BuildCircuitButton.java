@@ -30,24 +30,6 @@ import com.cburch.logisim.std.gates.CircuitBuilder;
 import com.cburch.logisim.util.StringUtil;
 
 class BuildCircuitButton extends JButton {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8892619562183369771L;
-
-	private static class ProjectItem {
-		Project project;
-
-		ProjectItem(Project project) {
-			this.project = project;
-		}
-
-		@Override
-		public String toString() {
-			return project.getLogisimFile().getDisplayName();
-		}
-	}
-
 	private class DialogPanel extends JPanel {
 		/**
 		 * 
@@ -183,6 +165,24 @@ class BuildCircuitButton extends JButton {
 			performAction(dest, name, replace, twoInputs, useNands);
 		}
 	}
+
+	private static class ProjectItem {
+		Project project;
+
+		ProjectItem(Project project) {
+			this.project = project;
+		}
+
+		@Override
+		public String toString() {
+			return project.getLogisimFile().getDisplayName();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8892619562183369771L;
 
 	private MyListener myListener = new MyListener();
 	private JFrame parent;

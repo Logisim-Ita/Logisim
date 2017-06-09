@@ -13,15 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class ZipClassLoader extends ClassLoader {
-	// This code was posted on a forum by "leukbr" on March 30, 2001.
-	// http://forums.sun.com/thread.jspa?threadID=360060&forumID=31
-	// I've modified it substantially to include a thread that keeps the file
-	// open for OPEN_TIME milliseconds so time isn't wasted continually
-	// opening and closing the file.
-	private static final int OPEN_TIME = 5000;
-	private static final int REQUEST_FIND = 0;
-	private static final int REQUEST_LOAD = 1;
-
 	private static class Request {
 		int action;
 		String resource;
@@ -32,20 +23,6 @@ public class ZipClassLoader extends ClassLoader {
 			this.action = action;
 			this.resource = resource;
 			this.responseSent = false;
-		}
-
-		@Override
-		public String toString() {
-			String act = action == REQUEST_LOAD ? "load" : action == REQUEST_FIND ? "find" : "act" + action;
-			return act + ":" + resource;
-		}
-
-		void setResponse(Object value) {
-			synchronized (this) {
-				response = value;
-				responseSent = true;
-				notifyAll();
-			}
 		}
 
 		void ensureDone() {
@@ -69,60 +46,31 @@ public class ZipClassLoader extends ClassLoader {
 				return response;
 			}
 		}
-	}
 
+		void setResponse(Object value) {
+			synchronized (this) {
+				response = value;
+				responseSent = true;
+				notifyAll();
+			}
+		}
+
+		@Override
+		public String toString() {
+			String act = action == REQUEST_LOAD ? "load" : action == REQUEST_FIND ? "find" : "act" + action;
+			return act + ":" + resource;
+		}
+	}
 	private class WorkThread extends Thread {
 		private LinkedList<Request> requests = new LinkedList<Request>();
 		private ZipFile zipFile = null;
 
-		@Override
-		public void run() {
-			try {
-				while (true) {
-					Request request = waitForNextRequest();
-					if (request == null)
-						return;
-
-					try {
-						switch (request.action) {
-						case REQUEST_LOAD:
-							performLoad(request);
-							break;
-						case REQUEST_FIND:
-							performFind(request);
-							break;
-						}
-					} finally {
-						request.ensureDone();
-					}
+		private void ensureZipOpen() {
+			if (zipFile == null) {
+				try {
+					zipFile = new ZipFile(zipPath);
+				} catch (IOException e) {
 				}
-			} catch (Throwable t) {
-			} finally {
-				if (zipFile != null) {
-					try {
-						zipFile.close();
-						zipFile = null;
-					} catch (IOException e) {
-					}
-				}
-			}
-		}
-
-		private Request waitForNextRequest() {
-			synchronized (bgLock) {
-				long start = System.currentTimeMillis();
-				while (requests.isEmpty()) {
-					long elapse = System.currentTimeMillis() - start;
-					if (elapse >= OPEN_TIME) {
-						bgThread = null;
-						return null;
-					}
-					try {
-						bgLock.wait(OPEN_TIME);
-					} catch (InterruptedException e) {
-					}
-				}
-				return requests.removeFirst();
 			}
 		}
 
@@ -174,37 +122,79 @@ public class ZipClassLoader extends ClassLoader {
 			req.setResponse(ret);
 		}
 
-		private void ensureZipOpen() {
-			if (zipFile == null) {
-				try {
-					zipFile = new ZipFile(zipPath);
-				} catch (IOException e) {
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					Request request = waitForNextRequest();
+					if (request == null)
+						return;
+
+					try {
+						switch (request.action) {
+						case REQUEST_LOAD:
+							performLoad(request);
+							break;
+						case REQUEST_FIND:
+							performFind(request);
+							break;
+						}
+					} finally {
+						request.ensureDone();
+					}
+				}
+			} catch (Throwable t) {
+			} finally {
+				if (zipFile != null) {
+					try {
+						zipFile.close();
+						zipFile = null;
+					} catch (IOException e) {
+					}
 				}
 			}
 		}
+
+		private Request waitForNextRequest() {
+			synchronized (bgLock) {
+				long start = System.currentTimeMillis();
+				while (requests.isEmpty()) {
+					long elapse = System.currentTimeMillis() - start;
+					if (elapse >= OPEN_TIME) {
+						bgThread = null;
+						return null;
+					}
+					try {
+						bgLock.wait(OPEN_TIME);
+					} catch (InterruptedException e) {
+					}
+				}
+				return requests.removeFirst();
+			}
+		}
 	}
+	// This code was posted on a forum by "leukbr" on March 30, 2001.
+	// http://forums.sun.com/thread.jspa?threadID=360060&forumID=31
+	// I've modified it substantially to include a thread that keeps the file
+	// open for OPEN_TIME milliseconds so time isn't wasted continually
+	// opening and closing the file.
+	private static final int OPEN_TIME = 5000;
+
+	private static final int REQUEST_FIND = 0;
+
+	private static final int REQUEST_LOAD = 1;
 
 	private File zipPath;
 	private HashMap<String, Object> classes = new HashMap<String, Object>();
 	private Object bgLock = new Object();
 	private WorkThread bgThread = null;
 
-	public ZipClassLoader(String zipFileName) {
-		this(new File(zipFileName));
-	}
-
 	public ZipClassLoader(File zipFile) {
 		zipPath = zipFile;
 	}
 
-	@Override
-	public URL findResource(String resourceName) {
-		Object ret = request(REQUEST_FIND, resourceName);
-		if (ret instanceof URL) {
-			return (URL) ret;
-		} else {
-			return super.findResource(resourceName);
-		}
+	public ZipClassLoader(String zipFileName) {
+		this(new File(zipFileName));
 	}
 
 	@Override
@@ -246,6 +236,16 @@ public class ZipClassLoader extends ClassLoader {
 			throw (Error) result;
 		} else {
 			return super.findClass(className);
+		}
+	}
+
+	@Override
+	public URL findResource(String resourceName) {
+		Object ret = request(REQUEST_FIND, resourceName);
+		if (ret instanceof URL) {
+			return (URL) ret;
+		} else {
+			return super.findResource(resourceName);
 		}
 	}
 

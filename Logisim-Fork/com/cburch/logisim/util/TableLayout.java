@@ -26,20 +26,16 @@ public class TableLayout implements LayoutManager2 {
 		this.curCol = 0;
 	}
 
-	public void setRowWeight(int rowIndex, double weight) {
-		if (weight < 0) {
-			throw new IllegalArgumentException("weight must be nonnegative");
+	@Override
+	public void addLayoutComponent(Component comp, Object constraints) {
+		if (constraints instanceof TableConstraints) {
+			TableConstraints con = (TableConstraints) constraints;
+			if (con.getRow() >= 0)
+				curRow = con.getRow();
+			if (con.getCol() >= 0)
+				curCol = con.getCol();
 		}
-		if (rowIndex < 0) {
-			throw new IllegalArgumentException("row index must be nonnegative");
-		}
-		if ((rowWeight == null || rowIndex >= rowWeight.length) && weight != 0.0) {
-			double[] a = new double[rowIndex + 10];
-			if (rowWeight != null)
-				System.arraycopy(rowWeight, 0, a, 0, rowWeight.length);
-			rowWeight = a;
-		}
-		rowWeight[rowIndex] = weight;
+		addLayoutComponent("", comp);
 	}
 
 	@Override
@@ -58,74 +54,6 @@ public class TableLayout implements LayoutManager2 {
 	}
 
 	@Override
-	public void addLayoutComponent(Component comp, Object constraints) {
-		if (constraints instanceof TableConstraints) {
-			TableConstraints con = (TableConstraints) constraints;
-			if (con.getRow() >= 0)
-				curRow = con.getRow();
-			if (con.getCol() >= 0)
-				curCol = con.getCol();
-		}
-		addLayoutComponent("", comp);
-	}
-
-	@Override
-	public void removeLayoutComponent(Component comp) {
-		for (int i = 0, n = contents.size(); i < n; i++) {
-			Component[] row = contents.get(i);
-			for (int j = 0; j < row.length; j++) {
-				if (row[j] == comp) {
-					row[j] = null;
-					return;
-				}
-			}
-		}
-		prefs = null;
-	}
-
-	@Override
-	public Dimension preferredLayoutSize(Container parent) {
-		if (prefs == null) {
-			int[] prefCol = new int[colCount];
-			int[] prefRow = new int[contents.size()];
-			int height = 0;
-			for (int i = 0; i < prefRow.length; i++) {
-				Component[] row = contents.get(i);
-				int rowHeight = 0;
-				for (int j = 0; j < row.length; j++) {
-					if (row[j] != null) {
-						Dimension dim = row[j].getPreferredSize();
-						if (dim.height > rowHeight)
-							rowHeight = dim.height;
-						if (dim.width > prefCol[j])
-							prefCol[j] = dim.width;
-					}
-				}
-				prefRow[i] = rowHeight;
-				height += rowHeight;
-			}
-			int width = 0;
-			for (int i = 0; i < prefCol.length; i++) {
-				width += prefCol[i];
-			}
-			this.prefs = new Dimension(width, height);
-			this.prefRow = prefRow;
-			this.prefCol = prefCol;
-		}
-		return new Dimension(prefs);
-	}
-
-	@Override
-	public Dimension minimumLayoutSize(Container parent) {
-		return preferredLayoutSize(parent);
-	}
-
-	@Override
-	public Dimension maximumLayoutSize(Container parent) {
-		return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-	}
-
-	@Override
 	public float getLayoutAlignmentX(Container parent) {
 		return 0.5f;
 	}
@@ -133,6 +61,11 @@ public class TableLayout implements LayoutManager2 {
 	@Override
 	public float getLayoutAlignmentY(Container parent) {
 		return 0.5f;
+	}
+
+	@Override
+	public void invalidateLayout(Container parent) {
+		prefs = null;
 	}
 
 	@Override
@@ -183,8 +116,75 @@ public class TableLayout implements LayoutManager2 {
 	}
 
 	@Override
-	public void invalidateLayout(Container parent) {
+	public Dimension maximumLayoutSize(Container parent) {
+		return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+	}
+
+	@Override
+	public Dimension minimumLayoutSize(Container parent) {
+		return preferredLayoutSize(parent);
+	}
+
+	@Override
+	public Dimension preferredLayoutSize(Container parent) {
+		if (prefs == null) {
+			int[] prefCol = new int[colCount];
+			int[] prefRow = new int[contents.size()];
+			int height = 0;
+			for (int i = 0; i < prefRow.length; i++) {
+				Component[] row = contents.get(i);
+				int rowHeight = 0;
+				for (int j = 0; j < row.length; j++) {
+					if (row[j] != null) {
+						Dimension dim = row[j].getPreferredSize();
+						if (dim.height > rowHeight)
+							rowHeight = dim.height;
+						if (dim.width > prefCol[j])
+							prefCol[j] = dim.width;
+					}
+				}
+				prefRow[i] = rowHeight;
+				height += rowHeight;
+			}
+			int width = 0;
+			for (int i = 0; i < prefCol.length; i++) {
+				width += prefCol[i];
+			}
+			this.prefs = new Dimension(width, height);
+			this.prefRow = prefRow;
+			this.prefCol = prefCol;
+		}
+		return new Dimension(prefs);
+	}
+
+	@Override
+	public void removeLayoutComponent(Component comp) {
+		for (int i = 0, n = contents.size(); i < n; i++) {
+			Component[] row = contents.get(i);
+			for (int j = 0; j < row.length; j++) {
+				if (row[j] == comp) {
+					row[j] = null;
+					return;
+				}
+			}
+		}
 		prefs = null;
+	}
+
+	public void setRowWeight(int rowIndex, double weight) {
+		if (weight < 0) {
+			throw new IllegalArgumentException("weight must be nonnegative");
+		}
+		if (rowIndex < 0) {
+			throw new IllegalArgumentException("row index must be nonnegative");
+		}
+		if ((rowWeight == null || rowIndex >= rowWeight.length) && weight != 0.0) {
+			double[] a = new double[rowIndex + 10];
+			if (rowWeight != null)
+				System.arraycopy(rowWeight, 0, a, 0, rowWeight.length);
+			rowWeight = a;
+		}
+		rowWeight[rowIndex] = weight;
 	}
 
 }

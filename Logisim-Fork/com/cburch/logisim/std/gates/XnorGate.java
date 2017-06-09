@@ -27,8 +27,33 @@ class XnorGate extends AbstractGate {
 	}
 
 	@Override
+	protected Expression computeExpression(Expression[] inputs, int numInputs) {
+		return Expressions.not(XorGate.xorExpression(inputs, numInputs));
+	}
+
+	@Override
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
+		Object behavior = state.getAttributeValue(GateAttributes.ATTR_XOR);
+		if (behavior == GateAttributes.XOR_ODD) {
+			return GateFunctions.computeOddParity(inputs, numInputs).not();
+		} else {
+			return GateFunctions.computeExactlyOne(inputs, numInputs).not();
+		}
+	}
+
+	@Override
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
+
+	@Override
 	protected String getRectangularLabel(AttributeSet attrs) {
 		return XorGate.FACTORY.getRectangularLabel(attrs);
+	}
+
+	@Override
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
+		PainterDin.paintXnor(painter, width, height, false);
 	}
 
 	@Override
@@ -47,32 +72,7 @@ class XnorGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
-		PainterDin.paintXnor(painter, width, height, false);
-	}
-
-	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
-		Object behavior = state.getAttributeValue(GateAttributes.ATTR_XOR);
-		if (behavior == GateAttributes.XOR_ODD) {
-			return GateFunctions.computeOddParity(inputs, numInputs).not();
-		} else {
-			return GateFunctions.computeExactlyOne(inputs, numInputs).not();
-		}
-	}
-
-	@Override
 	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
 		return !data.getPoint().equals(instance.getLocation());
-	}
-
-	@Override
-	protected Expression computeExpression(Expression[] inputs, int numInputs) {
-		return Expressions.not(XorGate.xorExpression(inputs, numInputs));
-	}
-
-	@Override
-	protected Value getIdentity() {
-		return Value.FALSE;
 	}
 }

@@ -27,6 +27,38 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 //all based on normal button
 public class Switch extends InstanceFactory {
+	public static class Logger extends InstanceLogger {
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			return state.getAttributeValue(StdAttr.LABEL);
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+			return data == null ? Value.FALSE : (Value) data.getValue();
+		}
+	}
+
+	public static class Poker extends InstancePoker {
+		@Override
+		public void mouseReleased(InstanceState state, MouseEvent e) {
+			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+			Value val = data == null ? Value.FALSE : (Value) data.getValue();
+			setValue(state, val.not());// opposite value
+		}
+
+		private void setValue(InstanceState state, Value val) {
+			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+			if (data == null) {
+				state.setData(new InstanceDataSingleton(val));
+			} else {
+				data.setValue(val);
+			}
+			state.getInstance().fireInvalidated();
+		}
+	}
+
 	private static final int DEPTH = 3;
 
 	public Switch() {
@@ -41,29 +73,6 @@ public class Switch extends InstanceFactory {
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Direction facing = attrs.getValue(StdAttr.FACING);
-		// changed to a rectangle
-		return Bounds.create(-20, -15, 20, 30).rotate(Direction.EAST, facing, 0, 0);
-	}
-
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		computeTextField(instance);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-			computeTextField(instance);
-		} else if (attr == Io.ATTR_LABEL_LOC) {
-			computeTextField(instance);
-		}
 	}
 
 	private void computeTextField(Instance instance) {
@@ -105,10 +114,26 @@ public class Switch extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-		Value val = data == null ? Value.FALSE : (Value) data.getValue();
-		state.setPort(0, val, 1);
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		computeTextField(instance);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction facing = attrs.getValue(StdAttr.FACING);
+		// changed to a rectangle
+		return Bounds.create(-20, -15, 20, 30).rotate(Direction.EAST, facing, 0, 0);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			computeTextField(instance);
+		} else if (attr == Io.ATTR_LABEL_LOC) {
+			computeTextField(instance);
+		}
 	}
 
 	@Override
@@ -254,47 +279,10 @@ public class Switch extends InstanceFactory {
 		painter.drawPorts();
 	}
 
-	public static class Poker extends InstancePoker {
-		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) { // on
-																		// mouse
-																		// released
-																		// check
-																		// the
-																		// value
-																		// and
-																		// set
-																		// the
-																		// opposite
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			Value val = data == null ? Value.FALSE : (Value) data.getValue();
-			if (val == Value.TRUE)
-				setValue(state, Value.FALSE);
-			else
-				setValue(state, Value.TRUE);
-		}
-
-		private void setValue(InstanceState state, Value val) {
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			if (data == null) {
-				state.setData(new InstanceDataSingleton(val));
-			} else {
-				data.setValue(val);
-			}
-			state.getInstance().fireInvalidated();
-		}
-	}
-
-	public static class Logger extends InstanceLogger {
-		@Override
-		public String getLogName(InstanceState state, Object option) {
-			return state.getAttributeValue(StdAttr.LABEL);
-		}
-
-		@Override
-		public Value getLogValue(InstanceState state, Object option) {
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			return data == null ? Value.FALSE : (Value) data.getValue();
-		}
+	@Override
+	public void propagate(InstanceState state) {
+		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+		Value val = data == null ? Value.FALSE : (Value) data.getValue();
+		state.setPort(0, val, 1);
 	}
 }

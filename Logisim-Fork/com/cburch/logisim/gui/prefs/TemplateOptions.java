@@ -32,11 +32,6 @@ import com.cburch.logisim.util.JFileChoosers;
 import com.cburch.logisim.util.StringUtil;
 
 class TemplateOptions extends OptionsPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -591966003927175665L;
-
 	private class MyListener implements ActionListener, PropertyChangeListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -89,6 +84,11 @@ class TemplateOptions extends OptionsPanel {
 			computeEnabled();
 		}
 
+		private void computeEnabled() {
+			custom.setEnabled(!templateField.getText().equals(""));
+			templateField.setEnabled(custom.isSelected());
+		}
+
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			String prop = event.getPropertyName();
@@ -110,12 +110,12 @@ class TemplateOptions extends OptionsPanel {
 			}
 			computeEnabled();
 		}
-
-		private void computeEnabled() {
-			custom.setEnabled(!templateField.getText().equals(""));
-			templateField.setEnabled(custom.isSelected());
-		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -591966003927175665L;
 
 	private MyListener myListener = new MyListener();
 
@@ -188,13 +188,13 @@ class TemplateOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("templateTitle");
+	public String getHelpText() {
+		return Strings.get("templateHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("templateHelp");
+	public String getTitle() {
+		return Strings.get("templateTitle");
 	}
 
 	@Override

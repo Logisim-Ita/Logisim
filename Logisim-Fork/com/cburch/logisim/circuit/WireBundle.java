@@ -21,6 +21,49 @@ class WireBundle {
 		parent = this;
 	}
 
+	void addPullValue(Value val) {
+		pullValue = pullValue.combine(val);
+	}
+
+	WireBundle find() {
+		WireBundle ret = this;
+		if (ret.parent != ret) {
+			do
+				ret = ret.parent;
+			while (ret.parent != ret);
+			this.parent = ret;
+		}
+		return ret;
+	}
+
+	Value getPullValue() {
+		return pullValue;
+	}
+
+	BitWidth getWidth() {
+		if (incompatibilityData != null) {
+			return BitWidth.UNKNOWN;
+		} else {
+			return width;
+		}
+	}
+
+	Location getWidthDeterminant() {
+		if (incompatibilityData != null) {
+			return null;
+		} else {
+			return widthDeterminant;
+		}
+	}
+
+	WidthIncompatibilityData getWidthIncompatibilityData() {
+		return incompatibilityData;
+	}
+
+	void isolate() {
+		parent = this;
+	}
+
 	boolean isValid() {
 		return incompatibilityData == null;
 	}
@@ -52,53 +95,10 @@ class WireBundle {
 		}
 	}
 
-	BitWidth getWidth() {
-		if (incompatibilityData != null) {
-			return BitWidth.UNKNOWN;
-		} else {
-			return width;
-		}
-	}
-
-	Location getWidthDeterminant() {
-		if (incompatibilityData != null) {
-			return null;
-		} else {
-			return widthDeterminant;
-		}
-	}
-
-	WidthIncompatibilityData getWidthIncompatibilityData() {
-		return incompatibilityData;
-	}
-
-	void isolate() {
-		parent = this;
-	}
-
 	void unite(WireBundle other) {
 		WireBundle group = this.find();
 		WireBundle group2 = other.find();
 		if (group != group2)
 			group.parent = group2;
-	}
-
-	WireBundle find() {
-		WireBundle ret = this;
-		if (ret.parent != ret) {
-			do
-				ret = ret.parent;
-			while (ret.parent != ret);
-			this.parent = ret;
-		}
-		return ret;
-	}
-
-	void addPullValue(Value val) {
-		pullValue = pullValue.combine(val);
-	}
-
-	Value getPullValue() {
-		return pullValue;
 	}
 }

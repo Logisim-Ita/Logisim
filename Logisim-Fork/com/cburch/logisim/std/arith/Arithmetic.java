@@ -27,13 +27,13 @@ public class Arithmetic extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Arithmetic";
+	public String getDisplayName() {
+		return Strings.get("arithmeticLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("arithmeticLibrary");
+	public String getName() {
+		return "Arithmetic";
 	}
 
 	@Override

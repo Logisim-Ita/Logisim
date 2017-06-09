@@ -42,13 +42,13 @@ public class Wiring extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Wiring";
+	public String getDisplayName() {
+		return Strings.get("wiringLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("wiringLibrary");
+	public String getName() {
+		return "Wiring";
 	}
 
 	@Override

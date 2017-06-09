@@ -31,8 +31,8 @@ class NegateAttribute extends Attribute<Boolean> {
 	}
 
 	@Override
-	public int hashCode() {
-		return index * 31 + (side == null ? 0 : side.hashCode());
+	public java.awt.Component getCellEditor(Boolean value) {
+		return BOOLEAN_ATTR.getCellEditor(null, value);
 	}
 
 	@Override
@@ -45,8 +45,8 @@ class NegateAttribute extends Attribute<Boolean> {
 	}
 
 	@Override
-	public String toDisplayString(Boolean value) {
-		return BOOLEAN_ATTR.toDisplayString(value);
+	public int hashCode() {
+		return index * 31 + (side == null ? 0 : side.hashCode());
 	}
 
 	@Override
@@ -55,8 +55,8 @@ class NegateAttribute extends Attribute<Boolean> {
 	}
 
 	@Override
-	public java.awt.Component getCellEditor(Boolean value) {
-		return BOOLEAN_ATTR.getCellEditor(null, value);
+	public String toDisplayString(Boolean value) {
+		return BOOLEAN_ATTR.toDisplayString(value);
 	}
 
 }

@@ -16,60 +16,18 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 
 public class RoundRectangle extends Rectangular {
+	private static boolean inCircle(int qx, int qy, int cx, int cy, int rx, int ry) {
+		double dx = qx - cx;
+		double dy = qy - cy;
+		double sum = (dx * dx) / (4 * rx * rx) + (dy * dy) / (4 * ry * ry);
+		return sum <= 0.25;
+	}
+
 	private int radius;
 
 	public RoundRectangle(int x, int y, int w, int h) {
 		super(x, y, w, h);
 		this.radius = 10;
-	}
-
-	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof RoundRectangle) {
-			RoundRectangle that = (RoundRectangle) other;
-			return super.matches(other) && this.radius == that.radius;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int matchesHashCode() {
-		return super.matchesHashCode() * 31 + radius;
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("shapeRoundRect");
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		return SvgCreator.createRoundRectangle(doc, this);
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.getRoundRectAttributes(getPaintType());
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <V> V getValue(Attribute<V> attr) {
-		if (attr == DrawAttr.CORNER_RADIUS) {
-			return (V) Integer.valueOf(radius);
-		} else {
-			return super.getValue(attr);
-		}
-	}
-
-	@Override
-	public void updateValue(Attribute<?> attr, Object value) {
-		if (attr == DrawAttr.CORNER_RADIUS) {
-			radius = ((Integer) value).intValue();
-		} else {
-			super.updateValue(attr, value);
-		}
 	}
 
 	@Override
@@ -101,6 +59,25 @@ public class RoundRectangle extends Rectangular {
 			else
 				return inCircle(qx, qy, x + w - rx, y + h - ry, rx, ry);
 		}
+	}
+
+	@Override
+	public void draw(Graphics g, int x, int y, int w, int h) {
+		int diam = 2 * radius;
+		if (setForFill(g))
+			g.fillRoundRect(x, y, w, h, diam, diam);
+		if (setForStroke(g))
+			g.drawRoundRect(x, y, w, h, diam, diam);
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.getRoundRectAttributes(getPaintType());
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("shapeRoundRect");
 	}
 
 	@Override
@@ -158,19 +135,42 @@ public class RoundRectangle extends Rectangular {
 		}
 	}
 
-	private static boolean inCircle(int qx, int qy, int cx, int cy, int rx, int ry) {
-		double dx = qx - cx;
-		double dy = qy - cy;
-		double sum = (dx * dx) / (4 * rx * rx) + (dy * dy) / (4 * ry * ry);
-		return sum <= 0.25;
+	@Override
+	@SuppressWarnings("unchecked")
+	public <V> V getValue(Attribute<V> attr) {
+		if (attr == DrawAttr.CORNER_RADIUS) {
+			return (V) Integer.valueOf(radius);
+		} else {
+			return super.getValue(attr);
+		}
 	}
 
 	@Override
-	public void draw(Graphics g, int x, int y, int w, int h) {
-		int diam = 2 * radius;
-		if (setForFill(g))
-			g.fillRoundRect(x, y, w, h, diam, diam);
-		if (setForStroke(g))
-			g.drawRoundRect(x, y, w, h, diam, diam);
+	public boolean matches(CanvasObject other) {
+		if (other instanceof RoundRectangle) {
+			RoundRectangle that = (RoundRectangle) other;
+			return super.matches(other) && this.radius == that.radius;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		return super.matchesHashCode() * 31 + radius;
+	}
+
+	@Override
+	public Element toSvgElement(Document doc) {
+		return SvgCreator.createRoundRectangle(doc, this);
+	}
+
+	@Override
+	public void updateValue(Attribute<?> attr, Object value) {
+		if (attr == DrawAttr.CORNER_RADIUS) {
+			radius = ((Integer) value).intValue();
+		} else {
+			super.updateValue(attr, value);
+		}
 	}
 }

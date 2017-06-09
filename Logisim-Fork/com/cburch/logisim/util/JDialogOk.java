@@ -19,11 +19,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 public abstract class JDialogOk extends JDialog {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7432361627841272787L;
-
 	private class MyListener extends WindowAdapter implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -45,6 +40,11 @@ public abstract class JDialogOk extends JDialog {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7432361627841272787L;
+
 	private JPanel contents = new JPanel(new BorderLayout());
 	protected JButton ok = new JButton(Strings.get("dlogOkButton"));
 	protected JButton cancel = new JButton(Strings.get("dlogCancelButton"));
@@ -57,6 +57,9 @@ public abstract class JDialogOk extends JDialog {
 	public JDialogOk(Frame parent, String title, boolean model) {
 		super(parent, title, true);
 		configure();
+	}
+
+	public void cancelClicked() {
 	}
 
 	private void configure() {
@@ -84,8 +87,5 @@ public abstract class JDialogOk extends JDialog {
 	}
 
 	public abstract void okClicked();
-
-	public void cancelClicked() {
-	}
 
 }

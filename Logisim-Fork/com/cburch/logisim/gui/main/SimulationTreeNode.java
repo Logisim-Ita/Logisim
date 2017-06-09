@@ -10,12 +10,6 @@ import javax.swing.tree.TreeNode;
 import com.cburch.logisim.comp.ComponentFactory;
 
 public abstract class SimulationTreeNode implements TreeNode {
-	public abstract ComponentFactory getComponentFactory();
-
-	public boolean isCurrentView(SimulationTreeModel model) {
-		return false;
-	}
-
 	@Override
 	public abstract Enumeration<?> children();
 
@@ -28,11 +22,17 @@ public abstract class SimulationTreeNode implements TreeNode {
 	@Override
 	public abstract int getChildCount();
 
+	public abstract ComponentFactory getComponentFactory();
+
 	@Override
 	public abstract int getIndex(TreeNode node);
 
 	@Override
 	public abstract TreeNode getParent();
+
+	public boolean isCurrentView(SimulationTreeModel model) {
+		return false;
+	}
 
 	@Override
 	public abstract boolean isLeaf();

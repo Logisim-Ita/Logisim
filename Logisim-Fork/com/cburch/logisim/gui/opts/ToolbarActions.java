@@ -9,27 +9,29 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Tool;
 
 class ToolbarActions {
-	private ToolbarActions() {
-	}
+	private static class AddSeparator extends Action {
+		ToolbarData toolbar;
+		int pos;
 
-	public static Action addTool(ToolbarData toolbar, Tool tool) {
-		return new AddTool(toolbar, tool);
-	}
+		AddSeparator(ToolbarData toolbar, int pos) {
+			this.toolbar = toolbar;
+			this.pos = pos;
+		}
 
-	public static Action removeTool(ToolbarData toolbar, int pos) {
-		return new RemoveTool(toolbar, pos);
-	}
+		@Override
+		public void doIt(Project proj) {
+			toolbar.addSeparator(pos);
+		}
 
-	public static Action moveTool(ToolbarData toolbar, int src, int dest) {
-		return new MoveTool(toolbar, src, dest);
-	}
+		@Override
+		public String getName() {
+			return Strings.get("toolbarInsertSepAction");
+		}
 
-	public static Action addSeparator(ToolbarData toolbar, int pos) {
-		return new AddSeparator(toolbar, pos);
-	}
-
-	public static Action removeSeparator(ToolbarData toolbar, int pos) {
-		return new RemoveSeparator(toolbar, pos);
+		@Override
+		public void undo(Project proj) {
+			toolbar.remove(pos);
+		}
 	}
 
 	private static class AddTool extends Action {
@@ -43,49 +45,19 @@ class ToolbarActions {
 		}
 
 		@Override
-		public String getName() {
-			return Strings.get("toolbarAddAction");
-		}
-
-		@Override
 		public void doIt(Project proj) {
 			pos = toolbar.getContents().size();
 			toolbar.addTool(pos, tool);
 		}
 
 		@Override
+		public String getName() {
+			return Strings.get("toolbarAddAction");
+		}
+
+		@Override
 		public void undo(Project proj) {
 			toolbar.remove(pos);
-		}
-	}
-
-	private static class RemoveTool extends Action {
-		ToolbarData toolbar;
-		Object removed;
-		int which;
-
-		RemoveTool(ToolbarData toolbar, int which) {
-			this.toolbar = toolbar;
-			this.which = which;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("toolbarRemoveAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			removed = toolbar.remove(which);
-		}
-
-		@Override
-		public void undo(Project proj) {
-			if (removed instanceof Tool) {
-				toolbar.addTool(which, (Tool) removed);
-			} else if (removed == null) {
-				toolbar.addSeparator(which);
-			}
 		}
 	}
 
@@ -101,8 +73,15 @@ class ToolbarActions {
 		}
 
 		@Override
-		public String getName() {
-			return Strings.get("toolbarMoveAction");
+		public Action append(Action other) {
+			if (other instanceof MoveTool) {
+				MoveTool o = (MoveTool) other;
+				if (this.toolbar == o.toolbar && this.dest == o.oldpos) {
+					// TODO if (this.oldpos == o.dest) return null;
+					return new MoveTool(toolbar, this.oldpos, o.dest);
+				}
+			}
+			return super.append(other);
 		}
 
 		@Override
@@ -111,8 +90,8 @@ class ToolbarActions {
 		}
 
 		@Override
-		public void undo(Project proj) {
-			toolbar.move(dest, oldpos);
+		public String getName() {
+			return Strings.get("toolbarMoveAction");
 		}
 
 		@Override
@@ -126,40 +105,8 @@ class ToolbarActions {
 		}
 
 		@Override
-		public Action append(Action other) {
-			if (other instanceof MoveTool) {
-				MoveTool o = (MoveTool) other;
-				if (this.toolbar == o.toolbar && this.dest == o.oldpos) {
-					// TODO if (this.oldpos == o.dest) return null;
-					return new MoveTool(toolbar, this.oldpos, o.dest);
-				}
-			}
-			return super.append(other);
-		}
-	}
-
-	private static class AddSeparator extends Action {
-		ToolbarData toolbar;
-		int pos;
-
-		AddSeparator(ToolbarData toolbar, int pos) {
-			this.toolbar = toolbar;
-			this.pos = pos;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("toolbarInsertSepAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			toolbar.addSeparator(pos);
-		}
-
-		@Override
 		public void undo(Project proj) {
-			toolbar.remove(pos);
+			toolbar.move(dest, oldpos);
 		}
 	}
 
@@ -173,19 +120,72 @@ class ToolbarActions {
 		}
 
 		@Override
-		public String getName() {
-			return Strings.get("toolbarRemoveSepAction");
+		public void doIt(Project proj) {
+			toolbar.remove(pos);
 		}
 
 		@Override
-		public void doIt(Project proj) {
-			toolbar.remove(pos);
+		public String getName() {
+			return Strings.get("toolbarRemoveSepAction");
 		}
 
 		@Override
 		public void undo(Project proj) {
 			toolbar.addSeparator(pos);
 		}
+	}
+
+	private static class RemoveTool extends Action {
+		ToolbarData toolbar;
+		Object removed;
+		int which;
+
+		RemoveTool(ToolbarData toolbar, int which) {
+			this.toolbar = toolbar;
+			this.which = which;
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			removed = toolbar.remove(which);
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("toolbarRemoveAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			if (removed instanceof Tool) {
+				toolbar.addTool(which, (Tool) removed);
+			} else if (removed == null) {
+				toolbar.addSeparator(which);
+			}
+		}
+	}
+
+	public static Action addSeparator(ToolbarData toolbar, int pos) {
+		return new AddSeparator(toolbar, pos);
+	}
+
+	public static Action addTool(ToolbarData toolbar, Tool tool) {
+		return new AddTool(toolbar, tool);
+	}
+
+	public static Action moveTool(ToolbarData toolbar, int src, int dest) {
+		return new MoveTool(toolbar, src, dest);
+	}
+
+	public static Action removeSeparator(ToolbarData toolbar, int pos) {
+		return new RemoveSeparator(toolbar, pos);
+	}
+
+	public static Action removeTool(ToolbarData toolbar, int pos) {
+		return new RemoveTool(toolbar, pos);
+	}
+
+	private ToolbarActions() {
 	}
 
 }

@@ -26,50 +26,6 @@ class TtyState implements InstanceData, Cloneable {
 		clear();
 	}
 
-	@Override
-	public TtyState clone() {
-		try {
-			TtyState ret = (TtyState) super.clone();
-			ret.rowData = this.rowData.clone();
-			return ret;
-		} catch (CloneNotSupportedException e) {
-			return null;
-		}
-	}
-
-	public Value setLastClock(Value newClock) {
-		Value ret = lastClock;
-		lastClock = newClock;
-		return ret;
-	}
-
-	public void setSendStdout(boolean value) {
-		sendStdout = value;
-	}
-
-	public void clear() {
-		Arrays.fill(rowData, "");
-		lastRow.delete(0, lastRow.length());
-		row = 0;
-	}
-
-	public String getRowString(int index) {
-		if (index < row)
-			return rowData[index];
-		else if (index == row)
-			return lastRow.toString();
-		else
-			return "";
-	}
-
-	public int getCursorRow() {
-		return row;
-	}
-
-	public int getCursorColumn() {
-		return lastRow.length();
-	}
-
 	public void add(char c) {
 		if (sendStdout) {
 			TtyInterface.sendFromTty(c);
@@ -99,6 +55,23 @@ class TtyState implements InstanceData, Cloneable {
 		}
 	}
 
+	public void clear() {
+		Arrays.fill(rowData, "");
+		lastRow.delete(0, lastRow.length());
+		row = 0;
+	}
+
+	@Override
+	public TtyState clone() {
+		try {
+			TtyState ret = (TtyState) super.clone();
+			ret.rowData = this.rowData.clone();
+			return ret;
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
+
 	private void commit() {
 		if (row >= rowData.length) {
 			System.arraycopy(rowData, 1, rowData, 0, rowData.length - 1);
@@ -108,6 +81,33 @@ class TtyState implements InstanceData, Cloneable {
 			row++;
 		}
 		lastRow.delete(0, lastRow.length());
+	}
+
+	public int getCursorColumn() {
+		return lastRow.length();
+	}
+
+	public int getCursorRow() {
+		return row;
+	}
+
+	public String getRowString(int index) {
+		if (index < row)
+			return rowData[index];
+		else if (index == row)
+			return lastRow.toString();
+		else
+			return "";
+	}
+
+	public Value setLastClock(Value newClock) {
+		Value ret = lastClock;
+		lastClock = newClock;
+		return ret;
+	}
+
+	public void setSendStdout(boolean value) {
+		sendStdout = value;
 	}
 
 	public void updateSize(int rows, int cols) {

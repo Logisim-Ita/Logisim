@@ -8,25 +8,25 @@ public class TruthTableEvent {
 	private int column;
 	private Object data;
 
-	public TruthTableEvent(TruthTable source, VariableListEvent event) {
-		this.source = source;
-		this.data = event;
-	}
-
 	public TruthTableEvent(TruthTable source, int column) {
 		this.source = source;
 		this.column = column;
+	}
+
+	public TruthTableEvent(TruthTable source, VariableListEvent event) {
+		this.source = source;
+		this.data = event;
 	}
 
 	public int getColumn() {
 		return column;
 	}
 
-	public TruthTable getSource() {
-		return source;
-	}
-
 	public Object getData() {
 		return data;
+	}
+
+	public TruthTable getSource() {
+		return source;
 	}
 }

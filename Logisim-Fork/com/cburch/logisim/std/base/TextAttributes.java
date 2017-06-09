@@ -31,8 +31,14 @@ class TextAttributes extends AbstractAttributeSet {
 		offsetBounds = null;
 	}
 
-	String getText() {
-		return text;
+	@Override
+	protected void copyInto(AbstractAttributeSet destObj) {
+		; // nothing to do
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return ATTRIBUTES;
 	}
 
 	Font getFont() {
@@ -43,31 +49,12 @@ class TextAttributes extends AbstractAttributeSet {
 		return ((Integer) halign.getValue()).intValue();
 	}
 
-	int getVerticalAlign() {
-		return ((Integer) valign.getValue()).intValue();
-	}
-
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
 
-	boolean setOffsetBounds(Bounds value) {
-		Bounds old = offsetBounds;
-		boolean same = old == null ? value == null : old.equals(value);
-		if (!same) {
-			offsetBounds = value;
-		}
-		return !same;
-	}
-
-	@Override
-	protected void copyInto(AbstractAttributeSet destObj) {
-		; // nothing to do
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return ATTRIBUTES;
+	String getText() {
+		return text;
 	}
 
 	@Override
@@ -82,6 +69,19 @@ class TextAttributes extends AbstractAttributeSet {
 		if (attr == Text.ATTR_VALIGN)
 			return (V) valign;
 		return null;
+	}
+
+	int getVerticalAlign() {
+		return ((Integer) valign.getValue()).intValue();
+	}
+
+	boolean setOffsetBounds(Bounds value) {
+		Bounds old = offsetBounds;
+		boolean same = old == null ? value == null : old.equals(value);
+		if (!same) {
+			offsetBounds = value;
+		}
+		return !same;
 	}
 
 	@Override

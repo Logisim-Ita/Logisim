@@ -33,13 +33,13 @@ public class Memory extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Memory";
+	public String getDisplayName() {
+		return Strings.get("memoryLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("memoryLibrary");
+	public String getName() {
+		return "Memory";
 	}
 
 	@Override

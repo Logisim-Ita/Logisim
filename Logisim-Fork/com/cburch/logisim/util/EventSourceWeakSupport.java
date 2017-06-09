@@ -18,14 +18,6 @@ public class EventSourceWeakSupport<L> implements Iterable<L> {
 		listeners.add(new WeakReference<L>(listener));
 	}
 
-	public void remove(L listener) {
-		for (Iterator<WeakReference<L>> it = listeners.iterator(); it.hasNext();) {
-			L l = it.next().get();
-			if (l == null || l == listener)
-				it.remove();
-		}
-	}
-
 	public boolean isEmpty() {
 		for (Iterator<WeakReference<L>> it = listeners.iterator(); it.hasNext();) {
 			L l = it.next().get();
@@ -52,5 +44,13 @@ public class EventSourceWeakSupport<L> implements Iterable<L> {
 			}
 		}
 		return ret.iterator();
+	}
+
+	public void remove(L listener) {
+		for (Iterator<WeakReference<L>> it = listeners.iterator(); it.hasNext();) {
+			L l = it.next().get();
+			if (l == null || l == listener)
+				it.remove();
+		}
 	}
 }

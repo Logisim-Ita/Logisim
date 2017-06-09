@@ -29,22 +29,6 @@ class ConnectionData {
 		this.wirePathStart = wirePathStart;
 	}
 
-	public Location getLocation() {
-		return loc;
-	}
-
-	public Direction getDirection() {
-		return dir;
-	}
-
-	public List<Wire> getWirePath() {
-		return wirePath;
-	}
-
-	public Location getWirePathStart() {
-		return wirePathStart;
-	}
-
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof ConnectionData) {
@@ -53,6 +37,22 @@ class ConnectionData {
 		} else {
 			return false;
 		}
+	}
+
+	public Direction getDirection() {
+		return dir;
+	}
+
+	public Location getLocation() {
+		return loc;
+	}
+
+	public List<Wire> getWirePath() {
+		return wirePath;
+	}
+
+	public Location getWirePathStart() {
+		return wirePathStart;
 	}
 
 	@Override

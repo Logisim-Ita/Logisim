@@ -38,20 +38,12 @@ public class MoveResult {
 		}
 	}
 
-	public Collection<Wire> getWiresToAdd() {
-		@SuppressWarnings("unchecked")
-		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
-		return ret;
-	}
-
-	public Collection<Wire> getWiresToRemove() {
-		@SuppressWarnings("unchecked")
-		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
-		return ret;
-	}
-
 	public ReplacementMap getReplacementMap() {
 		return replacements;
+	}
+
+	int getTotalDistance() {
+		return totalDistance;
 	}
 
 	public Collection<Location> getUnconnectedLocations() {
@@ -62,8 +54,16 @@ public class MoveResult {
 		return unsatisfiedConnections;
 	}
 
-	int getTotalDistance() {
-		return totalDistance;
+	public Collection<Wire> getWiresToAdd() {
+		@SuppressWarnings("unchecked")
+		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
+		return ret;
+	}
+
+	public Collection<Wire> getWiresToRemove() {
+		@SuppressWarnings("unchecked")
+		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
+		return ret;
 	}
 
 	public void print(PrintStream out) {

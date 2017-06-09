@@ -19,15 +19,15 @@ class AttrTableToolModel extends AttributeSetTableModel {
 		this.currentTool = tool;
 	}
 
+	@Override
+	public String getTitle() {
+		return currentTool.getDescription();
+	}
+
 	public void setTool(AbstractTool value) {
 		currentTool = value;
 		setAttributeSet(defaults.createSubset(value));
 		fireTitleChanged();
-	}
-
-	@Override
-	public String getTitle() {
-		return currentTool.getDescription();
 	}
 
 	@Override

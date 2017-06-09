@@ -18,32 +18,6 @@ import com.cburch.logisim.util.Dag;
 public class Dependencies {
 	private class MyListener implements LibraryListener, CircuitListener {
 		@Override
-		public void libraryChanged(LibraryEvent e) {
-			switch (e.getAction()) {
-			case LibraryEvent.ADD_TOOL:
-				if (e.getData() instanceof AddTool) {
-					ComponentFactory factory = ((AddTool) e.getData()).getFactory();
-					if (factory instanceof SubcircuitFactory) {
-						SubcircuitFactory circFact = (SubcircuitFactory) factory;
-						processCircuit(circFact.getSubcircuit());
-					}
-				}
-				break;
-			case LibraryEvent.REMOVE_TOOL:
-				if (e.getData() instanceof AddTool) {
-					ComponentFactory factory = ((AddTool) e.getData()).getFactory();
-					if (factory instanceof SubcircuitFactory) {
-						SubcircuitFactory circFact = (SubcircuitFactory) factory;
-						Circuit circ = circFact.getSubcircuit();
-						depends.removeNode(circ);
-						circ.removeCircuitListener(this);
-					}
-				}
-				break;
-			}
-		}
-
-		@Override
 		public void circuitChanged(CircuitEvent e) {
 			Component comp;
 			switch (e.getAction()) {
@@ -74,6 +48,32 @@ public class Dependencies {
 				break;
 			}
 		}
+
+		@Override
+		public void libraryChanged(LibraryEvent e) {
+			switch (e.getAction()) {
+			case LibraryEvent.ADD_TOOL:
+				if (e.getData() instanceof AddTool) {
+					ComponentFactory factory = ((AddTool) e.getData()).getFactory();
+					if (factory instanceof SubcircuitFactory) {
+						SubcircuitFactory circFact = (SubcircuitFactory) factory;
+						processCircuit(circFact.getSubcircuit());
+					}
+				}
+				break;
+			case LibraryEvent.REMOVE_TOOL:
+				if (e.getData() instanceof AddTool) {
+					ComponentFactory factory = ((AddTool) e.getData()).getFactory();
+					if (factory instanceof SubcircuitFactory) {
+						SubcircuitFactory circFact = (SubcircuitFactory) factory;
+						Circuit circ = circFact.getSubcircuit();
+						depends.removeNode(circ);
+						circ.removeCircuitListener(this);
+					}
+				}
+				break;
+			}
+		}
 	}
 
 	private MyListener myListener = new MyListener();
@@ -83,19 +83,19 @@ public class Dependencies {
 		addDependencies(file);
 	}
 
-	public boolean canRemove(Circuit circ) {
-		return !depends.hasPredecessors(circ);
+	private void addDependencies(LogisimFile file) {
+		file.addLibraryListener(myListener);
+		for (Circuit circuit : file.getCircuits()) {
+			processCircuit(circuit);
+		}
 	}
 
 	public boolean canAdd(Circuit circ, Circuit sub) {
 		return depends.canFollow(sub, circ);
 	}
 
-	private void addDependencies(LogisimFile file) {
-		file.addLibraryListener(myListener);
-		for (Circuit circuit : file.getCircuits()) {
-			processCircuit(circuit);
-		}
+	public boolean canRemove(Circuit circ) {
+		return !depends.hasPredecessors(circ);
 	}
 
 	private void processCircuit(Circuit circ) {

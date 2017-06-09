@@ -21,6 +21,16 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenu;
 
 public class LogisimMenuBar extends JMenuBar {
+	private class MyListener implements LocaleListener {
+		@Override
+		public void localeChanged() {
+			file.localeChanged();
+			edit.localeChanged();
+			project.localeChanged();
+			simulate.localeChanged();
+			help.localeChanged();
+		}
+	}
 	/**
 	 * 
 	 */
@@ -38,8 +48,8 @@ public class LogisimMenuBar extends JMenuBar {
 	public static final LogisimMenuItem RAISE_TOP = new LogisimMenuItem("RaiseTop");
 	public static final LogisimMenuItem LOWER_BOTTOM = new LogisimMenuItem("LowerBottom");
 	public static final LogisimMenuItem ADD_CONTROL = new LogisimMenuItem("AddControl");
-	public static final LogisimMenuItem REMOVE_CONTROL = new LogisimMenuItem("RemoveControl");
 
+	public static final LogisimMenuItem REMOVE_CONTROL = new LogisimMenuItem("RemoveControl");
 	public static final LogisimMenuItem ADD_CIRCUIT = new LogisimMenuItem("AddCircuit");
 	public static final LogisimMenuItem MOVE_CIRCUIT_UP = new LogisimMenuItem("MoveCircuitUp");
 	public static final LogisimMenuItem MOVE_CIRCUIT_DOWN = new LogisimMenuItem("MoveCircuitDown");
@@ -51,23 +61,13 @@ public class LogisimMenuBar extends JMenuBar {
 	public static final LogisimMenuItem VIEW_SIMULATION = new LogisimMenuItem("ViewSimulation");
 	public static final LogisimMenuItem REVERT_APPEARANCE = new LogisimMenuItem("RevertAppearance");
 	public static final LogisimMenuItem ANALYZE_CIRCUIT = new LogisimMenuItem("AnalyzeCircuit");
-	public static final LogisimMenuItem CIRCUIT_STATS = new LogisimMenuItem("GetCircuitStatistics");
 
+	public static final LogisimMenuItem CIRCUIT_STATS = new LogisimMenuItem("GetCircuitStatistics");
 	public static final LogisimMenuItem SIMULATE_ENABLE = new LogisimMenuItem("SimulateEnable");
 	public static final LogisimMenuItem SIMULATE_STEP = new LogisimMenuItem("SimulateStep");
 	public static final LogisimMenuItem TICK_ENABLE = new LogisimMenuItem("TickEnable");
-	public static final LogisimMenuItem TICK_STEP = new LogisimMenuItem("TickStep");
 
-	private class MyListener implements LocaleListener {
-		@Override
-		public void localeChanged() {
-			file.localeChanged();
-			edit.localeChanged();
-			project.localeChanged();
-			simulate.localeChanged();
-			help.localeChanged();
-		}
-	}
+	public static final LogisimMenuItem TICK_STEP = new LogisimMenuItem("TickStep");
 
 	private JFrame parent;
 	private MyListener listener;
@@ -99,30 +99,19 @@ public class LogisimMenuBar extends JMenuBar {
 		listener.localeChanged();
 	}
 
-	public void setEnabled(LogisimMenuItem which, boolean value) {
-		MenuItem item = menuItems.get(which);
-		if (item != null)
-			item.setEnabled(value);
-	}
-
 	public void addActionListener(LogisimMenuItem which, ActionListener l) {
 		MenuItem item = menuItems.get(which);
 		if (item != null)
 			item.addActionListener(l);
 	}
 
-	public void removeActionListener(LogisimMenuItem which, ActionListener l) {
-		MenuItem item = menuItems.get(which);
-		if (item != null)
-			item.removeActionListener(l);
-	}
-
 	public void addEnableListener(ChangeListener l) {
 		enableListeners.add(l);
 	}
 
-	public void removeEnableListener(ChangeListener l) {
-		enableListeners.remove(l);
+	public void doAction(LogisimMenuItem which) {
+		MenuItem item = menuItems.get(which);
+		item.actionPerformed(new ActionEvent(item, ActionEvent.ACTION_PERFORMED, which.toString()));
 	}
 
 	void fireEnableChanged() {
@@ -132,39 +121,50 @@ public class LogisimMenuBar extends JMenuBar {
 		}
 	}
 
-	public void setSimulateListener(SimulateListener l) {
-		simulateListener = l;
-	}
-
-	public void setCircuitState(Simulator sim, CircuitState state) {
-		simulate.setCurrentState(sim, state);
-	}
-
-	public Project getProject() {
-		return proj;
-	}
-
-	JFrame getParentWindow() {
-		return parent;
-	}
-
-	void registerItem(LogisimMenuItem which, MenuItem item) {
-		menuItems.put(which, item);
-	}
-
 	void fireStateChanged(Simulator sim, CircuitState state) {
 		if (simulateListener != null) {
 			simulateListener.stateChangeRequested(sim, state);
 		}
 	}
 
-	public void doAction(LogisimMenuItem which) {
-		MenuItem item = menuItems.get(which);
-		item.actionPerformed(new ActionEvent(item, ActionEvent.ACTION_PERFORMED, which.toString()));
+	JFrame getParentWindow() {
+		return parent;
+	}
+
+	public Project getProject() {
+		return proj;
 	}
 
 	public boolean isEnabled(LogisimMenuItem item) {
 		MenuItem menuItem = menuItems.get(item);
 		return menuItem != null && menuItem.isEnabled();
+	}
+
+	void registerItem(LogisimMenuItem which, MenuItem item) {
+		menuItems.put(which, item);
+	}
+
+	public void removeActionListener(LogisimMenuItem which, ActionListener l) {
+		MenuItem item = menuItems.get(which);
+		if (item != null)
+			item.removeActionListener(l);
+	}
+
+	public void removeEnableListener(ChangeListener l) {
+		enableListeners.remove(l);
+	}
+
+	public void setCircuitState(Simulator sim, CircuitState state) {
+		simulate.setCurrentState(sim, state);
+	}
+
+	public void setEnabled(LogisimMenuItem which, boolean value) {
+		MenuItem item = menuItems.get(which);
+		if (item != null)
+			item.setEnabled(value);
+	}
+
+	public void setSimulateListener(SimulateListener l) {
+		simulateListener = l;
 	}
 }

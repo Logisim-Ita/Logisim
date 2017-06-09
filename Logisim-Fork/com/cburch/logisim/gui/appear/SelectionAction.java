@@ -46,11 +46,6 @@ class SelectionAction extends Action {
 	}
 
 	@Override
-	public String getName() {
-		return displayName.get();
-	}
-
-	@Override
 	public void doIt(Project proj) {
 		Selection sel = canvas.getSelection();
 		sel.clearSelected();
@@ -81,6 +76,11 @@ class SelectionAction extends Action {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public String getName() {
+		return displayName.get();
 	}
 
 	@Override

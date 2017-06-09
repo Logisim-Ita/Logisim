@@ -17,7 +17,27 @@ public class InputEventUtil {
 	public static String BUTTON2 = "Button2";
 	public static String BUTTON3 = "Button3";
 
-	private InputEventUtil() {
+	public static int fromDisplayString(String str) {
+		int ret = 0;
+		StringTokenizer toks = new StringTokenizer(str);
+		while (toks.hasMoreTokens()) {
+			String s = toks.nextToken();
+			if (s.equals(Strings.get("ctrlMod")))
+				ret |= InputEvent.CTRL_DOWN_MASK;
+			else if (s.equals(Strings.get("altMod")))
+				ret |= InputEvent.ALT_DOWN_MASK;
+			else if (s.equals(Strings.get("shiftMod")))
+				ret |= InputEvent.SHIFT_DOWN_MASK;
+			else if (s.equals(Strings.get("button1Mod")))
+				ret |= InputEvent.BUTTON1_DOWN_MASK;
+			else if (s.equals(Strings.get("button2Mod")))
+				ret |= InputEvent.BUTTON2_DOWN_MASK;
+			else if (s.equals(Strings.get("button3Mod")))
+				ret |= InputEvent.BUTTON3_DOWN_MASK;
+			else
+				throw new NumberFormatException("InputEventUtil");
+		}
+		return ret;
 	}
 
 	public static int fromString(String str) {
@@ -36,58 +56,6 @@ public class InputEventUtil {
 			else if (s.equals(BUTTON2))
 				ret |= InputEvent.BUTTON2_DOWN_MASK;
 			else if (s.equals(BUTTON3))
-				ret |= InputEvent.BUTTON3_DOWN_MASK;
-			else
-				throw new NumberFormatException("InputEventUtil");
-		}
-		return ret;
-	}
-
-	public static String toString(int mods) {
-		ArrayList<String> arr = new ArrayList<String>();
-		if ((mods & InputEvent.CTRL_DOWN_MASK) != 0)
-			arr.add(CTRL);
-		if ((mods & InputEvent.ALT_DOWN_MASK) != 0)
-			arr.add(ALT);
-		if ((mods & InputEvent.SHIFT_DOWN_MASK) != 0)
-			arr.add(SHIFT);
-		if ((mods & InputEvent.BUTTON1_DOWN_MASK) != 0)
-			arr.add(BUTTON1);
-		if ((mods & InputEvent.BUTTON2_DOWN_MASK) != 0)
-			arr.add(BUTTON2);
-		if ((mods & InputEvent.BUTTON3_DOWN_MASK) != 0)
-			arr.add(BUTTON3);
-
-		Iterator<String> it = arr.iterator();
-		if (it.hasNext()) {
-			StringBuilder ret = new StringBuilder();
-			ret.append(it.next());
-			while (it.hasNext()) {
-				ret.append(" ");
-				ret.append(it.next());
-			}
-			return ret.toString();
-		} else {
-			return "";
-		}
-	}
-
-	public static int fromDisplayString(String str) {
-		int ret = 0;
-		StringTokenizer toks = new StringTokenizer(str);
-		while (toks.hasMoreTokens()) {
-			String s = toks.nextToken();
-			if (s.equals(Strings.get("ctrlMod")))
-				ret |= InputEvent.CTRL_DOWN_MASK;
-			else if (s.equals(Strings.get("altMod")))
-				ret |= InputEvent.ALT_DOWN_MASK;
-			else if (s.equals(Strings.get("shiftMod")))
-				ret |= InputEvent.SHIFT_DOWN_MASK;
-			else if (s.equals(Strings.get("button1Mod")))
-				ret |= InputEvent.BUTTON1_DOWN_MASK;
-			else if (s.equals(Strings.get("button2Mod")))
-				ret |= InputEvent.BUTTON2_DOWN_MASK;
-			else if (s.equals(Strings.get("button3Mod")))
 				ret |= InputEvent.BUTTON3_DOWN_MASK;
 			else
 				throw new NumberFormatException("InputEventUtil");
@@ -150,5 +118,37 @@ public class InputEventUtil {
 		} else {
 			return "";
 		}
+	}
+
+	public static String toString(int mods) {
+		ArrayList<String> arr = new ArrayList<String>();
+		if ((mods & InputEvent.CTRL_DOWN_MASK) != 0)
+			arr.add(CTRL);
+		if ((mods & InputEvent.ALT_DOWN_MASK) != 0)
+			arr.add(ALT);
+		if ((mods & InputEvent.SHIFT_DOWN_MASK) != 0)
+			arr.add(SHIFT);
+		if ((mods & InputEvent.BUTTON1_DOWN_MASK) != 0)
+			arr.add(BUTTON1);
+		if ((mods & InputEvent.BUTTON2_DOWN_MASK) != 0)
+			arr.add(BUTTON2);
+		if ((mods & InputEvent.BUTTON3_DOWN_MASK) != 0)
+			arr.add(BUTTON3);
+
+		Iterator<String> it = arr.iterator();
+		if (it.hasNext()) {
+			StringBuilder ret = new StringBuilder();
+			ret.append(it.next());
+			while (it.hasNext()) {
+				ret.append(" ");
+				ret.append(it.next());
+			}
+			return ret.toString();
+		} else {
+			return "";
+		}
+	}
+
+	private InputEventUtil() {
 	}
 }

@@ -36,69 +36,6 @@ public class Drawing implements CanvasModel {
 	}
 
 	@Override
-	public void removeCanvasModelListener(CanvasModelListener l) {
-		listeners.remove(l);
-	}
-
-	protected boolean isChangeAllowed(CanvasModelEvent e) {
-		return true;
-	}
-
-	private void fireChanged(CanvasModelEvent e) {
-		for (CanvasModelListener listener : listeners) {
-			listener.modelChanged(e);
-		}
-	}
-
-	@Override
-	public void paint(Graphics g, Selection selection) {
-		Set<CanvasObject> suppressed = selection.getDrawsSuppressed();
-		for (CanvasObject shape : getObjectsFromBottom()) {
-			Graphics dup = g.create();
-			if (suppressed.contains(shape)) {
-				selection.drawSuppressed(dup, shape);
-			} else {
-				shape.paint(dup, null);
-			}
-			dup.dispose();
-		}
-	}
-
-	@Override
-	public List<CanvasObject> getObjectsFromTop() {
-		ArrayList<CanvasObject> ret = new ArrayList<CanvasObject>(getObjectsFromBottom());
-		Collections.reverse(ret);
-		return ret;
-	}
-
-	@Override
-	public List<CanvasObject> getObjectsFromBottom() {
-		return Collections.unmodifiableList(canvasObjects);
-	}
-
-	@Override
-	public Collection<CanvasObject> getObjectsIn(Bounds bds) {
-		ArrayList<CanvasObject> ret = null;
-		for (CanvasObject shape : getObjectsFromBottom()) {
-			if (bds.contains(shape.getBounds())) {
-				if (ret == null)
-					ret = new ArrayList<CanvasObject>();
-				ret.add(shape);
-			}
-		}
-		if (ret == null) {
-			return Collections.emptyList();
-		} else {
-			return ret;
-		}
-	}
-
-	@Override
-	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape) {
-		return overlaps.getObjectsOverlapping(shape);
-	}
-
-	@Override
 	public void addObjects(int index, Collection<? extends CanvasObject> shapes) {
 		LinkedHashMap<CanvasObject, Integer> indexes;
 		indexes = new LinkedHashMap<CanvasObject, Integer>();
@@ -132,6 +69,109 @@ public class Drawing implements CanvasModel {
 	}
 
 	@Override
+	public Handle deleteHandle(Handle handle) {
+		CanvasModelEvent e = CanvasModelEvent.forDeleteHandle(this, handle);
+		if (isChangeAllowed(e)) {
+			CanvasObject o = handle.getObject();
+			Handle ret = o.deleteHandle(handle);
+			overlaps.invalidateShape(o);
+			fireChanged(e);
+			return ret;
+		} else {
+			return null;
+		}
+	}
+
+	private void fireChanged(CanvasModelEvent e) {
+		for (CanvasModelListener listener : listeners) {
+			listener.modelChanged(e);
+		}
+	}
+
+	@Override
+	public List<CanvasObject> getObjectsFromBottom() {
+		return Collections.unmodifiableList(canvasObjects);
+	}
+
+	@Override
+	public List<CanvasObject> getObjectsFromTop() {
+		ArrayList<CanvasObject> ret = new ArrayList<CanvasObject>(getObjectsFromBottom());
+		Collections.reverse(ret);
+		return ret;
+	}
+
+	@Override
+	public Collection<CanvasObject> getObjectsIn(Bounds bds) {
+		ArrayList<CanvasObject> ret = null;
+		for (CanvasObject shape : getObjectsFromBottom()) {
+			if (bds.contains(shape.getBounds())) {
+				if (ret == null)
+					ret = new ArrayList<CanvasObject>();
+				ret.add(shape);
+			}
+		}
+		if (ret == null) {
+			return Collections.emptyList();
+		} else {
+			return ret;
+		}
+	}
+
+	@Override
+	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape) {
+		return overlaps.getObjectsOverlapping(shape);
+	}
+
+	@Override
+	public void insertHandle(Handle desired, Handle previous) {
+		CanvasObject obj = desired.getObject();
+		CanvasModelEvent e = CanvasModelEvent.forInsertHandle(this, desired);
+		if (isChangeAllowed(e)) {
+			obj.insertHandle(desired, previous);
+			overlaps.invalidateShape(obj);
+			fireChanged(e);
+		}
+	}
+
+	protected boolean isChangeAllowed(CanvasModelEvent e) {
+		return true;
+	}
+
+	@Override
+	public Handle moveHandle(HandleGesture gesture) {
+		CanvasModelEvent e = CanvasModelEvent.forMoveHandle(this, gesture);
+		CanvasObject o = gesture.getHandle().getObject();
+		if (canvasObjects.contains(o) && (gesture.getDeltaX() != 0 || gesture.getDeltaY() != 0) && isChangeAllowed(e)) {
+			Handle moved = o.moveHandle(gesture);
+			gesture.setResultingHandle(moved);
+			overlaps.invalidateShape(o);
+			fireChanged(e);
+			return moved;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public void paint(Graphics g, Selection selection) {
+		Set<CanvasObject> suppressed = selection.getDrawsSuppressed();
+		for (CanvasObject shape : getObjectsFromBottom()) {
+			Graphics dup = g.create();
+			if (suppressed.contains(shape)) {
+				selection.drawSuppressed(dup, shape);
+			} else {
+				shape.paint(dup, null);
+			}
+			dup.dispose();
+		}
+	}
+
+	@Override
+	public void removeCanvasModelListener(CanvasModelListener l) {
+		listeners.remove(l);
+	}
+
+	@Override
 	public void removeObjects(Collection<? extends CanvasObject> shapes) {
 		List<CanvasObject> found = restrict(shapes);
 		CanvasModelEvent e = CanvasModelEvent.forRemove(this, found);
@@ -139,19 +179,6 @@ public class Drawing implements CanvasModel {
 			for (CanvasObject shape : found) {
 				canvasObjects.remove(shape);
 				overlaps.removeShape(shape);
-			}
-			fireChanged(e);
-		}
-	}
-
-	@Override
-	public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy) {
-		List<CanvasObject> found = restrict(shapes);
-		CanvasModelEvent e = CanvasModelEvent.forTranslate(this, found, dx, dy);
-		if (!found.isEmpty() && (dx != 0 || dy != 0) && isChangeAllowed(e)) {
-			for (CanvasObject shape : shapes) {
-				shape.translate(dx, dy);
-				overlaps.invalidateShape(shape);
 			}
 			fireChanged(e);
 		}
@@ -179,44 +206,15 @@ public class Drawing implements CanvasModel {
 		}
 	}
 
-	@Override
-	public Handle moveHandle(HandleGesture gesture) {
-		CanvasModelEvent e = CanvasModelEvent.forMoveHandle(this, gesture);
-		CanvasObject o = gesture.getHandle().getObject();
-		if (canvasObjects.contains(o) && (gesture.getDeltaX() != 0 || gesture.getDeltaY() != 0) && isChangeAllowed(e)) {
-			Handle moved = o.moveHandle(gesture);
-			gesture.setResultingHandle(moved);
-			overlaps.invalidateShape(o);
-			fireChanged(e);
-			return moved;
-		} else {
-			return null;
+	private ArrayList<CanvasObject> restrict(Collection<? extends CanvasObject> shapes) {
+		ArrayList<CanvasObject> ret;
+		ret = new ArrayList<CanvasObject>(shapes.size());
+		for (CanvasObject shape : shapes) {
+			if (canvasObjects.contains(shape)) {
+				ret.add(shape);
+			}
 		}
-	}
-
-	@Override
-	public void insertHandle(Handle desired, Handle previous) {
-		CanvasObject obj = desired.getObject();
-		CanvasModelEvent e = CanvasModelEvent.forInsertHandle(this, desired);
-		if (isChangeAllowed(e)) {
-			obj.insertHandle(desired, previous);
-			overlaps.invalidateShape(obj);
-			fireChanged(e);
-		}
-	}
-
-	@Override
-	public Handle deleteHandle(Handle handle) {
-		CanvasModelEvent e = CanvasModelEvent.forDeleteHandle(this, handle);
-		if (isChangeAllowed(e)) {
-			CanvasObject o = handle.getObject();
-			Handle ret = o.deleteHandle(handle);
-			overlaps.invalidateShape(o);
-			fireChanged(e);
-			return ret;
-		} else {
-			return null;
-		}
+		return ret;
 	}
 
 	@Override
@@ -254,14 +252,16 @@ public class Drawing implements CanvasModel {
 		}
 	}
 
-	private ArrayList<CanvasObject> restrict(Collection<? extends CanvasObject> shapes) {
-		ArrayList<CanvasObject> ret;
-		ret = new ArrayList<CanvasObject>(shapes.size());
-		for (CanvasObject shape : shapes) {
-			if (canvasObjects.contains(shape)) {
-				ret.add(shape);
+	@Override
+	public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy) {
+		List<CanvasObject> found = restrict(shapes);
+		CanvasModelEvent e = CanvasModelEvent.forTranslate(this, found, dx, dy);
+		if (!found.isEmpty() && (dx != 0 || dy != 0) && isChangeAllowed(e)) {
+			for (CanvasObject shape : shapes) {
+				shape.translate(dx, dy);
+				overlaps.invalidateShape(shape);
 			}
+			fireChanged(e);
 		}
-		return ret;
 	}
 }

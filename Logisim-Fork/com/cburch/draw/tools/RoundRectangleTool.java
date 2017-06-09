@@ -22,16 +22,6 @@ public class RoundRectangleTool extends RectangularTool {
 	}
 
 	@Override
-	public Icon getIcon() {
-		return Icons.getIcon("drawrrct.gif");
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.getRoundRectAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
-	}
-
-	@Override
 	public CanvasObject createShape(int x, int y, int w, int h) {
 		return attrs.applyTo(new RoundRectangle(x, y, w, h));
 	}
@@ -46,5 +36,15 @@ public class RoundRectangleTool extends RectangularTool {
 	public void fillShape(Graphics g, int x, int y, int w, int h) {
 		int r = 2 * attrs.getValue(DrawAttr.CORNER_RADIUS).intValue();
 		g.fillRoundRect(x, y, w, h, r, r);
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.getRoundRectAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
+	}
+
+	@Override
+	public Icon getIcon() {
+		return Icons.getIcon("drawrrct.gif");
 	}
 }

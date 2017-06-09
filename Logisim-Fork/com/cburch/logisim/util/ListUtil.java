@@ -18,11 +18,6 @@ public class ListUtil {
 		}
 
 		@Override
-		public int size() {
-			return a.size() + b.size();
-		}
-
-		@Override
 		public E get(int index) {
 			if (index < a.size())
 				return a.get(index);
@@ -35,12 +30,17 @@ public class ListUtil {
 			return IteratorUtil.createJoinedIterator(a.iterator(), b.iterator());
 		}
 
-	}
+		@Override
+		public int size() {
+			return a.size() + b.size();
+		}
 
-	private ListUtil() {
 	}
 
 	public static <E> List<E> joinImmutableLists(List<? extends E> a, List<? extends E> b) {
 		return new JoinedList<E>(a, b);
+	}
+
+	private ListUtil() {
 	}
 }

@@ -46,13 +46,6 @@ public class JFileChoosers {
 
 	private static String currentDirectory = "";
 
-	private JFileChoosers() {
-	}
-
-	public static String getCurrentDirectory() {
-		return currentDirectory;
-	}
-
 	public static JFileChooser create() {
 		RuntimeException first = null;
 		for (int i = 0; i < PROP_NAMES.length; i++) {
@@ -112,5 +105,12 @@ public class JFileChoosers {
 			ret.setSelectedFile(selected);
 			return ret;
 		}
+	}
+
+	public static String getCurrentDirectory() {
+		return currentDirectory;
+	}
+
+	private JFileChoosers() {
 	}
 }

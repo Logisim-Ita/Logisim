@@ -35,18 +35,28 @@ public class SplitterFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public String getName() {
-		return "Splitter";
-	}
-
-	@Override
-	public StringGetter getDisplayGetter() {
-		return Strings.getter("splitterComponent");
-	}
-
-	@Override
 	public AttributeSet createAttributeSet() {
 		return new SplitterAttributes();
+	}
+
+	@Override
+	public Component createComponent(Location loc, AttributeSet attrs) {
+		return new Splitter(loc, attrs);
+	}
+
+	//
+	// user interface methods
+	//
+	@Override
+	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrsBase) {
+		SplitterAttributes attrs = (SplitterAttributes) attrsBase;
+		context.getGraphics().setColor(color);
+		Location loc = Location.create(x, y);
+		if (attrs.appear == SplitterAttributes.APPEAR_LEGACY) {
+			SplitterPainter.drawLegacy(context, attrs, loc);
+		} else {
+			SplitterPainter.drawLines(context, attrs, loc);
+		}
 	}
 
 	@Override
@@ -67,8 +77,27 @@ public class SplitterFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public Component createComponent(Location loc, AttributeSet attrs) {
-		return new Splitter(loc, attrs);
+	public StringGetter getDisplayGetter() {
+		return Strings.getter("splitterComponent");
+	}
+
+	@Override
+	public Object getFeature(Object key, AttributeSet attrs) {
+		if (key == FACING_ATTRIBUTE_KEY) {
+			return StdAttr.FACING;
+		} else if (key == KeyConfigurator.class) {
+			KeyConfigurator altConfig = ParallelConfigurator.create(
+					new BitWidthConfigurator(SplitterAttributes.ATTR_WIDTH),
+					new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT, 1, 32, InputEvent.ALT_DOWN_MASK));
+			return JoinedConfigurator.create(new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT, 1, 32, 0),
+					altConfig);
+		}
+		return super.getFeature(key, attrs);
+	}
+
+	@Override
+	public String getName() {
+		return "Splitter";
 	}
 
 	@Override
@@ -85,40 +114,11 @@ public class SplitterFactory extends AbstractComponentFactory {
 		return bds;
 	}
 
-	//
-	// user interface methods
-	//
-	@Override
-	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrsBase) {
-		SplitterAttributes attrs = (SplitterAttributes) attrsBase;
-		context.getGraphics().setColor(color);
-		Location loc = Location.create(x, y);
-		if (attrs.appear == SplitterAttributes.APPEAR_LEGACY) {
-			SplitterPainter.drawLegacy(context, attrs, loc);
-		} else {
-			SplitterPainter.drawLines(context, attrs, loc);
-		}
-	}
-
 	@Override
 	public void paintIcon(ComponentDrawContext c, int x, int y, AttributeSet attrs) {
 		Graphics g = c.getGraphics();
 		if (toolIcon != null) {
 			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
 		}
-	}
-
-	@Override
-	public Object getFeature(Object key, AttributeSet attrs) {
-		if (key == FACING_ATTRIBUTE_KEY) {
-			return StdAttr.FACING;
-		} else if (key == KeyConfigurator.class) {
-			KeyConfigurator altConfig = ParallelConfigurator.create(
-					new BitWidthConfigurator(SplitterAttributes.ATTR_WIDTH),
-					new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT, 1, 32, InputEvent.ALT_DOWN_MASK));
-			return JoinedConfigurator.create(new IntegerConfigurator(SplitterAttributes.ATTR_FANOUT, 1, 32, 0),
-					altConfig);
-		}
-		return super.getFeature(key, attrs);
 	}
 }

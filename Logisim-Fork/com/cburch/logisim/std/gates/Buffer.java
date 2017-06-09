@@ -31,6 +31,34 @@ import com.cburch.logisim.util.Icons;
 class Buffer extends InstanceFactory {
 	public static InstanceFactory FACTORY = new Buffer();
 
+	//
+	// static methods - shared with other classes
+	//
+	static Value repair(InstanceState state, Value v) {
+		AttributeSet opts = state.getProject().getOptions().getAttributeSet();
+		Object onUndefined = opts.getValue(Options.ATTR_GATE_UNDEFINED);
+		boolean errorIfUndefined = onUndefined.equals(Options.GATE_UNDEFINED_ERROR);
+		Value repaired;
+		if (errorIfUndefined) {
+			int vw = v.getWidth();
+			BitWidth w = state.getAttributeValue(StdAttr.WIDTH);
+			int ww = w.getWidth();
+			if (vw == ww && v.isFullyDefined())
+				return v;
+			Value[] vs = new Value[w.getWidth()];
+			for (int i = 0; i < vs.length; i++) {
+				Value ini = i < vw ? v.get(i) : Value.ERROR;
+				vs[i] = ini.isFullyDefined() ? ini : Value.ERROR;
+			}
+			repaired = Value.create(vs);
+		} else {
+			repaired = v;
+		}
+
+		Object outType = state.getAttributeValue(GateAttributes.ATTR_OUTPUT);
+		return AbstractGate.pullOutput(repaired, outType);
+	}
+
 	private Buffer() {
 		super("Buffer", Strings.getter("bufferComponent"));
 		setAttributes(
@@ -45,25 +73,6 @@ class Buffer extends InstanceFactory {
 				new Port(0, -20, Port.INPUT, StdAttr.WIDTH), });
 	}
 
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Direction facing = attrs.getValue(StdAttr.FACING);
-		if (facing == Direction.SOUTH)
-			return Bounds.create(-9, -20, 18, 20);
-		if (facing == Direction.NORTH)
-			return Bounds.create(-9, 0, 18, 20);
-		if (facing == Direction.WEST)
-			return Bounds.create(0, -9, 20, 18);
-		return Bounds.create(-20, -9, 20, 18);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		Value in = state.getPort(1);
-		in = Buffer.repair(state, in);
-		state.setPort(0, in, GateAttributes.DELAY);
-	}
-
 	//
 	// methods for instances
 	//
@@ -72,15 +81,6 @@ class Buffer extends InstanceFactory {
 		configurePorts(instance);
 		instance.addAttributeListener();
 		NotGate.configureLabel(instance, false, null);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-			configurePorts(instance);
-			NotGate.configureLabel(instance, false, null);
-		}
 	}
 
 	private void configurePorts(Instance instance) {
@@ -109,21 +109,25 @@ class Buffer extends InstanceFactory {
 		return super.getInstanceFeature(instance, key);
 	}
 
-	//
-	// painting methods
-	//
 	@Override
-	public void paintGhost(InstancePainter painter) {
-		paintBase(painter);
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction facing = attrs.getValue(StdAttr.FACING);
+		if (facing == Direction.SOUTH)
+			return Bounds.create(-9, -20, 18, 20);
+		if (facing == Direction.NORTH)
+			return Bounds.create(-9, 0, 18, 20);
+		if (facing == Direction.WEST)
+			return Bounds.create(0, -9, 20, 18);
+		return Bounds.create(-20, -9, 20, 18);
 	}
 
 	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		g.setColor(Color.BLACK);
-		paintBase(painter);
-		painter.drawPorts();
-		painter.drawLabel();
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			configurePorts(instance);
+			NotGate.configureLabel(instance, false, null);
+		}
 	}
 
 	private void paintBase(InstancePainter painter) {
@@ -159,30 +163,26 @@ class Buffer extends InstanceFactory {
 	}
 
 	//
-	// static methods - shared with other classes
+	// painting methods
 	//
-	static Value repair(InstanceState state, Value v) {
-		AttributeSet opts = state.getProject().getOptions().getAttributeSet();
-		Object onUndefined = opts.getValue(Options.ATTR_GATE_UNDEFINED);
-		boolean errorIfUndefined = onUndefined.equals(Options.GATE_UNDEFINED_ERROR);
-		Value repaired;
-		if (errorIfUndefined) {
-			int vw = v.getWidth();
-			BitWidth w = state.getAttributeValue(StdAttr.WIDTH);
-			int ww = w.getWidth();
-			if (vw == ww && v.isFullyDefined())
-				return v;
-			Value[] vs = new Value[w.getWidth()];
-			for (int i = 0; i < vs.length; i++) {
-				Value ini = i < vw ? v.get(i) : Value.ERROR;
-				vs[i] = ini.isFullyDefined() ? ini : Value.ERROR;
-			}
-			repaired = Value.create(vs);
-		} else {
-			repaired = v;
-		}
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter);
+	}
 
-		Object outType = state.getAttributeValue(GateAttributes.ATTR_OUTPUT);
-		return AbstractGate.pullOutput(repaired, outType);
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		g.setColor(Color.BLACK);
+		paintBase(painter);
+		painter.drawPorts();
+		painter.drawLabel();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		Value in = state.getPort(1);
+		in = Buffer.repair(state, in);
+		state.setPort(0, in, GateAttributes.DELAY);
 	}
 }

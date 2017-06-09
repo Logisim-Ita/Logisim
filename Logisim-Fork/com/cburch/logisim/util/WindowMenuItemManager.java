@@ -14,7 +14,14 @@ import javax.swing.WindowConstants;
 public abstract class WindowMenuItemManager {
 	private class MyListener implements WindowListener {
 		@Override
-		public void windowOpened(WindowEvent event) {
+		public void windowActivated(WindowEvent event) {
+			addToManager();
+			WindowMenuManager.setCurrentManager(WindowMenuItemManager.this);
+		}
+
+		@Override
+		public void windowClosed(WindowEvent event) {
+			removeFromManager();
 		}
 
 		@Override
@@ -26,8 +33,8 @@ public abstract class WindowMenuItemManager {
 		}
 
 		@Override
-		public void windowClosed(WindowEvent event) {
-			removeFromManager();
+		public void windowDeactivated(WindowEvent event) {
+			WindowMenuManager.unsetCurrentManager(WindowMenuItemManager.this);
 		}
 
 		@Override
@@ -41,14 +48,7 @@ public abstract class WindowMenuItemManager {
 		}
 
 		@Override
-		public void windowActivated(WindowEvent event) {
-			addToManager();
-			WindowMenuManager.setCurrentManager(WindowMenuItemManager.this);
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent event) {
-			WindowMenuManager.unsetCurrentManager(WindowMenuItemManager.this);
+		public void windowOpened(WindowEvent event) {
 		}
 	}
 
@@ -67,15 +67,17 @@ public abstract class WindowMenuItemManager {
 		}
 	}
 
-	public abstract JFrame getJFrame(boolean create);
-
-	public void frameOpened(JFrame frame) {
-		if (!listenerAdded) {
-			frame.addWindowListener(myListener);
-			listenerAdded = true;
+	private void addToManager() {
+		if (!persistent && !inManager) {
+			WindowMenuManager.addManager(this);
+			inManager = true;
 		}
-		addToManager();
-		WindowMenuManager.setCurrentManager(this);
+	}
+
+	void createMenuItem(WindowMenu menu) {
+		WindowMenuItem ret = new WindowMenuItem(this);
+		menuItems.put(menu, ret);
+		menu.addMenuItem(this, ret, persistent);
 	}
 
 	public void frameClosed(JFrame frame) {
@@ -88,11 +90,23 @@ public abstract class WindowMenuItemManager {
 		}
 	}
 
-	private void addToManager() {
-		if (!persistent && !inManager) {
-			WindowMenuManager.addManager(this);
-			inManager = true;
+	public void frameOpened(JFrame frame) {
+		if (!listenerAdded) {
+			frame.addWindowListener(myListener);
+			listenerAdded = true;
 		}
+		addToManager();
+		WindowMenuManager.setCurrentManager(this);
+	}
+
+	public abstract JFrame getJFrame(boolean create);
+
+	JRadioButtonMenuItem getMenuItem(WindowMenu key) {
+		return menuItems.get(key);
+	}
+
+	public String getText() {
+		return text;
 	}
 
 	private void removeFromManager() {
@@ -106,27 +120,6 @@ public abstract class WindowMenuItemManager {
 		}
 	}
 
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String value) {
-		text = value;
-		for (JRadioButtonMenuItem menuItem : menuItems.values()) {
-			menuItem.setText(text);
-		}
-	}
-
-	JRadioButtonMenuItem getMenuItem(WindowMenu key) {
-		return menuItems.get(key);
-	}
-
-	void createMenuItem(WindowMenu menu) {
-		WindowMenuItem ret = new WindowMenuItem(this);
-		menuItems.put(menu, ret);
-		menu.addMenuItem(this, ret, persistent);
-	}
-
 	void removeMenuItem(WindowMenu menu) {
 		JRadioButtonMenuItem item = menuItems.remove(menu);
 		if (item != null)
@@ -136,6 +129,13 @@ public abstract class WindowMenuItemManager {
 	void setSelected(boolean selected) {
 		for (JRadioButtonMenuItem item : menuItems.values()) {
 			item.setSelected(selected);
+		}
+	}
+
+	public void setText(String value) {
+		text = value;
+		for (JRadioButtonMenuItem menuItem : menuItems.values()) {
+			menuItem.setText(text);
 		}
 	}
 }

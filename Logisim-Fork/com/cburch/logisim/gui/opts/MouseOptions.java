@@ -42,11 +42,6 @@ import com.cburch.logisim.util.InputEventUtil;
 import com.cburch.logisim.util.StringUtil;
 
 class MouseOptions extends OptionsPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5531075371121923273L;
-
 	private class AddArea extends JPanel {
 		/**
 		 * 
@@ -91,6 +86,66 @@ class MouseOptions extends OptionsPanel {
 		}
 	}
 
+	private class MappingsModel extends AbstractTableModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6685941567119691116L;
+		ArrayList<Integer> cur_keys;
+
+		MappingsModel() {
+			fireTableStructureChanged();
+		}
+
+		// AbstractTableModel methods
+		@Override
+		public void fireTableStructureChanged() {
+			cur_keys = new ArrayList<Integer>(getOptions().getMouseMappings().getMappedModifiers());
+			Collections.sort(cur_keys);
+			super.fireTableStructureChanged();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return 2;
+		}
+
+		// other methods
+		Integer getKey(int row) {
+			return cur_keys.get(row);
+		}
+
+		int getRow(Integer mods) {
+			int row = Collections.binarySearch(cur_keys, mods);
+			if (row < 0)
+				row = -(row + 1);
+			return row;
+		}
+
+		@Override
+		public int getRowCount() {
+			return cur_keys.size();
+		}
+
+		Tool getTool(int row) {
+			if (row < 0 || row >= cur_keys.size())
+				return null;
+			Integer key = cur_keys.get(row);
+			return getOptions().getMouseMappings().getToolFor(key.intValue());
+		}
+
+		@Override
+		public Object getValueAt(int row, int column) {
+			Integer key = cur_keys.get(row);
+			if (column == 0) {
+				return InputEventUtil.toDisplayString(key.intValue());
+			} else {
+				Tool tool = getOptions().getMouseMappings().getToolFor(key);
+				return tool.getDisplayName();
+			}
+		}
+	}
+
 	private class MyListener implements ActionListener, MouseListener, ListSelectionListener,
 			MouseMappings.MouseMappingsListener, ProjectExplorer.Listener {
 		//
@@ -108,6 +163,19 @@ class MouseOptions extends OptionsPanel {
 			}
 		}
 
+		@Override
+		public void deleteRequested(Event event) {
+		}
+
+		@Override
+		public void doubleClicked(Event event) {
+		}
+
+		@Override
+		public JPopupMenu menuRequested(Event event) {
+			return null;
+		}
+
 		//
 		// MouseListener methods
 		//
@@ -123,6 +191,14 @@ class MouseOptions extends OptionsPanel {
 		public void mouseExited(MouseEvent e) {
 		}
 
+		//
+		// MouseMappingsListener method
+		//
+		@Override
+		public void mouseMappingsChanged() {
+			model.fireTableStructureChanged();
+		}
+
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getSource() == addArea && curTool != null) {
@@ -135,6 +211,23 @@ class MouseOptions extends OptionsPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+		}
+
+		@Override
+		public void moveRequested(Event event, AddTool dragged, AddTool target) {
+		}
+
+		//
+		// Explorer.Listener methods
+		//
+		@Override
+		public void selectionChanged(Event event) {
+			Object target = event.getTarget();
+			if (target instanceof Tool) {
+				setCurrentTool((Tool) event.getTarget());
+			} else {
+				setCurrentTool(null);
+			}
 		}
 
 		//
@@ -159,105 +252,12 @@ class MouseOptions extends OptionsPanel {
 				attrTable.setAttrTableModel(model);
 			}
 		}
-
-		//
-		// MouseMappingsListener method
-		//
-		@Override
-		public void mouseMappingsChanged() {
-			model.fireTableStructureChanged();
-		}
-
-		//
-		// Explorer.Listener methods
-		//
-		@Override
-		public void selectionChanged(Event event) {
-			Object target = event.getTarget();
-			if (target instanceof Tool) {
-				setCurrentTool((Tool) event.getTarget());
-			} else {
-				setCurrentTool(null);
-			}
-		}
-
-		@Override
-		public void doubleClicked(Event event) {
-		}
-
-		@Override
-		public void moveRequested(Event event, AddTool dragged, AddTool target) {
-		}
-
-		@Override
-		public void deleteRequested(Event event) {
-		}
-
-		@Override
-		public JPopupMenu menuRequested(Event event) {
-			return null;
-		}
 	}
 
-	private class MappingsModel extends AbstractTableModel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -6685941567119691116L;
-		ArrayList<Integer> cur_keys;
-
-		MappingsModel() {
-			fireTableStructureChanged();
-		}
-
-		// AbstractTableModel methods
-		@Override
-		public void fireTableStructureChanged() {
-			cur_keys = new ArrayList<Integer>(getOptions().getMouseMappings().getMappedModifiers());
-			Collections.sort(cur_keys);
-			super.fireTableStructureChanged();
-		}
-
-		@Override
-		public int getRowCount() {
-			return cur_keys.size();
-		}
-
-		@Override
-		public int getColumnCount() {
-			return 2;
-		}
-
-		@Override
-		public Object getValueAt(int row, int column) {
-			Integer key = cur_keys.get(row);
-			if (column == 0) {
-				return InputEventUtil.toDisplayString(key.intValue());
-			} else {
-				Tool tool = getOptions().getMouseMappings().getToolFor(key);
-				return tool.getDisplayName();
-			}
-		}
-
-		// other methods
-		Integer getKey(int row) {
-			return cur_keys.get(row);
-		}
-
-		Tool getTool(int row) {
-			if (row < 0 || row >= cur_keys.size())
-				return null;
-			Integer key = cur_keys.get(row);
-			return getOptions().getMouseMappings().getToolFor(key.intValue());
-		}
-
-		int getRow(Integer mods) {
-			int row = Collections.binarySearch(cur_keys, mods);
-			if (row < 0)
-				row = -(row + 1);
-			return row;
-		}
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5531075371121923273L;
 
 	private MyListener listener = new MyListener();
 	private Tool curTool = null;
@@ -334,13 +334,13 @@ class MouseOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("mouseTitle");
+	public String getHelpText() {
+		return Strings.get("mouseHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("mouseHelp");
+	public String getTitle() {
+		return Strings.get("mouseTitle");
 	}
 
 	@Override

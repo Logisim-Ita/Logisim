@@ -13,11 +13,6 @@ import javax.swing.JMenuItem;
 import com.cburch.logisim.proj.Project;
 
 class MenuProject extends Menu {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6329011866349027157L;
-
 	private class MyListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -37,6 +32,11 @@ class MenuProject extends Menu {
 			}
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6329011866349027157L;
 
 	private LogisimMenuBar menubar;
 	private MyListener myListener = new MyListener();
@@ -115,6 +115,15 @@ class MenuProject extends Menu {
 		computeEnabled();
 	}
 
+	@Override
+	void computeEnabled() {
+		setEnabled(menubar.getProject() != null || addCircuit.hasListeners() || moveUp.hasListeners()
+				|| moveDown.hasListeners() || setAsMain.hasListeners() || remove.hasListeners() || layout.hasListeners()
+				|| revertAppearance.hasListeners() || appearance.hasListeners() || viewToolbox.hasListeners()
+				|| viewSimulation.hasListeners() || analyze.hasListeners() || stats.hasListeners());
+		menubar.fireEnableChanged();
+	}
+
 	public void localeChanged() {
 		setText(Strings.get("projectMenu"));
 		addCircuit.setText(Strings.get("projectAddCircuitItem"));
@@ -135,14 +144,5 @@ class MenuProject extends Menu {
 		analyze.setText(Strings.get("projectAnalyzeCircuitItem"));
 		stats.setText(Strings.get("projectGetCircuitStatisticsItem"));
 		options.setText(Strings.get("projectOptionsItem"));
-	}
-
-	@Override
-	void computeEnabled() {
-		setEnabled(menubar.getProject() != null || addCircuit.hasListeners() || moveUp.hasListeners()
-				|| moveDown.hasListeners() || setAsMain.hasListeners() || remove.hasListeners() || layout.hasListeners()
-				|| revertAppearance.hasListeners() || appearance.hasListeners() || viewToolbox.hasListeners()
-				|| viewSimulation.hasListeners() || analyze.hasListeners() || stats.hasListeners());
-		menubar.fireEnableChanged();
 	}
 }

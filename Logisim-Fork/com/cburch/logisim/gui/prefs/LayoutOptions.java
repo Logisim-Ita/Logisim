@@ -61,13 +61,13 @@ class LayoutOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("layoutTitle");
+	public String getHelpText() {
+		return Strings.get("layoutHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("layoutHelp");
+	public String getTitle() {
+		return Strings.get("layoutTitle");
 	}
 
 	@Override

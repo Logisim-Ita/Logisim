@@ -72,15 +72,70 @@ public class Counter extends InstanceFactory {
 	}
 
 	@Override
+	protected void configureNewInstance(Instance instance) {
+		Bounds bds = instance.getBounds();
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
+				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+	}
+
+	@Override
 	public AttributeSet createAttributeSet() {
 		return new CounterAttributes();
 	}
 
 	@Override
-	protected void configureNewInstance(Instance instance) {
-		Bounds bds = instance.getBounds();
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		Bounds bds = painter.getBounds();
+		RegisterData state = (RegisterData) painter.getData();
+		BitWidth widthVal = painter.getAttributeValue(StdAttr.WIDTH);
+		int width = widthVal == null ? 8 : widthVal.getWidth();
+
+		// determine text to draw in label
+		String a;
+		String b = null;
+		if (painter.getShowState()) {
+			int val = state == null ? 0 : state.value;
+			String str = StringUtil.toHexString(width, val);
+			if (str.length() <= 4) {
+				a = str;
+			} else {
+				int split = str.length() - 4;
+				a = str.substring(0, split);
+				b = str.substring(split);
+			}
+		} else {
+			a = Strings.get("counterLabel");
+			b = Strings.get("registerWidthLabel", "" + widthVal.getWidth());
+		}
+
+		// draw boundary, label
+		painter.drawBounds();
+		painter.drawLabel();
+
+		// draw input and output ports
+		if (b == null) {
+			painter.drawPort(IN, "D", Direction.EAST);
+			painter.drawPort(OUT, "Q", Direction.WEST);
+		} else {
+			painter.drawPort(IN);
+			painter.drawPort(OUT);
+		}
+		g.setColor(Color.GRAY);
+		painter.drawPort(LD);
+		painter.drawPort(CARRY);
+		painter.drawPort(CLR, "0", Direction.SOUTH);
+		painter.drawPort(CT, Strings.get("counterEnableLabel"), Direction.EAST);
+		g.setColor(Color.BLACK);
+		painter.drawClock(CK, Direction.NORTH);
+
+		// draw contents
+		if (b == null) {
+			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 4, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+		} else {
+			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+		}
 	}
 
 	@Override
@@ -155,60 +210,5 @@ public class Counter extends InstanceFactory {
 		data.value = newValue.toIntValue();
 		state.setPort(OUT, newValue, DELAY);
 		state.setPort(CARRY, carry ? Value.TRUE : Value.FALSE, DELAY);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		Bounds bds = painter.getBounds();
-		RegisterData state = (RegisterData) painter.getData();
-		BitWidth widthVal = painter.getAttributeValue(StdAttr.WIDTH);
-		int width = widthVal == null ? 8 : widthVal.getWidth();
-
-		// determine text to draw in label
-		String a;
-		String b = null;
-		if (painter.getShowState()) {
-			int val = state == null ? 0 : state.value;
-			String str = StringUtil.toHexString(width, val);
-			if (str.length() <= 4) {
-				a = str;
-			} else {
-				int split = str.length() - 4;
-				a = str.substring(0, split);
-				b = str.substring(split);
-			}
-		} else {
-			a = Strings.get("counterLabel");
-			b = Strings.get("registerWidthLabel", "" + widthVal.getWidth());
-		}
-
-		// draw boundary, label
-		painter.drawBounds();
-		painter.drawLabel();
-
-		// draw input and output ports
-		if (b == null) {
-			painter.drawPort(IN, "D", Direction.EAST);
-			painter.drawPort(OUT, "Q", Direction.WEST);
-		} else {
-			painter.drawPort(IN);
-			painter.drawPort(OUT);
-		}
-		g.setColor(Color.GRAY);
-		painter.drawPort(LD);
-		painter.drawPort(CARRY);
-		painter.drawPort(CLR, "0", Direction.SOUTH);
-		painter.drawPort(CT, Strings.get("counterEnableLabel"), Direction.EAST);
-		g.setColor(Color.BLACK);
-		painter.drawClock(CK, Direction.NORTH);
-
-		// draw contents
-		if (b == null) {
-			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 4, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
-		} else {
-			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
-			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
-		}
 	}
 }

@@ -14,15 +14,15 @@ public class TextFieldEvent {
 		this.newval = val;
 	}
 
-	public TextField getTextField() {
-		return field;
-	}
-
 	public String getOldText() {
 		return oldval;
 	}
 
 	public String getText() {
 		return newval;
+	}
+
+	public TextField getTextField() {
+		return field;
 	}
 }

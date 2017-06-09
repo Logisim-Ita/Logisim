@@ -13,17 +13,6 @@ class WireThread {
 		parent = this;
 	}
 
-	SmallSet<CircuitWires.ThreadBundle> getBundles() {
-		return bundles;
-	}
-
-	void unite(WireThread other) {
-		WireThread group = this.find();
-		WireThread group2 = other.find();
-		if (group != group2)
-			group.parent = group2;
-	}
-
 	WireThread find() {
 		WireThread ret = this;
 		if (ret.parent != ret) {
@@ -33,5 +22,16 @@ class WireThread {
 			this.parent = ret;
 		}
 		return ret;
+	}
+
+	SmallSet<CircuitWires.ThreadBundle> getBundles() {
+		return bundles;
+	}
+
+	void unite(WireThread other) {
+		WireThread group = this.find();
+		WireThread group2 = other.find();
+		if (group != group2)
+			group.parent = group2;
 	}
 }

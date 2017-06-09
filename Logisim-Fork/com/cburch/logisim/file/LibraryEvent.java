@@ -25,16 +25,16 @@ public class LibraryEvent {
 		this.data = data;
 	}
 
-	public Library getSource() {
-		return source;
-	}
-
 	public int getAction() {
 		return action;
 	}
 
 	public Object getData() {
 		return data;
+	}
+
+	public Library getSource() {
+		return source;
 	}
 
 }

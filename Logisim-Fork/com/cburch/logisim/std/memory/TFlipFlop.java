@@ -11,11 +11,6 @@ public class TFlipFlop extends AbstractFlipFlop {
 	}
 
 	@Override
-	protected String getInputName(int index) {
-		return "T";
-	}
-
-	@Override
 	protected Value computeValue(Value[] inputs, Value curValue) {
 		if (curValue == Value.UNKNOWN)
 			curValue = Value.FALSE;
@@ -24,5 +19,10 @@ public class TFlipFlop extends AbstractFlipFlop {
 		} else {
 			return curValue;
 		}
+	}
+
+	@Override
+	protected String getInputName(int index) {
+		return "T";
 	}
 }

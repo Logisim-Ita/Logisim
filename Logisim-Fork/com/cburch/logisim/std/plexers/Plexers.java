@@ -58,55 +58,6 @@ public class Plexers extends Library {
 			new FactoryDescription("BitSelector", Strings.getter("bitSelectorComponent"), "bitSelector.gif",
 					"BitSelector"), };
 
-	private List<Tool> tools = null;
-
-	public Plexers() {
-	}
-
-	@Override
-	public String getName() {
-		return "Plexers";
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("plexerLibrary");
-	}
-
-	@Override
-	public List<Tool> getTools() {
-		if (tools == null) {
-			tools = FactoryDescription.getTools(Plexers.class, DESCRIPTIONS);
-		}
-		return tools;
-	}
-
-	static void drawTrapezoid(Graphics g, Bounds bds, Direction facing, int facingLean) {
-		int wid = bds.getWidth();
-		int ht = bds.getHeight();
-		int x0 = bds.getX();
-		int x1 = x0 + wid;
-		int y0 = bds.getY();
-		int y1 = y0 + ht;
-		int[] xp = { x0, x1, x1, x0 };
-		int[] yp = { y0, y0, y1, y1 };
-		if (facing == Direction.WEST) {
-			yp[0] += facingLean;
-			yp[3] -= facingLean;
-		} else if (facing == Direction.NORTH) {
-			xp[0] += facingLean;
-			xp[1] -= facingLean;
-		} else if (facing == Direction.SOUTH) {
-			xp[2] -= facingLean;
-			xp[3] += facingLean;
-		} else {
-			yp[1] += facingLean;
-			yp[2] -= facingLean;
-		}
-		GraphicsUtil.switchToWidth(g, 2);
-		g.drawPolygon(xp, yp, 4);
-	}
-
 	static boolean contains(Location loc, Bounds bds, Direction facing) {
 		if (bds.contains(loc, 1)) {
 			int x = loc.getX();
@@ -139,5 +90,54 @@ public class Plexers extends Library {
 		} else {
 			return false;
 		}
+	}
+
+	static void drawTrapezoid(Graphics g, Bounds bds, Direction facing, int facingLean) {
+		int wid = bds.getWidth();
+		int ht = bds.getHeight();
+		int x0 = bds.getX();
+		int x1 = x0 + wid;
+		int y0 = bds.getY();
+		int y1 = y0 + ht;
+		int[] xp = { x0, x1, x1, x0 };
+		int[] yp = { y0, y0, y1, y1 };
+		if (facing == Direction.WEST) {
+			yp[0] += facingLean;
+			yp[3] -= facingLean;
+		} else if (facing == Direction.NORTH) {
+			xp[0] += facingLean;
+			xp[1] -= facingLean;
+		} else if (facing == Direction.SOUTH) {
+			xp[2] -= facingLean;
+			xp[3] += facingLean;
+		} else {
+			yp[1] += facingLean;
+			yp[2] -= facingLean;
+		}
+		GraphicsUtil.switchToWidth(g, 2);
+		g.drawPolygon(xp, yp, 4);
+	}
+
+	private List<Tool> tools = null;
+
+	public Plexers() {
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("plexerLibrary");
+	}
+
+	@Override
+	public String getName() {
+		return "Plexers";
+	}
+
+	@Override
+	public List<Tool> getTools() {
+		if (tools == null) {
+			tools = FactoryDescription.getTools(Plexers.class, DESCRIPTIONS);
+		}
+		return tools;
 	}
 }

@@ -29,67 +29,6 @@ public class Divider extends InstanceFactory {
 	private static final int UPPER = 3;
 	private static final int REM = 4;
 
-	public Divider() {
-		super("Divider", Strings.getter("dividerComponent"));
-		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
-		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
-		setIconName("divider.gif");
-
-		Port[] ps = new Port[5];
-		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
-		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
-		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[UPPER] = new Port(-20, -20, Port.INPUT, StdAttr.WIDTH);
-		ps[REM] = new Port(-20, 20, Port.OUTPUT, StdAttr.WIDTH);
-		ps[IN0].setToolTip(Strings.getter("dividerDividendLowerTip"));
-		ps[IN1].setToolTip(Strings.getter("dividerDivisorTip"));
-		ps[OUT].setToolTip(Strings.getter("dividerOutputTip"));
-		ps[UPPER].setToolTip(Strings.getter("dividerDividendUpperTip"));
-		ps[REM].setToolTip(Strings.getter("dividerRemainderTip"));
-		setPorts(ps);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		// get attributes
-		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-
-		// compute outputs
-		Value a = state.getPort(IN0);
-		Value b = state.getPort(IN1);
-		Value upper = state.getPort(UPPER);
-		Value[] outs = Divider.computeResult(dataWidth, a, b, upper);
-
-		// propagate them
-		int delay = dataWidth.getWidth() * (dataWidth.getWidth() + 2) * PER_DELAY;
-		state.setPort(OUT, outs[0], delay);
-		state.setPort(REM, outs[1], delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-
-		g.setColor(Color.GRAY);
-		painter.drawPort(IN0);
-		painter.drawPort(IN1);
-		painter.drawPort(OUT);
-		painter.drawPort(UPPER, Strings.get("dividerUpperInput"), Direction.NORTH);
-		painter.drawPort(REM, Strings.get("dividerRemainderOutput"), Direction.SOUTH);
-
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.BLACK);
-		g.fillOval(x - 12, y - 7, 4, 4);
-		g.drawLine(x - 15, y, x - 5, y);
-		g.fillOval(x - 12, y + 3, 4, 4);
-		GraphicsUtil.switchToWidth(g, 1);
-	}
-
 	static Value[] computeResult(BitWidth width, Value a, Value b, Value upper) {
 		int w = width.getWidth();
 		if (upper == Value.NIL || upper.isUnknown())
@@ -116,5 +55,66 @@ public class Divider extends InstanceFactory {
 		} else {
 			return new Value[] { Value.createUnknown(width), Value.createUnknown(width) };
 		}
+	}
+
+	public Divider() {
+		super("Divider", Strings.getter("dividerComponent"));
+		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
+		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
+		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
+		setIconName("divider.gif");
+
+		Port[] ps = new Port[5];
+		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
+		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[UPPER] = new Port(-20, -20, Port.INPUT, StdAttr.WIDTH);
+		ps[REM] = new Port(-20, 20, Port.OUTPUT, StdAttr.WIDTH);
+		ps[IN0].setToolTip(Strings.getter("dividerDividendLowerTip"));
+		ps[IN1].setToolTip(Strings.getter("dividerDivisorTip"));
+		ps[OUT].setToolTip(Strings.getter("dividerOutputTip"));
+		ps[UPPER].setToolTip(Strings.getter("dividerDividendUpperTip"));
+		ps[REM].setToolTip(Strings.getter("dividerRemainderTip"));
+		setPorts(ps);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+
+		g.setColor(Color.GRAY);
+		painter.drawPort(IN0);
+		painter.drawPort(IN1);
+		painter.drawPort(OUT);
+		painter.drawPort(UPPER, Strings.get("dividerUpperInput"), Direction.NORTH);
+		painter.drawPort(REM, Strings.get("dividerRemainderOutput"), Direction.SOUTH);
+
+		Location loc = painter.getLocation();
+		int x = loc.getX();
+		int y = loc.getY();
+		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(Color.BLACK);
+		g.fillOval(x - 12, y - 7, 4, 4);
+		g.drawLine(x - 15, y, x - 5, y);
+		g.fillOval(x - 12, y + 3, 4, 4);
+		GraphicsUtil.switchToWidth(g, 1);
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		// get attributes
+		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
+
+		// compute outputs
+		Value a = state.getPort(IN0);
+		Value b = state.getPort(IN1);
+		Value upper = state.getPort(UPPER);
+		Value[] outs = Divider.computeResult(dataWidth, a, b, upper);
+
+		// propagate them
+		int delay = dataWidth.getWidth() * (dataWidth.getWidth() + 2) * PER_DELAY;
+		state.setPort(OUT, outs[0], delay);
+		state.setPort(REM, outs[1], delay);
 	}
 }

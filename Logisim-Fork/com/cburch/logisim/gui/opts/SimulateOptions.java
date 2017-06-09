@@ -20,11 +20,6 @@ import com.cburch.logisim.file.Options;
 import com.cburch.logisim.util.TableLayout;
 
 class SimulateOptions extends OptionsPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -838554514713465773L;
-
 	private class MyListener implements ActionListener, AttributeListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -64,6 +59,10 @@ class SimulateOptions extends OptionsPanel {
 			}
 		}
 
+		private void loadGateUndefined(Object val) {
+			ComboOption.setSelected(gateUndefined, val);
+		}
+
 		@SuppressWarnings("rawtypes")
 		private void loadSimLimit(Integer val) {
 			int value = val.intValue();
@@ -76,14 +75,15 @@ class SimulateOptions extends OptionsPanel {
 			}
 		}
 
-		private void loadGateUndefined(Object val) {
-			ComboOption.setSelected(gateUndefined, val);
-		}
-
 		private void loadSimRandomness(Integer val) {
 			simRandomness.setSelected(val.intValue() > 0);
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -838554514713465773L;
 
 	private MyListener myListener = new MyListener();
 
@@ -126,13 +126,13 @@ class SimulateOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("simulateTitle");
+	public String getHelpText() {
+		return Strings.get("simulateHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("simulateHelp");
+	public String getTitle() {
+		return Strings.get("simulateTitle");
 	}
 
 	@Override

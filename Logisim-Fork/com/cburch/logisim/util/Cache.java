@@ -27,12 +27,6 @@ public class Cache {
 		return data[hashCode & mask];
 	}
 
-	public void put(int hashCode, Object value) {
-		if (value != null) {
-			data[hashCode & mask] = value;
-		}
-	}
-
 	public Object get(Object value) {
 		if (value == null)
 			return null;
@@ -43,6 +37,12 @@ public class Cache {
 		} else {
 			data[code] = value;
 			return value;
+		}
+	}
+
+	public void put(int hashCode, Object value) {
+		if (value != null) {
+			data[hashCode & mask] = value;
 		}
 	}
 }

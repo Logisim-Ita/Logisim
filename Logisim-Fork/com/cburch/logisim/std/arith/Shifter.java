@@ -52,13 +52,6 @@ public class Shifter extends InstanceFactory {
 		instance.addAttributeListener();
 	}
 
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.WIDTH) {
-			configurePorts(instance);
-		}
-	}
-
 	private void configurePorts(Instance instance) {
 		BitWidth dataWid = instance.getAttributeValue(StdAttr.WIDTH);
 		int data = dataWid == null ? 32 : dataWid.getWidth();
@@ -74,6 +67,56 @@ public class Shifter extends InstanceFactory {
 		ps[IN1].setToolTip(Strings.getter("shifterDistanceTip"));
 		ps[OUT].setToolTip(Strings.getter("shifterOutputTip"));
 		instance.setPorts(ps);
+	}
+
+	private void drawArrow(Graphics g, int x, int y, int d) {
+		int[] px = { x + d, x, x + d };
+		int[] py = { y + d, y, y - d };
+		g.fillPolygon(px, py, 3);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.WIDTH) {
+			configurePorts(instance);
+		}
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+
+		painter.drawPorts();
+
+		Location loc = painter.getLocation();
+		int x = loc.getX() - 15;
+		int y = loc.getY();
+		Object shift = painter.getAttributeValue(ATTR_SHIFT);
+		g.setColor(Color.BLACK);
+		if (shift == SHIFT_LOGICAL_RIGHT) {
+			g.fillRect(x, y - 1, 8, 3);
+			drawArrow(g, x + 10, y, -4);
+		} else if (shift == SHIFT_ARITHMETIC_RIGHT) {
+			g.fillRect(x, y - 1, 2, 3);
+			g.fillRect(x + 3, y - 1, 5, 3);
+			drawArrow(g, x + 10, y, -4);
+		} else if (shift == SHIFT_ROLL_RIGHT) {
+			g.fillRect(x, y - 1, 5, 3);
+			g.fillRect(x + 8, y - 7, 2, 8);
+			g.fillRect(x, y - 7, 2, 8);
+			g.fillRect(x, y - 7, 10, 2);
+			drawArrow(g, x + 8, y, -4);
+		} else if (shift == SHIFT_ROLL_LEFT) {
+			g.fillRect(x + 6, y - 1, 4, 3);
+			g.fillRect(x + 8, y - 7, 2, 8);
+			g.fillRect(x, y - 7, 2, 8);
+			g.fillRect(x, y - 7, 10, 2);
+			drawArrow(g, x + 3, y, 4);
+		} else { // SHIFT_LOGICAL_LEFT
+			g.fillRect(x + 2, y - 1, 8, 3);
+			drawArrow(g, x, y, 4);
+		}
 	}
 
 	@Override
@@ -148,48 +191,5 @@ public class Shifter extends InstanceFactory {
 		// propagate them
 		int delay = dataWidth.getWidth() * (3 * Adder.PER_DELAY);
 		state.setPort(OUT, vy, delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-
-		painter.drawPorts();
-
-		Location loc = painter.getLocation();
-		int x = loc.getX() - 15;
-		int y = loc.getY();
-		Object shift = painter.getAttributeValue(ATTR_SHIFT);
-		g.setColor(Color.BLACK);
-		if (shift == SHIFT_LOGICAL_RIGHT) {
-			g.fillRect(x, y - 1, 8, 3);
-			drawArrow(g, x + 10, y, -4);
-		} else if (shift == SHIFT_ARITHMETIC_RIGHT) {
-			g.fillRect(x, y - 1, 2, 3);
-			g.fillRect(x + 3, y - 1, 5, 3);
-			drawArrow(g, x + 10, y, -4);
-		} else if (shift == SHIFT_ROLL_RIGHT) {
-			g.fillRect(x, y - 1, 5, 3);
-			g.fillRect(x + 8, y - 7, 2, 8);
-			g.fillRect(x, y - 7, 2, 8);
-			g.fillRect(x, y - 7, 10, 2);
-			drawArrow(g, x + 8, y, -4);
-		} else if (shift == SHIFT_ROLL_LEFT) {
-			g.fillRect(x + 6, y - 1, 4, 3);
-			g.fillRect(x + 8, y - 7, 2, 8);
-			g.fillRect(x, y - 7, 2, 8);
-			g.fillRect(x, y - 7, 10, 2);
-			drawArrow(g, x + 3, y, 4);
-		} else { // SHIFT_LOGICAL_LEFT
-			g.fillRect(x + 2, y - 1, 8, 3);
-			drawArrow(g, x, y, 4);
-		}
-	}
-
-	private void drawArrow(Graphics g, int x, int y, int d) {
-		int[] px = { x + d, x, x + d };
-		int[] py = { y + d, y, y - d };
-		g.fillPolygon(px, py, 3);
 	}
 }

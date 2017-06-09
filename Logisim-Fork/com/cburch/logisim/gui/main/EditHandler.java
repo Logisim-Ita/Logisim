@@ -12,9 +12,31 @@ public abstract class EditHandler {
 
 	private Listener listener;
 
-	public void setListener(Listener listener) {
-		this.listener = listener;
-	}
+	public abstract void addControlPoint();
+
+	public abstract void computeEnabled();
+
+	public abstract void copy();
+
+	public abstract void cut();
+
+	public abstract void delete();
+
+	public abstract void duplicate();
+
+	public abstract void lower();
+
+	public abstract void lowerBottom();
+
+	public abstract void paste();
+
+	public abstract void raise();
+
+	public abstract void raiseTop();
+
+	public abstract void removeControlPoint();
+
+	public abstract void selectAll();
 
 	protected void setEnabled(LogisimMenuItem action, boolean value) {
 		Listener l = listener;
@@ -23,29 +45,7 @@ public abstract class EditHandler {
 		}
 	}
 
-	public abstract void computeEnabled();
-
-	public abstract void cut();
-
-	public abstract void copy();
-
-	public abstract void paste();
-
-	public abstract void delete();
-
-	public abstract void duplicate();
-
-	public abstract void selectAll();
-
-	public abstract void raise();
-
-	public abstract void lower();
-
-	public abstract void raiseTop();
-
-	public abstract void lowerBottom();
-
-	public abstract void addControlPoint();
-
-	public abstract void removeControlPoint();
+	public void setListener(Listener listener) {
+		this.listener = listener;
+	}
 }

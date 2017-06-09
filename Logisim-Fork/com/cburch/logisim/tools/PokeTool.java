@@ -30,9 +30,16 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.Icons;
 
 public class PokeTool extends Tool {
-	private static final Icon toolIcon = Icons.getIcon("poke.gif");
-	private static final Color caretColor = new Color(255, 255, 150);
-
+	private class Listener implements CircuitListener {
+		@Override
+		public void circuitChanged(CircuitEvent event) {
+			Circuit circ = pokedCircuit;
+			if (event.getCircuit() == circ && circ != null && (event.getAction() == CircuitEvent.ACTION_REMOVE
+					|| event.getAction() == CircuitEvent.ACTION_CLEAR) && !circ.contains(pokedComponent)) {
+				removeCaret(false);
+			}
+		}
+	}
 	private static class WireCaret extends AbstractCaret {
 		Canvas canvas;
 		Wire wire;
@@ -68,16 +75,9 @@ public class PokeTool extends Tool {
 		}
 	}
 
-	private class Listener implements CircuitListener {
-		@Override
-		public void circuitChanged(CircuitEvent event) {
-			Circuit circ = pokedCircuit;
-			if (event.getCircuit() == circ && circ != null && (event.getAction() == CircuitEvent.ACTION_REMOVE
-					|| event.getAction() == CircuitEvent.ACTION_CLEAR) && !circ.contains(pokedComponent)) {
-				removeCaret(false);
-			}
-		}
-	}
+	private static final Icon toolIcon = Icons.getIcon("poke.gif");
+
+	private static final Color caretColor = new Color(255, 255, 150);
 
 	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
@@ -91,53 +91,9 @@ public class PokeTool extends Tool {
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		return other instanceof PokeTool;
-	}
-
-	@Override
-	public int hashCode() {
-		return PokeTool.class.hashCode();
-	}
-
-	@Override
-	public String getName() {
-		return "Poke Tool";
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("pokeTool");
-	}
-
-	private void removeCaret(boolean normal) {
-		Circuit circ = pokedCircuit;
-		Caret caret = pokeCaret;
-		if (caret != null) {
-			if (normal)
-				caret.stopEditing();
-			else
-				caret.cancelEditing();
-			circ.removeCircuitListener(listener);
-			pokedCircuit = null;
-			pokedComponent = null;
-			pokeCaret = null;
-		}
-	}
-
-	private void setPokedComponent(Circuit circ, Component comp, Caret caret) {
+	public void deselect(Canvas canvas) {
 		removeCaret(true);
-		pokedCircuit = circ;
-		pokedComponent = comp;
-		pokeCaret = caret;
-		if (caret != null) {
-			circ.addCircuitListener(listener);
-		}
-	}
-
-	@Override
-	public String getDescription() {
-		return Strings.get("pokeToolDesc");
+		canvas.setHighlightedWires(WireSet.EMPTY);
 	}
 
 	@Override
@@ -147,9 +103,65 @@ public class PokeTool extends Tool {
 	}
 
 	@Override
-	public void deselect(Canvas canvas) {
-		removeCaret(true);
-		canvas.setHighlightedWires(WireSet.EMPTY);
+	public boolean equals(Object other) {
+		return other instanceof PokeTool;
+	}
+
+	@Override
+	public Cursor getCursor() {
+		return cursor;
+	}
+
+	@Override
+	public String getDescription() {
+		return Strings.get("pokeToolDesc");
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("pokeTool");
+	}
+
+	@Override
+	public String getName() {
+		return "Poke Tool";
+	}
+
+	@Override
+	public int hashCode() {
+		return PokeTool.class.hashCode();
+	}
+
+	@Override
+	public void keyPressed(Canvas canvas, KeyEvent e) {
+		if (pokeCaret != null) {
+			pokeCaret.keyPressed(e);
+			canvas.getProject().repaintCanvas();
+		}
+	}
+
+	@Override
+	public void keyReleased(Canvas canvas, KeyEvent e) {
+		if (pokeCaret != null) {
+			pokeCaret.keyReleased(e);
+			canvas.getProject().repaintCanvas();
+		}
+	}
+
+	@Override
+	public void keyTyped(Canvas canvas, KeyEvent e) {
+		if (pokeCaret != null) {
+			pokeCaret.keyTyped(e);
+			canvas.getProject().repaintCanvas();
+		}
+	}
+
+	@Override
+	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
+		if (pokeCaret != null) {
+			pokeCaret.mouseDragged(e);
+			canvas.getProject().repaintCanvas();
+		}
 	}
 
 	@Override
@@ -198,41 +210,9 @@ public class PokeTool extends Tool {
 	}
 
 	@Override
-	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
-		if (pokeCaret != null) {
-			pokeCaret.mouseDragged(e);
-			canvas.getProject().repaintCanvas();
-		}
-	}
-
-	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
 		if (pokeCaret != null) {
 			pokeCaret.mouseReleased(e);
-			canvas.getProject().repaintCanvas();
-		}
-	}
-
-	@Override
-	public void keyTyped(Canvas canvas, KeyEvent e) {
-		if (pokeCaret != null) {
-			pokeCaret.keyTyped(e);
-			canvas.getProject().repaintCanvas();
-		}
-	}
-
-	@Override
-	public void keyPressed(Canvas canvas, KeyEvent e) {
-		if (pokeCaret != null) {
-			pokeCaret.keyPressed(e);
-			canvas.getProject().repaintCanvas();
-		}
-	}
-
-	@Override
-	public void keyReleased(Canvas canvas, KeyEvent e) {
-		if (pokeCaret != null) {
-			pokeCaret.keyReleased(e);
 			canvas.getProject().repaintCanvas();
 		}
 	}
@@ -254,8 +234,28 @@ public class PokeTool extends Tool {
 		}
 	}
 
-	@Override
-	public Cursor getCursor() {
-		return cursor;
+	private void removeCaret(boolean normal) {
+		Circuit circ = pokedCircuit;
+		Caret caret = pokeCaret;
+		if (caret != null) {
+			if (normal)
+				caret.stopEditing();
+			else
+				caret.cancelEditing();
+			circ.removeCircuitListener(listener);
+			pokedCircuit = null;
+			pokedComponent = null;
+			pokeCaret = null;
+		}
+	}
+
+	private void setPokedComponent(Circuit circ, Component comp, Caret caret) {
+		removeCaret(true);
+		pokedCircuit = circ;
+		pokedComponent = comp;
+		pokeCaret = caret;
+		if (caret != null) {
+			circ.addCircuitListener(listener);
+		}
 	}
 }

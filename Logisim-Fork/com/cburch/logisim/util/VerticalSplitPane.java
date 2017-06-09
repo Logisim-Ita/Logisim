@@ -15,44 +15,32 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class VerticalSplitPane extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5640950675611320914L;
+	private class MyDragbar extends HorizontalSplitPane.Dragbar {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6973366305961644799L;
+
+		MyDragbar() {
+			setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+		}
+
+		@Override
+		int getDragValue(MouseEvent e) {
+			return getX() + e.getX() - VerticalSplitPane.this.getInsets().left;
+		}
+
+		@Override
+		void setDragValue(int value) {
+			Insets in = VerticalSplitPane.this.getInsets();
+			setFraction((double) value / (VerticalSplitPane.this.getWidth() - in.left - in.right));
+			revalidate();
+		}
+	}
 
 	private class MyLayout implements LayoutManager {
 		@Override
 		public void addLayoutComponent(String name, Component comp) {
-		}
-
-		@Override
-		public void removeLayoutComponent(Component comp) {
-		}
-
-		@Override
-		public Dimension preferredLayoutSize(Container parent) {
-			if (fraction <= 0.0)
-				return comp1.getPreferredSize();
-			if (fraction >= 1.0)
-				return comp0.getPreferredSize();
-			Insets in = parent.getInsets();
-			Dimension d0 = comp0.getPreferredSize();
-			Dimension d1 = comp1.getPreferredSize();
-			return new Dimension(in.left + d0.width + d1.width + in.right,
-					in.top + Math.max(d0.height, d1.height) + in.bottom);
-		}
-
-		@Override
-		public Dimension minimumLayoutSize(Container parent) {
-			if (fraction <= 0.0)
-				return comp1.getMinimumSize();
-			if (fraction >= 1.0)
-				return comp0.getMinimumSize();
-			Insets in = parent.getInsets();
-			Dimension d0 = comp0.getMinimumSize();
-			Dimension d1 = comp1.getMinimumSize();
-			return new Dimension(in.left + d0.width + d1.width + in.right,
-					in.top + Math.max(d0.height, d1.height) + in.bottom);
 		}
 
 		@Override
@@ -76,30 +64,42 @@ public class VerticalSplitPane extends JPanel {
 			dragbar.setBounds(in.left + split - HorizontalSplitPane.DRAG_TOLERANCE, in.top,
 					2 * HorizontalSplitPane.DRAG_TOLERANCE, maxHeight);
 		}
-	}
 
-	private class MyDragbar extends HorizontalSplitPane.Dragbar {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -6973366305961644799L;
-
-		MyDragbar() {
-			setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+		@Override
+		public Dimension minimumLayoutSize(Container parent) {
+			if (fraction <= 0.0)
+				return comp1.getMinimumSize();
+			if (fraction >= 1.0)
+				return comp0.getMinimumSize();
+			Insets in = parent.getInsets();
+			Dimension d0 = comp0.getMinimumSize();
+			Dimension d1 = comp1.getMinimumSize();
+			return new Dimension(in.left + d0.width + d1.width + in.right,
+					in.top + Math.max(d0.height, d1.height) + in.bottom);
 		}
 
 		@Override
-		int getDragValue(MouseEvent e) {
-			return getX() + e.getX() - VerticalSplitPane.this.getInsets().left;
+		public Dimension preferredLayoutSize(Container parent) {
+			if (fraction <= 0.0)
+				return comp1.getPreferredSize();
+			if (fraction >= 1.0)
+				return comp0.getPreferredSize();
+			Insets in = parent.getInsets();
+			Dimension d0 = comp0.getPreferredSize();
+			Dimension d1 = comp1.getPreferredSize();
+			return new Dimension(in.left + d0.width + d1.width + in.right,
+					in.top + Math.max(d0.height, d1.height) + in.bottom);
 		}
 
 		@Override
-		void setDragValue(int value) {
-			Insets in = VerticalSplitPane.this.getInsets();
-			setFraction((double) value / (VerticalSplitPane.this.getWidth() - in.left - in.right));
-			revalidate();
+		public void removeLayoutComponent(Component comp) {
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5640950675611320914L;
 
 	private JComponent comp0;
 	private JComponent comp1;

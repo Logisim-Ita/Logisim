@@ -40,16 +40,16 @@ public class BitSelector extends InstanceFactory {
 	}
 
 	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updatePorts(instance);
+	}
+
+	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
 		Bounds base = Bounds.create(-30, -15, 30, 30);
 		return base.rotate(Direction.EAST, facing, 0, 0);
-	}
-
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		updatePorts(instance);
 	}
 
 	@Override
@@ -60,6 +60,52 @@ public class BitSelector extends InstanceFactory {
 		} else if (attr == StdAttr.WIDTH || attr == GROUP_ATTR) {
 			updatePorts(instance);
 		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		Plexers.drawTrapezoid(painter.getGraphics(), painter.getBounds(), painter.getAttributeValue(StdAttr.FACING), 9);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		Direction facing = painter.getAttributeValue(StdAttr.FACING);
+
+		Plexers.drawTrapezoid(g, painter.getBounds(), facing, 9);
+		Bounds bds = painter.getBounds();
+		g.setColor(Color.BLACK);
+		GraphicsUtil.drawCenteredText(g, "Sel", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
+		painter.drawPorts();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		Value data = state.getPort(1);
+		Value select = state.getPort(2);
+		BitWidth groupBits = state.getAttributeValue(GROUP_ATTR);
+		Value group;
+		if (!select.isFullyDefined()) {
+			group = Value.createUnknown(groupBits);
+		} else {
+			int shift = select.toIntValue() * groupBits.getWidth();
+			if (shift >= data.getWidth()) {
+				group = Value.createKnown(groupBits, 0);
+			} else if (groupBits.getWidth() == 1) {
+				group = data.get(shift);
+			} else {
+				Value[] bits = new Value[groupBits.getWidth()];
+				for (int i = 0; i < bits.length; i++) {
+					if (shift + i >= data.getWidth()) {
+						bits[i] = Value.FALSE;
+					} else {
+						bits[i] = data.get(shift + i);
+					}
+				}
+				group = Value.create(bits);
+			}
+		}
+		state.setPort(0, group, Plexers.DELAY);
 	}
 
 	private void updatePorts(Instance instance) {
@@ -100,51 +146,5 @@ public class BitSelector extends InstanceFactory {
 		ps[1].setToolTip(Strings.getter("bitSelectorDataTip"));
 		ps[2].setToolTip(Strings.getter("bitSelectorSelectTip"));
 		instance.setPorts(ps);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		Value data = state.getPort(1);
-		Value select = state.getPort(2);
-		BitWidth groupBits = state.getAttributeValue(GROUP_ATTR);
-		Value group;
-		if (!select.isFullyDefined()) {
-			group = Value.createUnknown(groupBits);
-		} else {
-			int shift = select.toIntValue() * groupBits.getWidth();
-			if (shift >= data.getWidth()) {
-				group = Value.createKnown(groupBits, 0);
-			} else if (groupBits.getWidth() == 1) {
-				group = data.get(shift);
-			} else {
-				Value[] bits = new Value[groupBits.getWidth()];
-				for (int i = 0; i < bits.length; i++) {
-					if (shift + i >= data.getWidth()) {
-						bits[i] = Value.FALSE;
-					} else {
-						bits[i] = data.get(shift + i);
-					}
-				}
-				group = Value.create(bits);
-			}
-		}
-		state.setPort(0, group, Plexers.DELAY);
-	}
-
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		Plexers.drawTrapezoid(painter.getGraphics(), painter.getBounds(), painter.getAttributeValue(StdAttr.FACING), 9);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-
-		Plexers.drawTrapezoid(g, painter.getBounds(), facing, 9);
-		Bounds bds = painter.getBounds();
-		g.setColor(Color.BLACK);
-		GraphicsUtil.drawCenteredText(g, "Sel", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
-		painter.drawPorts();
 	}
 }

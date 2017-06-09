@@ -13,8 +13,9 @@ class ActionUnion extends Action {
 	}
 
 	@Override
-	public boolean isModification() {
-		return first.isModification() || second.isModification();
+	public void doIt() {
+		first.doIt();
+		second.doIt();
 	}
 
 	@Override
@@ -23,9 +24,8 @@ class ActionUnion extends Action {
 	}
 
 	@Override
-	public void doIt() {
-		first.doIt();
-		second.doIt();
+	public boolean isModification() {
+		return first.isModification() || second.isModification();
 	}
 
 	@Override

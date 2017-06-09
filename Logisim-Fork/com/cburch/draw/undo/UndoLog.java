@@ -29,8 +29,18 @@ public class UndoLog {
 		listeners.add(what);
 	}
 
-	public void removeProjectListener(UndoLogListener what) {
-		listeners.remove(what);
+	public void clearModified() {
+		modCount = 0;
+	}
+
+	//
+	// mutator methods
+	//
+	public void doAction(Action act) {
+		if (act == null)
+			return;
+		act.doIt();
+		logAction(act);
 	}
 
 	private void fireEvent(int action, Action actionObject) {
@@ -39,6 +49,14 @@ public class UndoLog {
 			if (e == null)
 				e = new UndoLogEvent(this, action, actionObject);
 			listener.undoLogChanged(e);
+		}
+	}
+
+	public Action getRedoAction() {
+		if (redoLog.size() == 0) {
+			return null;
+		} else {
+			return redoLog.getLast();
 		}
 	}
 
@@ -53,26 +71,8 @@ public class UndoLog {
 		}
 	}
 
-	public Action getRedoAction() {
-		if (redoLog.size() == 0) {
-			return null;
-		} else {
-			return redoLog.getLast();
-		}
-	}
-
 	public boolean isModified() {
 		return modCount != 0;
-	}
-
-	//
-	// mutator methods
-	//
-	public void doAction(Action act) {
-		if (act == null)
-			return;
-		act.doIt();
-		logAction(act);
 	}
 
 	public void logAction(Action act) {
@@ -99,17 +99,6 @@ public class UndoLog {
 		fireEvent(UndoLogEvent.ACTION_DONE, act);
 	}
 
-	public void undoAction() {
-		if (undoLog.size() > 0) {
-			Action action = undoLog.removeLast();
-			if (action.isModification())
-				--modCount;
-			action.undo();
-			redoLog.add(action);
-			fireEvent(UndoLogEvent.ACTION_UNDONE, action);
-		}
-	}
-
 	public void redoAction() {
 		if (redoLog.size() > 0) {
 			Action action = redoLog.removeLast();
@@ -121,7 +110,18 @@ public class UndoLog {
 		}
 	}
 
-	public void clearModified() {
-		modCount = 0;
+	public void removeProjectListener(UndoLogListener what) {
+		listeners.remove(what);
+	}
+
+	public void undoAction() {
+		if (undoLog.size() > 0) {
+			Action action = undoLog.removeLast();
+			if (action.isModification())
+				--modCount;
+			action.undo();
+			redoLog.add(action);
+			fireEvent(UndoLogEvent.ACTION_UNDONE, action);
+		}
 	}
 }

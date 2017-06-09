@@ -45,13 +45,13 @@ class ExperimentalOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("experimentTitle");
+	public String getHelpText() {
+		return Strings.get("experimentHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("experimentHelp");
+	public String getTitle() {
+		return Strings.get("experimentTitle");
 	}
 
 	@Override

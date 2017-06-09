@@ -12,11 +12,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 public abstract class EditPopup extends JPopupMenu {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2388513486007265587L;
-
 	private class Listener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -29,6 +24,11 @@ public abstract class EditPopup extends JPopupMenu {
 			}
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2388513486007265587L;
 
 	private Listener listener;
 	private Map<LogisimMenuItem, JMenuItem> items;
@@ -43,6 +43,21 @@ public abstract class EditPopup extends JPopupMenu {
 		if (!waitForInitialize)
 			initialize();
 	}
+
+	private boolean add(LogisimMenuItem item, String display) {
+		if (shouldShow(item)) {
+			JMenuItem menu = new JMenuItem(display);
+			items.put(item, menu);
+			menu.setEnabled(isEnabled(item));
+			menu.addActionListener(listener);
+			add(menu);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	protected abstract void fire(LogisimMenuItem item);
 
 	protected void initialize() {
 		boolean x = false;
@@ -73,22 +88,7 @@ public abstract class EditPopup extends JPopupMenu {
 		}
 	}
 
-	private boolean add(LogisimMenuItem item, String display) {
-		if (shouldShow(item)) {
-			JMenuItem menu = new JMenuItem(display);
-			items.put(item, menu);
-			menu.setEnabled(isEnabled(item));
-			menu.addActionListener(listener);
-			add(menu);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	protected abstract boolean shouldShow(LogisimMenuItem item);
-
 	protected abstract boolean isEnabled(LogisimMenuItem item);
 
-	protected abstract void fire(LogisimMenuItem item);
+	protected abstract boolean shouldShow(LogisimMenuItem item);
 }

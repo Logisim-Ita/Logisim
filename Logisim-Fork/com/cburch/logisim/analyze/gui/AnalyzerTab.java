@@ -11,7 +11,7 @@ abstract class AnalyzerTab extends JPanel {
 	 */
 	private static final long serialVersionUID = 4864438824056672176L;
 
-	abstract void updateTab();
-
 	abstract void localeChanged();
+
+	abstract void updateTab();
 }

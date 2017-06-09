@@ -23,23 +23,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 class SelectionPanel extends LogPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8028350381641630757L;
-
 	private class Listener extends MouseAdapter
 			implements ActionListener, TreeSelectionListener, ListSelectionListener {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount() == 2) {
-				TreePath path = selector.getPathForLocation(e.getX(), e.getY());
-				if (path != null && listener != null) {
-					doAdd(selector.getSelectedItems());
-				}
-			}
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
@@ -82,16 +67,6 @@ class SelectionPanel extends LogPanel {
 			}
 		}
 
-		@Override
-		public void valueChanged(TreeSelectionEvent event) {
-			computeEnabled();
-		}
-
-		@Override
-		public void valueChanged(ListSelectionEvent event) {
-			computeEnabled();
-		}
-
 		private void computeEnabled() {
 			int index = list.getSelectedIndex();
 			addTool.setEnabled(selector.hasSelectedItems());
@@ -121,7 +96,32 @@ class SelectionPanel extends LogPanel {
 				list.setSelectedIndex(newIndex);
 			}
 		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getClickCount() == 2) {
+				TreePath path = selector.getPathForLocation(e.getX(), e.getY());
+				if (path != null && listener != null) {
+					doAdd(selector.getSelectedItems());
+				}
+			}
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			computeEnabled();
+		}
+
+		@Override
+		public void valueChanged(TreeSelectionEvent event) {
+			computeEnabled();
+		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8028350381641630757L;
 
 	private Listener listener = new Listener();
 
@@ -185,13 +185,13 @@ class SelectionPanel extends LogPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("selectionTab");
+	public String getHelpText() {
+		return Strings.get("selectionHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("selectionHelp");
+	public String getTitle() {
+		return Strings.get("selectionTab");
 	}
 
 	@Override

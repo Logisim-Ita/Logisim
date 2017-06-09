@@ -14,6 +14,15 @@ public class AttributeMapKey {
 		this.object = object;
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof AttributeMapKey))
+			return false;
+		AttributeMapKey o = (AttributeMapKey) other;
+		return (attr == null ? o.attr == null : attr.equals(o.attr))
+				&& (object == null ? o.object == null : object.equals(o.object));
+	}
+
 	public Attribute<?> getAttribute() {
 		return attr;
 	}
@@ -27,14 +36,5 @@ public class AttributeMapKey {
 		int a = attr == null ? 0 : attr.hashCode();
 		int b = object == null ? 0 : object.hashCode();
 		return a ^ b;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (!(other instanceof AttributeMapKey))
-			return false;
-		AttributeMapKey o = (AttributeMapKey) other;
-		return (attr == null ? o.attr == null : attr.equals(o.attr))
-				&& (object == null ? o.object == null : object.equals(o.object));
 	}
 }

@@ -28,78 +28,46 @@ import com.cburch.logisim.util.CollectionUtil;
 class SelectionBase {
 	static final Set<Component> NO_COMPONENTS = Collections.emptySet();
 
-	Project proj;
-	private ArrayList<Selection.Listener> listeners = new ArrayList<Selection.Listener>();
+	private static Bounds computeBounds(Collection<Component> components) {
+		if (components.isEmpty()) {
+			return Bounds.EMPTY_BOUNDS;
+		} else {
+			Iterator<Component> it = components.iterator();
+			Bounds ret = it.next().getBounds();
+			while (it.hasNext()) {
+				Component comp = it.next();
+				Bounds bds = comp.getBounds();
+				ret = ret.add(bds);
+			}
+			return ret;
+		}
+	}
+	private static boolean shouldSnapComponent(Component comp) {
+		Boolean shouldSnapValue = (Boolean) comp.getFactory().getFeature(ComponentFactory.SHOULD_SNAP,
+				comp.getAttributeSet());
+		return shouldSnapValue == null ? true : shouldSnapValue.booleanValue();
+	}
 
-	final HashSet<Component> selected = new HashSet<Component>(); // of selected
-																	// Components
+	Project proj;
+																	private ArrayList<Selection.Listener> listeners = new ArrayList<Selection.Listener>();
+																final HashSet<Component> selected = new HashSet<Component>(); // of selected
+																			// Components
 																	// in
 																	// circuit
 	final HashSet<Component> lifted = new HashSet<Component>(); // of selected
-																// Components
+
+	// Components
 																// removed
 	final HashSet<Component> suppressHandles = new HashSet<Component>(); // of
-																			// Components
+	// Components
 	final Set<Component> unionSet = CollectionUtil.createUnmodifiableSetUnion(selected, lifted);
 
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;
+
 	private boolean shouldSnap = false;
 
 	public SelectionBase(Project proj) {
 		this.proj = proj;
-	}
-
-	//
-	// listener methods
-	//
-	public void addListener(Selection.Listener l) {
-		listeners.add(l);
-	}
-
-	public void removeListener(Selection.Listener l) {
-		listeners.remove(l);
-	}
-
-	public void fireSelectionChanged() {
-		bounds = null;
-		computeShouldSnap();
-		Selection.Event e = new Selection.Event(this);
-		for (Selection.Listener l : listeners) {
-			l.selectionChanged(e);
-		}
-	}
-
-	//
-	// query methods
-	//
-	public Bounds getBounds() {
-		if (bounds == null) {
-			bounds = computeBounds(unionSet);
-		}
-		return bounds;
-	}
-
-	public Bounds getBounds(Graphics g) {
-		Iterator<Component> it = unionSet.iterator();
-		if (it.hasNext()) {
-			bounds = it.next().getBounds(g);
-			while (it.hasNext()) {
-				Component comp = it.next();
-				Bounds bds = comp.getBounds(g);
-				bounds = bounds.add(bds);
-			}
-		} else {
-			bounds = Bounds.EMPTY_BOUNDS;
-		}
-		return bounds;
-	}
-
-	public boolean shouldSnap() {
-		return shouldSnap;
-	}
-
-	public boolean hasConflictWhenMoved(int dx, int dy) {
-		return hasConflictTranslated(unionSet, dx, dy, false);
 	}
 
 	//
@@ -117,32 +85,11 @@ class SelectionBase {
 		}
 	}
 
-	// removes from selection - NOT from circuit
-	void remove(CircuitMutation xn, Component comp) {
-		boolean removed = selected.remove(comp);
-		if (lifted.contains(comp)) {
-			if (xn == null) {
-				throw new IllegalStateException("cannot remove");
-			} else {
-				lifted.remove(comp);
-				removed = true;
-				xn.add(comp);
-			}
-		}
-
-		if (removed) {
-			if (shouldSnapComponent(comp))
-				computeShouldSnap();
-			fireSelectionChanged();
-		}
-	}
-
-	void dropAll(CircuitMutation xn) {
-		if (!lifted.isEmpty()) {
-			xn.addAll(lifted);
-			selected.addAll(lifted);
-			lifted.clear();
-		}
+	//
+	// listener methods
+	//
+	public void addListener(Selection.Listener l) {
+		listeners.add(l);
 	}
 
 	void clear(CircuitMutation xn) {
@@ -166,50 +113,6 @@ class SelectionBase {
 		fireSelectionChanged();
 	}
 
-	public void setSuppressHandles(Collection<Component> toSuppress) {
-		suppressHandles.clear();
-		if (toSuppress != null)
-			suppressHandles.addAll(toSuppress);
-	}
-
-	void duplicateHelper(CircuitMutation xn) {
-		HashSet<Component> oldSelected = new HashSet<Component>(selected);
-		oldSelected.addAll(lifted);
-		pasteHelper(xn, oldSelected);
-	}
-
-	void pasteHelper(CircuitMutation xn, Collection<Component> comps) {
-		clear(xn);
-
-		Map<Component, Component> newLifted = copyComponents(comps);
-		lifted.addAll(newLifted.values());
-		fireSelectionChanged();
-	}
-
-	void deleteAllHelper(CircuitMutation xn) {
-		for (Component comp : selected) {
-			xn.remove(comp);
-		}
-		selected.clear();
-		lifted.clear();
-		fireSelectionChanged();
-	}
-
-	void translateHelper(CircuitMutation xn, int dx, int dy) {
-		Map<Component, Component> selectedAfter = copyComponents(selected, dx, dy);
-		for (Map.Entry<Component, Component> entry : selectedAfter.entrySet()) {
-			xn.replace(entry.getKey(), entry.getValue());
-		}
-
-		Map<Component, Component> liftedAfter = copyComponents(lifted, dx, dy);
-		lifted.clear();
-		for (Map.Entry<Component, Component> entry : liftedAfter.entrySet()) {
-			xn.add(entry.getValue());
-			selected.add(entry.getValue());
-		}
-		fireSelectionChanged();
-	}
-
 	//
 	// private methods
 	//
@@ -220,57 +123,6 @@ class SelectionBase {
 				shouldSnap = true;
 				return;
 			}
-		}
-	}
-
-	private static boolean shouldSnapComponent(Component comp) {
-		Boolean shouldSnapValue = (Boolean) comp.getFactory().getFeature(ComponentFactory.SHOULD_SNAP,
-				comp.getAttributeSet());
-		return shouldSnapValue == null ? true : shouldSnapValue.booleanValue();
-	}
-
-	private boolean hasConflictTranslated(Collection<Component> components, int dx, int dy, boolean selfConflicts) {
-		Circuit circuit = proj.getCurrentCircuit();
-		if (circuit == null)
-			return false;
-		for (Component comp : components) {
-			if (!(comp instanceof Wire)) {
-				for (EndData endData : comp.getEnds()) {
-					if (endData != null && endData.isExclusive()) {
-						Location endLoc = endData.getLocation().translate(dx, dy);
-						Component conflict = circuit.getExclusive(endLoc);
-						if (conflict != null) {
-							if (selfConflicts || !components.contains(conflict))
-								return true;
-						}
-					}
-				}
-				Location newLoc = comp.getLocation().translate(dx, dy);
-				Bounds newBounds = comp.getBounds().translate(dx, dy);
-				for (Component comp2 : circuit.getAllContaining(newLoc)) {
-					Bounds bds = comp2.getBounds();
-					if (bds.equals(newBounds)) {
-						if (selfConflicts || !components.contains(comp2))
-							return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private static Bounds computeBounds(Collection<Component> components) {
-		if (components.isEmpty()) {
-			return Bounds.EMPTY_BOUNDS;
-		} else {
-			Iterator<Component> it = components.iterator();
-			Bounds ret = it.next().getBounds();
-			while (it.hasNext()) {
-				Component comp = it.next();
-				Bounds bds = comp.getBounds();
-				ret = ret.add(bds);
-			}
-			return ret;
 		}
 	}
 
@@ -336,6 +188,105 @@ class SelectionBase {
 		return ret;
 	}
 
+	void deleteAllHelper(CircuitMutation xn) {
+		for (Component comp : selected) {
+			xn.remove(comp);
+		}
+		selected.clear();
+		lifted.clear();
+		fireSelectionChanged();
+	}
+
+	void dropAll(CircuitMutation xn) {
+		if (!lifted.isEmpty()) {
+			xn.addAll(lifted);
+			selected.addAll(lifted);
+			lifted.clear();
+		}
+	}
+
+	void duplicateHelper(CircuitMutation xn) {
+		HashSet<Component> oldSelected = new HashSet<Component>(selected);
+		oldSelected.addAll(lifted);
+		pasteHelper(xn, oldSelected);
+	}
+
+	public void fireSelectionChanged() {
+		bounds = null;
+		computeShouldSnap();
+		Selection.Event e = new Selection.Event(this);
+		for (Selection.Listener l : listeners) {
+			l.selectionChanged(e);
+		}
+	}
+
+	//
+	// query methods
+	//
+	public Bounds getBounds() {
+		if (bounds == null) {
+			bounds = computeBounds(unionSet);
+		}
+		return bounds;
+	}
+
+	public Bounds getBounds(Graphics g) {
+		Iterator<Component> it = unionSet.iterator();
+		if (it.hasNext()) {
+			bounds = it.next().getBounds(g);
+			while (it.hasNext()) {
+				Component comp = it.next();
+				Bounds bds = comp.getBounds(g);
+				bounds = bounds.add(bds);
+			}
+		} else {
+			bounds = Bounds.EMPTY_BOUNDS;
+		}
+		return bounds;
+	}
+
+	private boolean hasConflictTranslated(Collection<Component> components, int dx, int dy, boolean selfConflicts) {
+		Circuit circuit = proj.getCurrentCircuit();
+		if (circuit == null)
+			return false;
+		for (Component comp : components) {
+			if (!(comp instanceof Wire)) {
+				for (EndData endData : comp.getEnds()) {
+					if (endData != null && endData.isExclusive()) {
+						Location endLoc = endData.getLocation().translate(dx, dy);
+						Component conflict = circuit.getExclusive(endLoc);
+						if (conflict != null) {
+							if (selfConflicts || !components.contains(conflict))
+								return true;
+						}
+					}
+				}
+				Location newLoc = comp.getLocation().translate(dx, dy);
+				Bounds newBounds = comp.getBounds().translate(dx, dy);
+				for (Component comp2 : circuit.getAllContaining(newLoc)) {
+					Bounds bds = comp2.getBounds();
+					if (bds.equals(newBounds)) {
+						if (selfConflicts || !components.contains(comp2))
+							return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean hasConflictWhenMoved(int dx, int dy) {
+		return hasConflictTranslated(unionSet, dx, dy, false);
+	}
+
+	void pasteHelper(CircuitMutation xn, Collection<Component> comps) {
+		clear(xn);
+
+		Map<Component, Component> newLifted = copyComponents(comps);
+		lifted.addAll(newLifted.values());
+		fireSelectionChanged();
+	}
+
 	// debugging methods
 	public void print() {
 		System.err.println(" shouldSnap: " + shouldSnap()); // OK
@@ -353,6 +304,55 @@ class SelectionBase {
 					+ comp + "  [" + comp.hashCode() + "]");
 			hasPrinted = true;
 		}
+	}
+
+	// removes from selection - NOT from circuit
+	void remove(CircuitMutation xn, Component comp) {
+		boolean removed = selected.remove(comp);
+		if (lifted.contains(comp)) {
+			if (xn == null) {
+				throw new IllegalStateException("cannot remove");
+			} else {
+				lifted.remove(comp);
+				removed = true;
+				xn.add(comp);
+			}
+		}
+
+		if (removed) {
+			if (shouldSnapComponent(comp))
+				computeShouldSnap();
+			fireSelectionChanged();
+		}
+	}
+
+	public void removeListener(Selection.Listener l) {
+		listeners.remove(l);
+	}
+
+	public void setSuppressHandles(Collection<Component> toSuppress) {
+		suppressHandles.clear();
+		if (toSuppress != null)
+			suppressHandles.addAll(toSuppress);
+	}
+
+	public boolean shouldSnap() {
+		return shouldSnap;
+	}
+
+	void translateHelper(CircuitMutation xn, int dx, int dy) {
+		Map<Component, Component> selectedAfter = copyComponents(selected, dx, dy);
+		for (Map.Entry<Component, Component> entry : selectedAfter.entrySet()) {
+			xn.replace(entry.getKey(), entry.getValue());
+		}
+
+		Map<Component, Component> liftedAfter = copyComponents(lifted, dx, dy);
+		lifted.clear();
+		for (Map.Entry<Component, Component> entry : liftedAfter.entrySet()) {
+			xn.add(entry.getValue());
+			selected.add(entry.getValue());
+		}
+		fireSelectionChanged();
 	}
 
 }

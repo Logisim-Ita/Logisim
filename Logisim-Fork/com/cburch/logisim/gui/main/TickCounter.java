@@ -26,63 +26,6 @@ class TickCounter implements SimulatorListener {
 		queueSize = 0;
 	}
 
-	@Override
-	public void propagationCompleted(SimulatorEvent e) {
-		Simulator sim = e.getSource();
-		if (!sim.isTicking()) {
-			queueSize = 0;
-		}
-	}
-
-	@Override
-	public void simulatorStateChanged(SimulatorEvent e) {
-		propagationCompleted(e);
-	}
-
-	@Override
-	public void tickCompleted(SimulatorEvent e) {
-		Simulator sim = e.getSource();
-		if (!sim.isTicking()) {
-			queueSize = 0;
-		} else {
-			double freq = sim.getTickFrequency();
-			if (freq != tickFrequency) {
-				queueSize = 0;
-				tickFrequency = freq;
-			}
-
-			int curSize = queueSize;
-			int maxSize = queueTimes.length;
-			int start = queueStart;
-			int end;
-			if (curSize < maxSize) { // new sample is added into queue
-				end = start + curSize;
-				if (end >= maxSize) {
-					end -= maxSize;
-				}
-				curSize++;
-				queueSize = curSize;
-			} else { // new sample replaces oldest value in queue
-				end = queueStart;
-				if (end + 1 >= maxSize) {
-					queueStart = 0;
-				} else {
-					queueStart = end + 1;
-				}
-			}
-			long startTime = queueTimes[start];
-			long endTime = System.currentTimeMillis();
-			double rate;
-			if (startTime == endTime || curSize <= 1) {
-				rate = Double.MAX_VALUE;
-			} else {
-				rate = 1000.0 * (curSize - 1) / (endTime - startTime);
-			}
-			queueTimes[end] = endTime;
-			queueRates[end] = rate;
-		}
-	}
-
 	public String getTickRate() {
 		int size = queueSize;
 		if (size <= 1) {
@@ -139,6 +82,14 @@ class TickCounter implements SimulatorListener {
 		}
 	}
 
+	@Override
+	public void propagationCompleted(SimulatorEvent e) {
+		Simulator sim = e.getSource();
+		if (!sim.isTicking()) {
+			queueSize = 0;
+		}
+	}
+
 	private String roundString(double val, double min) {
 		// round so we have only three significant digits
 		int i = 0; // invariant: a = 10^i
@@ -169,6 +120,55 @@ class TickCounter implements SimulatorListener {
 			return "" + (int) Math.round(a * Math.round(bv));
 		} else { // keep some after decimal point
 			return String.format("%." + (-i) + "f", Double.valueOf(a * bv));
+		}
+	}
+
+	@Override
+	public void simulatorStateChanged(SimulatorEvent e) {
+		propagationCompleted(e);
+	}
+
+	@Override
+	public void tickCompleted(SimulatorEvent e) {
+		Simulator sim = e.getSource();
+		if (!sim.isTicking()) {
+			queueSize = 0;
+		} else {
+			double freq = sim.getTickFrequency();
+			if (freq != tickFrequency) {
+				queueSize = 0;
+				tickFrequency = freq;
+			}
+
+			int curSize = queueSize;
+			int maxSize = queueTimes.length;
+			int start = queueStart;
+			int end;
+			if (curSize < maxSize) { // new sample is added into queue
+				end = start + curSize;
+				if (end >= maxSize) {
+					end -= maxSize;
+				}
+				curSize++;
+				queueSize = curSize;
+			} else { // new sample replaces oldest value in queue
+				end = queueStart;
+				if (end + 1 >= maxSize) {
+					queueStart = 0;
+				} else {
+					queueStart = end + 1;
+				}
+			}
+			long startTime = queueTimes[start];
+			long endTime = System.currentTimeMillis();
+			double rate;
+			if (startTime == endTime || curSize <= 1) {
+				rate = Double.MAX_VALUE;
+			} else {
+				rate = 1000.0 * (curSize - 1) / (endTime - startTime);
+			}
+			queueTimes[end] = endTime;
+			queueRates[end] = rate;
 		}
 	}
 }

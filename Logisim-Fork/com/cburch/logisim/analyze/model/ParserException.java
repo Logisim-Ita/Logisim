@@ -21,6 +21,10 @@ public class ParserException extends Exception {
 		this.length = length;
 	}
 
+	public int getEndOffset() {
+		return start + length;
+	}
+
 	@Override
 	public String getMessage() {
 		return message.get();
@@ -32,9 +36,5 @@ public class ParserException extends Exception {
 
 	public int getOffset() {
 		return start;
-	}
-
-	public int getEndOffset() {
-		return start + length;
 	}
 }

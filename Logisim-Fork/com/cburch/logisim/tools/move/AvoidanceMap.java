@@ -113,6 +113,14 @@ class AvoidanceMap {
 		}
 	}
 
+	public void print(PrintStream stream) {
+		ArrayList<Location> list = new ArrayList<Location>(avoid.keySet());
+		Collections.sort(list);
+		for (int i = 0, n = list.size(); i < n; i++) {
+			stream.println(list.get(i) + ": " + avoid.get(list.get(i)));
+		}
+	}
+
 	public void unmarkLocation(Location loc) {
 		avoid.remove(loc);
 	}
@@ -147,14 +155,6 @@ class AvoidanceMap {
 			}
 		} else { // diagonal - shouldn't happen
 			throw new RuntimeException("diagonal wires not supported");
-		}
-	}
-
-	public void print(PrintStream stream) {
-		ArrayList<Location> list = new ArrayList<Location>(avoid.keySet());
-		Collections.sort(list);
-		for (int i = 0, n = list.size(); i < n; i++) {
-			stream.println(list.get(i) + ": " + avoid.get(list.get(i)));
 		}
 	}
 }

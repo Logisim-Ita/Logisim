@@ -21,12 +21,6 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
 
 class OpenRecent extends JMenu implements PropertyChangeListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1981330127729616152L;
-	private static final int MAX_ITEM_LENGTH = 50;
-
 	private class RecentItem extends JMenuItem implements ActionListener {
 		/**
 		 * 
@@ -48,37 +42,12 @@ class OpenRecent extends JMenu implements PropertyChangeListener {
 			ProjectActions.doOpen(par, proj, file);
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1981330127729616152L;
 
-	private LogisimMenuBar menubar;
-	private List<RecentItem> recentItems;
-
-	OpenRecent(LogisimMenuBar menubar) {
-		this.menubar = menubar;
-		this.recentItems = new ArrayList<RecentItem>();
-		AppPreferences.addPropertyChangeListener(AppPreferences.RECENT_PROJECTS, this);
-		renewItems();
-	}
-
-	private void renewItems() {
-		for (int index = recentItems.size() - 1; index >= 0; index--) {
-			RecentItem item = recentItems.get(index);
-			remove(item);
-		}
-		recentItems.clear();
-
-		List<File> files = AppPreferences.getRecentFiles();
-		if (files.isEmpty()) {
-			recentItems.add(new RecentItem(null));
-		} else {
-			for (File file : files) {
-				recentItems.add(new RecentItem(file));
-			}
-		}
-
-		for (RecentItem item : recentItems) {
-			add(item);
-		}
-	}
+	private static final int MAX_ITEM_LENGTH = 50;
 
 	private static String getFileText(File file) {
 		if (file == null) {
@@ -102,6 +71,16 @@ class OpenRecent extends JMenu implements PropertyChangeListener {
 			}
 		}
 	}
+	private LogisimMenuBar menubar;
+
+	private List<RecentItem> recentItems;
+
+	OpenRecent(LogisimMenuBar menubar) {
+		this.menubar = menubar;
+		this.recentItems = new ArrayList<RecentItem>();
+		AppPreferences.addPropertyChangeListener(AppPreferences.RECENT_PROJECTS, this);
+		renewItems();
+	}
 
 	void localeChanged() {
 		setText(Strings.get("fileOpenRecentItem"));
@@ -116,6 +95,27 @@ class OpenRecent extends JMenu implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getPropertyName().equals(AppPreferences.RECENT_PROJECTS)) {
 			renewItems();
+		}
+	}
+
+	private void renewItems() {
+		for (int index = recentItems.size() - 1; index >= 0; index--) {
+			RecentItem item = recentItems.get(index);
+			remove(item);
+		}
+		recentItems.clear();
+
+		List<File> files = AppPreferences.getRecentFiles();
+		if (files.isEmpty()) {
+			recentItems.add(new RecentItem(null));
+		} else {
+			for (File file : files) {
+				recentItems.add(new RecentItem(file));
+			}
+		}
+
+		for (RecentItem item : recentItems) {
+			add(item);
 		}
 	}
 }

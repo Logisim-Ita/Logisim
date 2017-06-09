@@ -11,92 +11,9 @@ import com.cburch.logisim.data.Value;
 import com.cburch.logisim.util.StringGetter;
 
 public abstract class RadixOption extends AttributeOption {
-	public static final RadixOption RADIX_2 = new Radix2();
-	public static final RadixOption RADIX_8 = new Radix8();
-	public static final RadixOption RADIX_10_UNSIGNED = new Radix10Unsigned();
-	public static final RadixOption RADIX_10_SIGNED = new Radix10Signed();
-	public static final RadixOption RADIX_16 = new Radix16();
-
-	public static final RadixOption[] OPTIONS = { RADIX_2, RADIX_8, RADIX_10_SIGNED, RADIX_10_UNSIGNED, RADIX_16 };
-	public static final Attribute<RadixOption> ATTRIBUTE = Attributes.forOption("radix", Strings.getter("radixAttr"),
-			OPTIONS);
-
-	public static RadixOption decode(String value) {
-		for (RadixOption opt : OPTIONS) {
-			if (value.equals(opt.saveName)) {
-				return opt;
-			}
-		}
-		return RADIX_2;
-	}
-
-	private String saveName;
-	private StringGetter displayGetter;
-
-	private RadixOption(String saveName, StringGetter displayGetter) {
-		super(saveName, displayGetter);
-		this.saveName = saveName;
-		this.displayGetter = displayGetter;
-	}
-
-	public StringGetter getDisplayGetter() {
-		return displayGetter;
-	}
-
-	public String getSaveString() {
-		return saveName;
-	}
-
-	@Override
-	public String toDisplayString() {
-		return displayGetter.get();
-	}
-
-	@Override
-	public String toString() {
-		return saveName;
-	}
-
-	public abstract String toString(Value value);
-
-	public abstract int getMaxLength(BitWidth width);
-
-	public int getMaxLength(Value value) {
-		return getMaxLength(value.getBitWidth());
-	}
-
-	private static class Radix2 extends RadixOption {
-		private Radix2() {
-			super("2", Strings.getter("radix2"));
-		}
-
-		@Override
-		public String toString(Value value) {
-			return value.toDisplayString(2);
-		}
-
-		@Override
-		public int getMaxLength(Value value) {
-			return value.toDisplayString(2).length();
-		}
-
-		@Override
-		public int getMaxLength(BitWidth width) {
-			int bits = width.getWidth();
-			if (bits <= 1)
-				return 1;
-			return bits + ((bits - 1) / 4);
-		}
-	}
-
 	private static class Radix10Signed extends RadixOption {
 		private Radix10Signed() {
 			super("10signed", Strings.getter("radix10Signed"));
-		}
-
-		@Override
-		public String toString(Value value) {
-			return value.toDecimalString(true);
 		}
 
 		@Override
@@ -147,16 +64,15 @@ public abstract class RadixOption extends AttributeOption {
 				return 1;
 			}
 		}
-	}
-
-	private static class Radix10Unsigned extends RadixOption {
-		private Radix10Unsigned() {
-			super("10unsigned", Strings.getter("radix10Unsigned"));
-		}
 
 		@Override
 		public String toString(Value value) {
-			return value.toDecimalString(false);
+			return value.toDecimalString(true);
+		}
+	}
+	private static class Radix10Unsigned extends RadixOption {
+		private Radix10Unsigned() {
+			super("10unsigned", Strings.getter("radix10Unsigned"));
 		}
 
 		@Override
@@ -204,16 +120,58 @@ public abstract class RadixOption extends AttributeOption {
 				return 1;
 			}
 		}
-	}
 
+		@Override
+		public String toString(Value value) {
+			return value.toDecimalString(false);
+		}
+	}
+	private static class Radix16 extends RadixOption {
+		private Radix16() {
+			super("16", Strings.getter("radix16"));
+		}
+
+		@Override
+		public int getMaxLength(BitWidth width) {
+			return Math.max(1, (width.getWidth() + 3) / 4);
+		}
+
+		@Override
+		public String toString(Value value) {
+			return value.toDisplayString(16);
+		}
+	}
+	private static class Radix2 extends RadixOption {
+		private Radix2() {
+			super("2", Strings.getter("radix2"));
+		}
+
+		@Override
+		public int getMaxLength(BitWidth width) {
+			int bits = width.getWidth();
+			if (bits <= 1)
+				return 1;
+			return bits + ((bits - 1) / 4);
+		}
+
+		@Override
+		public int getMaxLength(Value value) {
+			return value.toDisplayString(2).length();
+		}
+
+		@Override
+		public String toString(Value value) {
+			return value.toDisplayString(2);
+		}
+	}
 	private static class Radix8 extends RadixOption {
 		private Radix8() {
 			super("8", Strings.getter("radix8"));
 		}
 
 		@Override
-		public String toString(Value value) {
-			return value.toDisplayString(8);
+		public int getMaxLength(BitWidth width) {
+			return Math.max(1, (width.getWidth() + 2) / 3);
 		}
 
 		@Override
@@ -222,24 +180,66 @@ public abstract class RadixOption extends AttributeOption {
 		}
 
 		@Override
-		public int getMaxLength(BitWidth width) {
-			return Math.max(1, (width.getWidth() + 2) / 3);
-		}
-	}
-
-	private static class Radix16 extends RadixOption {
-		private Radix16() {
-			super("16", Strings.getter("radix16"));
-		}
-
-		@Override
 		public String toString(Value value) {
-			return value.toDisplayString(16);
-		}
-
-		@Override
-		public int getMaxLength(BitWidth width) {
-			return Math.max(1, (width.getWidth() + 3) / 4);
+			return value.toDisplayString(8);
 		}
 	}
+
+	public static final RadixOption RADIX_2 = new Radix2();
+	public static final RadixOption RADIX_8 = new Radix8();
+
+	public static final RadixOption RADIX_10_UNSIGNED = new Radix10Unsigned();
+
+	public static final RadixOption RADIX_10_SIGNED = new Radix10Signed();
+	public static final RadixOption RADIX_16 = new Radix16();
+
+	public static final RadixOption[] OPTIONS = { RADIX_2, RADIX_8, RADIX_10_SIGNED, RADIX_10_UNSIGNED, RADIX_16 };
+
+	public static final Attribute<RadixOption> ATTRIBUTE = Attributes.forOption("radix", Strings.getter("radixAttr"),
+			OPTIONS);
+
+	public static RadixOption decode(String value) {
+		for (RadixOption opt : OPTIONS) {
+			if (value.equals(opt.saveName)) {
+				return opt;
+			}
+		}
+		return RADIX_2;
+	}
+
+	private String saveName;
+
+	private StringGetter displayGetter;
+
+	private RadixOption(String saveName, StringGetter displayGetter) {
+		super(saveName, displayGetter);
+		this.saveName = saveName;
+		this.displayGetter = displayGetter;
+	}
+
+	public StringGetter getDisplayGetter() {
+		return displayGetter;
+	}
+
+	public abstract int getMaxLength(BitWidth width);
+
+	public int getMaxLength(Value value) {
+		return getMaxLength(value.getBitWidth());
+	}
+
+	public String getSaveString() {
+		return saveName;
+	}
+
+	@Override
+	public String toDisplayString() {
+		return displayGetter.get();
+	}
+
+	@Override
+	public String toString() {
+		return saveName;
+	}
+
+	public abstract String toString(Value value);
 }

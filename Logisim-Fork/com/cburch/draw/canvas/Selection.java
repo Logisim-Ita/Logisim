@@ -44,29 +44,9 @@ public class Selection {
 		listeners.add(l);
 	}
 
-	public void removeSelectionListener(SelectionListener l) {
-		listeners.remove(l);
-	}
-
-	private void fireChanged(int action, Collection<CanvasObject> affected) {
-		SelectionEvent e = null;
-		for (SelectionListener listener : listeners) {
-			if (e == null)
-				e = new SelectionEvent(this, action, affected);
-			listener.selectionChanged(e);
-		}
-	}
-
-	public boolean isEmpty() {
-		return selected.isEmpty();
-	}
-
-	public boolean isSelected(CanvasObject shape) {
-		return selected.contains(shape);
-	}
-
-	public Set<CanvasObject> getSelected() {
-		return selectedView;
+	public void clearDrawsSuppressed() {
+		suppressed.clear();
+		curHandleGesture = null;
 	}
 
 	public void clearSelected() {
@@ -78,6 +58,129 @@ public class Selection {
 			setHandleSelected(null);
 			fireChanged(SelectionEvent.ACTION_REMOVED, oldSelected);
 		}
+	}
+
+	public void drawSuppressed(Graphics g, CanvasObject shape) {
+		String state = suppressed.get(shape);
+		if (state == MOVING_HANDLE) {
+			shape.paint(g, curHandleGesture);
+		} else if (state == TRANSLATING) {
+			g.translate(moveDx, moveDy);
+			shape.paint(g, null);
+		}
+	}
+
+	private void fireChanged(int action, Collection<CanvasObject> affected) {
+		SelectionEvent e = null;
+		for (SelectionListener listener : listeners) {
+			if (e == null)
+				e = new SelectionEvent(this, action, affected);
+			listener.selectionChanged(e);
+		}
+	}
+
+	public Set<CanvasObject> getDrawsSuppressed() {
+		return suppressedView;
+	}
+
+	public Location getMovingDelta() {
+		return Location.create(moveDx, moveDy);
+	}
+
+	public Set<CanvasObject> getSelected() {
+		return selectedView;
+	}
+
+	public Handle getSelectedHandle() {
+		return selectedHandle;
+	}
+
+	public boolean isEmpty() {
+		return selected.isEmpty();
+	}
+
+	public boolean isSelected(CanvasObject shape) {
+		return selected.contains(shape);
+	}
+
+	void modelChanged(CanvasModelEvent event) {
+		int action = event.getAction();
+		switch (action) {
+		case CanvasModelEvent.ACTION_REMOVED:
+			Collection<? extends CanvasObject> affected = event.getAffected();
+			if (affected != null) {
+				selected.removeAll(affected);
+				suppressed.keySet().removeAll(affected);
+				Handle h = selectedHandle;
+				if (h != null && affected.contains(h.getObject())) {
+					setHandleSelected(null);
+				}
+			}
+			break;
+		case CanvasModelEvent.ACTION_HANDLE_DELETED:
+			if (event.getHandle().equals(selectedHandle)) {
+				setHandleSelected(null);
+			}
+			break;
+		case CanvasModelEvent.ACTION_HANDLE_MOVED:
+			HandleGesture gesture = event.getHandleGesture();
+			if (gesture.getHandle().equals(selectedHandle)) {
+				setHandleSelected(gesture.getResultingHandle());
+			}
+		}
+	}
+
+	public void removeSelectionListener(SelectionListener l) {
+		listeners.remove(l);
+	}
+
+	public void setHandleGesture(HandleGesture gesture) {
+		HandleGesture g = curHandleGesture;
+		if (g != null)
+			suppressed.remove(g.getHandle().getObject());
+
+		Handle h = gesture.getHandle();
+		suppressed.put(h.getObject(), MOVING_HANDLE);
+		curHandleGesture = gesture;
+	}
+
+	public void setHandleSelected(Handle handle) {
+		Handle cur = selectedHandle;
+		boolean same = cur == null ? handle == null : cur.equals(handle);
+		if (!same) {
+			selectedHandle = handle;
+			curHandleGesture = null;
+			Collection<CanvasObject> objs;
+			if (handle == null) {
+				objs = Collections.emptySet();
+			} else {
+				objs = Collections.singleton(handle.getObject());
+			}
+			fireChanged(SelectionEvent.ACTION_HANDLE, objs);
+		}
+	}
+
+	public void setHidden(Collection<? extends CanvasObject> shapes, boolean value) {
+		if (value) {
+			for (CanvasObject o : shapes) {
+				suppressed.put(o, HIDDEN);
+			}
+		} else {
+			suppressed.keySet().removeAll(shapes);
+		}
+	}
+
+	public void setMovingDelta(int dx, int dy) {
+		moveDx = dx;
+		moveDy = dy;
+	}
+
+	public void setMovingShapes(Collection<? extends CanvasObject> shapes, int dx, int dy) {
+		for (CanvasObject o : shapes) {
+			suppressed.put(o, TRANSLATING);
+		}
+		moveDx = dx;
+		moveDy = dy;
 	}
 
 	public void setSelected(CanvasObject shape, boolean value) {
@@ -137,109 +240,6 @@ public class Selection {
 		}
 		if (!added.isEmpty()) {
 			fireChanged(SelectionEvent.ACTION_ADDED, added);
-		}
-	}
-
-	public Set<CanvasObject> getDrawsSuppressed() {
-		return suppressedView;
-	}
-
-	public void clearDrawsSuppressed() {
-		suppressed.clear();
-		curHandleGesture = null;
-	}
-
-	public Handle getSelectedHandle() {
-		return selectedHandle;
-	}
-
-	public void setHandleSelected(Handle handle) {
-		Handle cur = selectedHandle;
-		boolean same = cur == null ? handle == null : cur.equals(handle);
-		if (!same) {
-			selectedHandle = handle;
-			curHandleGesture = null;
-			Collection<CanvasObject> objs;
-			if (handle == null) {
-				objs = Collections.emptySet();
-			} else {
-				objs = Collections.singleton(handle.getObject());
-			}
-			fireChanged(SelectionEvent.ACTION_HANDLE, objs);
-		}
-	}
-
-	public void setHandleGesture(HandleGesture gesture) {
-		HandleGesture g = curHandleGesture;
-		if (g != null)
-			suppressed.remove(g.getHandle().getObject());
-
-		Handle h = gesture.getHandle();
-		suppressed.put(h.getObject(), MOVING_HANDLE);
-		curHandleGesture = gesture;
-	}
-
-	public void setMovingShapes(Collection<? extends CanvasObject> shapes, int dx, int dy) {
-		for (CanvasObject o : shapes) {
-			suppressed.put(o, TRANSLATING);
-		}
-		moveDx = dx;
-		moveDy = dy;
-	}
-
-	public void setHidden(Collection<? extends CanvasObject> shapes, boolean value) {
-		if (value) {
-			for (CanvasObject o : shapes) {
-				suppressed.put(o, HIDDEN);
-			}
-		} else {
-			suppressed.keySet().removeAll(shapes);
-		}
-	}
-
-	public Location getMovingDelta() {
-		return Location.create(moveDx, moveDy);
-	}
-
-	public void setMovingDelta(int dx, int dy) {
-		moveDx = dx;
-		moveDy = dy;
-	}
-
-	public void drawSuppressed(Graphics g, CanvasObject shape) {
-		String state = suppressed.get(shape);
-		if (state == MOVING_HANDLE) {
-			shape.paint(g, curHandleGesture);
-		} else if (state == TRANSLATING) {
-			g.translate(moveDx, moveDy);
-			shape.paint(g, null);
-		}
-	}
-
-	void modelChanged(CanvasModelEvent event) {
-		int action = event.getAction();
-		switch (action) {
-		case CanvasModelEvent.ACTION_REMOVED:
-			Collection<? extends CanvasObject> affected = event.getAffected();
-			if (affected != null) {
-				selected.removeAll(affected);
-				suppressed.keySet().removeAll(affected);
-				Handle h = selectedHandle;
-				if (h != null && affected.contains(h.getObject())) {
-					setHandleSelected(null);
-				}
-			}
-			break;
-		case CanvasModelEvent.ACTION_HANDLE_DELETED:
-			if (event.getHandle().equals(selectedHandle)) {
-				setHandleSelected(null);
-			}
-			break;
-		case CanvasModelEvent.ACTION_HANDLE_MOVED:
-			HandleGesture gesture = event.getHandleGesture();
-			if (gesture.getHandle().equals(selectedHandle)) {
-				setHandleSelected(gesture.getResultingHandle());
-			}
 		}
 	}
 }

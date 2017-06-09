@@ -24,15 +24,15 @@ class ClipboardContents {
 		this.anchorFacing = anchorFacing;
 	}
 
-	public Collection<CanvasObject> getElements() {
-		return onClipboard;
+	public Direction getAnchorFacing() {
+		return anchorFacing;
 	}
 
 	public Location getAnchorLocation() {
 		return anchorLocation;
 	}
 
-	public Direction getAnchorFacing() {
-		return anchorFacing;
+	public Collection<CanvasObject> getElements() {
+		return onClipboard;
 	}
 }

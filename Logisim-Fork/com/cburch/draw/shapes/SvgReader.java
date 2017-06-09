@@ -19,80 +19,14 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class SvgReader {
-	private SvgReader() {
-	}
-
 	private static final Pattern PATH_REGEX = Pattern.compile("[a-zA-Z]|[-0-9.]+");
 
-	public static AbstractCanvasObject createShape(Element elt) {
-		String name = elt.getTagName();
-		AbstractCanvasObject ret;
-		if (name.equals("ellipse")) {
-			ret = createOval(elt);
-		} else if (name.equals("line")) {
-			ret = createLine(elt);
-		} else if (name.equals("path")) {
-			ret = createPath(elt);
-		} else if (name.equals("polyline")) {
-			ret = createPolyline(elt);
-		} else if (name.equals("polygon")) {
-			ret = createPolygon(elt);
-		} else if (name.equals("rect")) {
-			ret = createRectangle(elt);
-		} else if (name.equals("text")) {
-			ret = createText(elt);
-		} else {
-			return null;
-		}
-		List<Attribute<?>> attrs = ret.getAttributes();
-		if (attrs.contains(DrawAttr.PAINT_TYPE)) {
-			String stroke = elt.getAttribute("stroke");
-			String fill = elt.getAttribute("fill");
-			if (stroke.equals("") || stroke.equals("none")) {
-				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_FILL);
-			} else if (fill.equals("none")) {
-				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE);
-			} else {
-				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE_FILL);
-			}
-		}
-		attrs = ret.getAttributes(); // since changing paintType could change it
-		if (attrs.contains(DrawAttr.STROKE_WIDTH) && elt.hasAttribute("stroke-width")) {
-			Integer width = Integer.valueOf(elt.getAttribute("stroke-width"));
-			ret.setValue(DrawAttr.STROKE_WIDTH, width);
-		}
-		if (attrs.contains(DrawAttr.STROKE_COLOR)) {
-			String color = elt.getAttribute("stroke");
-			String opacity = elt.getAttribute("stroke-opacity");
-			if (!color.equals("none")) {
-				ret.setValue(DrawAttr.STROKE_COLOR, getColor(color, opacity));
-			}
-		}
-		if (attrs.contains(DrawAttr.FILL_COLOR)) {
-			String color = elt.getAttribute("fill");
-			if (color.equals(""))
-				color = "#000000";
-			String opacity = elt.getAttribute("fill-opacity");
-			if (!color.equals("none")) {
-				ret.setValue(DrawAttr.FILL_COLOR, getColor(color, opacity));
-			}
-		}
-		return ret;
-	}
-
-	private static AbstractCanvasObject createRectangle(Element elt) {
-		int x = Integer.parseInt(elt.getAttribute("x"));
-		int y = Integer.parseInt(elt.getAttribute("y"));
-		int w = Integer.parseInt(elt.getAttribute("width"));
-		int h = Integer.parseInt(elt.getAttribute("height"));
-		if (elt.hasAttribute("rx")) {
-			AbstractCanvasObject ret = new RoundRectangle(x, y, w, h);
-			int rx = Integer.parseInt(elt.getAttribute("rx"));
-			ret.setValue(DrawAttr.CORNER_RADIUS, Integer.valueOf(rx));
-			return ret;
-		} else {
-			return new Rectangle(x, y, w, h);
-		}
+	private static AbstractCanvasObject createLine(Element elt) {
+		int x0 = Integer.parseInt(elt.getAttribute("x1"));
+		int y0 = Integer.parseInt(elt.getAttribute("y1"));
+		int x1 = Integer.parseInt(elt.getAttribute("x2"));
+		int y1 = Integer.parseInt(elt.getAttribute("y2"));
+		return new Line(x0, y0, x1, y1);
 	}
 
 	private static AbstractCanvasObject createOval(Element elt) {
@@ -105,67 +39,6 @@ public class SvgReader {
 		int w = (int) Math.round(rx * 2);
 		int h = (int) Math.round(ry * 2);
 		return new Oval(x, y, w, h);
-	}
-
-	private static AbstractCanvasObject createLine(Element elt) {
-		int x0 = Integer.parseInt(elt.getAttribute("x1"));
-		int y0 = Integer.parseInt(elt.getAttribute("y1"));
-		int x1 = Integer.parseInt(elt.getAttribute("x2"));
-		int y1 = Integer.parseInt(elt.getAttribute("y2"));
-		return new Line(x0, y0, x1, y1);
-	}
-
-	private static AbstractCanvasObject createPolygon(Element elt) {
-		return new Poly(true, parsePoints(elt.getAttribute("points")));
-	}
-
-	private static AbstractCanvasObject createPolyline(Element elt) {
-		return new Poly(false, parsePoints(elt.getAttribute("points")));
-	}
-
-	private static AbstractCanvasObject createText(Element elt) {
-		int x = Integer.parseInt(elt.getAttribute("x"));
-		int y = Integer.parseInt(elt.getAttribute("y"));
-		String text = elt.getTextContent();
-		Text ret = new Text(x, y, text);
-
-		String fontFamily = elt.getAttribute("font-family");
-		String fontStyle = elt.getAttribute("font-style");
-		String fontWeight = elt.getAttribute("font-weight");
-		String fontSize = elt.getAttribute("font-size");
-		int styleFlags = 0;
-		if (fontStyle.equals("italic"))
-			styleFlags |= Font.ITALIC;
-		if (fontWeight.equals("bold"))
-			styleFlags |= Font.BOLD;
-		int size = Integer.parseInt(fontSize);
-		ret.setValue(DrawAttr.FONT, new Font(fontFamily, styleFlags, size));
-
-		String alignStr = elt.getAttribute("text-anchor");
-		AttributeOption halign;
-		if (alignStr.equals("start")) {
-			halign = DrawAttr.ALIGN_LEFT;
-		} else if (alignStr.equals("end")) {
-			halign = DrawAttr.ALIGN_RIGHT;
-		} else {
-			halign = DrawAttr.ALIGN_CENTER;
-		}
-		ret.setValue(DrawAttr.ALIGNMENT, halign);
-
-		// fill color is handled after we return
-		return ret;
-	}
-
-	private static List<Location> parsePoints(String points) {
-		Pattern patt = Pattern.compile("[ ,\n\r\t]+");
-		String[] toks = patt.split(points);
-		Location[] ret = new Location[toks.length / 2];
-		for (int i = 0; i < ret.length; i++) {
-			int x = Integer.parseInt(toks[2 * i]);
-			int y = Integer.parseInt(toks[2 * i + 1]);
-			ret[i] = Location.create(x, y);
-		}
-		return UnmodifiableList.create(ret);
 	}
 
 	private static AbstractCanvasObject createPath(Element elt) {
@@ -230,6 +103,118 @@ public class SvgReader {
 		}
 	}
 
+	private static AbstractCanvasObject createPolygon(Element elt) {
+		return new Poly(true, parsePoints(elt.getAttribute("points")));
+	}
+
+	private static AbstractCanvasObject createPolyline(Element elt) {
+		return new Poly(false, parsePoints(elt.getAttribute("points")));
+	}
+
+	private static AbstractCanvasObject createRectangle(Element elt) {
+		int x = Integer.parseInt(elt.getAttribute("x"));
+		int y = Integer.parseInt(elt.getAttribute("y"));
+		int w = Integer.parseInt(elt.getAttribute("width"));
+		int h = Integer.parseInt(elt.getAttribute("height"));
+		if (elt.hasAttribute("rx")) {
+			AbstractCanvasObject ret = new RoundRectangle(x, y, w, h);
+			int rx = Integer.parseInt(elt.getAttribute("rx"));
+			ret.setValue(DrawAttr.CORNER_RADIUS, Integer.valueOf(rx));
+			return ret;
+		} else {
+			return new Rectangle(x, y, w, h);
+		}
+	}
+
+	public static AbstractCanvasObject createShape(Element elt) {
+		String name = elt.getTagName();
+		AbstractCanvasObject ret;
+		if (name.equals("ellipse")) {
+			ret = createOval(elt);
+		} else if (name.equals("line")) {
+			ret = createLine(elt);
+		} else if (name.equals("path")) {
+			ret = createPath(elt);
+		} else if (name.equals("polyline")) {
+			ret = createPolyline(elt);
+		} else if (name.equals("polygon")) {
+			ret = createPolygon(elt);
+		} else if (name.equals("rect")) {
+			ret = createRectangle(elt);
+		} else if (name.equals("text")) {
+			ret = createText(elt);
+		} else {
+			return null;
+		}
+		List<Attribute<?>> attrs = ret.getAttributes();
+		if (attrs.contains(DrawAttr.PAINT_TYPE)) {
+			String stroke = elt.getAttribute("stroke");
+			String fill = elt.getAttribute("fill");
+			if (stroke.equals("") || stroke.equals("none")) {
+				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_FILL);
+			} else if (fill.equals("none")) {
+				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE);
+			} else {
+				ret.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE_FILL);
+			}
+		}
+		attrs = ret.getAttributes(); // since changing paintType could change it
+		if (attrs.contains(DrawAttr.STROKE_WIDTH) && elt.hasAttribute("stroke-width")) {
+			Integer width = Integer.valueOf(elt.getAttribute("stroke-width"));
+			ret.setValue(DrawAttr.STROKE_WIDTH, width);
+		}
+		if (attrs.contains(DrawAttr.STROKE_COLOR)) {
+			String color = elt.getAttribute("stroke");
+			String opacity = elt.getAttribute("stroke-opacity");
+			if (!color.equals("none")) {
+				ret.setValue(DrawAttr.STROKE_COLOR, getColor(color, opacity));
+			}
+		}
+		if (attrs.contains(DrawAttr.FILL_COLOR)) {
+			String color = elt.getAttribute("fill");
+			if (color.equals(""))
+				color = "#000000";
+			String opacity = elt.getAttribute("fill-opacity");
+			if (!color.equals("none")) {
+				ret.setValue(DrawAttr.FILL_COLOR, getColor(color, opacity));
+			}
+		}
+		return ret;
+	}
+
+	private static AbstractCanvasObject createText(Element elt) {
+		int x = Integer.parseInt(elt.getAttribute("x"));
+		int y = Integer.parseInt(elt.getAttribute("y"));
+		String text = elt.getTextContent();
+		Text ret = new Text(x, y, text);
+
+		String fontFamily = elt.getAttribute("font-family");
+		String fontStyle = elt.getAttribute("font-style");
+		String fontWeight = elt.getAttribute("font-weight");
+		String fontSize = elt.getAttribute("font-size");
+		int styleFlags = 0;
+		if (fontStyle.equals("italic"))
+			styleFlags |= Font.ITALIC;
+		if (fontWeight.equals("bold"))
+			styleFlags |= Font.BOLD;
+		int size = Integer.parseInt(fontSize);
+		ret.setValue(DrawAttr.FONT, new Font(fontFamily, styleFlags, size));
+
+		String alignStr = elt.getAttribute("text-anchor");
+		AttributeOption halign;
+		if (alignStr.equals("start")) {
+			halign = DrawAttr.ALIGN_LEFT;
+		} else if (alignStr.equals("end")) {
+			halign = DrawAttr.ALIGN_RIGHT;
+		} else {
+			halign = DrawAttr.ALIGN_CENTER;
+		}
+		ret.setValue(DrawAttr.ALIGNMENT, halign);
+
+		// fill color is handled after we return
+		return ret;
+	}
+
 	private static Color getColor(String hue, String opacity) {
 		int r;
 		int g;
@@ -250,5 +235,20 @@ public class SvgReader {
 			a = (int) Math.round(Double.parseDouble(opacity) * 255);
 		}
 		return new Color(r, g, b, a);
+	}
+
+	private static List<Location> parsePoints(String points) {
+		Pattern patt = Pattern.compile("[ ,\n\r\t]+");
+		String[] toks = patt.split(points);
+		Location[] ret = new Location[toks.length / 2];
+		for (int i = 0; i < ret.length; i++) {
+			int x = Integer.parseInt(toks[2 * i]);
+			int y = Integer.parseInt(toks[2 * i + 1]);
+			ret[i] = Location.create(x, y);
+		}
+		return UnmodifiableList.create(ret);
+	}
+
+	private SvgReader() {
 	}
 }

@@ -25,6 +25,18 @@ class CircuitMutatorImpl implements CircuitMutator {
 	}
 
 	@Override
+	public void add(Circuit circuit, Component comp) {
+		modified.add(circuit);
+		log.add(CircuitChange.add(circuit, comp));
+
+		ReplacementMap repl = new ReplacementMap();
+		repl.add(comp);
+		getMap(circuit).append(repl);
+
+		circuit.mutatorAdd(comp);
+	}
+
+	@Override
 	public void clear(Circuit circuit) {
 		HashSet<Component> comps = new HashSet<Component>(circuit.getNonWires());
 		comps.addAll(circuit.getWires());
@@ -40,16 +52,34 @@ class CircuitMutatorImpl implements CircuitMutator {
 		circuit.mutatorClear();
 	}
 
-	@Override
-	public void add(Circuit circuit, Component comp) {
+	private ReplacementMap getMap(Circuit circuit) {
+		ReplacementMap ret = replacements.get(circuit);
+		if (ret == null) {
+			ret = new ReplacementMap();
+			replacements.put(circuit, ret);
+		}
+		return ret;
+	}
+
+	Collection<Circuit> getModifiedCircuits() {
+		return Collections.unmodifiableSet(modified);
+	}
+
+	ReplacementMap getReplacementMap(Circuit circuit) {
+		return replacements.get(circuit);
+	}
+
+	CircuitTransaction getReverseTransaction() {
+		CircuitMutation ret = new CircuitMutation();
+		ArrayList<CircuitChange> log = this.log;
+		for (int i = log.size() - 1; i >= 0; i--) {
+			ret.change(log.get(i).getReverseChange());
+		}
+		return ret;
+	}
+
+	void markModified(Circuit circuit) {
 		modified.add(circuit);
-		log.add(CircuitChange.add(circuit, comp));
-
-		ReplacementMap repl = new ReplacementMap();
-		repl.add(comp);
-		getMap(circuit).append(repl);
-
-		circuit.mutatorAdd(comp);
 	}
 
 	@Override
@@ -110,35 +140,5 @@ class CircuitMutatorImpl implements CircuitMutator {
 		Object oldValue = attrs.getValue(a);
 		log.add(CircuitChange.setForCircuit(circuit, attr, oldValue, newValue));
 		attrs.setValue(a, newValue);
-	}
-
-	private ReplacementMap getMap(Circuit circuit) {
-		ReplacementMap ret = replacements.get(circuit);
-		if (ret == null) {
-			ret = new ReplacementMap();
-			replacements.put(circuit, ret);
-		}
-		return ret;
-	}
-
-	CircuitTransaction getReverseTransaction() {
-		CircuitMutation ret = new CircuitMutation();
-		ArrayList<CircuitChange> log = this.log;
-		for (int i = log.size() - 1; i >= 0; i--) {
-			ret.change(log.get(i).getReverseChange());
-		}
-		return ret;
-	}
-
-	ReplacementMap getReplacementMap(Circuit circuit) {
-		return replacements.get(circuit);
-	}
-
-	void markModified(Circuit circuit) {
-		modified.add(circuit);
-	}
-
-	Collection<Circuit> getModifiedCircuits() {
-		return Collections.unmodifiableSet(modified);
 	}
 }

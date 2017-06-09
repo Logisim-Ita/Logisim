@@ -22,16 +22,6 @@ class WireFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public String getName() {
-		return "Wire";
-	}
-
-	@Override
-	public StringGetter getDisplayGetter() {
-		return Strings.getter("wireComponent");
-	}
-
-	@Override
 	public AttributeSet createAttributeSet() {
 		return Wire.create(Location.create(0, 0), Location.create(100, 0));
 	}
@@ -45,18 +35,6 @@ class WireFactory extends AbstractComponentFactory {
 			return Wire.create(loc, loc.translate(len, 0));
 		} else {
 			return Wire.create(loc, loc.translate(0, len));
-		}
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Object dir = attrs.getValue(Wire.dir_attr);
-		int len = attrs.getValue(Wire.len_attr).intValue();
-
-		if (dir == Wire.VALUE_HORZ) {
-			return Bounds.create(0, -2, len, 5);
-		} else {
-			return Bounds.create(-2, 0, 5, len);
 		}
 	}
 
@@ -75,6 +53,28 @@ class WireFactory extends AbstractComponentFactory {
 			g.drawLine(x, y, x + len, y);
 		} else {
 			g.drawLine(x, y, x, y + len);
+		}
+	}
+
+	@Override
+	public StringGetter getDisplayGetter() {
+		return Strings.getter("wireComponent");
+	}
+
+	@Override
+	public String getName() {
+		return "Wire";
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Object dir = attrs.getValue(Wire.dir_attr);
+		int len = attrs.getValue(Wire.len_attr).intValue();
+
+		if (dir == Wire.VALUE_HORZ) {
+			return Bounds.create(0, -2, len, 5);
+		} else {
+			return Bounds.create(-2, 0, 5, len);
 		}
 	}
 }

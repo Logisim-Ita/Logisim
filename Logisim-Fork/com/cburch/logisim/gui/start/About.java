@@ -20,32 +20,6 @@ import com.cburch.logisim.Main;
 import com.cburch.logisim.data.Value;
 
 public class About {
-	static final int IMAGE_WIDTH = 400;
-	static final int IMAGE_HEIGHT = 250;
-
-	private static class PanelThread extends Thread {
-		private MyPanel panel;
-		private boolean running = true;
-
-		PanelThread(MyPanel panel) {
-			this.panel = panel;
-		}
-
-		@Override
-		public void run() {
-			long start = System.currentTimeMillis();
-			while (running) {
-				long elapse = System.currentTimeMillis() - start;
-				panel.credits.setScroll((int) elapse);
-				panel.repaint();
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException ex) {
-				}
-			}
-		}
-	}
-
 	private static class MyPanel extends JPanel implements AncestorListener {
 		/**
 		 * 
@@ -72,14 +46,21 @@ public class About {
 		}
 
 		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
+		public void ancestorAdded(AncestorEvent arg0) {
+			if (thread == null) {
+				thread = new PanelThread(this);
+				thread.start();
+			}
+		}
 
-			try {
-				g.setColor(fadeColor);
-				g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-				drawText(g, 10, 5);
-			} catch (Throwable t) {
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			if (thread != null) {
+				thread.running = false;
 			}
 		}
 
@@ -100,27 +81,43 @@ public class About {
 		}
 
 		@Override
-		public void ancestorAdded(AncestorEvent arg0) {
-			if (thread == null) {
-				thread = new PanelThread(this);
-				thread.start();
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+
+			try {
+				g.setColor(fadeColor);
+				g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+				drawText(g, 10, 5);
+			} catch (Throwable t) {
 			}
+		}
+	}
+	private static class PanelThread extends Thread {
+		private MyPanel panel;
+		private boolean running = true;
+
+		PanelThread(MyPanel panel) {
+			this.panel = panel;
 		}
 
 		@Override
-		public void ancestorRemoved(AncestorEvent arg0) {
-			if (thread != null) {
-				thread.running = false;
+		public void run() {
+			long start = System.currentTimeMillis();
+			while (running) {
+				long elapse = System.currentTimeMillis() - start;
+				panel.credits.setScroll((int) elapse);
+				panel.repaint();
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException ex) {
+				}
 			}
 		}
-
-		@Override
-		public void ancestorMoved(AncestorEvent arg0) {
-		}
 	}
 
-	private About() {
-	}
+	static final int IMAGE_WIDTH = 400;
+
+	static final int IMAGE_HEIGHT = 250;
 
 	public static MyPanel getImagePanel() {
 		return new MyPanel();
@@ -132,5 +129,8 @@ public class About {
 		panel.add(imgPanel);
 
 		JOptionPane.showMessageDialog(owner, panel, "Logisim " + Main.VERSION_NAME, JOptionPane.PLAIN_MESSAGE);
+	}
+
+	private About() {
 	}
 }

@@ -19,21 +19,13 @@ public final class CircuitMutation extends CircuitTransaction {
 	private Circuit primary;
 	private List<CircuitChange> changes;
 
-	public CircuitMutation(Circuit circuit) {
-		this.primary = circuit;
-		this.changes = new ArrayList<CircuitChange>();
-	}
-
 	CircuitMutation() {
 		this(null);
 	}
 
-	public boolean isEmpty() {
-		return changes.isEmpty();
-	}
-
-	public void clear() {
-		changes.add(CircuitChange.clear(primary, null));
+	public CircuitMutation(Circuit circuit) {
+		this.primary = circuit;
+		this.changes = new ArrayList<CircuitChange>();
 	}
 
 	public void add(Component comp) {
@@ -44,42 +36,12 @@ public final class CircuitMutation extends CircuitTransaction {
 		changes.add(CircuitChange.addAll(primary, comps));
 	}
 
-	public void remove(Component comp) {
-		changes.add(CircuitChange.remove(primary, comp));
-	}
-
-	public void removeAll(Collection<? extends Component> comps) {
-		changes.add(CircuitChange.removeAll(primary, comps));
-	}
-
-	public void replace(Component oldComp, Component newComp) {
-		ReplacementMap repl = new ReplacementMap(oldComp, newComp);
-		changes.add(CircuitChange.replace(primary, repl));
-	}
-
-	public void replace(ReplacementMap replacements) {
-		if (!replacements.isEmpty()) {
-			replacements.freeze();
-			changes.add(CircuitChange.replace(primary, replacements));
-		}
-	}
-
-	public void set(Component comp, Attribute<?> attr, Object value) {
-		changes.add(CircuitChange.set(primary, comp, attr, value));
-	}
-
-	public void setForCircuit(Attribute<?> attr, Object value) {
-		changes.add(CircuitChange.setForCircuit(primary, attr, value));
-	}
-
 	void change(CircuitChange change) {
 		changes.add(change);
 	}
 
-	public Action toAction(StringGetter name) {
-		if (name == null)
-			name = Strings.getter("unknownChangeAction");
-		return new CircuitAction(name, this);
+	public void clear() {
+		changes.add(CircuitChange.clear(primary, null));
 	}
 
 	@Override
@@ -102,6 +64,30 @@ public final class CircuitMutation extends CircuitTransaction {
 		return accessMap;
 	}
 
+	public boolean isEmpty() {
+		return changes.isEmpty();
+	}
+
+	public void remove(Component comp) {
+		changes.add(CircuitChange.remove(primary, comp));
+	}
+
+	public void removeAll(Collection<? extends Component> comps) {
+		changes.add(CircuitChange.removeAll(primary, comps));
+	}
+
+	public void replace(Component oldComp, Component newComp) {
+		ReplacementMap repl = new ReplacementMap(oldComp, newComp);
+		changes.add(CircuitChange.replace(primary, repl));
+	}
+
+	public void replace(ReplacementMap replacements) {
+		if (!replacements.isEmpty()) {
+			replacements.freeze();
+			changes.add(CircuitChange.replace(primary, replacements));
+		}
+	}
+
 	@Override
 	protected void run(CircuitMutator mutator) {
 		Circuit curCircuit = null;
@@ -120,5 +106,19 @@ public final class CircuitMutation extends CircuitTransaction {
 		if (curCircuit != null) {
 			mutator.replace(curCircuit, curReplacements);
 		}
+	}
+
+	public void set(Component comp, Attribute<?> attr, Object value) {
+		changes.add(CircuitChange.set(primary, comp, attr, value));
+	}
+
+	public void setForCircuit(Attribute<?> attr, Object value) {
+		changes.add(CircuitChange.setForCircuit(primary, attr, value));
+	}
+
+	public Action toAction(StringGetter name) {
+		if (name == null)
+			name = Strings.getter("unknownChangeAction");
+		return new CircuitAction(name, this);
 	}
 }

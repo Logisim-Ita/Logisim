@@ -22,16 +22,6 @@ public class RectangleTool extends RectangularTool {
 	}
 
 	@Override
-	public Icon getIcon() {
-		return Icons.getIcon("drawrect.gif");
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.getFillAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
-	}
-
-	@Override
 	public CanvasObject createShape(int x, int y, int w, int h) {
 		return attrs.applyTo(new Rectangle(x, y, w, h));
 	}
@@ -44,5 +34,15 @@ public class RectangleTool extends RectangularTool {
 	@Override
 	public void fillShape(Graphics g, int x, int y, int w, int h) {
 		g.fillRect(x, y, w, h);
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.getFillAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
+	}
+
+	@Override
+	public Icon getIcon() {
+		return Icons.getIcon("drawrect.gif");
 	}
 }

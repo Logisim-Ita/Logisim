@@ -26,7 +26,77 @@ import com.cburch.logisim.std.wiring.Constant;
 import com.cburch.logisim.std.wiring.Pin;
 
 public class CircuitBuilder {
-	private CircuitBuilder() {
+	private static class CompareYs implements Comparator<Location> {
+		@Override
+		public int compare(Location a, Location b) {
+			return a.getY() - b.getY();
+		}
+	}
+
+	private static class InputData {
+		int startX;
+		String[] names;
+		HashMap<String, SingleInput> inputs = new HashMap<String, SingleInput>();
+
+		InputData() {
+		}
+
+		int getSpineX(String input) {
+			SingleInput data = inputs.get(input);
+			return data.spineX;
+		}
+
+		int getStartX() {
+			return startX;
+		}
+
+		void registerConnection(String input, Location loc) {
+			SingleInput data = inputs.get(input);
+			data.ys.add(loc);
+		}
+	}
+
+	private static class Layout {
+		// initialized by parent
+		int y; // top edge relative to parent's top edge
+		// (or edge corresponding to input)
+
+		// initialized by self
+		int width;
+		int height;
+		ComponentFactory factory;
+		AttributeSet attrs;
+		int outputY; // where output is relative to my top edge
+		int subX; // where right edge of sublayouts should be relative to my
+					// left edge
+		Layout[] subLayouts;
+		String inputName; // for references directly to inputs
+
+		Layout(int width, int height, int outputY, ComponentFactory factory, AttributeSet attrs, Layout[] subLayouts,
+				int subX) {
+			this.width = width;
+			this.height = roundUp(height);
+			this.outputY = outputY;
+			this.factory = factory;
+			this.attrs = attrs;
+			this.subLayouts = subLayouts;
+			this.subX = subX;
+			this.inputName = null;
+		}
+
+		Layout(String inputName) {
+			this(0, 0, 0, null, null, null, 0);
+			this.inputName = inputName;
+		}
+	}
+
+	private static class SingleInput {
+		int spineX;
+		ArrayList<Location> ys = new ArrayList<Location>();
+
+		SingleInput(int spineX) {
+			this.spineX = spineX;
+		}
 	}
 
 	public static CircuitMutation build(Circuit destCirc, AnalyzerModel model, boolean twoInputs, boolean useNands) {
@@ -80,44 +150,28 @@ public class CircuitBuilder {
 	}
 
 	//
+	// computeInputData
+	//
+	private static InputData computeInputData(AnalyzerModel model) {
+		InputData ret = new InputData();
+		VariableList inputs = model.getInputs();
+		int spineX = 60;
+		ret.names = new String[inputs.size()];
+		for (int i = 0; i < inputs.size(); i++) {
+			String name = inputs.get(i);
+			ret.names[i] = name;
+			ret.inputs.put(name, new SingleInput(spineX));
+			spineX += 20;
+		}
+		ret.startX = spineX;
+		return ret;
+	}
+
+	//
 	// layoutGates
 	//
 	private static Layout layoutGates(CircuitDetermination det) {
 		return layoutGatesSub(det);
-	}
-
-	private static class Layout {
-		// initialized by parent
-		int y; // top edge relative to parent's top edge
-		// (or edge corresponding to input)
-
-		// initialized by self
-		int width;
-		int height;
-		ComponentFactory factory;
-		AttributeSet attrs;
-		int outputY; // where output is relative to my top edge
-		int subX; // where right edge of sublayouts should be relative to my
-					// left edge
-		Layout[] subLayouts;
-		String inputName; // for references directly to inputs
-
-		Layout(int width, int height, int outputY, ComponentFactory factory, AttributeSet attrs, Layout[] subLayouts,
-				int subX) {
-			this.width = width;
-			this.height = roundUp(height);
-			this.outputY = outputY;
-			this.factory = factory;
-			this.attrs = attrs;
-			this.subLayouts = subLayouts;
-			this.subX = subX;
-			this.inputName = null;
-		}
-
-		Layout(String inputName) {
-			this(0, 0, 0, null, null, null, 0);
-			this.inputName = inputName;
-		}
 	}
 
 	private static Layout layoutGatesSub(CircuitDetermination det) {
@@ -245,64 +299,6 @@ public class CircuitBuilder {
 		return new Layout(width, height, outputY, factory, attrs, sub, subWidth);
 	}
 
-	private static int roundDown(int value) {
-		return value / 10 * 10;
-	}
-
-	private static int roundUp(int value) {
-		return (value + 9) / 10 * 10;
-	}
-
-	//
-	// computeInputData
-	//
-	private static InputData computeInputData(AnalyzerModel model) {
-		InputData ret = new InputData();
-		VariableList inputs = model.getInputs();
-		int spineX = 60;
-		ret.names = new String[inputs.size()];
-		for (int i = 0; i < inputs.size(); i++) {
-			String name = inputs.get(i);
-			ret.names[i] = name;
-			ret.inputs.put(name, new SingleInput(spineX));
-			spineX += 20;
-		}
-		ret.startX = spineX;
-		return ret;
-	}
-
-	private static class InputData {
-		int startX;
-		String[] names;
-		HashMap<String, SingleInput> inputs = new HashMap<String, SingleInput>();
-
-		InputData() {
-		}
-
-		int getStartX() {
-			return startX;
-		}
-
-		int getSpineX(String input) {
-			SingleInput data = inputs.get(input);
-			return data.spineX;
-		}
-
-		void registerConnection(String input, Location loc) {
-			SingleInput data = inputs.get(input);
-			data.ys.add(loc);
-		}
-	}
-
-	private static class SingleInput {
-		int spineX;
-		ArrayList<Location> ys = new ArrayList<Location>();
-
-		SingleInput(int spineX) {
-			this.spineX = spineX;
-		}
-	}
-
 	//
 	// placeComponents
 	//
@@ -419,19 +415,6 @@ public class CircuitBuilder {
 	}
 
 	//
-	// placeOutput
-	//
-	private static void placeOutput(CircuitMutation result, Location loc, String name) {
-		ComponentFactory factory = Pin.FACTORY;
-		AttributeSet attrs = factory.createAttributeSet();
-		attrs.setValue(StdAttr.FACING, Direction.WEST);
-		attrs.setValue(Pin.ATTR_TYPE, Boolean.TRUE);
-		attrs.setValue(StdAttr.LABEL, name);
-		attrs.setValue(Pin.ATTR_LABEL_LOC, Direction.NORTH);
-		result.add(factory.createComponent(loc, attrs));
-	}
-
-	//
 	// placeInputs
 	//
 	private static void placeInputs(CircuitMutation result, InputData inputData) {
@@ -504,10 +487,27 @@ public class CircuitBuilder {
 		}
 	}
 
-	private static class CompareYs implements Comparator<Location> {
-		@Override
-		public int compare(Location a, Location b) {
-			return a.getY() - b.getY();
-		}
+	//
+	// placeOutput
+	//
+	private static void placeOutput(CircuitMutation result, Location loc, String name) {
+		ComponentFactory factory = Pin.FACTORY;
+		AttributeSet attrs = factory.createAttributeSet();
+		attrs.setValue(StdAttr.FACING, Direction.WEST);
+		attrs.setValue(Pin.ATTR_TYPE, Boolean.TRUE);
+		attrs.setValue(StdAttr.LABEL, name);
+		attrs.setValue(Pin.ATTR_LABEL_LOC, Direction.NORTH);
+		result.add(factory.createComponent(loc, attrs));
+	}
+
+	private static int roundDown(int value) {
+		return value / 10 * 10;
+	}
+
+	private static int roundUp(int value) {
+		return (value + 9) / 10 * 10;
+	}
+
+	private CircuitBuilder() {
 	}
 }

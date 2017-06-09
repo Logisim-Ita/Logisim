@@ -37,24 +37,6 @@ public class CounterPoker extends InstancePoker {
 		// have clicked within a label, but that will be outside the bounds.
 	}
 
-	/**
-	 * Draws an indicator that the caret is being selected. Here, we'll draw a
-	 * red rectangle around the value.
-	 */
-	@Override
-	public void paint(InstancePainter painter) {
-		Bounds bds = painter.getBounds();
-		BitWidth width = painter.getAttributeValue(StdAttr.WIDTH);
-		int len = (width.getWidth() + 3) / 4;
-
-		Graphics g = painter.getGraphics();
-		g.setColor(Color.RED);
-		int wid = 7 * len + 2; // width of caret rectangle
-		int ht = 16; // height of caret rectangle
-		g.drawRect(bds.getX() + (bds.getWidth() - wid) / 2, bds.getY() + (bds.getHeight() - ht) / 2, wid, ht);
-		g.setColor(Color.BLACK);
-	}
-
 	/** Processes a key by just adding it onto the end of the current value. */
 	@Override
 	public void keyTyped(InstanceState state, KeyEvent e) {
@@ -76,5 +58,23 @@ public class CounterPoker extends InstancePoker {
 		// another thread, and invoking setPort directly could interfere with
 		// that. Using fireInvalidated notifies the propagation thread to
 		// invoke propagate on the counter at its next opportunity.
+	}
+
+	/**
+	 * Draws an indicator that the caret is being selected. Here, we'll draw a
+	 * red rectangle around the value.
+	 */
+	@Override
+	public void paint(InstancePainter painter) {
+		Bounds bds = painter.getBounds();
+		BitWidth width = painter.getAttributeValue(StdAttr.WIDTH);
+		int len = (width.getWidth() + 3) / 4;
+
+		Graphics g = painter.getGraphics();
+		g.setColor(Color.RED);
+		int wid = 7 * len + 2; // width of caret rectangle
+		int ht = 16; // height of caret rectangle
+		g.drawRect(bds.getX() + (bds.getWidth() - wid) / 2, bds.getY() + (bds.getHeight() - ht) / 2, wid, ht);
+		g.setColor(Color.BLACK);
 	}
 }

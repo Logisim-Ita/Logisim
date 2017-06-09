@@ -28,28 +28,13 @@ public class SubcircuitPoker extends InstancePoker {
 		return Bounds.create(cx - 5, cy - 5, 15, 15);
 	}
 
-	@Override
-	public void paint(InstancePainter painter) {
-		if (painter.getDestination() instanceof Canvas && painter.getData() instanceof CircuitState) {
-			Bounds bds = painter.getInstance().getBounds();
-			int cx = bds.getX() + bds.getWidth() / 2;
-			int cy = bds.getY() + bds.getHeight() / 2;
-
-			int tx = cx + 3;
-			int ty = cy + 3;
-			int[] xp = { tx - 1, cx + 8, cx + 10, tx + 1 };
-			int[] yp = { ty + 1, cy + 10, cy + 8, ty - 1 };
-			Graphics g = painter.getGraphics();
-			if (mouseDown) {
-				g.setColor(MAGNIFYING_INTERIOR_DOWN);
-			} else {
-				g.setColor(MAGNIFYING_INTERIOR);
-			}
-			g.fillOval(cx - 5, cy - 5, 10, 10);
-			g.setColor(Color.BLACK);
-			g.drawOval(cx - 5, cy - 5, 10, 10);
-			g.fillPolygon(xp, yp, xp.length);
-		}
+	private boolean isWithin(InstanceState state, MouseEvent e) {
+		Bounds bds = state.getInstance().getBounds();
+		int cx = bds.getX() + bds.getWidth() / 2;
+		int cy = bds.getY() + bds.getHeight() / 2;
+		int dx = e.getX() - cx;
+		int dy = e.getY() - cy;
+		return dx * dx + dy * dy <= 60;
 	}
 
 	@Override
@@ -73,12 +58,27 @@ public class SubcircuitPoker extends InstancePoker {
 		}
 	}
 
-	private boolean isWithin(InstanceState state, MouseEvent e) {
-		Bounds bds = state.getInstance().getBounds();
-		int cx = bds.getX() + bds.getWidth() / 2;
-		int cy = bds.getY() + bds.getHeight() / 2;
-		int dx = e.getX() - cx;
-		int dy = e.getY() - cy;
-		return dx * dx + dy * dy <= 60;
+	@Override
+	public void paint(InstancePainter painter) {
+		if (painter.getDestination() instanceof Canvas && painter.getData() instanceof CircuitState) {
+			Bounds bds = painter.getInstance().getBounds();
+			int cx = bds.getX() + bds.getWidth() / 2;
+			int cy = bds.getY() + bds.getHeight() / 2;
+
+			int tx = cx + 3;
+			int ty = cy + 3;
+			int[] xp = { tx - 1, cx + 8, cx + 10, tx + 1 };
+			int[] yp = { ty + 1, cy + 10, cy + 8, ty - 1 };
+			Graphics g = painter.getGraphics();
+			if (mouseDown) {
+				g.setColor(MAGNIFYING_INTERIOR_DOWN);
+			} else {
+				g.setColor(MAGNIFYING_INTERIOR);
+			}
+			g.fillOval(cx - 5, cy - 5, 10, 10);
+			g.setColor(Color.BLACK);
+			g.drawOval(cx - 5, cy - 5, 10, 10);
+			g.fillPolygon(xp, yp, xp.length);
+		}
 	}
 }

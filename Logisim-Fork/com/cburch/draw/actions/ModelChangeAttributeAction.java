@@ -25,12 +25,8 @@ public class ModelChangeAttributeAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		HashSet<CanvasObject> ret = new HashSet<CanvasObject>();
-		for (AttributeMapKey key : newValues.keySet()) {
-			ret.add(key.getObject());
-		}
-		return ret;
+	void doSub(CanvasModel model) {
+		model.setAttributeValues(newValues);
 	}
 
 	@Override
@@ -60,8 +56,12 @@ public class ModelChangeAttributeAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.setAttributeValues(newValues);
+	public Collection<CanvasObject> getObjects() {
+		HashSet<CanvasObject> ret = new HashSet<CanvasObject>();
+		for (AttributeMapKey key : newValues.keySet()) {
+			ret.add(key.getObject());
+		}
+		return ret;
 	}
 
 	@Override

@@ -38,89 +38,6 @@ class TunnelAttributes extends AbstractAttributeSet {
 		configureLabel();
 	}
 
-	Direction getFacing() {
-		return facing;
-	}
-
-	String getLabel() {
-		return label;
-	}
-
-	Font getFont() {
-		return labelFont;
-	}
-
-	Bounds getOffsetBounds() {
-		return offsetBounds;
-	}
-
-	int getLabelX() {
-		return labelX;
-	}
-
-	int getLabelY() {
-		return labelY;
-	}
-
-	int getLabelHAlign() {
-		return labelHAlign;
-	}
-
-	int getLabelVAlign() {
-		return labelVAlign;
-	}
-
-	boolean setOffsetBounds(Bounds value) {
-		Bounds old = offsetBounds;
-		boolean same = old == null ? value == null : old.equals(value);
-		if (!same) {
-			offsetBounds = value;
-		}
-		return !same;
-	}
-
-	@Override
-	protected void copyInto(AbstractAttributeSet destObj) {
-		; // nothing to do
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return ATTRIBUTES;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <V> V getValue(Attribute<V> attr) {
-		if (attr == StdAttr.FACING)
-			return (V) facing;
-		if (attr == StdAttr.WIDTH)
-			return (V) width;
-		if (attr == StdAttr.LABEL)
-			return (V) label;
-		if (attr == StdAttr.LABEL_FONT)
-			return (V) labelFont;
-		return null;
-	}
-
-	@Override
-	public <V> void setValue(Attribute<V> attr, V value) {
-		if (attr == StdAttr.FACING) {
-			facing = (Direction) value;
-			configureLabel();
-		} else if (attr == StdAttr.WIDTH) {
-			width = (BitWidth) value;
-		} else if (attr == StdAttr.LABEL) {
-			label = (String) value;
-		} else if (attr == StdAttr.LABEL_FONT) {
-			labelFont = (Font) value;
-		} else {
-			throw new IllegalArgumentException("unknown attribute");
-		}
-		offsetBounds = null;
-		fireAttributeValueChanged(attr, value);
-	}
-
 	private void configureLabel() {
 		Direction facing = this.facing;
 		int x;
@@ -153,5 +70,88 @@ class TunnelAttributes extends AbstractAttributeSet {
 		labelY = y;
 		labelHAlign = halign;
 		labelVAlign = valign;
+	}
+
+	@Override
+	protected void copyInto(AbstractAttributeSet destObj) {
+		; // nothing to do
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return ATTRIBUTES;
+	}
+
+	Direction getFacing() {
+		return facing;
+	}
+
+	Font getFont() {
+		return labelFont;
+	}
+
+	String getLabel() {
+		return label;
+	}
+
+	int getLabelHAlign() {
+		return labelHAlign;
+	}
+
+	int getLabelVAlign() {
+		return labelVAlign;
+	}
+
+	int getLabelX() {
+		return labelX;
+	}
+
+	int getLabelY() {
+		return labelY;
+	}
+
+	Bounds getOffsetBounds() {
+		return offsetBounds;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <V> V getValue(Attribute<V> attr) {
+		if (attr == StdAttr.FACING)
+			return (V) facing;
+		if (attr == StdAttr.WIDTH)
+			return (V) width;
+		if (attr == StdAttr.LABEL)
+			return (V) label;
+		if (attr == StdAttr.LABEL_FONT)
+			return (V) labelFont;
+		return null;
+	}
+
+	boolean setOffsetBounds(Bounds value) {
+		Bounds old = offsetBounds;
+		boolean same = old == null ? value == null : old.equals(value);
+		if (!same) {
+			offsetBounds = value;
+		}
+		return !same;
+	}
+
+	@Override
+	public <V> void setValue(Attribute<V> attr, V value) {
+		if (attr == StdAttr.FACING) {
+			facing = (Direction) value;
+			configureLabel();
+		} else if (attr == StdAttr.WIDTH) {
+			width = (BitWidth) value;
+		} else if (attr == StdAttr.LABEL) {
+			label = (String) value;
+		} else if (attr == StdAttr.LABEL_FONT) {
+			labelFont = (Font) value;
+		} else {
+			throw new IllegalArgumentException("unknown attribute");
+		}
+		offsetBounds = null;
+		fireAttributeValueChanged(attr, value);
 	}
 }

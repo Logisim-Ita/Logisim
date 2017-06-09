@@ -24,13 +24,13 @@ abstract class OptionsPanel extends JPanel {
 		this.optionsFrame = frame;
 	}
 
-	public abstract String getTitle();
-
 	public abstract String getHelpText();
-
-	public abstract void localeChanged();
 
 	PreferencesFrame getPreferencesFrame() {
 		return optionsFrame;
 	}
+
+	public abstract String getTitle();
+
+	public abstract void localeChanged();
 }

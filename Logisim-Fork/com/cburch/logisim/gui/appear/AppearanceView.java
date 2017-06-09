@@ -43,26 +43,6 @@ public class AppearanceView {
 		editHandler = new AppearanceEditHandler(canvas);
 	}
 
-	public Canvas getCanvas() {
-		return canvas;
-	}
-
-	public CanvasPane getCanvasPane() {
-		return canvasPane;
-	}
-
-	public ToolbarModel getToolbarModel() {
-		return toolbarModel;
-	}
-
-	public ZoomModel getZoomModel() {
-		return zoomModel;
-	}
-
-	public EditHandler getEditHandler() {
-		return editHandler;
-	}
-
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
@@ -74,6 +54,26 @@ public class AppearanceView {
 			attrTableManager = ret;
 		}
 		return ret;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public CanvasPane getCanvasPane() {
+		return canvasPane;
+	}
+
+	public EditHandler getEditHandler() {
+		return editHandler;
+	}
+
+	public ToolbarModel getToolbarModel() {
+		return toolbarModel;
+	}
+
+	public ZoomModel getZoomModel() {
+		return zoomModel;
 	}
 
 	public void setCircuit(Project proj, CircuitState circuitState) {

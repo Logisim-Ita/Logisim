@@ -43,13 +43,13 @@ class WindowOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("windowTitle");
+	public String getHelpText() {
+		return Strings.get("windowHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("windowHelp");
+	public String getTitle() {
+		return Strings.get("windowTitle");
 	}
 
 	@Override

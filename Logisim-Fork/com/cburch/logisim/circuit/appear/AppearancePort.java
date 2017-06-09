@@ -33,6 +33,45 @@ public class AppearancePort extends AppearanceElement {
 	}
 
 	@Override
+	public boolean contains(Location loc, boolean assumeFilled) {
+		if (isInput()) {
+			return getBounds().contains(loc);
+		} else {
+			return super.isInCircle(loc, OUTPUT_RADIUS);
+		}
+	}
+
+	@Override
+	public Bounds getBounds() {
+		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
+		return super.getBounds(r);
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("circuitPort");
+	}
+
+	@Override
+	public List<Handle> getHandles(HandleGesture gesture) {
+		Location loc = getLocation();
+
+		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
+		return UnmodifiableList
+				.create(new Handle[] { new Handle(this, loc.translate(-r, -r)), new Handle(this, loc.translate(r, -r)),
+						new Handle(this, loc.translate(r, r)), new Handle(this, loc.translate(-r, r)) });
+	}
+
+	public Instance getPin() {
+		return pin;
+	}
+
+	private boolean isInput() {
+		Instance p = pin;
+		return p == null || Pin.FACTORY.isInputPin(p);
+	}
+
+	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof AppearancePort) {
 			AppearancePort that = (AppearancePort) other;
@@ -45,63 +84,6 @@ public class AppearancePort extends AppearanceElement {
 	@Override
 	public int matchesHashCode() {
 		return super.matchesHashCode() + pin.hashCode();
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("circuitPort");
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		Location loc = getLocation();
-		Location pinLoc = pin.getLocation();
-		Element ret = doc.createElement("circ-port");
-		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
-		ret.setAttribute("x", "" + (loc.getX() - r));
-		ret.setAttribute("y", "" + (loc.getY() - r));
-		ret.setAttribute("width", "" + 2 * r);
-		ret.setAttribute("height", "" + 2 * r);
-		ret.setAttribute("pin", "" + pinLoc.getX() + "," + pinLoc.getY());
-		return ret;
-	}
-
-	public Instance getPin() {
-		return pin;
-	}
-
-	void setPin(Instance value) {
-		pin = value;
-	}
-
-	private boolean isInput() {
-		Instance p = pin;
-		return p == null || Pin.FACTORY.isInputPin(p);
-	}
-
-	@Override
-	public Bounds getBounds() {
-		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
-		return super.getBounds(r);
-	}
-
-	@Override
-	public boolean contains(Location loc, boolean assumeFilled) {
-		if (isInput()) {
-			return getBounds().contains(loc);
-		} else {
-			return super.isInCircle(loc, OUTPUT_RADIUS);
-		}
-	}
-
-	@Override
-	public List<Handle> getHandles(HandleGesture gesture) {
-		Location loc = getLocation();
-
-		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
-		return UnmodifiableList
-				.create(new Handle[] { new Handle(this, loc.translate(-r, -r)), new Handle(this, loc.translate(r, -r)),
-						new Handle(this, loc.translate(r, r)), new Handle(this, loc.translate(-r, r)) });
 	}
 
 	@Override
@@ -118,5 +100,23 @@ public class AppearancePort extends AppearanceElement {
 			g.drawOval(x - r, y - r, 2 * r, 2 * r);
 		}
 		g.fillOval(x - MINOR_RADIUS, y - MINOR_RADIUS, 2 * MINOR_RADIUS, 2 * MINOR_RADIUS);
+	}
+
+	void setPin(Instance value) {
+		pin = value;
+	}
+
+	@Override
+	public Element toSvgElement(Document doc) {
+		Location loc = getLocation();
+		Location pinLoc = pin.getLocation();
+		Element ret = doc.createElement("circ-port");
+		int r = isInput() ? INPUT_RADIUS : OUTPUT_RADIUS;
+		ret.setAttribute("x", "" + (loc.getX() - r));
+		ret.setAttribute("y", "" + (loc.getY() - r));
+		ret.setAttribute("width", "" + 2 * r);
+		ret.setAttribute("height", "" + 2 * r);
+		ret.setAttribute("pin", "" + pinLoc.getX() + "," + pinLoc.getY());
+		return ret;
 	}
 }

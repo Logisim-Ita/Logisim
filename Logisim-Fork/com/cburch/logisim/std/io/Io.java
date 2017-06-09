@@ -27,7 +27,7 @@ public class Io extends Library {
 	static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
 			Strings.getter("ioLabelColorAttr"));
 	static final Attribute<Boolean> ATTR_ACTIVE = Attributes.forBoolean("active", Strings.getter("ioActiveAttr"));
-
+	static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
 	static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255, 0);
 
 	private static FactoryDescription[] DESCRIPTIONS = {
@@ -36,7 +36,7 @@ public class Io extends Library {
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
 			new FactoryDescription("LED", Strings.getter("ledComponent"), "led.gif", "Led"),
-			new FactoryDescription("RGB Led", Strings.getter("RGB LED"), "rgbled.gif", "RGBLed"),
+			new FactoryDescription("RGBLed", Strings.getter("rgbledComponent"), "rgbled.gif", "RGBLed"),
 			new FactoryDescription("7-Segment Display", Strings.getter("sevenSegmentComponent"), "7seg.gif",
 					"SevenSegment"),
 			new FactoryDescription("Hex Digit Display", Strings.getter("hexDigitComponent"), "hexdig.gif", "HexDigit"),
@@ -49,13 +49,13 @@ public class Io extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "I/O";
+	public String getDisplayName() {
+		return Strings.get("ioLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("ioLibrary");
+	public String getName() {
+		return "I/O";
 	}
 
 	@Override

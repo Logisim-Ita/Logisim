@@ -11,11 +11,6 @@ public class JKFlipFlop extends AbstractFlipFlop {
 	}
 
 	@Override
-	protected String getInputName(int index) {
-		return index == 0 ? "J" : "K";
-	}
-
-	@Override
 	protected Value computeValue(Value[] inputs, Value curValue) {
 		if (inputs[0] == Value.FALSE) {
 			if (inputs[1] == Value.FALSE) {
@@ -31,5 +26,10 @@ public class JKFlipFlop extends AbstractFlipFlop {
 			}
 		}
 		return Value.UNKNOWN;
+	}
+
+	@Override
+	protected String getInputName(int index) {
+		return index == 0 ? "J" : "K";
 	}
 }

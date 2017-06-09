@@ -44,6 +44,17 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		canvas.addMouseMotionListener(this);
 	}
 
+	// returns all the ports in the current selection
+	private Set<AppearancePort> getSelectedPorts() {
+		HashSet<AppearancePort> ports = new HashSet<AppearancePort>();
+		for (CanvasObject o : canvas.getSelection().getSelected()) {
+			if (o instanceof AppearancePort) {
+				ports.add((AppearancePort) o);
+			}
+		}
+		return ports;
+	}
+
 	public void hideCurrentPopup() {
 		Popup cur = curPopup;
 		if (cur != null) {
@@ -51,6 +62,58 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 			dragStart = null;
 			cur.hide();
 		}
+	}
+
+	// returns true if the canvas contains any port not in the given set
+	private boolean isPortUnselected(Set<AppearancePort> selected) {
+		for (CanvasObject o : canvas.getModel().getObjectsFromBottom()) {
+			if (o instanceof AppearancePort) {
+				if (!selected.contains(o)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		Location start = dragStart;
+		if (start != null && start.manhattanDistanceTo(e.getX(), e.getY()) > 4) {
+			hideCurrentPopup();
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		hideCurrentPopup();
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		long sincePopup = System.currentTimeMillis() - curPopupTime;
+		if (sincePopup > 50)
+			hideCurrentPopup();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		long sincePopup = System.currentTimeMillis() - curPopupTime;
+		if (sincePopup > 50)
+			hideCurrentPopup();
+		dragStart = Location.create(e.getX(), e.getY());
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
 	}
 
 	@Override
@@ -83,29 +146,6 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		return null;
 	}
 
-	// returns all the ports in the current selection
-	private Set<AppearancePort> getSelectedPorts() {
-		HashSet<AppearancePort> ports = new HashSet<AppearancePort>();
-		for (CanvasObject o : canvas.getSelection().getSelected()) {
-			if (o instanceof AppearancePort) {
-				ports.add((AppearancePort) o);
-			}
-		}
-		return ports;
-	}
-
-	// returns true if the canvas contains any port not in the given set
-	private boolean isPortUnselected(Set<AppearancePort> selected) {
-		for (CanvasObject o : canvas.getModel().getObjectsFromBottom()) {
-			if (o instanceof AppearancePort) {
-				if (!selected.contains(o)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	private void showPopup(Set<AppearancePort> portObjects) {
 		dragStart = null;
 		CircuitState circuitState = canvas.getCircuitState();
@@ -130,46 +170,6 @@ class LayoutPopupManager implements SelectionListener, MouseListener, MouseMotio
 		popup.show();
 		curPopup = popup;
 		curPopupTime = System.currentTimeMillis();
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		hideCurrentPopup();
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		long sincePopup = System.currentTimeMillis() - curPopupTime;
-		if (sincePopup > 50)
-			hideCurrentPopup();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		long sincePopup = System.currentTimeMillis() - curPopupTime;
-		if (sincePopup > 50)
-			hideCurrentPopup();
-		dragStart = Location.create(e.getX(), e.getY());
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		Location start = dragStart;
-		if (start != null && start.manhattanDistanceTo(e.getX(), e.getY()) > 4) {
-			hideCurrentPopup();
-		}
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent arg0) {
 	}
 
 }

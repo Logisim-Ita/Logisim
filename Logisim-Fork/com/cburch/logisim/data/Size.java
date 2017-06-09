@@ -20,35 +20,6 @@ public class Size {
 		this.ht = ht;
 	}
 
-	@Override
-	public boolean equals(Object other_obj) {
-		if (!(other_obj instanceof Size))
-			return false;
-		Size other = (Size) other_obj;
-		return wid == other.wid && ht == other.ht;
-	}
-
-	@Override
-	public String toString() {
-		return wid + "x" + ht;
-	}
-
-	public int getWidth() {
-		return wid;
-	}
-
-	public int getHeight() {
-		return ht;
-	}
-
-	public java.awt.Dimension toAwtDimension() {
-		return new java.awt.Dimension(wid, ht);
-	}
-
-	public boolean contains(Location p) {
-		return contains(p.getX(), p.getY());
-	}
-
 	public boolean contains(int x, int y) {
 		return x >= 0 && y >= 0 && x < this.wid && y < this.ht;
 	}
@@ -59,8 +30,37 @@ public class Size {
 		return contains(x, y) && contains(oth_x, oth_y);
 	}
 
+	public boolean contains(Location p) {
+		return contains(p.getX(), p.getY());
+	}
+
 	public boolean contains(Size bd) {
 		return contains(bd.wid, bd.ht);
+	}
+
+	@Override
+	public boolean equals(Object other_obj) {
+		if (!(other_obj instanceof Size))
+			return false;
+		Size other = (Size) other_obj;
+		return wid == other.wid && ht == other.ht;
+	}
+
+	public int getHeight() {
+		return ht;
+	}
+
+	public int getWidth() {
+		return wid;
+	}
+
+	public java.awt.Dimension toAwtDimension() {
+		return new java.awt.Dimension(wid, ht);
+	}
+
+	@Override
+	public String toString() {
+		return wid + "x" + ht;
 	}
 
 }

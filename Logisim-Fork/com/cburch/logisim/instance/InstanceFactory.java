@@ -70,14 +70,75 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		this.shouldSnap = Boolean.TRUE;
 	}
 
-	@Override
-	public String getName() {
-		return name;
+	// event methods
+	protected void configureNewInstance(Instance instance) {
+	}
+
+	public boolean contains(Location loc, AttributeSet attrs) {
+		Bounds bds = getOffsetBounds(attrs);
+		if (bds == null)
+			return false;
+		return bds.contains(loc, 1);
 	}
 
 	@Override
-	public String getDisplayName() {
-		return getDisplayGetter().get();
+	public AttributeSet createAttributeSet() {
+		Attribute<?>[] as = attrs;
+		AttributeSet ret = as == null ? AttributeSets.EMPTY : AttributeSets.fixedSet(as, defaults);
+		return ret;
+	}
+
+	@Override
+	public final Component createComponent(Location loc, AttributeSet attrs) {
+		InstanceComponent ret = new InstanceComponent(this, loc, attrs);
+		configureNewInstance(ret.getInstance());
+		return ret;
+	}
+
+	public final InstanceState createInstanceState(CircuitState state, Component comp) {
+		return createInstanceState(state, ((InstanceComponent) comp).getInstance());
+	}
+
+	public InstanceState createInstanceState(CircuitState state, Instance instance) {
+		return new InstanceStateImpl(state, instance.getComponent());
+	}
+
+	@Override
+	public final void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs) {
+		InstancePainter painter = context.getInstancePainter();
+		Graphics g = painter.getGraphics();
+		g.setColor(color);
+		g.translate(x, y);
+		painter.setFactory(this, attrs);
+		paintGhost(painter);
+		g.translate(-x, -y);
+		if (painter.getFactory() == null) {
+			super.drawGhost(context, color, x, y, attrs);
+		}
+	}
+
+	@Override
+	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
+		Attribute<?>[] as = attrs;
+		if (as != null) {
+			for (int i = 0; i < as.length; i++) {
+				if (as[i] == attr) {
+					return defaults[i];
+				}
+			}
+			return null;
+		} else {
+			AttributeSet dfltSet = defaultSet;
+			if (dfltSet == null) {
+				dfltSet = createAttributeSet();
+				defaultSet = dfltSet;
+			}
+			return dfltSet.getValue(attr);
+		}
+	}
+
+	public StringGetter getDefaultToolTip() {
+		return defaultToolTip;
 	}
 
 	@Override
@@ -85,14 +146,80 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		return displayName;
 	}
 
-	public void setIconName(String value) {
-		iconName = value;
-		icon = null;
+	@Override
+	public String getDisplayName() {
+		return getDisplayGetter().get();
 	}
 
-	public void setIcon(Icon value) {
-		iconName = "";
-		icon = value;
+	public Attribute<Direction> getFacingAttribute() {
+		return facingAttribute;
+	}
+
+	@Override
+	public final Object getFeature(Object key, AttributeSet attrs) {
+		if (key == FACING_ATTRIBUTE_KEY)
+			return facingAttribute;
+		if (key == KeyConfigurator.class)
+			return keyConfigurator;
+		if (key == SHOULD_SNAP)
+			return shouldSnap;
+		return super.getFeature(key, attrs);
+	}
+
+	protected Object getInstanceFeature(Instance instance, Object key) {
+		if (key == Pokable.class && pokerClass != null) {
+			return new InstancePokerAdapter(instance.getComponent(), pokerClass);
+		} else if (key == Loggable.class && loggerClass != null) {
+			return new InstanceLoggerAdapter(instance.getComponent(), loggerClass);
+		} else {
+			return null;
+		}
+	}
+
+	public KeyConfigurator getKeyConfigurator() {
+		return keyConfigurator;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Bounds ret = bounds;
+		if (ret == null) {
+			throw new RuntimeException("offset bounds unknown: " + "use setOffsetBounds or override getOffsetBounds");
+		}
+		return ret;
+	}
+
+	public List<Port> getPorts() {
+		return portList;
+	}
+
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+	}
+
+	private boolean isClassOk(Class<?> sub, Class<?> sup) {
+		boolean isSub = sup.isAssignableFrom(sub);
+		if (!isSub) {
+			System.err.println(sub.getName() + " must be a subclass of " + sup.getName()); // OK
+			return false;
+		}
+		try {
+			sub.getConstructor(new Class[0]);
+			return true;
+		} catch (SecurityException e) {
+			System.err.println(sub.getName() + " needs its no-args constructor to be public"); // OK
+		} catch (NoSuchMethodException e) {
+			System.err.println(sub.getName() + " is missing a no-arguments constructor"); // OK
+		}
+		return true;
+	}
+
+	public void paintGhost(InstancePainter painter) {
+		painter.setFactory(null, null);
 	}
 
 	@Override
@@ -122,105 +249,35 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		}
 	}
 
-	@Override
-	public final Component createComponent(Location loc, AttributeSet attrs) {
-		InstanceComponent ret = new InstanceComponent(this, loc, attrs);
-		configureNewInstance(ret.getInstance());
-		return ret;
+	public void paintIcon(InstancePainter painter) {
+		painter.setFactory(null, null);
 	}
 
-	public void setOffsetBounds(Bounds value) {
-		bounds = value;
-	}
+	public abstract void paintInstance(InstancePainter painter);
 
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Bounds ret = bounds;
-		if (ret == null) {
-			throw new RuntimeException("offset bounds unknown: " + "use setOffsetBounds or override getOffsetBounds");
-		}
-		return ret;
-	}
-
-	public boolean contains(Location loc, AttributeSet attrs) {
-		Bounds bds = getOffsetBounds(attrs);
-		if (bds == null)
-			return false;
-		return bds.contains(loc, 1);
-	}
-
-	public Attribute<Direction> getFacingAttribute() {
-		return facingAttribute;
-	}
-
-	public void setFacingAttribute(Attribute<Direction> value) {
-		facingAttribute = value;
-	}
-
-	public KeyConfigurator getKeyConfigurator() {
-		return keyConfigurator;
-	}
-
-	public void setKeyConfigurator(KeyConfigurator value) {
-		keyConfigurator = value;
-	}
+	public abstract void propagate(InstanceState state);
 
 	public void setAttributes(Attribute<?>[] attrs, Object[] defaults) {
 		this.attrs = attrs;
 		this.defaults = defaults;
 	}
 
-	@Override
-	public AttributeSet createAttributeSet() {
-		Attribute<?>[] as = attrs;
-		AttributeSet ret = as == null ? AttributeSets.EMPTY : AttributeSets.fixedSet(as, defaults);
-		return ret;
-	}
-
-	@Override
-	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
-		Attribute<?>[] as = attrs;
-		if (as != null) {
-			for (int i = 0; i < as.length; i++) {
-				if (as[i] == attr) {
-					return defaults[i];
-				}
-			}
-			return null;
-		} else {
-			AttributeSet dfltSet = defaultSet;
-			if (dfltSet == null) {
-				dfltSet = createAttributeSet();
-				defaultSet = dfltSet;
-			}
-			return dfltSet.getValue(attr);
-		}
-	}
-
-	public void setPorts(Port[] ports) {
-		portList = new UnmodifiableList<Port>(ports);
-	}
-
-	public void setPorts(List<Port> ports) {
-		portList = Collections.unmodifiableList(ports);
-	}
-
-	public List<Port> getPorts() {
-		return portList;
-	}
-
 	public void setDefaultToolTip(StringGetter value) {
 		defaultToolTip = value;
 	}
 
-	public StringGetter getDefaultToolTip() {
-		return defaultToolTip;
+	public void setFacingAttribute(Attribute<Direction> value) {
+		facingAttribute = value;
 	}
 
-	public void setInstancePoker(Class<? extends InstancePoker> pokerClass) {
-		if (isClassOk(pokerClass, InstancePoker.class)) {
-			this.pokerClass = pokerClass;
-		}
+	public void setIcon(Icon value) {
+		iconName = "";
+		icon = value;
+	}
+
+	public void setIconName(String value) {
+		iconName = value;
+		icon = null;
 	}
 
 	public void setInstanceLogger(Class<? extends InstanceLogger> loggerClass) {
@@ -229,86 +286,29 @@ public abstract class InstanceFactory extends AbstractComponentFactory {
 		}
 	}
 
+	public void setInstancePoker(Class<? extends InstancePoker> pokerClass) {
+		if (isClassOk(pokerClass, InstancePoker.class)) {
+			this.pokerClass = pokerClass;
+		}
+	}
+
+	public void setKeyConfigurator(KeyConfigurator value) {
+		keyConfigurator = value;
+	}
+
+	public void setOffsetBounds(Bounds value) {
+		bounds = value;
+	}
+
+	public void setPorts(List<Port> ports) {
+		portList = Collections.unmodifiableList(ports);
+	}
+
+	public void setPorts(Port[] ports) {
+		portList = new UnmodifiableList<Port>(ports);
+	}
+
 	public void setShouldSnap(boolean value) {
 		shouldSnap = Boolean.valueOf(value);
-	}
-
-	private boolean isClassOk(Class<?> sub, Class<?> sup) {
-		boolean isSub = sup.isAssignableFrom(sub);
-		if (!isSub) {
-			System.err.println(sub.getName() + " must be a subclass of " + sup.getName()); // OK
-			return false;
-		}
-		try {
-			sub.getConstructor(new Class[0]);
-			return true;
-		} catch (SecurityException e) {
-			System.err.println(sub.getName() + " needs its no-args constructor to be public"); // OK
-		} catch (NoSuchMethodException e) {
-			System.err.println(sub.getName() + " is missing a no-arguments constructor"); // OK
-		}
-		return true;
-	}
-
-	@Override
-	public final Object getFeature(Object key, AttributeSet attrs) {
-		if (key == FACING_ATTRIBUTE_KEY)
-			return facingAttribute;
-		if (key == KeyConfigurator.class)
-			return keyConfigurator;
-		if (key == SHOULD_SNAP)
-			return shouldSnap;
-		return super.getFeature(key, attrs);
-	}
-
-	@Override
-	public final void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs) {
-		InstancePainter painter = context.getInstancePainter();
-		Graphics g = painter.getGraphics();
-		g.setColor(color);
-		g.translate(x, y);
-		painter.setFactory(this, attrs);
-		paintGhost(painter);
-		g.translate(-x, -y);
-		if (painter.getFactory() == null) {
-			super.drawGhost(context, color, x, y, attrs);
-		}
-	}
-
-	public void paintIcon(InstancePainter painter) {
-		painter.setFactory(null, null);
-	}
-
-	public void paintGhost(InstancePainter painter) {
-		painter.setFactory(null, null);
-	}
-
-	public abstract void paintInstance(InstancePainter painter);
-
-	public abstract void propagate(InstanceState state);
-
-	// event methods
-	protected void configureNewInstance(Instance instance) {
-	}
-
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-	}
-
-	protected Object getInstanceFeature(Instance instance, Object key) {
-		if (key == Pokable.class && pokerClass != null) {
-			return new InstancePokerAdapter(instance.getComponent(), pokerClass);
-		} else if (key == Loggable.class && loggerClass != null) {
-			return new InstanceLoggerAdapter(instance.getComponent(), loggerClass);
-		} else {
-			return null;
-		}
-	}
-
-	public InstanceState createInstanceState(CircuitState state, Instance instance) {
-		return new InstanceStateImpl(state, instance.getComponent());
-	}
-
-	public final InstanceState createInstanceState(CircuitState state, Component comp) {
-		return createInstanceState(state, ((InstanceComponent) comp).getInstance());
 	}
 }

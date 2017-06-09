@@ -28,82 +28,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class Caret {
-	private static Color SELECT_COLOR = new Color(192, 192, 255);
-
 	private class Listener implements MouseListener, MouseMotionListener, KeyListener, FocusListener {
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void focusGained(FocusEvent e) {
+			expose(cursor, false);
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
-			Measures measures = hex.getMeasures();
-			long loc = measures.toAddress(e.getX(), e.getY());
-			setDot(loc, (e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
-			if (!hex.isFocusOwner())
-				hex.requestFocus();
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			mouseDragged(e);
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			Measures measures = hex.getMeasures();
-			long loc = measures.toAddress(e.getX(), e.getY());
-			setDot(loc, true);
-
-			// TODO should repeat dragged events when mouse leaves the
-			// component
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-		}
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-			int mask = e.getModifiers();
-			if ((mask & ~InputEvent.SHIFT_MASK) != 0)
-				return;
-
-			char c = e.getKeyChar();
-			int cols = hex.getMeasures().getColumnCount();
-			switch (c) {
-			case ' ':
-				if (cursor >= 0)
-					setDot(cursor + 1, (mask & InputEvent.SHIFT_MASK) != 0);
-				break;
-			case '\n':
-				if (cursor >= 0)
-					setDot(cursor + cols, (mask & InputEvent.SHIFT_MASK) != 0);
-				break;
-			case '\u0008':
-			case '\u007f':
-				hex.delete();
-				// setDot(cursor - 1, (mask & InputEvent.SHIFT_MASK) != 0);
-				break;
-			default:
-				int digit = Character.digit(e.getKeyChar(), 16);
-				if (digit >= 0) {
-					HexModel model = hex.getModel();
-					if (model != null && cursor >= model.getFirstOffset() && cursor <= model.getLastOffset()) {
-						int curValue = model.get(cursor);
-						int newValue = 16 * curValue + digit;
-						model.set(cursor, newValue);
-					}
-				}
-			}
+		public void focusLost(FocusEvent e) {
+			expose(cursor, false);
 		}
 
 		@Override
@@ -186,15 +119,82 @@ public class Caret {
 		}
 
 		@Override
-		public void focusGained(FocusEvent e) {
-			expose(cursor, false);
+		public void keyTyped(KeyEvent e) {
+			int mask = e.getModifiers();
+			if ((mask & ~InputEvent.SHIFT_MASK) != 0)
+				return;
+
+			char c = e.getKeyChar();
+			int cols = hex.getMeasures().getColumnCount();
+			switch (c) {
+			case ' ':
+				if (cursor >= 0)
+					setDot(cursor + 1, (mask & InputEvent.SHIFT_MASK) != 0);
+				break;
+			case '\n':
+				if (cursor >= 0)
+					setDot(cursor + cols, (mask & InputEvent.SHIFT_MASK) != 0);
+				break;
+			case '\u0008':
+			case '\u007f':
+				hex.delete();
+				// setDot(cursor - 1, (mask & InputEvent.SHIFT_MASK) != 0);
+				break;
+			default:
+				int digit = Character.digit(e.getKeyChar(), 16);
+				if (digit >= 0) {
+					HexModel model = hex.getModel();
+					if (model != null && cursor >= model.getFirstOffset() && cursor <= model.getLastOffset()) {
+						int curValue = model.get(cursor);
+						int newValue = 16 * curValue + digit;
+						model.set(cursor, newValue);
+					}
+				}
+			}
 		}
 
 		@Override
-		public void focusLost(FocusEvent e) {
-			expose(cursor, false);
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			Measures measures = hex.getMeasures();
+			long loc = measures.toAddress(e.getX(), e.getY());
+			setDot(loc, true);
+
+			// TODO should repeat dragged events when mouse leaves the
+			// component
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			Measures measures = hex.getMeasures();
+			long loc = measures.toAddress(e.getX(), e.getY());
+			setDot(loc, (e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
+			if (!hex.isFocusOwner())
+				hex.requestFocus();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			mouseDragged(e);
 		}
 	}
+
+	private static Color SELECT_COLOR = new Color(192, 192, 255);
 
 	private static final Stroke CURSOR_STROKE = new BasicStroke(2.0f);
 
@@ -244,16 +244,44 @@ public class Caret {
 		listeners.add(l);
 	}
 
-	public void removeChangeListener(ChangeListener l) {
-		listeners.remove(l);
+	private void expose(long loc, boolean scrollTo) {
+		if (loc >= 0) {
+			Measures measures = hex.getMeasures();
+			int x = measures.toX(loc);
+			int y = measures.toY(loc);
+			int w = measures.getCellWidth();
+			int h = measures.getCellHeight();
+			hex.repaint(x - 1, y - 1, w + 2, h + 2);
+			if (scrollTo) {
+				hex.scrollRectToVisible(new Rectangle(x, y, w, h));
+			}
+		}
+	}
+
+	public long getDot() {
+		return cursor;
 	}
 
 	public long getMark() {
 		return mark;
 	}
 
-	public long getDot() {
-		return cursor;
+	void paintForeground(Graphics g, long start, long end) {
+		if (cursor >= start && cursor < end && hex.isFocusOwner()) {
+			Measures measures = hex.getMeasures();
+			int x = measures.toX(cursor);
+			int y = measures.toY(cursor);
+			Graphics2D g2 = (Graphics2D) g;
+			Stroke oldStroke = g2.getStroke();
+			g2.setColor(hex.getForeground());
+			g2.setStroke(CURSOR_STROKE);
+			g2.drawRect(x, y, measures.getCellWidth() - 1, measures.getCellHeight() - 1);
+			g2.setStroke(oldStroke);
+		}
+	}
+
+	public void removeChangeListener(ChangeListener l) {
+		listeners.remove(l);
 	}
 
 	public void setDot(long value, boolean keepMark) {
@@ -281,34 +309,6 @@ public class Caret {
 					l.stateChanged(event);
 				}
 			}
-		}
-	}
-
-	private void expose(long loc, boolean scrollTo) {
-		if (loc >= 0) {
-			Measures measures = hex.getMeasures();
-			int x = measures.toX(loc);
-			int y = measures.toY(loc);
-			int w = measures.getCellWidth();
-			int h = measures.getCellHeight();
-			hex.repaint(x - 1, y - 1, w + 2, h + 2);
-			if (scrollTo) {
-				hex.scrollRectToVisible(new Rectangle(x, y, w, h));
-			}
-		}
-	}
-
-	void paintForeground(Graphics g, long start, long end) {
-		if (cursor >= start && cursor < end && hex.isFocusOwner()) {
-			Measures measures = hex.getMeasures();
-			int x = measures.toX(cursor);
-			int y = measures.toY(cursor);
-			Graphics2D g2 = (Graphics2D) g;
-			Stroke oldStroke = g2.getStroke();
-			g2.setColor(hex.getForeground());
-			g2.setStroke(CURSOR_STROKE);
-			g2.drawRect(x, y, measures.getCellWidth() - 1, measures.getCellHeight() - 1);
-			g2.setStroke(oldStroke);
 		}
 	}
 }

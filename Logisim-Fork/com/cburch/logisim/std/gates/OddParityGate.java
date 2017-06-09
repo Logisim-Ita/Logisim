@@ -24,8 +24,27 @@ class OddParityGate extends AbstractGate {
 	}
 
 	@Override
-	public void paintIconShaped(InstancePainter painter) {
-		paintIconRectangular(painter);
+	protected Expression computeExpression(Expression[] inputs, int numInputs) {
+		Expression ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = Expressions.xor(ret, inputs[i]);
+		}
+		return ret;
+	}
+
+	@Override
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
+		return GateFunctions.computeOddParity(inputs, numInputs);
+	}
+
+	@Override
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
+
+	@Override
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
+		paintRectangular(painter, width, height);
 	}
 
 	@Override
@@ -41,32 +60,13 @@ class OddParityGate extends AbstractGate {
 	}
 
 	@Override
+	public void paintIconShaped(InstancePainter painter) {
+		paintIconRectangular(painter);
+	}
+
+	@Override
 	protected void paintShape(InstancePainter painter, int width, int height) {
 		paintRectangular(painter, width, height);
-	}
-
-	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
-		paintRectangular(painter, width, height);
-	}
-
-	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
-		return GateFunctions.computeOddParity(inputs, numInputs);
-	}
-
-	@Override
-	protected Expression computeExpression(Expression[] inputs, int numInputs) {
-		Expression ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = Expressions.xor(ret, inputs[i]);
-		}
-		return ret;
-	}
-
-	@Override
-	protected Value getIdentity() {
-		return Value.FALSE;
 	}
 
 }

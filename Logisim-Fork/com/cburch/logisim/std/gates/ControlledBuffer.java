@@ -67,6 +67,50 @@ class ControlledBuffer extends InstanceFactory {
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
 
+	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		configurePorts(instance);
+		NotGate.configureLabel(instance, false, instance.getPortLocation(2));
+	}
+
+	private void configurePorts(Instance instance) {
+		Direction facing = instance.getAttributeValue(StdAttr.FACING);
+		Bounds bds = getOffsetBounds(instance.getAttributeSet());
+		int d = Math.max(bds.getWidth(), bds.getHeight()) - 20;
+		Location loc0 = Location.create(0, 0);
+		Location loc1 = loc0.translate(facing.reverse(), 20 + d);
+		Location loc2;
+		if (instance.getAttributeValue(ATTR_CONTROL) == LEFT_HANDED) {
+			loc2 = loc0.translate(facing.reverse(), 10 + d, 10);
+		} else {
+			loc2 = loc0.translate(facing.reverse(), 10 + d, -10);
+		}
+
+		Port[] ports = new Port[3];
+		ports[0] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ports[1] = new Port(loc1.getX(), loc1.getY(), Port.INPUT, StdAttr.WIDTH);
+		ports[2] = new Port(loc2.getX(), loc2.getY(), Port.INPUT, 1);
+		instance.setPorts(ports);
+	}
+
+	@Override
+	public Object getInstanceFeature(final Instance instance, Object key) {
+		if (key == WireRepair.class) {
+			return new WireRepair() {
+				@Override
+				public boolean shouldRepairWire(WireRepairData data) {
+					Location port2 = instance.getPortLocation(2);
+					return data.getPoint().equals(port2);
+				}
+			};
+		}
+		return super.getInstanceFeature(instance, key);
+	}
+
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		int w = 20;
@@ -81,6 +125,18 @@ class ControlledBuffer extends InstanceFactory {
 		if (facing == Direction.WEST)
 			return Bounds.create(0, -10, w, 20);
 		return Bounds.create(-w, -10, w, 20);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING || attr == NotGate.ATTR_SIZE) {
+			instance.recomputeBounds();
+			configurePorts(instance);
+			NotGate.configureLabel(instance, false, instance.getPortLocation(2));
+		} else if (attr == ATTR_CONTROL) {
+			configurePorts(instance);
+			NotGate.configureLabel(instance, false, instance.getPortLocation(2));
+		}
 	}
 
 	//
@@ -172,48 +228,6 @@ class ControlledBuffer extends InstanceFactory {
 		g.translate(-x, -y);
 	}
 
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		configurePorts(instance);
-		NotGate.configureLabel(instance, false, instance.getPortLocation(2));
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING || attr == NotGate.ATTR_SIZE) {
-			instance.recomputeBounds();
-			configurePorts(instance);
-			NotGate.configureLabel(instance, false, instance.getPortLocation(2));
-		} else if (attr == ATTR_CONTROL) {
-			configurePorts(instance);
-			NotGate.configureLabel(instance, false, instance.getPortLocation(2));
-		}
-	}
-
-	private void configurePorts(Instance instance) {
-		Direction facing = instance.getAttributeValue(StdAttr.FACING);
-		Bounds bds = getOffsetBounds(instance.getAttributeSet());
-		int d = Math.max(bds.getWidth(), bds.getHeight()) - 20;
-		Location loc0 = Location.create(0, 0);
-		Location loc1 = loc0.translate(facing.reverse(), 20 + d);
-		Location loc2;
-		if (instance.getAttributeValue(ATTR_CONTROL) == LEFT_HANDED) {
-			loc2 = loc0.translate(facing.reverse(), 10 + d, 10);
-		} else {
-			loc2 = loc0.translate(facing.reverse(), 10 + d, -10);
-		}
-
-		Port[] ports = new Port[3];
-		ports[0] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ports[1] = new Port(loc1.getX(), loc1.getY(), Port.INPUT, StdAttr.WIDTH);
-		ports[2] = new Port(loc2.getX(), loc2.getY(), Port.INPUT, 1);
-		instance.setPorts(ports);
-	}
-
 	@Override
 	public void propagate(InstanceState state) {
 		Value control = state.getPort(2);
@@ -237,19 +251,5 @@ class ControlledBuffer extends InstanceFactory {
 			}
 			state.setPort(0, out, GateAttributes.DELAY);
 		}
-	}
-
-	@Override
-	public Object getInstanceFeature(final Instance instance, Object key) {
-		if (key == WireRepair.class) {
-			return new WireRepair() {
-				@Override
-				public boolean shouldRepairWire(WireRepairData data) {
-					Location port2 = instance.getPortLocation(2);
-					return data.getPoint().equals(port2);
-				}
-			};
-		}
-		return super.getInstanceFeature(instance, key);
 	}
 }

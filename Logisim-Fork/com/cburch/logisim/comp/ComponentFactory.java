@@ -24,27 +24,18 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	public static final Object TOOL_TIP = new Object();
 	public static final Object FACING_ATTRIBUTE_KEY = new Object();
 
-	public String getName();
-
-	public String getDisplayName();
-
-	public StringGetter getDisplayGetter();
+	public AttributeSet createAttributeSet();
 
 	public Component createComponent(Location loc, AttributeSet attrs);
 
-	public Bounds getOffsetBounds(AttributeSet attrs);
-
-	public AttributeSet createAttributeSet();
-
-	@Override
-	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
+	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs);
 
 	@Override
 	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver);
 
-	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs);
+	public StringGetter getDisplayGetter();
 
-	public void paintIcon(ComponentDrawContext context, int x, int y, AttributeSet attrs);
+	public String getDisplayName();
 
 	/**
 	 * Retrieves special-purpose features for this factory. This technique
@@ -67,4 +58,13 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	 *         the feature.
 	 */
 	public Object getFeature(Object key, AttributeSet attrs);
+
+	public String getName();
+
+	public Bounds getOffsetBounds(AttributeSet attrs);
+
+	@Override
+	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver);
+
+	public void paintIcon(ComponentDrawContext context, int x, int y, AttributeSet attrs);
 }

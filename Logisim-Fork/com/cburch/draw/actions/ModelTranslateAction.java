@@ -24,13 +24,14 @@ public class ModelTranslateAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.unmodifiableSet(moved);
-	}
-
-	@Override
-	public String getName() {
-		return Strings.get("actionTranslate", getShapesName(moved));
+	public Action append(Action other) {
+		if (other instanceof ModelTranslateAction) {
+			ModelTranslateAction o = (ModelTranslateAction) other;
+			if (this.moved.equals(o.moved)) {
+				return new ModelTranslateAction(getModel(), moved, this.dx + o.dx, this.dy + o.dy);
+			}
+		}
+		return super.append(other);
 	}
 
 	@Override
@@ -39,8 +40,13 @@ public class ModelTranslateAction extends ModelAction {
 	}
 
 	@Override
-	void undoSub(CanvasModel model) {
-		model.translateObjects(moved, -dx, -dy);
+	public String getName() {
+		return Strings.get("actionTranslate", getShapesName(moved));
+	}
+
+	@Override
+	public Collection<CanvasObject> getObjects() {
+		return Collections.unmodifiableSet(moved);
 	}
 
 	@Override
@@ -54,13 +60,7 @@ public class ModelTranslateAction extends ModelAction {
 	}
 
 	@Override
-	public Action append(Action other) {
-		if (other instanceof ModelTranslateAction) {
-			ModelTranslateAction o = (ModelTranslateAction) other;
-			if (this.moved.equals(o.moved)) {
-				return new ModelTranslateAction(getModel(), moved, this.dx + o.dx, this.dy + o.dy);
-			}
-		}
-		return super.append(other);
+	void undoSub(CanvasModel model) {
+		model.translateObjects(moved, -dx, -dy);
 	}
 }

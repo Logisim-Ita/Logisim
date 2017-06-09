@@ -8,11 +8,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 public interface ToolbarItem {
-	public boolean isSelectable();
-
-	public void paintIcon(Component destination, Graphics g);
+	public Dimension getDimension(Object orientation);
 
 	public String getToolTip();
 
-	public Dimension getDimension(Object orientation);
+	public boolean isSelectable();
+
+	public void paintIcon(Component destination, Graphics g);
 }

@@ -20,6 +20,13 @@ public class DurationAttribute extends Attribute<Integer> {
 	}
 
 	@Override
+	public java.awt.Component getCellEditor(Integer value) {
+		JTextField field = new JTextField();
+		field.setText(value.toString());
+		return field;
+	}
+
+	@Override
 	public Integer parse(String value) {
 		try {
 			Integer ret = Integer.valueOf(value);
@@ -41,13 +48,6 @@ public class DurationAttribute extends Attribute<Integer> {
 		} else {
 			return StringUtil.format(Strings.get("clockDurationValue"), value.toString());
 		}
-	}
-
-	@Override
-	public java.awt.Component getCellEditor(Integer value) {
-		JTextField field = new JTextField();
-		field.setText(value.toString());
-		return field;
 	}
 
 }

@@ -26,49 +26,6 @@ class RomContentsListener implements HexModelListener {
 		}
 
 		@Override
-		public String getName() {
-			return Strings.get("romChangeAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			if (!completed) {
-				completed = true;
-				try {
-					source.setEnabled(false);
-					contents.set(start, newValues);
-				} finally {
-					source.setEnabled(true);
-				}
-			}
-		}
-
-		@Override
-		public void undo(Project proj) {
-			if (completed) {
-				completed = false;
-				try {
-					source.setEnabled(false);
-					contents.set(start, oldValues);
-				} finally {
-					source.setEnabled(true);
-				}
-			}
-		}
-
-		@Override
-		public boolean shouldAppendTo(Action other) {
-			if (other instanceof Change) {
-				Change o = (Change) other;
-				long oEnd = o.start + o.newValues.length;
-				long end = start + newValues.length;
-				if (oEnd >= start && end >= o.start)
-					return true;
-			}
-			return super.shouldAppendTo(other);
-		}
-
-		@Override
 		public Action append(Action other) {
 			if (other instanceof Change) {
 				Change o = (Change) other;
@@ -88,6 +45,49 @@ class RomContentsListener implements HexModelListener {
 			}
 			return super.append(other);
 		}
+
+		@Override
+		public void doIt(Project proj) {
+			if (!completed) {
+				completed = true;
+				try {
+					source.setEnabled(false);
+					contents.set(start, newValues);
+				} finally {
+					source.setEnabled(true);
+				}
+			}
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("romChangeAction");
+		}
+
+		@Override
+		public boolean shouldAppendTo(Action other) {
+			if (other instanceof Change) {
+				Change o = (Change) other;
+				long oEnd = o.start + o.newValues.length;
+				long end = start + newValues.length;
+				if (oEnd >= start && end >= o.start)
+					return true;
+			}
+			return super.shouldAppendTo(other);
+		}
+
+		@Override
+		public void undo(Project proj) {
+			if (completed) {
+				completed = false;
+				try {
+					source.setEnabled(false);
+					contents.set(start, oldValues);
+				} finally {
+					source.setEnabled(true);
+				}
+			}
+		}
 	}
 
 	Project proj;
@@ -95,16 +95,6 @@ class RomContentsListener implements HexModelListener {
 
 	RomContentsListener(Project proj) {
 		this.proj = proj;
-	}
-
-	void setEnabled(boolean value) {
-		enabled = value;
-	}
-
-	@Override
-	public void metainfoChanged(HexModel source) {
-		// ignore - this can only come from an already-registered
-		// action
 	}
 
 	@Override
@@ -117,5 +107,15 @@ class RomContentsListener implements HexModelListener {
 			}
 			proj.doAction(new Change(this, (MemContents) source, start, oldValues, newValues));
 		}
+	}
+
+	@Override
+	public void metainfoChanged(HexModel source) {
+		// ignore - this can only come from an already-registered
+		// action
+	}
+
+	void setEnabled(boolean value) {
+		enabled = value;
 	}
 }

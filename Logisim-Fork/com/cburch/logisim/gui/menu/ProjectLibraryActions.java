@@ -22,9 +22,6 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Library;
 
 public class ProjectLibraryActions {
-	private ProjectLibraryActions() {
-	}
-
 	private static class BuiltinOption {
 		Library lib;
 
@@ -90,21 +87,6 @@ public class ProjectLibraryActions {
 		}
 	}
 
-	public static void doLoadLogisimLibrary(Project proj) {
-		Loader loader = proj.getLogisimFile().getLoader();
-		JFileChooser chooser = loader.createChooser();
-		chooser.setDialogTitle(Strings.get("loadLogisimDialogTitle"));
-		chooser.setFileFilter(Loader.LOGISIM_FILTER);
-		int check = chooser.showOpenDialog(proj.getFrame());
-		if (check == JFileChooser.APPROVE_OPTION) {
-			File f = chooser.getSelectedFile();
-			Library lib = loader.loadLogisimLibrary(f);
-			if (lib != null) {
-				proj.doAction(LogisimFileActions.loadLibrary(lib));
-			}
-		}
-	}
-
 	public static void doLoadJarLibrary(Project proj) {
 		Loader loader = proj.getLogisimFile().getLoader();
 		JFileChooser chooser = loader.createChooser();
@@ -150,6 +132,21 @@ public class ProjectLibraryActions {
 		}
 	}
 
+	public static void doLoadLogisimLibrary(Project proj) {
+		Loader loader = proj.getLogisimFile().getLoader();
+		JFileChooser chooser = loader.createChooser();
+		chooser.setDialogTitle(Strings.get("loadLogisimDialogTitle"));
+		chooser.setFileFilter(Loader.LOGISIM_FILTER);
+		int check = chooser.showOpenDialog(proj.getFrame());
+		if (check == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			Library lib = loader.loadLogisimLibrary(f);
+			if (lib != null) {
+				proj.doAction(LogisimFileActions.loadLibrary(lib));
+			}
+		}
+	}
+
 	public static void doUnloadLibraries(Project proj) {
 		LogisimFile file = proj.getLogisimFile();
 		ArrayList<Library> canUnload = new ArrayList<Library>();
@@ -182,5 +179,8 @@ public class ProjectLibraryActions {
 		} else {
 			proj.doAction(LogisimFileActions.unloadLibrary(lib));
 		}
+	}
+
+	private ProjectLibraryActions() {
 	}
 }

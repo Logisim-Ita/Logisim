@@ -11,16 +11,6 @@ import com.cburch.logisim.instance.StdAttr;
 
 public class ShiftRegisterLogger extends InstanceLogger {
 	@Override
-	public Object[] getLogOptions(InstanceState state) {
-		Integer stages = state.getAttributeValue(ShiftRegister.ATTR_LENGTH);
-		Object[] ret = new Object[stages.intValue()];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = Integer.valueOf(i);
-		}
-		return ret;
-	}
-
-	@Override
 	public String getLogName(InstanceState state, Object option) {
 		String inName = state.getAttributeValue(StdAttr.LABEL);
 		if (inName == null || inName.equals("")) {
@@ -31,6 +21,16 @@ public class ShiftRegisterLogger extends InstanceLogger {
 		} else {
 			return inName;
 		}
+	}
+
+	@Override
+	public Object[] getLogOptions(InstanceState state) {
+		Integer stages = state.getAttributeValue(ShiftRegister.ATTR_LENGTH);
+		Object[] ret = new Object[stages.intValue()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = Integer.valueOf(i);
+		}
+		return ret;
 	}
 
 	@Override

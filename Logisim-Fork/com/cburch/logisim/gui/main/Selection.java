@@ -51,6 +51,37 @@ public class Selection extends SelectionBase {
 		}
 
 		@Override
+		public void circuitChanged(CircuitEvent event) {
+			if (event.getAction() == CircuitEvent.TRANSACTION_DONE) {
+				Circuit circuit = event.getCircuit();
+				ReplacementMap repl = event.getResult().getReplacementMap(circuit);
+				boolean change = false;
+
+				ArrayList<Component> oldAnchored;
+				oldAnchored = new ArrayList<Component>(getComponents());
+				for (Component comp : oldAnchored) {
+					Collection<Component> replacedBy = repl.get(comp);
+					if (replacedBy != null) {
+						change = true;
+						selected.remove(comp);
+						lifted.remove(comp);
+						for (Component add : replacedBy) {
+							if (circuit.contains(add)) {
+								selected.add(add);
+							} else {
+								lifted.add(add);
+							}
+						}
+					}
+				}
+
+				if (change) {
+					fireSelectionChanged();
+				}
+			}
+		}
+
+		@Override
 		public void projectChanged(ProjectEvent event) {
 			int type = event.getAction();
 			if (type == ProjectEvent.ACTION_START) {
@@ -92,37 +123,6 @@ public class Selection extends SelectionBase {
 				}
 			}
 		}
-
-		@Override
-		public void circuitChanged(CircuitEvent event) {
-			if (event.getAction() == CircuitEvent.TRANSACTION_DONE) {
-				Circuit circuit = event.getCircuit();
-				ReplacementMap repl = event.getResult().getReplacementMap(circuit);
-				boolean change = false;
-
-				ArrayList<Component> oldAnchored;
-				oldAnchored = new ArrayList<Component>(getComponents());
-				for (Component comp : oldAnchored) {
-					Collection<Component> replacedBy = repl.get(comp);
-					if (replacedBy != null) {
-						change = true;
-						selected.remove(comp);
-						lifted.remove(comp);
-						for (Component add : replacedBy) {
-							if (circuit.contains(add)) {
-								selected.add(add);
-							} else {
-								lifted.add(add);
-							}
-						}
-					}
-				}
-
-				if (change) {
-					fireSelectionChanged();
-				}
-			}
-		}
 	}
 
 	private MyListener myListener;
@@ -136,73 +136,6 @@ public class Selection extends SelectionBase {
 		attrs = new SelectionAttributes(canvas, this);
 		proj.addProjectListener(myListener);
 		proj.addCircuitListener(myListener);
-	}
-
-	//
-	// query methods
-	//
-	public boolean isEmpty() {
-		return selected.isEmpty() && lifted.isEmpty();
-	}
-
-	public AttributeSet getAttributeSet() {
-		return attrs;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (!(other instanceof Selection))
-			return false;
-		Selection otherSelection = (Selection) other;
-		return this.selected.equals(otherSelection.selected) && this.lifted.equals(otherSelection.lifted);
-	}
-
-	public Set<Component> getComponents() {
-		return unionSet;
-	}
-
-	public Collection<Component> getAnchoredComponents() {
-		return selected;
-	}
-
-	public Collection<Component> getFloatingComponents() {
-		return lifted;
-	}
-
-	public Collection<Component> getComponentsContaining(Location query) {
-		HashSet<Component> ret = new HashSet<Component>();
-		for (Component comp : unionSet) {
-			if (comp.contains(query))
-				ret.add(comp);
-		}
-		return ret;
-	}
-
-	public Collection<Component> getComponentsContaining(Location query, Graphics g) {
-		HashSet<Component> ret = new HashSet<Component>();
-		for (Component comp : unionSet) {
-			if (comp.contains(query, g))
-				ret.add(comp);
-		}
-		return ret;
-	}
-
-	public Collection<Component> getComponentsWithin(Bounds bds) {
-		HashSet<Component> ret = new HashSet<Component>();
-		for (Component comp : unionSet) {
-			if (bds.contains(comp.getBounds()))
-				ret.add(comp);
-		}
-		return ret;
-	}
-
-	public Collection<Component> getComponentsWithin(Bounds bds, Graphics g) {
-		HashSet<Component> ret = new HashSet<Component>();
-		for (Component comp : unionSet) {
-			if (bds.contains(comp.getBounds(g)))
-				ret.add(comp);
-		}
-		return ret;
 	}
 
 	public boolean contains(Component comp) {
@@ -259,6 +192,73 @@ public class Selection extends SelectionBase {
 			context.getGraphics().dispose();
 		}
 		context.setGraphics(g);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof Selection))
+			return false;
+		Selection otherSelection = (Selection) other;
+		return this.selected.equals(otherSelection.selected) && this.lifted.equals(otherSelection.lifted);
+	}
+
+	public Collection<Component> getAnchoredComponents() {
+		return selected;
+	}
+
+	public AttributeSet getAttributeSet() {
+		return attrs;
+	}
+
+	public Set<Component> getComponents() {
+		return unionSet;
+	}
+
+	public Collection<Component> getComponentsContaining(Location query) {
+		HashSet<Component> ret = new HashSet<Component>();
+		for (Component comp : unionSet) {
+			if (comp.contains(query))
+				ret.add(comp);
+		}
+		return ret;
+	}
+
+	public Collection<Component> getComponentsContaining(Location query, Graphics g) {
+		HashSet<Component> ret = new HashSet<Component>();
+		for (Component comp : unionSet) {
+			if (comp.contains(query, g))
+				ret.add(comp);
+		}
+		return ret;
+	}
+
+	public Collection<Component> getComponentsWithin(Bounds bds) {
+		HashSet<Component> ret = new HashSet<Component>();
+		for (Component comp : unionSet) {
+			if (bds.contains(comp.getBounds()))
+				ret.add(comp);
+		}
+		return ret;
+	}
+
+	public Collection<Component> getComponentsWithin(Bounds bds, Graphics g) {
+		HashSet<Component> ret = new HashSet<Component>();
+		for (Component comp : unionSet) {
+			if (bds.contains(comp.getBounds(g)))
+				ret.add(comp);
+		}
+		return ret;
+	}
+
+	public Collection<Component> getFloatingComponents() {
+		return lifted;
+	}
+
+	//
+	// query methods
+	//
+	public boolean isEmpty() {
+		return selected.isEmpty() && lifted.isEmpty();
 	}
 
 	@Override

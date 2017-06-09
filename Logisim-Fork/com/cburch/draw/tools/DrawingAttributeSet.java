@@ -23,12 +23,6 @@ import com.cburch.logisim.util.EventSourceWeakSupport;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class DrawingAttributeSet implements AttributeSet, Cloneable {
-	static final List<Attribute<?>> ATTRS_ALL = UnmodifiableList
-			.create(new Attribute<?>[] { DrawAttr.FONT, DrawAttr.ALIGNMENT, DrawAttr.PAINT_TYPE, DrawAttr.STROKE_WIDTH,
-					DrawAttr.STROKE_COLOR, DrawAttr.FILL_COLOR, DrawAttr.TEXT_DEFAULT_FILL, DrawAttr.CORNER_RADIUS });
-	static final List<Object> DEFAULTS_ALL = Arrays.asList(new Object[] { DrawAttr.DEFAULT_FONT, DrawAttr.ALIGN_CENTER,
-			DrawAttr.PAINT_STROKE, Integer.valueOf(1), Color.BLACK, Color.WHITE, Color.BLACK, Integer.valueOf(10) });
-
 	private class Restriction extends AbstractAttributeSet implements AttributeListener {
 		private AbstractTool tool;
 		private List<Attribute<?>> selectedAttrs;
@@ -39,19 +33,22 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 			updateAttributes();
 		}
 
-		private void updateAttributes() {
-			List<Attribute<?>> toolAttrs;
-			if (tool == null) {
-				toolAttrs = Collections.emptyList();
-			} else {
-				toolAttrs = tool.getAttributes();
+		//
+		// AttributeListener methods
+		//
+		@Override
+		public void attributeListChanged(AttributeEvent e) {
+			fireAttributeListChanged();
+		}
+
+		@Override
+		public void attributeValueChanged(AttributeEvent e) {
+			if (selectedAttrs.contains(e.getAttribute())) {
+				@SuppressWarnings("unchecked")
+				Attribute<Object> attr = (Attribute<Object>) e.getAttribute();
+				fireAttributeValueChanged(attr, e.getValue());
 			}
-			if (!toolAttrs.equals(selectedAttrs)) {
-				selectedAttrs = new ArrayList<Attribute<?>>(toolAttrs);
-				selectedView = Collections.unmodifiableList(selectedAttrs);
-				DrawingAttributeSet.this.addAttributeListener(this);
-				fireAttributeListChanged();
-			}
+			updateAttributes();
 		}
 
 		@Override
@@ -75,24 +72,27 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 			updateAttributes();
 		}
 
-		//
-		// AttributeListener methods
-		//
-		@Override
-		public void attributeListChanged(AttributeEvent e) {
-			fireAttributeListChanged();
-		}
-
-		@Override
-		public void attributeValueChanged(AttributeEvent e) {
-			if (selectedAttrs.contains(e.getAttribute())) {
-				@SuppressWarnings("unchecked")
-				Attribute<Object> attr = (Attribute<Object>) e.getAttribute();
-				fireAttributeValueChanged(attr, e.getValue());
+		private void updateAttributes() {
+			List<Attribute<?>> toolAttrs;
+			if (tool == null) {
+				toolAttrs = Collections.emptyList();
+			} else {
+				toolAttrs = tool.getAttributes();
 			}
-			updateAttributes();
+			if (!toolAttrs.equals(selectedAttrs)) {
+				selectedAttrs = new ArrayList<Attribute<?>>(toolAttrs);
+				selectedView = Collections.unmodifiableList(selectedAttrs);
+				DrawingAttributeSet.this.addAttributeListener(this);
+				fireAttributeListChanged();
+			}
 		}
 	}
+	static final List<Attribute<?>> ATTRS_ALL = UnmodifiableList
+			.create(new Attribute<?>[] { DrawAttr.FONT, DrawAttr.ALIGNMENT, DrawAttr.PAINT_TYPE, DrawAttr.STROKE_WIDTH,
+					DrawAttr.STROKE_COLOR, DrawAttr.FILL_COLOR, DrawAttr.TEXT_DEFAULT_FILL, DrawAttr.CORNER_RADIUS });
+
+	static final List<Object> DEFAULTS_ALL = Arrays.asList(new Object[] { DrawAttr.DEFAULT_FONT, DrawAttr.ALIGN_CENTER,
+			DrawAttr.PAINT_STROKE, Integer.valueOf(1), Color.BLACK, Color.WHITE, Color.BLACK, Integer.valueOf(10) });
 
 	private EventSourceWeakSupport<AttributeListener> listeners;
 	private List<Attribute<?>> attrs;
@@ -104,18 +104,26 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 		values = DEFAULTS_ALL;
 	}
 
-	public AttributeSet createSubset(AbstractTool tool) {
-		return new Restriction(tool);
-	}
-
 	@Override
 	public void addAttributeListener(AttributeListener l) {
 		listeners.add(l);
 	}
 
-	@Override
-	public void removeAttributeListener(AttributeListener l) {
-		listeners.remove(l);
+	public <E extends CanvasObject> E applyTo(E drawable) {
+		AbstractCanvasObject d = (AbstractCanvasObject) drawable;
+		// use a for(i...) loop since the attribute list may change as we go on
+		for (int i = 0; i < d.getAttributes().size(); i++) {
+			Attribute<?> attr = d.getAttributes().get(i);
+			@SuppressWarnings("unchecked")
+			Attribute<Object> a = (Attribute<Object>) attr;
+			if (attr == DrawAttr.FILL_COLOR && this.containsAttribute(DrawAttr.TEXT_DEFAULT_FILL)) {
+				d.setValue(a, this.getValue(DrawAttr.TEXT_DEFAULT_FILL));
+			} else if (this.containsAttribute(a)) {
+				Object value = this.getValue(a);
+				d.setValue(a, value);
+			}
+		}
+		return drawable;
 	}
 
 	@Override
@@ -131,13 +139,12 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 	}
 
 	@Override
-	public List<Attribute<?>> getAttributes() {
-		return attrs;
-	}
-
-	@Override
 	public boolean containsAttribute(Attribute<?> attr) {
 		return attrs.contains(attr);
+	}
+
+	public AttributeSet createSubset(AbstractTool tool) {
+		return new Restriction(tool);
 	}
 
 	@Override
@@ -150,18 +157,8 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 	}
 
 	@Override
-	public boolean isReadOnly(Attribute<?> attr) {
-		return false;
-	}
-
-	@Override
-	public void setReadOnly(Attribute<?> attr, boolean value) {
-		throw new UnsupportedOperationException("setReadOnly");
-	}
-
-	@Override
-	public boolean isToSave(Attribute<?> attr) {
-		return true;
+	public List<Attribute<?>> getAttributes() {
+		return attrs;
 	}
 
 	@Override
@@ -178,6 +175,26 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isReadOnly(Attribute<?> attr) {
+		return false;
+	}
+
+	@Override
+	public boolean isToSave(Attribute<?> attr) {
+		return true;
+	}
+
+	@Override
+	public void removeAttributeListener(AttributeListener l) {
+		listeners.remove(l);
+	}
+
+	@Override
+	public void setReadOnly(Attribute<?> attr, boolean value) {
+		throw new UnsupportedOperationException("setReadOnly");
 	}
 
 	@Override
@@ -203,22 +220,5 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 			}
 		}
 		throw new IllegalArgumentException(attr.toString());
-	}
-
-	public <E extends CanvasObject> E applyTo(E drawable) {
-		AbstractCanvasObject d = (AbstractCanvasObject) drawable;
-		// use a for(i...) loop since the attribute list may change as we go on
-		for (int i = 0; i < d.getAttributes().size(); i++) {
-			Attribute<?> attr = d.getAttributes().get(i);
-			@SuppressWarnings("unchecked")
-			Attribute<Object> a = (Attribute<Object>) attr;
-			if (attr == DrawAttr.FILL_COLOR && this.containsAttribute(DrawAttr.TEXT_DEFAULT_FILL)) {
-				d.setValue(a, this.getValue(DrawAttr.TEXT_DEFAULT_FILL));
-			} else if (this.containsAttribute(a)) {
-				Object value = this.getValue(a);
-				d.setValue(a, value);
-			}
-		}
-		return drawable;
 	}
 }

@@ -29,20 +29,45 @@ class Model {
 		log = new HashMap<SelectionItem, ValueLog>();
 	}
 
-	public boolean isSelected() {
-		return selected;
-	}
-
 	public void addModelListener(ModelListener l) {
 		listeners.add(l);
 	}
 
-	public void removeModelListener(ModelListener l) {
-		listeners.remove(l);
+	private void fireEntryAdded(ModelEvent e, Value[] values) {
+		for (ModelListener l : listeners) {
+			l.entryAdded(e, values);
+		}
+	}
+
+	private void fireFilePropertyChanged(ModelEvent e) {
+		for (ModelListener l : listeners) {
+			l.filePropertyChanged(e);
+		}
+	}
+
+	void fireSelectionChanged(ModelEvent e) {
+		for (Iterator<SelectionItem> it = log.keySet().iterator(); it.hasNext();) {
+			SelectionItem i = it.next();
+			if (selection.indexOf(i) < 0) {
+				it.remove();
+			}
+		}
+
+		for (ModelListener l : listeners) {
+			l.selectionChanged(e);
+		}
 	}
 
 	public CircuitState getCircuitState() {
 		return selection.getCircuitState();
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public boolean getFileHeader() {
+		return fileHeader;
 	}
 
 	public Selection getSelection() {
@@ -62,34 +87,8 @@ class Model {
 		return fileEnabled;
 	}
 
-	public File getFile() {
-		return file;
-	}
-
-	public boolean getFileHeader() {
-		return fileHeader;
-	}
-
-	public void setFileEnabled(boolean value) {
-		if (fileEnabled == value)
-			return;
-		fileEnabled = value;
-		fireFilePropertyChanged(new ModelEvent());
-	}
-
-	public void setFile(File value) {
-		if (file == null ? value == null : file.equals(value))
-			return;
-		file = value;
-		fileEnabled = file != null;
-		fireFilePropertyChanged(new ModelEvent());
-	}
-
-	public void setFileHeader(boolean value) {
-		if (fileHeader == value)
-			return;
-		fileHeader = value;
-		fireFilePropertyChanged(new ModelEvent());
+	public boolean isSelected() {
+		return selected;
 	}
 
 	public void propagationCompleted() {
@@ -113,6 +112,32 @@ class Model {
 		}
 	}
 
+	public void removeModelListener(ModelListener l) {
+		listeners.remove(l);
+	}
+
+	public void setFile(File value) {
+		if (file == null ? value == null : file.equals(value))
+			return;
+		file = value;
+		fileEnabled = file != null;
+		fireFilePropertyChanged(new ModelEvent());
+	}
+
+	public void setFileEnabled(boolean value) {
+		if (fileEnabled == value)
+			return;
+		fileEnabled = value;
+		fireFilePropertyChanged(new ModelEvent());
+	}
+
+	public void setFileHeader(boolean value) {
+		if (fileHeader == value)
+			return;
+		fileHeader = value;
+		fireFilePropertyChanged(new ModelEvent());
+	}
+
 	public void setSelected(JFrame frame, boolean value) {
 		if (selected == value)
 			return;
@@ -127,30 +152,5 @@ class Model {
 			fileEnabled = false;
 		}
 		fireFilePropertyChanged(new ModelEvent());
-	}
-
-	void fireSelectionChanged(ModelEvent e) {
-		for (Iterator<SelectionItem> it = log.keySet().iterator(); it.hasNext();) {
-			SelectionItem i = it.next();
-			if (selection.indexOf(i) < 0) {
-				it.remove();
-			}
-		}
-
-		for (ModelListener l : listeners) {
-			l.selectionChanged(e);
-		}
-	}
-
-	private void fireEntryAdded(ModelEvent e, Value[] values) {
-		for (ModelListener l : listeners) {
-			l.entryAdded(e, values);
-		}
-	}
-
-	private void fireFilePropertyChanged(ModelEvent e) {
-		for (ModelListener l : listeners) {
-			l.filePropertyChanged(e);
-		}
 	}
 }

@@ -26,6 +26,54 @@ import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringGetter;
 
 abstract class AbstractFlipFlop extends InstanceFactory {
+	public static class Logger extends InstanceLogger {
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			String ret = state.getAttributeValue(StdAttr.LABEL);
+			return ret != null && !ret.equals("") ? ret : null;
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			StateData s = (StateData) state.getData();
+			return s == null ? Value.FALSE : s.curValue;
+		}
+	}
+
+	public static class Poker extends InstancePoker {
+		boolean isPressed = true;
+
+		private boolean isInside(InstanceState state, MouseEvent e) {
+			Location loc = state.getInstance().getLocation();
+			int dx = e.getX() - (loc.getX() - 20);
+			int dy = e.getY() - (loc.getY() + 10);
+			int d2 = dx * dx + dy * dy;
+			return d2 < 8 * 8;
+		}
+
+		@Override
+		public void mousePressed(InstanceState state, MouseEvent e) {
+			isPressed = isInside(state, e);
+		}
+
+		@Override
+		public void mouseReleased(InstanceState state, MouseEvent e) {
+			if (isPressed && isInside(state, e)) {
+				StateData myState = (StateData) state.getData();
+				if (myState == null)
+					return;
+
+				myState.curValue = myState.curValue.not();
+				state.fireInvalidated();
+			}
+			isPressed = false;
+		}
+	}
+
+	private static class StateData extends ClockState implements InstanceData {
+		Value curValue = Value.FALSE;
+	}
+
 	private static final int STD_PORTS = 6;
 
 	private Attribute<AttributeOption> triggerAttribute;
@@ -66,11 +114,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		setPorts(ps);
 	}
 
-	//
-	// abstract methods intended to be implemented in subclasses
-	//
-	protected abstract String getInputName(int index);
-
 	protected abstract Value computeValue(Value[] inputs, Value curValue);
 
 	//
@@ -83,38 +126,10 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
-	@Override
-	public void propagate(InstanceState state) {
-		StateData data = (StateData) state.getData();
-		if (data == null) {
-			data = new StateData();
-			state.setData(data);
-		}
-
-		int n = getPorts().size() - STD_PORTS;
-		Object triggerType = state.getAttributeValue(triggerAttribute);
-		boolean triggered = data.updateClock(state.getPort(n), triggerType);
-
-		if (state.getPort(n + 3) == Value.TRUE) { // clear requested
-			data.curValue = Value.FALSE;
-		} else if (state.getPort(n + 4) == Value.TRUE) { // preset requested
-			data.curValue = Value.TRUE;
-		} else if (triggered && state.getPort(n + 5) != Value.FALSE) {
-			// Clock has triggered and flip-flop is enabled: Update the state
-			Value[] inputs = new Value[n];
-			for (int i = 0; i < n; i++) {
-				inputs[i] = state.getPort(i);
-			}
-
-			Value newVal = computeValue(inputs, data.curValue);
-			if (newVal == Value.TRUE || newVal == Value.FALSE) {
-				data.curValue = newVal;
-			}
-		}
-
-		state.setPort(n + 1, data.curValue, Memory.DELAY);
-		state.setPort(n + 2, data.curValue.not(), Memory.DELAY);
-	}
+	//
+	// abstract methods intended to be implemented in subclasses
+	//
+	protected abstract String getInputName(int index);
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
@@ -149,51 +164,36 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		painter.drawPort(n + 2);
 	}
 
-	private static class StateData extends ClockState implements InstanceData {
-		Value curValue = Value.FALSE;
-	}
-
-	public static class Logger extends InstanceLogger {
-		@Override
-		public String getLogName(InstanceState state, Object option) {
-			String ret = state.getAttributeValue(StdAttr.LABEL);
-			return ret != null && !ret.equals("") ? ret : null;
+	@Override
+	public void propagate(InstanceState state) {
+		StateData data = (StateData) state.getData();
+		if (data == null) {
+			data = new StateData();
+			state.setData(data);
 		}
 
-		@Override
-		public Value getLogValue(InstanceState state, Object option) {
-			StateData s = (StateData) state.getData();
-			return s == null ? Value.FALSE : s.curValue;
-		}
-	}
+		int n = getPorts().size() - STD_PORTS;
+		Object triggerType = state.getAttributeValue(triggerAttribute);
+		boolean triggered = data.updateClock(state.getPort(n), triggerType);
 
-	public static class Poker extends InstancePoker {
-		boolean isPressed = true;
-
-		@Override
-		public void mousePressed(InstanceState state, MouseEvent e) {
-			isPressed = isInside(state, e);
-		}
-
-		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) {
-			if (isPressed && isInside(state, e)) {
-				StateData myState = (StateData) state.getData();
-				if (myState == null)
-					return;
-
-				myState.curValue = myState.curValue.not();
-				state.fireInvalidated();
+		if (state.getPort(n + 3) == Value.TRUE) { // clear requested
+			data.curValue = Value.FALSE;
+		} else if (state.getPort(n + 4) == Value.TRUE) { // preset requested
+			data.curValue = Value.TRUE;
+		} else if (triggered && state.getPort(n + 5) != Value.FALSE) {
+			// Clock has triggered and flip-flop is enabled: Update the state
+			Value[] inputs = new Value[n];
+			for (int i = 0; i < n; i++) {
+				inputs[i] = state.getPort(i);
 			}
-			isPressed = false;
+
+			Value newVal = computeValue(inputs, data.curValue);
+			if (newVal == Value.TRUE || newVal == Value.FALSE) {
+				data.curValue = newVal;
+			}
 		}
 
-		private boolean isInside(InstanceState state, MouseEvent e) {
-			Location loc = state.getInstance().getLocation();
-			int dx = e.getX() - (loc.getX() - 20);
-			int dy = e.getY() - (loc.getY() + 10);
-			int d2 = dx * dx + dy * dy;
-			return d2 < 8 * 8;
-		}
+		state.setPort(n + 1, data.curValue, Memory.DELAY);
+		state.setPort(n + 2, data.curValue.not(), Memory.DELAY);
 	}
 }

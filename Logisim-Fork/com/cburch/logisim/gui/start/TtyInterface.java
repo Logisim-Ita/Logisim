@@ -31,17 +31,134 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.StringUtil;
 
 public class TtyInterface {
+	// It's possible to avoid using the separate thread using
+	// System.in.available(),
+	// but this doesn't quite work because on some systems, the keyboard input
+	// is not interactively echoed until System.in.read() is invoked.
+	private static class StdinThread extends Thread {
+		private LinkedList<char[]> queue; // of char[]
+
+		public StdinThread() {
+			queue = new LinkedList<char[]>();
+		}
+
+		public char[] getBuffer() {
+			synchronized (queue) {
+				if (queue.isEmpty()) {
+					return null;
+				} else {
+					return queue.removeFirst();
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+			InputStreamReader stdin = new InputStreamReader(System.in);
+			char[] buffer = new char[32];
+			while (true) {
+				try {
+					int nbytes = stdin.read(buffer);
+					if (nbytes > 0) {
+						char[] add = new char[nbytes];
+						System.arraycopy(buffer, 0, add, 0, nbytes);
+						synchronized (queue) {
+							queue.addLast(add);
+						}
+					}
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
 	public static final int FORMAT_TABLE = 1;
 	public static final int FORMAT_SPEED = 2;
 	public static final int FORMAT_TTY = 4;
 	public static final int FORMAT_HALT = 8;
+
 	public static final int FORMAT_STATISTICS = 16;
 
 	private static boolean lastIsNewline = true;
 
-	public static void sendFromTty(char c) {
-		lastIsNewline = c == '\n';
-		System.out.print(c); // OK
+	private static int countDigits(int num) {
+		int digits = 1;
+		int lessThan = 10;
+		while (num >= lessThan) {
+			digits++;
+			lessThan *= 10;
+		}
+		return digits;
+	}
+
+	private static void displaySpeed(long tickCount, long elapse) {
+		double hertz = (double) tickCount / elapse * 1000.0;
+		double precision;
+		if (hertz >= 100)
+			precision = 1.0;
+		else if (hertz >= 10)
+			precision = 0.1;
+		else if (hertz >= 1)
+			precision = 0.01;
+		else if (hertz >= 0.01)
+			precision = 0.0001;
+		else
+			precision = 0.0000001;
+		hertz = (int) (hertz / precision) * precision;
+		String hertzStr = hertz == (int) hertz ? "" + (int) hertz : "" + hertz;
+		System.out.println(StringUtil.format(Strings.get("ttySpeedMsg"), // OK
+				hertzStr, "" + tickCount, "" + elapse));
+	}
+
+	private static void displayStatistics(LogisimFile file) {
+		FileStatistics stats = FileStatistics.compute(file, file.getMainCircuit());
+		FileStatistics.Count total = stats.getTotalWithSubcircuits();
+		int maxName = 0;
+		for (FileStatistics.Count count : stats.getCounts()) {
+			int nameLength = count.getFactory().getDisplayName().length();
+			if (nameLength > maxName)
+				maxName = nameLength;
+		}
+		String fmt = "%" + countDigits(total.getUniqueCount()) + "d\t" + "%" + countDigits(total.getRecursiveCount())
+				+ "d\t";
+		String fmtNormal = fmt + "%-" + maxName + "s\t%s\n";
+		for (FileStatistics.Count count : stats.getCounts()) {
+			Library lib = count.getLibrary();
+			String libName = lib == null ? "-" : lib.getDisplayName();
+			System.out.printf(fmtNormal, // OK
+					Integer.valueOf(count.getUniqueCount()), Integer.valueOf(count.getRecursiveCount()),
+					count.getFactory().getDisplayName(), libName);
+		}
+		FileStatistics.Count totalWithout = stats.getTotalWithoutSubcircuits();
+		System.out.printf(fmt + "%s\n", // OK
+				Integer.valueOf(totalWithout.getUniqueCount()), Integer.valueOf(totalWithout.getRecursiveCount()),
+				Strings.get("statsTotalWithout"));
+		System.out.printf(fmt + "%s\n", // OK
+				Integer.valueOf(total.getUniqueCount()), Integer.valueOf(total.getRecursiveCount()),
+				Strings.get("statsTotalWith"));
+	}
+
+	private static void displayTableRow(ArrayList<Value> prevOutputs, ArrayList<Value> curOutputs) {
+		boolean shouldPrint = false;
+		if (prevOutputs == null) {
+			shouldPrint = true;
+		} else {
+			for (int i = 0; i < curOutputs.size(); i++) {
+				Value a = prevOutputs.get(i);
+				Value b = curOutputs.get(i);
+				if (!a.equals(b)) {
+					shouldPrint = true;
+					break;
+				}
+			}
+		}
+		if (shouldPrint) {
+			for (int i = 0; i < curOutputs.size(); i++) {
+				if (i != 0)
+					System.out.print("\t"); // OK
+				System.out.print(curOutputs.get(i)); // OK
+			}
+			System.out.println(); // OK
+		}
 	}
 
 	private static void ensureLineTerminated() {
@@ -49,6 +166,47 @@ public class TtyInterface {
 			lastIsNewline = true;
 			System.out.print('\n'); // OK
 		}
+	}
+
+	private static boolean loadRam(CircuitState circState, File loadFile) throws IOException {
+		if (loadFile == null)
+			return false;
+
+		boolean found = false;
+		for (Component comp : circState.getCircuit().getNonWires()) {
+			if (comp.getFactory() instanceof Ram) {
+				Ram ramFactory = (Ram) comp.getFactory();
+				InstanceState ramState = circState.getInstanceState(comp);
+				ramFactory.loadImage(ramState, loadFile);
+				found = true;
+			}
+		}
+
+		for (CircuitState sub : circState.getSubstates()) {
+			found |= loadRam(sub, loadFile);
+		}
+		return found;
+	}
+
+	private static boolean prepareForTty(CircuitState circState, ArrayList<InstanceState> keybStates) {
+		boolean found = false;
+		for (Component comp : circState.getCircuit().getNonWires()) {
+			Object factory = comp.getFactory();
+			if (factory instanceof Tty) {
+				Tty ttyFactory = (Tty) factory;
+				InstanceState ttyState = circState.getInstanceState(comp);
+				ttyFactory.sendToStdout(ttyState);
+				found = true;
+			} else if (factory instanceof Keyboard) {
+				keybStates.add(circState.getInstanceState(comp));
+				found = true;
+			}
+		}
+
+		for (CircuitState sub : circState.getSubstates()) {
+			found |= prepareForTty(sub, keybStates);
+		}
+		return found;
 	}
 
 	public static void run(Startup args) {
@@ -107,85 +265,6 @@ public class TtyInterface {
 		int ttyFormat = args.getTtyFormat();
 		int simCode = runSimulation(circState, outputPins, haltPin, ttyFormat);
 		System.exit(simCode);
-	}
-
-	private static void displayStatistics(LogisimFile file) {
-		FileStatistics stats = FileStatistics.compute(file, file.getMainCircuit());
-		FileStatistics.Count total = stats.getTotalWithSubcircuits();
-		int maxName = 0;
-		for (FileStatistics.Count count : stats.getCounts()) {
-			int nameLength = count.getFactory().getDisplayName().length();
-			if (nameLength > maxName)
-				maxName = nameLength;
-		}
-		String fmt = "%" + countDigits(total.getUniqueCount()) + "d\t" + "%" + countDigits(total.getRecursiveCount())
-				+ "d\t";
-		String fmtNormal = fmt + "%-" + maxName + "s\t%s\n";
-		for (FileStatistics.Count count : stats.getCounts()) {
-			Library lib = count.getLibrary();
-			String libName = lib == null ? "-" : lib.getDisplayName();
-			System.out.printf(fmtNormal, // OK
-					Integer.valueOf(count.getUniqueCount()), Integer.valueOf(count.getRecursiveCount()),
-					count.getFactory().getDisplayName(), libName);
-		}
-		FileStatistics.Count totalWithout = stats.getTotalWithoutSubcircuits();
-		System.out.printf(fmt + "%s\n", // OK
-				Integer.valueOf(totalWithout.getUniqueCount()), Integer.valueOf(totalWithout.getRecursiveCount()),
-				Strings.get("statsTotalWithout"));
-		System.out.printf(fmt + "%s\n", // OK
-				Integer.valueOf(total.getUniqueCount()), Integer.valueOf(total.getRecursiveCount()),
-				Strings.get("statsTotalWith"));
-	}
-
-	private static int countDigits(int num) {
-		int digits = 1;
-		int lessThan = 10;
-		while (num >= lessThan) {
-			digits++;
-			lessThan *= 10;
-		}
-		return digits;
-	}
-
-	private static boolean loadRam(CircuitState circState, File loadFile) throws IOException {
-		if (loadFile == null)
-			return false;
-
-		boolean found = false;
-		for (Component comp : circState.getCircuit().getNonWires()) {
-			if (comp.getFactory() instanceof Ram) {
-				Ram ramFactory = (Ram) comp.getFactory();
-				InstanceState ramState = circState.getInstanceState(comp);
-				ramFactory.loadImage(ramState, loadFile);
-				found = true;
-			}
-		}
-
-		for (CircuitState sub : circState.getSubstates()) {
-			found |= loadRam(sub, loadFile);
-		}
-		return found;
-	}
-
-	private static boolean prepareForTty(CircuitState circState, ArrayList<InstanceState> keybStates) {
-		boolean found = false;
-		for (Component comp : circState.getCircuit().getNonWires()) {
-			Object factory = comp.getFactory();
-			if (factory instanceof Tty) {
-				Tty ttyFactory = (Tty) factory;
-				InstanceState ttyState = circState.getInstanceState(comp);
-				ttyFactory.sendToStdout(ttyState);
-				found = true;
-			} else if (factory instanceof Keyboard) {
-				keybStates.add(circState.getInstanceState(comp));
-				found = true;
-			}
-		}
-
-		for (CircuitState sub : circState.getSubstates()) {
-			found |= prepareForTty(sub, keybStates);
-		}
-		return found;
 	}
 
 	private static int runSimulation(CircuitState circState, ArrayList<Instance> outputPins, Instance haltPin,
@@ -270,87 +349,8 @@ public class TtyInterface {
 		return retCode;
 	}
 
-	private static void displayTableRow(ArrayList<Value> prevOutputs, ArrayList<Value> curOutputs) {
-		boolean shouldPrint = false;
-		if (prevOutputs == null) {
-			shouldPrint = true;
-		} else {
-			for (int i = 0; i < curOutputs.size(); i++) {
-				Value a = prevOutputs.get(i);
-				Value b = curOutputs.get(i);
-				if (!a.equals(b)) {
-					shouldPrint = true;
-					break;
-				}
-			}
-		}
-		if (shouldPrint) {
-			for (int i = 0; i < curOutputs.size(); i++) {
-				if (i != 0)
-					System.out.print("\t"); // OK
-				System.out.print(curOutputs.get(i)); // OK
-			}
-			System.out.println(); // OK
-		}
-	}
-
-	private static void displaySpeed(long tickCount, long elapse) {
-		double hertz = (double) tickCount / elapse * 1000.0;
-		double precision;
-		if (hertz >= 100)
-			precision = 1.0;
-		else if (hertz >= 10)
-			precision = 0.1;
-		else if (hertz >= 1)
-			precision = 0.01;
-		else if (hertz >= 0.01)
-			precision = 0.0001;
-		else
-			precision = 0.0000001;
-		hertz = (int) (hertz / precision) * precision;
-		String hertzStr = hertz == (int) hertz ? "" + (int) hertz : "" + hertz;
-		System.out.println(StringUtil.format(Strings.get("ttySpeedMsg"), // OK
-				hertzStr, "" + tickCount, "" + elapse));
-	}
-
-	// It's possible to avoid using the separate thread using
-	// System.in.available(),
-	// but this doesn't quite work because on some systems, the keyboard input
-	// is not interactively echoed until System.in.read() is invoked.
-	private static class StdinThread extends Thread {
-		private LinkedList<char[]> queue; // of char[]
-
-		public StdinThread() {
-			queue = new LinkedList<char[]>();
-		}
-
-		public char[] getBuffer() {
-			synchronized (queue) {
-				if (queue.isEmpty()) {
-					return null;
-				} else {
-					return queue.removeFirst();
-				}
-			}
-		}
-
-		@Override
-		public void run() {
-			InputStreamReader stdin = new InputStreamReader(System.in);
-			char[] buffer = new char[32];
-			while (true) {
-				try {
-					int nbytes = stdin.read(buffer);
-					if (nbytes > 0) {
-						char[] add = new char[nbytes];
-						System.arraycopy(buffer, 0, add, 0, nbytes);
-						synchronized (queue) {
-							queue.addLast(add);
-						}
-					}
-				} catch (IOException e) {
-				}
-			}
-		}
+	public static void sendFromTty(char c) {
+		lastIsNewline = c == '\n';
+		System.out.print(c); // OK
 	}
 }

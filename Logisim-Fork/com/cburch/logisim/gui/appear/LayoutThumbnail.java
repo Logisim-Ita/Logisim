@@ -40,12 +40,6 @@ public class LayoutThumbnail extends JComponent {
 		setPreferredSize(new Dimension(200, 200));
 	}
 
-	public void setCircuit(CircuitState circuitState, Collection<Instance> ports) {
-		this.circuitState = circuitState;
-		this.ports = ports;
-		repaint();
-	}
-
 	@Override
 	protected void paintComponent(Graphics g) {
 		if (circuitState != null) {
@@ -96,6 +90,12 @@ public class LayoutThumbnail extends JComponent {
 			GraphicsUtil.switchToWidth(g, 2);
 			g.drawRect(0, 0, size.width - 2, size.height - 2);
 		}
+	}
+
+	public void setCircuit(CircuitState circuitState, Collection<Instance> ports) {
+		this.circuitState = circuitState;
+		this.ports = ports;
+		repaint();
 	}
 
 }

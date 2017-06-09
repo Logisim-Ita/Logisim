@@ -19,13 +19,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class HorizontalSplitPane extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8977009017954942590L;
-	static final int DRAG_TOLERANCE = 3;
-	private static final Color DRAG_COLOR = new Color(0, 0, 0, 128);
-
 	abstract static class Dragbar extends JComponent implements MouseListener, MouseMotionListener {
 		/**
 		 * 
@@ -41,18 +34,29 @@ public class HorizontalSplitPane extends JPanel {
 
 		abstract int getDragValue(MouseEvent e);
 
-		abstract void setDragValue(int value);
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		}
 
 		@Override
-		public void paintComponent(Graphics g) {
+		public void mouseDragged(MouseEvent e) {
 			if (dragging) {
-				g.setColor(DRAG_COLOR);
-				g.fillRect(0, 0, getWidth(), getHeight());
+				int newValue = getDragValue(e);
+				if (newValue != curValue)
+					setDragValue(newValue);
 			}
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
 		}
 
 		@Override
@@ -76,84 +80,15 @@ public class HorizontalSplitPane extends JPanel {
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
+		public void paintComponent(Graphics g) {
 			if (dragging) {
-				int newValue = getDragValue(e);
-				if (newValue != curValue)
-					setDragValue(newValue);
+				g.setColor(DRAG_COLOR);
+				g.fillRect(0, 0, getWidth(), getHeight());
 			}
 		}
 
-		@Override
-		public void mouseMoved(MouseEvent e) {
-		}
+		abstract void setDragValue(int value);
 	}
-
-	private class MyLayout implements LayoutManager {
-		@Override
-		public void addLayoutComponent(String name, Component comp) {
-		}
-
-		@Override
-		public void removeLayoutComponent(Component comp) {
-		}
-
-		@Override
-		public Dimension preferredLayoutSize(Container parent) {
-			if (fraction <= 0.0)
-				return comp1.getPreferredSize();
-			if (fraction >= 1.0)
-				return comp0.getPreferredSize();
-			Insets in = parent.getInsets();
-			Dimension d0 = comp0.getPreferredSize();
-			Dimension d1 = comp1.getPreferredSize();
-			return new Dimension(in.left + Math.max(d0.width, d1.width) + in.right,
-					in.top + d0.height + d1.height + in.bottom);
-		}
-
-		@Override
-		public Dimension minimumLayoutSize(Container parent) {
-			if (fraction <= 0.0)
-				return comp1.getMinimumSize();
-			if (fraction >= 1.0)
-				return comp0.getMinimumSize();
-			Insets in = parent.getInsets();
-			Dimension d0 = comp0.getMinimumSize();
-			Dimension d1 = comp1.getMinimumSize();
-			return new Dimension(in.left + Math.max(d0.width, d1.width) + in.right,
-					in.top + d0.height + d1.height + in.bottom);
-		}
-
-		@Override
-		public void layoutContainer(Container parent) {
-			Insets in = parent.getInsets();
-			int maxWidth = parent.getWidth() - (in.left + in.right);
-			int maxHeight = parent.getHeight() - (in.top + in.bottom);
-			int split;
-			if (fraction <= 0.0) {
-				split = 0;
-			} else if (fraction >= 1.0) {
-				split = maxWidth;
-			} else {
-				split = (int) Math.round(maxHeight * fraction);
-				split = Math.min(split, maxHeight - comp1.getMinimumSize().height);
-				split = Math.max(split, comp0.getMinimumSize().height);
-			}
-
-			comp0.setBounds(in.left, in.top, maxWidth, split);
-			comp1.setBounds(in.left, in.top + split, maxWidth, maxHeight - split);
-			dragbar.setBounds(in.left, in.top + split - DRAG_TOLERANCE, maxWidth, 2 * DRAG_TOLERANCE);
-		}
-	}
-
 	private class MyDragbar extends Dragbar {
 		/**
 		 * 
@@ -176,6 +111,71 @@ public class HorizontalSplitPane extends JPanel {
 			revalidate();
 		}
 	}
+	private class MyLayout implements LayoutManager {
+		@Override
+		public void addLayoutComponent(String name, Component comp) {
+		}
+
+		@Override
+		public void layoutContainer(Container parent) {
+			Insets in = parent.getInsets();
+			int maxWidth = parent.getWidth() - (in.left + in.right);
+			int maxHeight = parent.getHeight() - (in.top + in.bottom);
+			int split;
+			if (fraction <= 0.0) {
+				split = 0;
+			} else if (fraction >= 1.0) {
+				split = maxWidth;
+			} else {
+				split = (int) Math.round(maxHeight * fraction);
+				split = Math.min(split, maxHeight - comp1.getMinimumSize().height);
+				split = Math.max(split, comp0.getMinimumSize().height);
+			}
+
+			comp0.setBounds(in.left, in.top, maxWidth, split);
+			comp1.setBounds(in.left, in.top + split, maxWidth, maxHeight - split);
+			dragbar.setBounds(in.left, in.top + split - DRAG_TOLERANCE, maxWidth, 2 * DRAG_TOLERANCE);
+		}
+
+		@Override
+		public Dimension minimumLayoutSize(Container parent) {
+			if (fraction <= 0.0)
+				return comp1.getMinimumSize();
+			if (fraction >= 1.0)
+				return comp0.getMinimumSize();
+			Insets in = parent.getInsets();
+			Dimension d0 = comp0.getMinimumSize();
+			Dimension d1 = comp1.getMinimumSize();
+			return new Dimension(in.left + Math.max(d0.width, d1.width) + in.right,
+					in.top + d0.height + d1.height + in.bottom);
+		}
+
+		@Override
+		public Dimension preferredLayoutSize(Container parent) {
+			if (fraction <= 0.0)
+				return comp1.getPreferredSize();
+			if (fraction >= 1.0)
+				return comp0.getPreferredSize();
+			Insets in = parent.getInsets();
+			Dimension d0 = comp0.getPreferredSize();
+			Dimension d1 = comp1.getPreferredSize();
+			return new Dimension(in.left + Math.max(d0.width, d1.width) + in.right,
+					in.top + d0.height + d1.height + in.bottom);
+		}
+
+		@Override
+		public void removeLayoutComponent(Component comp) {
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8977009017954942590L;
+
+	static final int DRAG_TOLERANCE = 3;
+
+	private static final Color DRAG_COLOR = new Color(0, 0, 0, 128);
 
 	private JComponent comp0;
 	private JComponent comp1;

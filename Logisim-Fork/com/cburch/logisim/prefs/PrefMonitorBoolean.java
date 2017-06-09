@@ -30,14 +30,6 @@ class PrefMonitorBoolean extends AbstractPrefMonitor<Boolean> {
 	}
 
 	@Override
-	public void set(Boolean newValue) {
-		boolean newVal = newValue.booleanValue();
-		if (value != newVal) {
-			AppPreferences.getPrefs().putBoolean(getIdentifier(), newVal);
-		}
-	}
-
-	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		Preferences prefs = event.getNode();
 		String prop = event.getKey();
@@ -49,6 +41,14 @@ class PrefMonitorBoolean extends AbstractPrefMonitor<Boolean> {
 				value = newValue;
 				AppPreferences.firePropertyChange(name, oldValue, newValue);
 			}
+		}
+	}
+
+	@Override
+	public void set(Boolean newValue) {
+		boolean newVal = newValue.booleanValue();
+		if (value != newVal) {
+			AppPreferences.getPrefs().putBoolean(getIdentifier(), newVal);
 		}
 	}
 }

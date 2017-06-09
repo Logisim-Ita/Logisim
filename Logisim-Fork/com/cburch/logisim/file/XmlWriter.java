@@ -77,118 +77,53 @@ class XmlWriter {
 		this.loader = loader;
 	}
 
-	Element fromLogisimFile() {
-		Element ret = doc.createElement("project");
-		doc.appendChild(ret);
-		ret.appendChild(doc.createTextNode(
-				"\nThis file is intended to be " + "loaded by Logisim (http://www.cburch.com/logisim/).\n"));
-		ret.setAttribute("version", "1.0");
-		ret.setAttribute("source", Main.VERSION_NAME);
-
-		for (Library lib : file.getLibraries()) {
-			Element elt = fromLibrary(lib);
-			if (elt != null)
-				ret.appendChild(elt);
-		}
-
-		if (file.getMainCircuit() != null) {
-			Element mainElt = doc.createElement("main");
-			mainElt.setAttribute("name", file.getMainCircuit().getName());
-			ret.appendChild(mainElt);
-		}
-
-		ret.appendChild(fromOptions());
-		ret.appendChild(fromMouseMappings());
-		ret.appendChild(fromToolbarData());
-
-		for (Circuit circ : file.getCircuits()) {
-			ret.appendChild(fromCircuit(circ));
-		}
-		return ret;
-	}
-
-	Element fromLibrary(Library lib) {
-		Element ret = doc.createElement("lib");
-		if (libs.containsKey(lib))
-			return null;
-		String name = "" + libs.size();
-		String desc = loader.getDescriptor(lib);
-		if (desc == null) {
-			loader.showError("library location unknown: " + lib.getName());
-			return null;
-		}
-		libs.put(lib, name);
-		ret.setAttribute("name", name);
-		ret.setAttribute("desc", desc);
-		for (Tool t : lib.getTools()) {
-			AttributeSet attrs = t.getAttributeSet();
-			if (attrs != null) {
-				Element toAdd = doc.createElement("tool");
-				toAdd.setAttribute("name", t.getName());
-				addAttributeSetContent(toAdd, attrs, t);
-				if (toAdd.getChildNodes().getLength() > 0) {
-					ret.appendChild(toAdd);
+	void addAttributeSetContent(Element elt, AttributeSet attrs, AttributeDefaultProvider source) {
+		if (attrs == null)
+			return;
+		LogisimVersion ver = Main.VERSION;
+		if (source != null && source.isAllDefaultValues(attrs, ver))
+			return;
+		for (Attribute<?> attrBase : attrs.getAttributes()) {
+			@SuppressWarnings("unchecked")
+			Attribute<Object> attr = (Attribute<Object>) attrBase;
+			Object val = attrs.getValue(attr);
+			if (attrs.isToSave(attr) && val != null) {
+				Object dflt = source == null ? null : source.getDefaultAttributeValue(attr, ver);
+				if (dflt == null || !dflt.equals(val)) {
+					Element a = doc.createElement("a");
+					a.setAttribute("name", attr.getName());
+					String value = attr.toStandardString(val);
+					if (value.indexOf("\n") >= 0) {
+						a.appendChild(doc.createTextNode(value));
+					} else {
+						a.setAttribute("val", attr.toStandardString(val));
+					}
+					elt.appendChild(a);
 				}
 			}
 		}
-		return ret;
 	}
 
-	Element fromOptions() {
-		Element elt = doc.createElement("options");
-		addAttributeSetContent(elt, file.getOptions().getAttributeSet(), null);
-		return elt;
-	}
-
-	Element fromMouseMappings() {
-		Element elt = doc.createElement("mappings");
-		MouseMappings map = file.getOptions().getMouseMappings();
-		for (Map.Entry<Integer, Tool> entry : map.getMappings().entrySet()) {
-			Integer mods = entry.getKey();
-			Tool tool = entry.getValue();
-			Element toolElt = fromTool(tool);
-			String mapValue = InputEventUtil.toString(mods.intValue());
-			toolElt.setAttribute("map", mapValue);
-			elt.appendChild(toolElt);
+	Library findLibrary(ComponentFactory source) {
+		if (file.contains(source)) {
+			return file;
 		}
-		return elt;
+		for (Library lib : file.getLibraries()) {
+			if (lib.contains(source))
+				return lib;
+		}
+		return null;
 	}
 
-	Element fromToolbarData() {
-		Element elt = doc.createElement("toolbar");
-		ToolbarData toolbar = file.getOptions().getToolbarData();
-		for (Tool tool : toolbar.getContents()) {
-			if (tool == null) {
-				elt.appendChild(doc.createElement("sep"));
-			} else {
-				elt.appendChild(fromTool(tool));
-			}
+	Library findLibrary(Tool tool) {
+		if (libraryContains(file, tool)) {
+			return file;
 		}
-		return elt;
-	}
-
-	Element fromTool(Tool tool) {
-		Library lib = findLibrary(tool);
-		String lib_name;
-		if (lib == null) {
-			loader.showError(StringUtil.format("tool `%s' not found", tool.getDisplayName()));
-			return null;
-		} else if (lib == file) {
-			lib_name = null;
-		} else {
-			lib_name = libs.get(lib);
-			if (lib_name == null) {
-				loader.showError("unknown library within file");
-				return null;
-			}
+		for (Library lib : file.getLibraries()) {
+			if (libraryContains(lib, tool))
+				return lib;
 		}
-
-		Element elt = doc.createElement("tool");
-		if (lib_name != null)
-			elt.setAttribute("lib", lib_name);
-		elt.setAttribute("name", tool.getName());
-		addAttributeSetContent(elt, tool.getAttributeSet(), tool);
-		return elt;
+		return null;
 	}
 
 	Element fromCircuit(Circuit circuit) {
@@ -244,60 +179,125 @@ class XmlWriter {
 		return ret;
 	}
 
+	Element fromLibrary(Library lib) {
+		Element ret = doc.createElement("lib");
+		if (libs.containsKey(lib))
+			return null;
+		String name = "" + libs.size();
+		String desc = loader.getDescriptor(lib);
+		if (desc == null) {
+			loader.showError("library location unknown: " + lib.getName());
+			return null;
+		}
+		libs.put(lib, name);
+		ret.setAttribute("name", name);
+		ret.setAttribute("desc", desc);
+		for (Tool t : lib.getTools()) {
+			AttributeSet attrs = t.getAttributeSet();
+			if (attrs != null) {
+				Element toAdd = doc.createElement("tool");
+				toAdd.setAttribute("name", t.getName());
+				addAttributeSetContent(toAdd, attrs, t);
+				if (toAdd.getChildNodes().getLength() > 0) {
+					ret.appendChild(toAdd);
+				}
+			}
+		}
+		return ret;
+	}
+
+	Element fromLogisimFile() {
+		Element ret = doc.createElement("project");
+		doc.appendChild(ret);
+		ret.appendChild(doc.createTextNode(
+				"\nThis file is intended to be " + "loaded by Logisim (http://www.cburch.com/logisim/).\n"));
+		ret.setAttribute("version", "1.0");
+		ret.setAttribute("source", Main.VERSION_NAME);
+
+		for (Library lib : file.getLibraries()) {
+			Element elt = fromLibrary(lib);
+			if (elt != null)
+				ret.appendChild(elt);
+		}
+
+		if (file.getMainCircuit() != null) {
+			Element mainElt = doc.createElement("main");
+			mainElt.setAttribute("name", file.getMainCircuit().getName());
+			ret.appendChild(mainElt);
+		}
+
+		ret.appendChild(fromOptions());
+		ret.appendChild(fromMouseMappings());
+		ret.appendChild(fromToolbarData());
+
+		for (Circuit circ : file.getCircuits()) {
+			ret.appendChild(fromCircuit(circ));
+		}
+		return ret;
+	}
+
+	Element fromMouseMappings() {
+		Element elt = doc.createElement("mappings");
+		MouseMappings map = file.getOptions().getMouseMappings();
+		for (Map.Entry<Integer, Tool> entry : map.getMappings().entrySet()) {
+			Integer mods = entry.getKey();
+			Tool tool = entry.getValue();
+			Element toolElt = fromTool(tool);
+			String mapValue = InputEventUtil.toString(mods.intValue());
+			toolElt.setAttribute("map", mapValue);
+			elt.appendChild(toolElt);
+		}
+		return elt;
+	}
+
+	Element fromOptions() {
+		Element elt = doc.createElement("options");
+		addAttributeSetContent(elt, file.getOptions().getAttributeSet(), null);
+		return elt;
+	}
+
+	Element fromTool(Tool tool) {
+		Library lib = findLibrary(tool);
+		String lib_name;
+		if (lib == null) {
+			loader.showError(StringUtil.format("tool `%s' not found", tool.getDisplayName()));
+			return null;
+		} else if (lib == file) {
+			lib_name = null;
+		} else {
+			lib_name = libs.get(lib);
+			if (lib_name == null) {
+				loader.showError("unknown library within file");
+				return null;
+			}
+		}
+
+		Element elt = doc.createElement("tool");
+		if (lib_name != null)
+			elt.setAttribute("lib", lib_name);
+		elt.setAttribute("name", tool.getName());
+		addAttributeSetContent(elt, tool.getAttributeSet(), tool);
+		return elt;
+	}
+
+	Element fromToolbarData() {
+		Element elt = doc.createElement("toolbar");
+		ToolbarData toolbar = file.getOptions().getToolbarData();
+		for (Tool tool : toolbar.getContents()) {
+			if (tool == null) {
+				elt.appendChild(doc.createElement("sep"));
+			} else {
+				elt.appendChild(fromTool(tool));
+			}
+		}
+		return elt;
+	}
+
 	Element fromWire(Wire w) {
 		Element ret = doc.createElement("wire");
 		ret.setAttribute("from", w.getEnd0().toString());
 		ret.setAttribute("to", w.getEnd1().toString());
 		return ret;
-	}
-
-	void addAttributeSetContent(Element elt, AttributeSet attrs, AttributeDefaultProvider source) {
-		if (attrs == null)
-			return;
-		LogisimVersion ver = Main.VERSION;
-		if (source != null && source.isAllDefaultValues(attrs, ver))
-			return;
-		for (Attribute<?> attrBase : attrs.getAttributes()) {
-			@SuppressWarnings("unchecked")
-			Attribute<Object> attr = (Attribute<Object>) attrBase;
-			Object val = attrs.getValue(attr);
-			if (attrs.isToSave(attr) && val != null) {
-				Object dflt = source == null ? null : source.getDefaultAttributeValue(attr, ver);
-				if (dflt == null || !dflt.equals(val)) {
-					Element a = doc.createElement("a");
-					a.setAttribute("name", attr.getName());
-					String value = attr.toStandardString(val);
-					if (value.indexOf("\n") >= 0) {
-						a.appendChild(doc.createTextNode(value));
-					} else {
-						a.setAttribute("val", attr.toStandardString(val));
-					}
-					elt.appendChild(a);
-				}
-			}
-		}
-	}
-
-	Library findLibrary(Tool tool) {
-		if (libraryContains(file, tool)) {
-			return file;
-		}
-		for (Library lib : file.getLibraries()) {
-			if (libraryContains(lib, tool))
-				return lib;
-		}
-		return null;
-	}
-
-	Library findLibrary(ComponentFactory source) {
-		if (file.contains(source)) {
-			return file;
-		}
-		for (Library lib : file.getLibraries()) {
-			if (lib.contains(source))
-				return lib;
-		}
-		return null;
 	}
 
 	boolean libraryContains(Library lib, Tool query) {

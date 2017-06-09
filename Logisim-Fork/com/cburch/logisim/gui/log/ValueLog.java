@@ -18,8 +18,16 @@ class ValueLog {
 		firstIndex = 0;
 	}
 
-	public int size() {
-		return curSize;
+	public void append(Value val) {
+		if (curSize < LOG_SIZE) {
+			log[curSize] = val;
+			curSize++;
+		} else {
+			log[firstIndex] = val;
+			firstIndex++;
+			if (firstIndex >= LOG_SIZE)
+				firstIndex = 0;
+		}
 	}
 
 	public Value get(int index) {
@@ -34,15 +42,7 @@ class ValueLog {
 				: (firstIndex == 0 ? log[curSize - 1] : log[firstIndex - 1]);
 	}
 
-	public void append(Value val) {
-		if (curSize < LOG_SIZE) {
-			log[curSize] = val;
-			curSize++;
-		} else {
-			log[firstIndex] = val;
-			firstIndex++;
-			if (firstIndex >= LOG_SIZE)
-				firstIndex = 0;
-		}
+	public int size() {
+		return curSize;
 	}
 }

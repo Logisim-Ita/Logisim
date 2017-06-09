@@ -10,15 +10,15 @@ public class AttributeOption implements AttributeOptionInterface {
 	private String name;
 	private StringGetter desc;
 
-	public AttributeOption(Object value, StringGetter desc) {
-		this.value = value;
-		this.name = value.toString();
-		this.desc = desc;
-	}
-
 	public AttributeOption(Object value, String name, StringGetter desc) {
 		this.value = value;
 		this.name = name;
+		this.desc = desc;
+	}
+
+	public AttributeOption(Object value, StringGetter desc) {
+		this.value = value;
+		this.name = value.toString();
 		this.desc = desc;
 	}
 
@@ -28,12 +28,12 @@ public class AttributeOption implements AttributeOptionInterface {
 	}
 
 	@Override
-	public String toString() {
-		return name;
+	public String toDisplayString() {
+		return desc.get();
 	}
 
 	@Override
-	public String toDisplayString() {
-		return desc.get();
+	public String toString() {
+		return name;
 	}
 }

@@ -47,12 +47,15 @@ class PropagationPoints {
 		data.add(new Entry(state, loc));
 	}
 
-	void clear() {
-		data.clear();
+	private void addSubstates(HashMap<CircuitState, CircuitState> map, CircuitState source, CircuitState value) {
+		map.put(source, value);
+		for (CircuitState s : source.getSubstates()) {
+			addSubstates(map, s, value);
+		}
 	}
 
-	boolean isEmpty() {
-		return data.isEmpty();
+	void clear() {
+		data.clear();
 	}
 
 	void draw(ComponentDrawContext context) {
@@ -81,10 +84,7 @@ class PropagationPoints {
 		GraphicsUtil.switchToWidth(g, 1);
 	}
 
-	private void addSubstates(HashMap<CircuitState, CircuitState> map, CircuitState source, CircuitState value) {
-		map.put(source, value);
-		for (CircuitState s : source.getSubstates()) {
-			addSubstates(map, s, value);
-		}
+	boolean isEmpty() {
+		return data.isEmpty();
 	}
 }

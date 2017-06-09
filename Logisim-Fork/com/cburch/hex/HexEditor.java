@@ -15,23 +15,23 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
 public class HexEditor extends JComponent implements Scrollable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -688232359841362298L;
-
 	private class Listener implements HexModelListener {
+		@Override
+		public void bytesChanged(HexModel source, long start, long numBytes, int[] oldValues) {
+			repaint(0, measures.toY(start), getWidth(), measures.toY(start + numBytes) + measures.getCellHeight());
+		}
+
 		@Override
 		public void metainfoChanged(HexModel source) {
 			measures.recompute();
 			repaint();
 		}
-
-		@Override
-		public void bytesChanged(HexModel source, long start, long numBytes, int[] oldValues) {
-			repaint(0, measures.toY(start), getWidth(), measures.toY(start + numBytes) + measures.getCellHeight());
-		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -688232359841362298L;
 
 	private HexModel model;
 	private Listener listener;
@@ -54,68 +54,88 @@ public class HexEditor extends JComponent implements Scrollable {
 		measures.recompute();
 	}
 
-	Measures getMeasures() {
-		return measures;
+	public Object addHighlight(int start, int end, Color color) {
+		return highlighter.add(start, end, color);
 	}
 
-	Highlighter getHighlighter() {
-		return highlighter;
-	}
-
-	public HexModel getModel() {
-		return model;
+	public void delete() {
+		long p0 = caret.getMark();
+		long p1 = caret.getDot();
+		if (p0 < 0 || p1 < 0)
+			return;
+		if (p0 > p1) {
+			long t = p0;
+			p0 = p1;
+			p1 = t;
+		}
+		model.fill(p0, p1 - p0 + 1, 0);
 	}
 
 	public Caret getCaret() {
 		return caret;
 	}
 
-	public Object addHighlight(int start, int end, Color color) {
-		return highlighter.add(start, end, color);
+	Highlighter getHighlighter() {
+		return highlighter;
 	}
 
-	public void removeHighlight(Object tag) {
-		highlighter.remove(tag);
+	Measures getMeasures() {
+		return measures;
 	}
 
-	public void setModel(HexModel value) {
-		if (model == value)
-			return;
-		if (model != null)
-			model.removeHexModelListener(listener);
-		model = value;
-		highlighter.clear();
-		caret.setDot(-1, false);
-		if (model != null)
-			model.addHexModelListener(listener);
-		measures.recompute();
+	public HexModel getModel() {
+		return model;
 	}
 
-	public void scrollAddressToVisible(int start, int end) {
-		if (start < 0 || end < 0)
-			return;
-		int x0 = measures.toX(start);
-		int x1 = measures.toX(end) + measures.getCellWidth();
-		int y0 = measures.toY(start);
-		int y1 = measures.toY(end);
-		int h = measures.getCellHeight();
-		if (y0 == y1) {
-			scrollRectToVisible(new Rectangle(x0, y0, x1 - x0, h));
+	//
+	// Scrollable methods
+	//
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle vis, int orientation, int direction) {
+		if (orientation == SwingConstants.VERTICAL) {
+			int height = measures.getCellHeight();
+			if (height < 1) {
+				measures.recompute();
+				height = measures.getCellHeight();
+				if (height < 1)
+					return 19 * vis.height / 20;
+			}
+			int lines = Math.max(1, (vis.height / height) - 1);
+			return lines * height;
 		} else {
-			scrollRectToVisible(new Rectangle(x0, y0, x1 - x0, (y1 + h) - y0));
+			return 19 * vis.width / 20;
 		}
 	}
 
 	@Override
-	public void setFont(Font value) {
-		super.setFont(value);
-		measures.recompute();
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
 	}
 
 	@Override
-	public void setBounds(int x, int y, int width, int height) {
-		super.setBounds(x, y, width, height);
-		measures.widthChanged();
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle vis, int orientation, int direction) {
+		if (orientation == SwingConstants.VERTICAL) {
+			int ret = measures.getCellHeight();
+			if (ret < 1) {
+				measures.recompute();
+				ret = measures.getCellHeight();
+				if (ret < 1)
+					return 1;
+			}
+			return ret;
+		} else {
+			return Math.max(1, vis.width / 20);
+		}
 	}
 
 	@Override
@@ -168,6 +188,62 @@ public class HexEditor extends JComponent implements Scrollable {
 		caret.paintForeground(g, xaddr0, xaddr1);
 	}
 
+	public void removeHighlight(Object tag) {
+		highlighter.remove(tag);
+	}
+
+	public void scrollAddressToVisible(int start, int end) {
+		if (start < 0 || end < 0)
+			return;
+		int x0 = measures.toX(start);
+		int x1 = measures.toX(end) + measures.getCellWidth();
+		int y0 = measures.toY(start);
+		int y1 = measures.toY(end);
+		int h = measures.getCellHeight();
+		if (y0 == y1) {
+			scrollRectToVisible(new Rectangle(x0, y0, x1 - x0, h));
+		} else {
+			scrollRectToVisible(new Rectangle(x0, y0, x1 - x0, (y1 + h) - y0));
+		}
+	}
+
+	public void selectAll() {
+		caret.setDot(model.getLastOffset(), false);
+		caret.setDot(0, true);
+	}
+
+	//
+	// selection methods
+	//
+	public boolean selectionExists() {
+		return caret.getMark() >= 0 && caret.getDot() >= 0;
+	}
+
+	@Override
+	public void setBounds(int x, int y, int width, int height) {
+		super.setBounds(x, y, width, height);
+		measures.widthChanged();
+	}
+
+	@Override
+	public void setFont(Font value) {
+		super.setFont(value);
+		measures.recompute();
+	}
+
+	public void setModel(HexModel value) {
+		if (model == value)
+			return;
+		if (model != null)
+			model.removeHexModelListener(listener);
+		model = value;
+		highlighter.clear();
+		caret.setDot(-1, false);
+		if (model != null)
+			model.addHexModelListener(listener);
+		measures.recompute();
+	}
+
 	private String toHex(long value, int chars) {
 		String ret = Long.toHexString(value);
 		int retLen = ret.length();
@@ -182,81 +258,5 @@ public class HexEditor extends JComponent implements Scrollable {
 		} else {
 			return ret.substring(retLen - chars);
 		}
-	}
-
-	//
-	// selection methods
-	//
-	public boolean selectionExists() {
-		return caret.getMark() >= 0 && caret.getDot() >= 0;
-	}
-
-	public void selectAll() {
-		caret.setDot(model.getLastOffset(), false);
-		caret.setDot(0, true);
-	}
-
-	public void delete() {
-		long p0 = caret.getMark();
-		long p1 = caret.getDot();
-		if (p0 < 0 || p1 < 0)
-			return;
-		if (p0 > p1) {
-			long t = p0;
-			p0 = p1;
-			p1 = t;
-		}
-		model.fill(p0, p1 - p0 + 1, 0);
-	}
-
-	//
-	// Scrollable methods
-	//
-	@Override
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
-
-	@Override
-	public int getScrollableUnitIncrement(Rectangle vis, int orientation, int direction) {
-		if (orientation == SwingConstants.VERTICAL) {
-			int ret = measures.getCellHeight();
-			if (ret < 1) {
-				measures.recompute();
-				ret = measures.getCellHeight();
-				if (ret < 1)
-					return 1;
-			}
-			return ret;
-		} else {
-			return Math.max(1, vis.width / 20);
-		}
-	}
-
-	@Override
-	public int getScrollableBlockIncrement(Rectangle vis, int orientation, int direction) {
-		if (orientation == SwingConstants.VERTICAL) {
-			int height = measures.getCellHeight();
-			if (height < 1) {
-				measures.recompute();
-				height = measures.getCellHeight();
-				if (height < 1)
-					return 19 * vis.height / 20;
-			}
-			int lines = Math.max(1, (vis.height / height) - 1);
-			return lines * height;
-		} else {
-			return 19 * vis.width / 20;
-		}
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportWidth() {
-		return true;
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportHeight() {
-		return false;
 	}
 }

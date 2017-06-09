@@ -42,85 +42,8 @@ public class Line extends AbstractCanvasObject {
 	}
 
 	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof Line) {
-			Line that = (Line) other;
-			return this.x0 == that.x0 && this.y0 == that.x1 && this.x1 == that.y0 && this.y1 == that.y1
-					&& this.strokeWidth == that.strokeWidth && this.strokeColor.equals(that.strokeColor);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int matchesHashCode() {
-		int ret = x0 * 31 + y0;
-		ret = ret * 31 * 31 + x1 * 31 + y1;
-		ret = ret * 31 + strokeWidth;
-		ret = ret * 31 + strokeColor.hashCode();
-		return ret;
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		return SvgCreator.createLine(doc, this);
-	}
-
-	public Location getEnd0() {
-		return Location.create(x0, y0);
-	}
-
-	public Location getEnd1() {
-		return Location.create(x1, y1);
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("shapeLine");
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.ATTRS_STROKE;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <V> V getValue(Attribute<V> attr) {
-		if (attr == DrawAttr.STROKE_COLOR) {
-			return (V) strokeColor;
-		} else if (attr == DrawAttr.STROKE_WIDTH) {
-			return (V) Integer.valueOf(strokeWidth);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public void updateValue(Attribute<?> attr, Object value) {
-		if (attr == DrawAttr.STROKE_COLOR) {
-			strokeColor = (Color) value;
-		} else if (attr == DrawAttr.STROKE_WIDTH) {
-			strokeWidth = ((Integer) value).intValue();
-		}
-	}
-
-	@Override
-	public Bounds getBounds() {
-		return bounds;
-	}
-
-	@Override
-	public Location getRandomPoint(Bounds bds, Random rand) {
-		double u = rand.nextDouble();
-		int x = (int) Math.round(x0 + u * (x1 - x0));
-		int y = (int) Math.round(y0 + u * (y1 - y0));
-		int w = strokeWidth;
-		if (w > 1) {
-			x += (rand.nextInt(w) - w / 2);
-			y += (rand.nextInt(w) - w / 2);
-		}
-		return Location.create(x, y);
+	public boolean canMoveHandle(Handle handle) {
+		return true;
 	}
 
 	@Override
@@ -133,11 +56,26 @@ public class Line extends AbstractCanvasObject {
 	}
 
 	@Override
-	public void translate(int dx, int dy) {
-		x0 += dx;
-		y0 += dy;
-		x1 += dx;
-		y1 += dy;
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.ATTRS_STROKE;
+	}
+
+	@Override
+	public Bounds getBounds() {
+		return bounds;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("shapeLine");
+	}
+
+	public Location getEnd0() {
+		return Location.create(x0, y0);
+	}
+
+	public Location getEnd1() {
+		return Location.create(x1, y1);
 	}
 
 	public List<Handle> getHandles() {
@@ -160,8 +98,48 @@ public class Line extends AbstractCanvasObject {
 	}
 
 	@Override
-	public boolean canMoveHandle(Handle handle) {
-		return true;
+	public Location getRandomPoint(Bounds bds, Random rand) {
+		double u = rand.nextDouble();
+		int x = (int) Math.round(x0 + u * (x1 - x0));
+		int y = (int) Math.round(y0 + u * (y1 - y0));
+		int w = strokeWidth;
+		if (w > 1) {
+			x += (rand.nextInt(w) - w / 2);
+			y += (rand.nextInt(w) - w / 2);
+		}
+		return Location.create(x, y);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <V> V getValue(Attribute<V> attr) {
+		if (attr == DrawAttr.STROKE_COLOR) {
+			return (V) strokeColor;
+		} else if (attr == DrawAttr.STROKE_WIDTH) {
+			return (V) Integer.valueOf(strokeWidth);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public boolean matches(CanvasObject other) {
+		if (other instanceof Line) {
+			Line that = (Line) other;
+			return this.x0 == that.x0 && this.y0 == that.x1 && this.x1 == that.y0 && this.y1 == that.y1
+					&& this.strokeWidth == that.strokeWidth && this.strokeColor.equals(that.strokeColor);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		int ret = x0 * 31 + y0;
+		ret = ret * 31 * 31 + x1 * 31 + y1;
+		ret = ret * 31 + strokeWidth;
+		ret = ret * 31 + strokeColor.hashCode();
+		return ret;
 	}
 
 	@Override
@@ -201,6 +179,28 @@ public class Line extends AbstractCanvasObject {
 				y1 += gesture.getDeltaY();
 			}
 			g.drawLine(x0, y0, x1, y1);
+		}
+	}
+
+	@Override
+	public Element toSvgElement(Document doc) {
+		return SvgCreator.createLine(doc, this);
+	}
+
+	@Override
+	public void translate(int dx, int dy) {
+		x0 += dx;
+		y0 += dy;
+		x1 += dx;
+		y1 += dy;
+	}
+
+	@Override
+	public void updateValue(Attribute<?> attr, Object value) {
+		if (attr == DrawAttr.STROKE_COLOR) {
+			strokeColor = (Color) value;
+		} else if (attr == DrawAttr.STROKE_WIDTH) {
+			strokeWidth = ((Integer) value).intValue();
 		}
 	}
 

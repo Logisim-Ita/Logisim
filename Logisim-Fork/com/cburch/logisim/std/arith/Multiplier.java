@@ -29,66 +29,6 @@ public class Multiplier extends InstanceFactory {
 	private static final int C_IN = 3;
 	private static final int C_OUT = 4;
 
-	public Multiplier() {
-		super("Multiplier", Strings.getter("multiplierComponent"));
-		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
-		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
-		setIconName("multiplier.gif");
-
-		Port[] ps = new Port[5];
-		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
-		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
-		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[C_IN] = new Port(-20, -20, Port.INPUT, StdAttr.WIDTH);
-		ps[C_OUT] = new Port(-20, 20, Port.OUTPUT, StdAttr.WIDTH);
-		ps[IN0].setToolTip(Strings.getter("multiplierInputTip"));
-		ps[IN1].setToolTip(Strings.getter("multiplierInputTip"));
-		ps[OUT].setToolTip(Strings.getter("multiplierOutputTip"));
-		ps[C_IN].setToolTip(Strings.getter("multiplierCarryInTip"));
-		ps[C_OUT].setToolTip(Strings.getter("multiplierCarryOutTip"));
-		setPorts(ps);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		// get attributes
-		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-
-		// compute outputs
-		Value a = state.getPort(IN0);
-		Value b = state.getPort(IN1);
-		Value c_in = state.getPort(C_IN);
-		Value[] outs = Multiplier.computeProduct(dataWidth, a, b, c_in);
-
-		// propagate them
-		int delay = dataWidth.getWidth() * (dataWidth.getWidth() + 2) * PER_DELAY;
-		state.setPort(OUT, outs[0], delay);
-		state.setPort(C_OUT, outs[1], delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-
-		g.setColor(Color.GRAY);
-		painter.drawPort(IN0);
-		painter.drawPort(IN1);
-		painter.drawPort(OUT);
-		painter.drawPort(C_IN, "c in", Direction.NORTH);
-		painter.drawPort(C_OUT, "c out", Direction.SOUTH);
-
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.BLACK);
-		g.drawLine(x - 15, y - 5, x - 5, y + 5);
-		g.drawLine(x - 15, y + 5, x - 5, y - 5);
-		GraphicsUtil.switchToWidth(g, 1);
-	}
-
 	static Value[] computeProduct(BitWidth width, Value a, Value b, Value c_in) {
 		int w = width.getWidth();
 		if (c_in == Value.NIL || c_in.isUnknown())
@@ -129,17 +69,17 @@ public class Multiplier extends InstanceFactory {
 		}
 	}
 
-	private static int findUnknown(Value[] vals) {
+	private static int findError(Value[] vals) {
 		for (int i = 0; i < vals.length; i++) {
-			if (!vals[i].isFullyDefined())
+			if (vals[i].isErrorValue())
 				return i;
 		}
 		return vals.length;
 	}
 
-	private static int findError(Value[] vals) {
+	private static int findUnknown(Value[] vals) {
 		for (int i = 0; i < vals.length; i++) {
-			if (vals[i].isErrorValue())
+			if (!vals[i].isFullyDefined())
 				return i;
 		}
 		return vals.length;
@@ -154,5 +94,65 @@ public class Multiplier extends InstanceFactory {
 			ret |= val << i;
 		}
 		return ret;
+	}
+
+	public Multiplier() {
+		super("Multiplier", Strings.getter("multiplierComponent"));
+		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
+		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
+		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
+		setIconName("multiplier.gif");
+
+		Port[] ps = new Port[5];
+		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
+		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[C_IN] = new Port(-20, -20, Port.INPUT, StdAttr.WIDTH);
+		ps[C_OUT] = new Port(-20, 20, Port.OUTPUT, StdAttr.WIDTH);
+		ps[IN0].setToolTip(Strings.getter("multiplierInputTip"));
+		ps[IN1].setToolTip(Strings.getter("multiplierInputTip"));
+		ps[OUT].setToolTip(Strings.getter("multiplierOutputTip"));
+		ps[C_IN].setToolTip(Strings.getter("multiplierCarryInTip"));
+		ps[C_OUT].setToolTip(Strings.getter("multiplierCarryOutTip"));
+		setPorts(ps);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+
+		g.setColor(Color.GRAY);
+		painter.drawPort(IN0);
+		painter.drawPort(IN1);
+		painter.drawPort(OUT);
+		painter.drawPort(C_IN, "c in", Direction.NORTH);
+		painter.drawPort(C_OUT, "c out", Direction.SOUTH);
+
+		Location loc = painter.getLocation();
+		int x = loc.getX();
+		int y = loc.getY();
+		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(Color.BLACK);
+		g.drawLine(x - 15, y - 5, x - 5, y + 5);
+		g.drawLine(x - 15, y + 5, x - 5, y - 5);
+		GraphicsUtil.switchToWidth(g, 1);
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		// get attributes
+		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
+
+		// compute outputs
+		Value a = state.getPort(IN0);
+		Value b = state.getPort(IN1);
+		Value c_in = state.getPort(C_IN);
+		Value[] outs = Multiplier.computeProduct(dataWidth, a, b, c_in);
+
+		// propagate them
+		int delay = dataWidth.getWidth() * (dataWidth.getWidth() + 2) * PER_DELAY;
+		state.setPort(OUT, outs[0], delay);
+		state.setPort(C_OUT, outs[1], delay);
 	}
 }

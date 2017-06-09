@@ -109,13 +109,8 @@ public class MenuTool extends Tool {
 	}
 
 	@Override
-	public int hashCode() {
-		return MenuTool.class.hashCode();
-	}
-
-	@Override
-	public String getName() {
-		return "Menu Tool";
+	public String getDescription() {
+		return Strings.get("menuToolDesc");
 	}
 
 	@Override
@@ -124,8 +119,13 @@ public class MenuTool extends Tool {
 	}
 
 	@Override
-	public String getDescription() {
-		return Strings.get("menuToolDesc");
+	public String getName() {
+		return "Menu Tool";
+	}
+
+	@Override
+	public int hashCode() {
+		return MenuTool.class.hashCode();
 	}
 
 	@Override

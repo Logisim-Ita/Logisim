@@ -6,9 +6,6 @@ package com.cburch.draw.shapes;
 import com.cburch.logisim.data.Bounds;
 
 public class CurveUtil {
-	private CurveUtil() {
-	}
-
 	/**
 	 * getBounds and findNearestPoint are based translated from the ActionScript
 	 * of Olivier Besson's Bezier class for collision detection. Code from:
@@ -18,43 +15,6 @@ public class CurveUtil {
 	// a value we consider "small enough" to equal it to zero:
 	// (this is used for double solutions in 2nd or 3d degree equation)
 	private static final double zeroMax = 0.0000001;
-
-	// note: p0 and p2 are endpoints, p1 is control point
-	public static Bounds getBounds(double[] p0, double[] p1, double[] p2) {
-		double[] A = computeA(p0, p1);
-		double[] B = computeB(p0, p1, p2);
-
-		// rough evaluation of bounds:
-		double xMin = Math.min(p0[0], Math.min(p1[0], p2[0]));
-		double xMax = Math.max(p0[0], Math.max(p1[0], p2[0]));
-		double yMin = Math.min(p0[1], Math.min(p1[1], p2[1]));
-		double yMax = Math.max(p0[1], Math.max(p1[1], p2[1]));
-
-		// more accurate evaluation:
-		// see Andree Michelle for a faster but less readable method
-		if (xMin == p1[0] || xMax == p1[0]) {
-			double u = -A[0] / B[0]; // u where getTan(u)[0] == 0
-			u = (1 - u) * (1 - u) * p0[0] + 2 * u * (1 - u) * p1[0] + u * u * p2[0];
-			if (xMin == p1[0])
-				xMin = u;
-			else
-				xMax = u;
-		}
-		if (yMin == p1[1] || yMax == p1[1]) {
-			double u = -A[1] / B[1]; // u where getTan(u)[1] == 0
-			u = (1 - u) * (1 - u) * p0[1] + 2 * u * (1 - u) * p1[1] + u * u * p2[1];
-			if (yMin == p1[1])
-				yMin = u;
-			else
-				yMax = u;
-		}
-
-		int x = (int) xMin;
-		int y = (int) yMin;
-		int w = (int) Math.ceil(xMax) - x;
-		int h = (int) Math.ceil(yMax) - y;
-		return Bounds.create(x, y, w, h);
-	}
 
 	private static double[] computeA(double[] p0, double[] p1) {
 		return new double[] { p1[0] - p0[0], p1[1] - p0[1] };
@@ -117,12 +77,84 @@ public class CurveUtil {
 		}
 	}
 
+	// note: p0 and p2 are endpoints, p1 is control point
+	public static Bounds getBounds(double[] p0, double[] p1, double[] p2) {
+		double[] A = computeA(p0, p1);
+		double[] B = computeB(p0, p1, p2);
+
+		// rough evaluation of bounds:
+		double xMin = Math.min(p0[0], Math.min(p1[0], p2[0]));
+		double xMax = Math.max(p0[0], Math.max(p1[0], p2[0]));
+		double yMin = Math.min(p0[1], Math.min(p1[1], p2[1]));
+		double yMax = Math.max(p0[1], Math.max(p1[1], p2[1]));
+
+		// more accurate evaluation:
+		// see Andree Michelle for a faster but less readable method
+		if (xMin == p1[0] || xMax == p1[0]) {
+			double u = -A[0] / B[0]; // u where getTan(u)[0] == 0
+			u = (1 - u) * (1 - u) * p0[0] + 2 * u * (1 - u) * p1[0] + u * u * p2[0];
+			if (xMin == p1[0])
+				xMin = u;
+			else
+				xMax = u;
+		}
+		if (yMin == p1[1] || yMax == p1[1]) {
+			double u = -A[1] / B[1]; // u where getTan(u)[1] == 0
+			u = (1 - u) * (1 - u) * p0[1] + 2 * u * (1 - u) * p1[1] + u * u * p2[1];
+			if (yMin == p1[1])
+				yMin = u;
+			else
+				yMax = u;
+		}
+
+		int x = (int) xMin;
+		int y = (int) yMin;
+		int w = (int) Math.ceil(xMax) - x;
+		int h = (int) Math.ceil(yMax) - y;
+		return Bounds.create(x, y, w, h);
+	}
+
 	private static void getPos(double[] result, double t, double[] p0, double[] p1, double[] p2) {
 		double a = (1 - t) * (1 - t);
 		double b = 2 * t * (1 - t);
 		double c = t * t;
 		result[0] = a * p0[0] + b * p1[0] + c * p2[0];
 		result[1] = a * p0[1] + b * p1[1] + c * p2[1];
+	}
+
+	// Translated from ActionScript written by Jim Armstrong, at
+	// www.algorithmist.net. ActionScript is (c) 2006-2007, Jim Armstrong.
+	// All rights reserved.
+	//
+	// This software program is supplied 'as is' without any warranty, express,
+	// implied, or otherwise, including without limitation all warranties of
+	// merchantability or fitness for a particular purpose. Jim Armstrong shall
+	// not be liable for any special incidental, or consequential damages,
+	// including, without limitation, lost revenues, lost profits, or loss of
+	// prospective economic advantage, resulting from the use or misuse of this
+	// software program.
+	public static double[] interpolate(double[] end0, double[] end1, double[] mid) {
+		double dx = mid[0] - end0[0];
+		double dy = mid[1] - end0[1];
+		double d0 = Math.sqrt(dx * dx + dy * dy);
+
+		dx = mid[0] - end1[0];
+		dy = mid[1] - end1[1];
+		double d1 = Math.sqrt(dx * dx + dy * dy);
+
+		if (d0 < zeroMax || d1 < zeroMax) {
+			return new double[] { (end0[0] + end1[0]) / 2, (end0[1] + end1[1]) / 2 };
+		}
+
+		double t = d0 / (d0 + d1);
+		double u = 1.0 - t;
+		double t2 = t * t;
+		double u2 = u * u;
+		double den = 2 * t * u;
+
+		double xNum = mid[0] - u2 * end0[0] - t2 * end1[0];
+		double yNum = mid[1] - u2 * end0[1] - t2 * end1[1];
+		return new double[] { xNum / den, yNum / den };
 	}
 
 	// a local duplicate & optimized version of
@@ -193,38 +225,6 @@ public class CurveUtil {
 		}
 	}
 
-	// Translated from ActionScript written by Jim Armstrong, at
-	// www.algorithmist.net. ActionScript is (c) 2006-2007, Jim Armstrong.
-	// All rights reserved.
-	//
-	// This software program is supplied 'as is' without any warranty, express,
-	// implied, or otherwise, including without limitation all warranties of
-	// merchantability or fitness for a particular purpose. Jim Armstrong shall
-	// not be liable for any special incidental, or consequential damages,
-	// including, without limitation, lost revenues, lost profits, or loss of
-	// prospective economic advantage, resulting from the use or misuse of this
-	// software program.
-	public static double[] interpolate(double[] end0, double[] end1, double[] mid) {
-		double dx = mid[0] - end0[0];
-		double dy = mid[1] - end0[1];
-		double d0 = Math.sqrt(dx * dx + dy * dy);
-
-		dx = mid[0] - end1[0];
-		dy = mid[1] - end1[1];
-		double d1 = Math.sqrt(dx * dx + dy * dy);
-
-		if (d0 < zeroMax || d1 < zeroMax) {
-			return new double[] { (end0[0] + end1[0]) / 2, (end0[1] + end1[1]) / 2 };
-		}
-
-		double t = d0 / (d0 + d1);
-		double u = 1.0 - t;
-		double t2 = t * t;
-		double u2 = u * u;
-		double den = 2 * t * u;
-
-		double xNum = mid[0] - u2 * end0[0] - t2 * end1[0];
-		double yNum = mid[1] - u2 * end0[1] - t2 * end1[1];
-		return new double[] { xNum / den, yNum / den };
+	private CurveUtil() {
 	}
 }

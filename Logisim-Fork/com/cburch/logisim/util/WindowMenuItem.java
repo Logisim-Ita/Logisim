@@ -22,14 +22,14 @@ class WindowMenuItem extends JRadioButtonMenuItem {
 		setSelected(WindowMenuManager.getCurrentManager() == manager);
 	}
 
-	public JFrame getJFrame() {
-		return manager.getJFrame(true);
-	}
-
 	public void actionPerformed(ActionEvent event) {
 		JFrame frame = getJFrame();
 		frame.setExtendedState(Frame.NORMAL);
 		frame.setVisible(true);
 		frame.toFront();
+	}
+
+	public JFrame getJFrame() {
+		return manager.getJFrame(true);
 	}
 }

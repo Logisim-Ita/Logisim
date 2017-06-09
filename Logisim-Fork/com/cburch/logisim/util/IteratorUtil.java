@@ -7,65 +7,17 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class IteratorUtil {
-	public static Iterator<?> EMPTY_ITERATOR = new EmptyIterator<Object>();
-
-	public static <E> Iterator<E> emptyIterator() {
-		return new EmptyIterator<E>();
-	}
-
-	private static class EmptyIterator<E> implements Iterator<E> {
-		private EmptyIterator() {
-		}
-
-		@Override
-		public E next() {
-			throw new NoSuchElementException();
-		}
-
-		@Override
-		public boolean hasNext() {
-			return false;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("EmptyIterator.remove");
-		}
-	}
-
-	private static class UnitIterator<E> implements Iterator<E> {
-		private E data;
-		private boolean taken = false;
-
-		private UnitIterator(E data) {
-			this.data = data;
-		}
-
-		@Override
-		public E next() {
-			if (taken)
-				throw new NoSuchElementException();
-			taken = true;
-			return data;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return !taken;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("UnitIterator.remove");
-		}
-	}
-
 	private static class ArrayIterator<E> implements Iterator<E> {
 		private E[] data;
 		private int i = -1;
 
 		private ArrayIterator(E[] data) {
 			this.data = data;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return i + 1 < data.length;
 		}
 
 		@Override
@@ -77,13 +29,28 @@ public class IteratorUtil {
 		}
 
 		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("ArrayIterator.remove");
+		}
+	}
+
+	private static class EmptyIterator<E> implements Iterator<E> {
+		private EmptyIterator() {
+		}
+
+		@Override
 		public boolean hasNext() {
-			return i + 1 < data.length;
+			return false;
+		}
+
+		@Override
+		public E next() {
+			throw new NoSuchElementException();
 		}
 
 		@Override
 		public void remove() {
-			throw new UnsupportedOperationException("ArrayIterator.remove");
+			throw new UnsupportedOperationException("EmptyIterator.remove");
 		}
 	}
 
@@ -94,6 +61,11 @@ public class IteratorUtil {
 		private IteratorUnion(Iterator<? extends E> cur, Iterator<? extends E> next) {
 			this.cur = cur;
 			this.next = next;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return cur.hasNext() || (next != null && next.hasNext());
 		}
 
 		@Override
@@ -109,19 +81,39 @@ public class IteratorUtil {
 		}
 
 		@Override
-		public boolean hasNext() {
-			return cur.hasNext() || (next != null && next.hasNext());
-		}
-
-		@Override
 		public void remove() {
 			cur.remove();
 		}
 	}
 
-	public static <E> Iterator<E> createUnitIterator(E data) {
-		return new UnitIterator<E>(data);
+	private static class UnitIterator<E> implements Iterator<E> {
+		private E data;
+		private boolean taken = false;
+
+		private UnitIterator(E data) {
+			this.data = data;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !taken;
+		}
+
+		@Override
+		public E next() {
+			if (taken)
+				throw new NoSuchElementException();
+			taken = true;
+			return data;
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("UnitIterator.remove");
+		}
 	}
+
+	public static Iterator<?> EMPTY_ITERATOR = new EmptyIterator<Object>();
 
 	public static <E> Iterator<E> createArrayIterator(E[] data) {
 		return new ArrayIterator<E>(data);
@@ -139,6 +131,14 @@ public class IteratorUtil {
 		} else {
 			return new IteratorUnion<E>(i0, i1);
 		}
+	}
+
+	public static <E> Iterator<E> createUnitIterator(E data) {
+		return new UnitIterator<E>(data);
+	}
+
+	public static <E> Iterator<E> emptyIterator() {
+		return new EmptyIterator<E>();
 	}
 
 }

@@ -32,6 +32,22 @@ public class RegisterPoker extends InstancePoker {
 	}
 
 	@Override
+	public void keyTyped(InstanceState state, KeyEvent e) {
+		int val = Character.digit(e.getKeyChar(), 16);
+		if (val < 0)
+			return;
+
+		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
+		if (dataWidth == null)
+			dataWidth = BitWidth.create(8);
+		curValue = (curValue * 16 + val) & dataWidth.getMask();
+		RegisterData data = (RegisterData) state.getData();
+		data.value = curValue;
+
+		state.fireInvalidated();
+	}
+
+	@Override
 	public void paint(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
 		BitWidth dataWidth = painter.getAttributeValue(StdAttr.WIDTH);
@@ -47,21 +63,5 @@ public class RegisterPoker extends InstancePoker {
 			g.drawRect(bds.getX() + (bds.getWidth() - wid) / 2, bds.getY() + 4, wid, 15);
 		}
 		g.setColor(Color.BLACK);
-	}
-
-	@Override
-	public void keyTyped(InstanceState state, KeyEvent e) {
-		int val = Character.digit(e.getKeyChar(), 16);
-		if (val < 0)
-			return;
-
-		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-		if (dataWidth == null)
-			dataWidth = BitWidth.create(8);
-		curValue = (curValue * 16 + val) & dataWidth.getMask();
-		RegisterData data = (RegisterData) state.getData();
-		data.value = curValue;
-
-		state.fireInvalidated();
 	}
 }

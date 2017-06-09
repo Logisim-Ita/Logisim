@@ -23,6 +23,30 @@ abstract class FillableCanvasObject extends AbstractCanvasObject {
 		fillColor = Color.WHITE;
 	}
 
+	public AttributeOption getPaintType() {
+		return paintType;
+	}
+
+	public int getStrokeWidth() {
+		return strokeWidth;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <V> V getValue(Attribute<V> attr) {
+		if (attr == DrawAttr.PAINT_TYPE) {
+			return (V) paintType;
+		} else if (attr == DrawAttr.STROKE_COLOR) {
+			return (V) strokeColor;
+		} else if (attr == DrawAttr.FILL_COLOR) {
+			return (V) fillColor;
+		} else if (attr == DrawAttr.STROKE_WIDTH) {
+			return (V) Integer.valueOf(strokeWidth);
+		} else {
+			return null;
+		}
+	}
+
 	@Override
 	public boolean matches(CanvasObject other) {
 		if (other instanceof FillableCanvasObject) {
@@ -55,30 +79,6 @@ abstract class FillableCanvasObject extends AbstractCanvasObject {
 			ret = ret * 31;
 		}
 		return ret;
-	}
-
-	public AttributeOption getPaintType() {
-		return paintType;
-	}
-
-	public int getStrokeWidth() {
-		return strokeWidth;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <V> V getValue(Attribute<V> attr) {
-		if (attr == DrawAttr.PAINT_TYPE) {
-			return (V) paintType;
-		} else if (attr == DrawAttr.STROKE_COLOR) {
-			return (V) strokeColor;
-		} else if (attr == DrawAttr.FILL_COLOR) {
-			return (V) fillColor;
-		} else if (attr == DrawAttr.STROKE_WIDTH) {
-			return (V) Integer.valueOf(strokeWidth);
-		} else {
-			return null;
-		}
 	}
 
 	@Override

@@ -10,19 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TruthTable {
-	private static final Entry DEFAULT_ENTRY = Entry.DONT_CARE;
-
 	private class MyListener implements VariableListListener {
-		@Override
-		public void listChanged(VariableListEvent event) {
-			if (event.getSource() == model.getInputs()) {
-				inputsChanged(event);
-			} else {
-				outputsChanged(event);
-			}
-			fireStructureChanged(event);
-		}
-
 		private void inputsChanged(VariableListEvent event) {
 			int action = event.getType();
 			if (action == VariableListEvent.ADD) {
@@ -56,6 +44,43 @@ public class TruthTable {
 			}
 		}
 
+		@Override
+		public void listChanged(VariableListEvent event) {
+			if (event.getSource() == model.getInputs()) {
+				inputsChanged(event);
+			} else {
+				outputsChanged(event);
+			}
+			fireStructureChanged(event);
+		}
+
+		private Entry[] moveInput(Entry[] old, int oldIndex, int newIndex) {
+			int inputs = model.getInputs().size();
+			oldIndex = inputs - 1 - oldIndex;
+			newIndex = inputs - 1 - newIndex;
+			Entry[] ret = new Entry[old.length];
+			int sameMask = (old.length - 1) ^ ((1 << (1 + Math.max(oldIndex, newIndex))) - 1)
+					^ ((1 << Math.min(oldIndex, newIndex)) - 1); // bits that
+																	// don't
+																	// change
+			int moveMask = 1 << oldIndex; // bit that moves
+			int moveDist = Math.abs(newIndex - oldIndex);
+			boolean moveLeft = newIndex > oldIndex;
+			int blockMask = (old.length - 1) ^ sameMask ^ moveMask; // bits that
+																	// move by
+																	// one
+			for (int i = 0; i < old.length; i++) {
+				int j; // new index
+				if (moveLeft) {
+					j = (i & sameMask) | ((i & moveMask) << moveDist) | ((i & blockMask) >> 1);
+				} else {
+					j = (i & sameMask) | ((i & moveMask) >> moveDist) | ((i & blockMask) << 1);
+				}
+				ret[j] = old[i];
+			}
+			return ret;
+		}
+
 		private void outputsChanged(VariableListEvent event) {
 			int action = event.getType();
 			if (action == VariableListEvent.ALL_REPLACED) {
@@ -87,38 +112,17 @@ public class TruthTable {
 			}
 			return ret;
 		}
-
-		private Entry[] moveInput(Entry[] old, int oldIndex, int newIndex) {
-			int inputs = model.getInputs().size();
-			oldIndex = inputs - 1 - oldIndex;
-			newIndex = inputs - 1 - newIndex;
-			Entry[] ret = new Entry[old.length];
-			int sameMask = (old.length - 1) ^ ((1 << (1 + Math.max(oldIndex, newIndex))) - 1)
-					^ ((1 << Math.min(oldIndex, newIndex)) - 1); // bits that
-																	// don't
-																	// change
-			int moveMask = 1 << oldIndex; // bit that moves
-			int moveDist = Math.abs(newIndex - oldIndex);
-			boolean moveLeft = newIndex > oldIndex;
-			int blockMask = (old.length - 1) ^ sameMask ^ moveMask; // bits that
-																	// move by
-																	// one
-			for (int i = 0; i < old.length; i++) {
-				int j; // new index
-				if (moveLeft) {
-					j = (i & sameMask) | ((i & moveMask) << moveDist) | ((i & blockMask) >> 1);
-				} else {
-					j = (i & sameMask) | ((i & moveMask) >> moveDist) | ((i & blockMask) << 1);
-				}
-				ret[j] = old[i];
-			}
-			return ret;
-		}
 	}
 
+	private static final Entry DEFAULT_ENTRY = Entry.DONT_CARE;
+
+	public static boolean isInputSet(int row, int column, int inputs) {
+		return ((row >> (inputs - 1 - column)) & 0x1) == 1;
+	}
 	private MyListener myListener = new MyListener();
 	private List<TruthTableListener> listeners = new ArrayList<TruthTableListener>();
 	private AnalyzerModel model;
+
 	private HashMap<String, Entry[]> outputColumns = new HashMap<String, Entry[]>();
 
 	public TruthTable(AnalyzerModel model) {
@@ -129,10 +133,6 @@ public class TruthTable {
 
 	public void addTruthTableListener(TruthTableListener l) {
 		listeners.add(l);
-	}
-
-	public void removeTruthTableListener(TruthTableListener l) {
-		listeners.remove(l);
 	}
 
 	private void fireCellsChanged(int column) {
@@ -149,33 +149,8 @@ public class TruthTable {
 		}
 	}
 
-	public int getRowCount() {
-		int sz = model.getInputs().size();
-		return 1 << sz;
-	}
-
 	public int getInputColumnCount() {
 		return model.getInputs().size();
-	}
-
-	public int getOutputColumnCount() {
-		return model.getOutputs().size();
-	}
-
-	public String getInputHeader(int column) {
-		return model.getInputs().get(column);
-	}
-
-	public String getOutputHeader(int column) {
-		return model.getOutputs().get(column);
-	}
-
-	public int getInputIndex(String input) {
-		return model.getInputs().indexOf(input);
-	}
-
-	public int getOutputIndex(String output) {
-		return model.getOutputs().indexOf(output);
 	}
 
 	public Entry getInputEntry(int row, int column) {
@@ -191,6 +166,34 @@ public class TruthTable {
 		return isInputSet(row, column, inputs) ? Entry.ONE : Entry.ZERO;
 	}
 
+	public String getInputHeader(int column) {
+		return model.getInputs().get(column);
+	}
+
+	public int getInputIndex(String input) {
+		return model.getInputs().indexOf(input);
+	}
+
+	public Entry[] getOutputColumn(int column) {
+		int outputs = model.getOutputs().size();
+		if (column < 0 || column >= outputs) {
+			throw new IllegalArgumentException("index: " + column + " size: " + outputs);
+		}
+
+		String outputName = model.getOutputs().get(column);
+		Entry[] columnData = outputColumns.get(outputName);
+		if (columnData == null) {
+			columnData = new Entry[getRowCount()];
+			Arrays.fill(columnData, DEFAULT_ENTRY);
+			outputColumns.put(outputName, columnData);
+		}
+		return columnData;
+	}
+
+	public int getOutputColumnCount() {
+		return model.getOutputs().size();
+	}
+
 	public Entry getOutputEntry(int row, int column) {
 		int outputs = model.getOutputs().size();
 		if (row < 0 || row >= getRowCount() || column < 0 || column >= outputs) {
@@ -204,6 +207,44 @@ public class TruthTable {
 				return Entry.DONT_CARE;
 			return columnData[row];
 		}
+	}
+
+	public String getOutputHeader(int column) {
+		return model.getOutputs().get(column);
+	}
+
+	public int getOutputIndex(String output) {
+		return model.getOutputs().indexOf(output);
+	}
+
+	public int getRowCount() {
+		int sz = model.getInputs().size();
+		return 1 << sz;
+	}
+
+	public void removeTruthTableListener(TruthTableListener l) {
+		listeners.remove(l);
+	}
+
+	public void setOutputColumn(int column, Entry[] values) {
+		if (values != null && values.length != getRowCount()) {
+			throw new IllegalArgumentException("argument to setOutputColumn is wrong length");
+		}
+
+		int outputs = model.getOutputs().size();
+		if (column < 0 || column >= outputs) {
+			throw new IllegalArgumentException("index: " + column + " size: " + outputs);
+		}
+
+		String outputName = model.getOutputs().get(column);
+		Entry[] oldValues = outputColumns.get(outputName);
+		if (oldValues == values)
+			return;
+		else if (values == null)
+			outputColumns.remove(outputName);
+		else
+			outputColumns.put(outputName, values);
+		fireCellsChanged(column);
 	}
 
 	public void setOutputEntry(int row, int column, Entry value) {
@@ -233,46 +274,5 @@ public class TruthTable {
 		}
 
 		fireCellsChanged(column);
-	}
-
-	public Entry[] getOutputColumn(int column) {
-		int outputs = model.getOutputs().size();
-		if (column < 0 || column >= outputs) {
-			throw new IllegalArgumentException("index: " + column + " size: " + outputs);
-		}
-
-		String outputName = model.getOutputs().get(column);
-		Entry[] columnData = outputColumns.get(outputName);
-		if (columnData == null) {
-			columnData = new Entry[getRowCount()];
-			Arrays.fill(columnData, DEFAULT_ENTRY);
-			outputColumns.put(outputName, columnData);
-		}
-		return columnData;
-	}
-
-	public void setOutputColumn(int column, Entry[] values) {
-		if (values != null && values.length != getRowCount()) {
-			throw new IllegalArgumentException("argument to setOutputColumn is wrong length");
-		}
-
-		int outputs = model.getOutputs().size();
-		if (column < 0 || column >= outputs) {
-			throw new IllegalArgumentException("index: " + column + " size: " + outputs);
-		}
-
-		String outputName = model.getOutputs().get(column);
-		Entry[] oldValues = outputColumns.get(outputName);
-		if (oldValues == values)
-			return;
-		else if (values == null)
-			outputColumns.remove(outputName);
-		else
-			outputColumns.put(outputName, values);
-		fireCellsChanged(column);
-	}
-
-	public static boolean isInputSet(int row, int column, int inputs) {
-		return ((row >> (inputs - 1 - column)) & 0x1) == 1;
 	}
 }

@@ -30,75 +30,29 @@ class CanvasListener implements MouseListener, MouseMotionListener, KeyListener,
 		return tool;
 	}
 
-	public void setTool(CanvasTool value) {
-		CanvasTool oldValue = tool;
-		if (value != oldValue) {
-			tool = value;
-			if (oldValue != null)
-				oldValue.toolDeselected(canvas);
-			if (value != null) {
-				value.toolSelected(canvas);
-				canvas.setCursor(value.getCursor(canvas));
-			} else {
-				canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	private void handlePopupTrigger(MouseEvent e) {
+		Location loc = Location.create(e.getX(), e.getY());
+		List<CanvasObject> objects = canvas.getModel().getObjectsFromTop();
+		CanvasObject clicked = null;
+		for (CanvasObject o : objects) {
+			if (o.contains(loc, false)) {
+				clicked = o;
+				break;
 			}
 		}
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		if (tool != null)
-			tool.mouseMoved(canvas, e);
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		canvas.requestFocus();
-		if (e.isPopupTrigger()) {
-			handlePopupTrigger(e);
-		} else if (e.getButton() == 1) {
-			if (tool != null)
-				tool.mousePressed(canvas, e);
+		if (clicked == null) {
+			for (CanvasObject o : objects) {
+				if (o.contains(loc, true)) {
+					clicked = o;
+					break;
+				}
+			}
 		}
+		canvas.showPopupMenu(e, clicked);
 	}
 
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if (isButton1(e)) {
-			if (tool != null)
-				tool.mouseDragged(canvas, e);
-		} else {
-			if (tool != null)
-				tool.mouseMoved(canvas, e);
-		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			if (tool != null)
-				tool.cancelMousePress(canvas);
-			handlePopupTrigger(e);
-		} else if (e.getButton() == 1) {
-			if (tool != null)
-				tool.mouseReleased(canvas, e);
-		}
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		if (tool != null)
-			tool.mouseEntered(canvas, e);
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		if (tool != null)
-			tool.mouseExited(canvas, e);
+	private boolean isButton1(MouseEvent e) {
+		return (e.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0;
 	}
 
 	@Override
@@ -125,28 +79,74 @@ class CanvasListener implements MouseListener, MouseMotionListener, KeyListener,
 		canvas.repaint();
 	}
 
-	private boolean isButton1(MouseEvent e) {
-		return (e.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) != 0;
+	@Override
+	public void mouseClicked(MouseEvent e) {
 	}
 
-	private void handlePopupTrigger(MouseEvent e) {
-		Location loc = Location.create(e.getX(), e.getY());
-		List<CanvasObject> objects = canvas.getModel().getObjectsFromTop();
-		CanvasObject clicked = null;
-		for (CanvasObject o : objects) {
-			if (o.contains(loc, false)) {
-				clicked = o;
-				break;
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if (isButton1(e)) {
+			if (tool != null)
+				tool.mouseDragged(canvas, e);
+		} else {
+			if (tool != null)
+				tool.mouseMoved(canvas, e);
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		if (tool != null)
+			tool.mouseEntered(canvas, e);
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		if (tool != null)
+			tool.mouseExited(canvas, e);
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if (tool != null)
+			tool.mouseMoved(canvas, e);
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		canvas.requestFocus();
+		if (e.isPopupTrigger()) {
+			handlePopupTrigger(e);
+		} else if (e.getButton() == 1) {
+			if (tool != null)
+				tool.mousePressed(canvas, e);
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+			if (tool != null)
+				tool.cancelMousePress(canvas);
+			handlePopupTrigger(e);
+		} else if (e.getButton() == 1) {
+			if (tool != null)
+				tool.mouseReleased(canvas, e);
+		}
+	}
+
+	public void setTool(CanvasTool value) {
+		CanvasTool oldValue = tool;
+		if (value != oldValue) {
+			tool = value;
+			if (oldValue != null)
+				oldValue.toolDeselected(canvas);
+			if (value != null) {
+				value.toolSelected(canvas);
+				canvas.setCursor(value.getCursor(canvas));
+			} else {
+				canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		}
-		if (clicked == null) {
-			for (CanvasObject o : objects) {
-				if (o.contains(loc, true)) {
-					clicked = o;
-					break;
-				}
-			}
-		}
-		canvas.showPopupMenu(e, clicked);
 	}
 }

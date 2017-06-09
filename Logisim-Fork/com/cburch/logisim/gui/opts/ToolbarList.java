@@ -25,36 +25,6 @@ import com.cburch.logisim.tools.Tool;
 
 @SuppressWarnings("rawtypes")
 class ToolbarList extends JList {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8608509296085108835L;
-
-	private static class ToolIcon implements Icon {
-		private Tool tool;
-
-		ToolIcon(Tool tool) {
-			this.tool = tool;
-		}
-
-		@Override
-		public void paintIcon(Component comp, Graphics g, int x, int y) {
-			Graphics gNew = g.create();
-			tool.paintIcon(new ComponentDrawContext(comp, null, null, g, gNew), x + 2, y + 2);
-			gNew.dispose();
-		}
-
-		@Override
-		public int getIconWidth() {
-			return 20;
-		}
-
-		@Override
-		public int getIconHeight() {
-			return 20;
-		}
-	}
-
 	private static class ListRenderer extends DefaultListCellRenderer {
 		/**
 		 * 
@@ -92,21 +62,6 @@ class ToolbarList extends JList {
 		private static final long serialVersionUID = -1346121772272500171L;
 
 		@Override
-		public int getSize() {
-			return base.size();
-		}
-
-		@Override
-		public Object getElementAt(int index) {
-			return base.get(index);
-		}
-
-		@Override
-		public void toolbarChanged() {
-			fireContentsChanged(this, 0, getSize());
-		}
-
-		@Override
 		public void attributeListChanged(AttributeEvent e) {
 		}
 
@@ -116,12 +71,57 @@ class ToolbarList extends JList {
 		}
 
 		@Override
+		public Object getElementAt(int index) {
+			return base.get(index);
+		}
+
+		@Override
+		public int getSize() {
+			return base.size();
+		}
+
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (AppPreferences.GATE_SHAPE.isSource(event)) {
 				repaint();
 			}
 		}
+
+		@Override
+		public void toolbarChanged() {
+			fireContentsChanged(this, 0, getSize());
+		}
 	}
+
+	private static class ToolIcon implements Icon {
+		private Tool tool;
+
+		ToolIcon(Tool tool) {
+			this.tool = tool;
+		}
+
+		@Override
+		public int getIconHeight() {
+			return 20;
+		}
+
+		@Override
+		public int getIconWidth() {
+			return 20;
+		}
+
+		@Override
+		public void paintIcon(Component comp, Graphics g, int x, int y) {
+			Graphics gNew = g.create();
+			tool.paintIcon(new ComponentDrawContext(comp, null, null, g, gNew), x + 2, y + 2);
+			gNew.dispose();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8608509296085108835L;
 
 	private ToolbarData base;
 	private Model model;

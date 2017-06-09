@@ -19,8 +19,8 @@ public class ModelInsertHandleAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.singleton(desired.getObject());
+	void doSub(CanvasModel model) {
+		model.insertHandle(desired, null);
 	}
 
 	@Override
@@ -29,8 +29,8 @@ public class ModelInsertHandleAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.insertHandle(desired, null);
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(desired.getObject());
 	}
 
 	@Override

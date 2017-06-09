@@ -49,6 +49,30 @@ class NotGate extends InstanceFactory {
 
 	public static InstanceFactory FACTORY = new NotGate();
 
+	static void configureLabel(Instance instance, boolean isRectangular, Location control) {
+		Object facing = instance.getAttributeValue(StdAttr.FACING);
+		Bounds bds = instance.getBounds();
+		int x;
+		int y;
+		int halign;
+		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+			x = bds.getX() + bds.getWidth() / 2 + 2;
+			y = bds.getY() - 2;
+			halign = TextField.H_LEFT;
+		} else { // west or east
+			y = isRectangular ? bds.getY() - 2 : bds.getY();
+			if (control != null && control.getY() == bds.getY()) {
+				// the control line will get in the way
+				x = control.getX() + 2;
+				halign = TextField.H_LEFT;
+			} else {
+				x = bds.getX() + bds.getWidth() / 2;
+				halign = TextField.H_CENTER;
+			}
+		}
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, TextField.V_BASELINE);
+	}
+
 	private NotGate() {
 		super("NOT Gate", Strings.getter("notGateComponent"));
 		setAttributes(
@@ -60,38 +84,6 @@ class NotGate extends InstanceFactory {
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
 
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Object value = attrs.getValue(ATTR_SIZE);
-		if (value == SIZE_NARROW) {
-			Direction facing = attrs.getValue(StdAttr.FACING);
-			if (facing == Direction.SOUTH)
-				return Bounds.create(-9, -20, 18, 20);
-			if (facing == Direction.NORTH)
-				return Bounds.create(-9, 0, 18, 20);
-			if (facing == Direction.WEST)
-				return Bounds.create(0, -9, 20, 18);
-			return Bounds.create(-20, -9, 20, 18);
-		} else {
-			Direction facing = attrs.getValue(StdAttr.FACING);
-			if (facing == Direction.SOUTH)
-				return Bounds.create(-9, -30, 18, 30);
-			if (facing == Direction.NORTH)
-				return Bounds.create(-9, 0, 18, 30);
-			if (facing == Direction.WEST)
-				return Bounds.create(0, -9, 30, 18);
-			return Bounds.create(-30, -9, 30, 18);
-		}
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		Value in = state.getPort(1);
-		Value out = in.not();
-		out = Buffer.repair(state, out);
-		state.setPort(0, out, GateAttributes.DELAY);
-	}
-
 	//
 	// methods for instances
 	//
@@ -101,16 +93,6 @@ class NotGate extends InstanceFactory {
 		instance.addAttributeListener();
 		String gateShape = AppPreferences.GATE_SHAPE.get();
 		configureLabel(instance, gateShape.equals(AppPreferences.SHAPE_RECTANGULAR), null);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_SIZE || attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-			configurePorts(instance);
-			String gateShape = AppPreferences.GATE_SHAPE.get();
-			configureLabel(instance, gateShape.equals(AppPreferences.SHAPE_RECTANGULAR), null);
-		}
 	}
 
 	private void configurePorts(Instance instance) {
@@ -139,6 +121,74 @@ class NotGate extends InstanceFactory {
 			};
 		}
 		return super.getInstanceFeature(instance, key);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Object value = attrs.getValue(ATTR_SIZE);
+		if (value == SIZE_NARROW) {
+			Direction facing = attrs.getValue(StdAttr.FACING);
+			if (facing == Direction.SOUTH)
+				return Bounds.create(-9, -20, 18, 20);
+			if (facing == Direction.NORTH)
+				return Bounds.create(-9, 0, 18, 20);
+			if (facing == Direction.WEST)
+				return Bounds.create(0, -9, 20, 18);
+			return Bounds.create(-20, -9, 20, 18);
+		} else {
+			Direction facing = attrs.getValue(StdAttr.FACING);
+			if (facing == Direction.SOUTH)
+				return Bounds.create(-9, -30, 18, 30);
+			if (facing == Direction.NORTH)
+				return Bounds.create(-9, 0, 18, 30);
+			if (facing == Direction.WEST)
+				return Bounds.create(0, -9, 30, 18);
+			return Bounds.create(-30, -9, 30, 18);
+		}
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == ATTR_SIZE || attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			configurePorts(instance);
+			String gateShape = AppPreferences.GATE_SHAPE.get();
+			configureLabel(instance, gateShape.equals(AppPreferences.SHAPE_RECTANGULAR), null);
+		}
+	}
+
+	private void paintBase(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		Direction facing = painter.getAttributeValue(StdAttr.FACING);
+		Location loc = painter.getLocation();
+		int x = loc.getX();
+		int y = loc.getY();
+		g.translate(x, y);
+		double rotate = 0.0;
+		if (facing != null && facing != Direction.EAST && g instanceof Graphics2D) {
+			rotate = -facing.toRadians();
+			((Graphics2D) g).rotate(rotate);
+		}
+
+		Object shape = painter.getGateShape();
+		if (shape == AppPreferences.SHAPE_RECTANGULAR) {
+			paintRectangularBase(g, painter);
+		} else if (shape == AppPreferences.SHAPE_DIN40700) {
+			int width = painter.getAttributeValue(ATTR_SIZE) == SIZE_NARROW ? 20 : 30;
+			PainterDin.paintAnd(painter, width, 18, true);
+		} else {
+			PainterShaped.paintNot(painter);
+		}
+
+		if (rotate != 0.0) {
+			((Graphics2D) g).rotate(-rotate);
+		}
+		g.translate(-x, -y);
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter);
 	}
 
 	//
@@ -185,45 +235,11 @@ class NotGate extends InstanceFactory {
 	}
 
 	@Override
-	public void paintGhost(InstancePainter painter) {
-		paintBase(painter);
-	}
-
-	@Override
 	public void paintInstance(InstancePainter painter) {
 		painter.getGraphics().setColor(Color.BLACK);
 		paintBase(painter);
 		painter.drawPorts();
 		painter.drawLabel();
-	}
-
-	private void paintBase(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		g.translate(x, y);
-		double rotate = 0.0;
-		if (facing != null && facing != Direction.EAST && g instanceof Graphics2D) {
-			rotate = -facing.toRadians();
-			((Graphics2D) g).rotate(rotate);
-		}
-
-		Object shape = painter.getGateShape();
-		if (shape == AppPreferences.SHAPE_RECTANGULAR) {
-			paintRectangularBase(g, painter);
-		} else if (shape == AppPreferences.SHAPE_DIN40700) {
-			int width = painter.getAttributeValue(ATTR_SIZE) == SIZE_NARROW ? 20 : 30;
-			PainterDin.paintAnd(painter, width, 18, true);
-		} else {
-			PainterShaped.paintNot(painter);
-		}
-
-		if (rotate != 0.0) {
-			((Graphics2D) g).rotate(-rotate);
-		}
-		g.translate(-x, -y);
 	}
 
 	private void paintRectangularBase(Graphics g, InstancePainter painter) {
@@ -240,27 +256,11 @@ class NotGate extends InstanceFactory {
 		GraphicsUtil.switchToWidth(g, 1);
 	}
 
-	static void configureLabel(Instance instance, boolean isRectangular, Location control) {
-		Object facing = instance.getAttributeValue(StdAttr.FACING);
-		Bounds bds = instance.getBounds();
-		int x;
-		int y;
-		int halign;
-		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
-			x = bds.getX() + bds.getWidth() / 2 + 2;
-			y = bds.getY() - 2;
-			halign = TextField.H_LEFT;
-		} else { // west or east
-			y = isRectangular ? bds.getY() - 2 : bds.getY();
-			if (control != null && control.getY() == bds.getY()) {
-				// the control line will get in the way
-				x = control.getX() + 2;
-				halign = TextField.H_LEFT;
-			} else {
-				x = bds.getX() + bds.getWidth() / 2;
-				halign = TextField.H_CENTER;
-			}
-		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, TextField.V_BASELINE);
+	@Override
+	public void propagate(InstanceState state) {
+		Value in = state.getPort(1);
+		Value out = in.not();
+		out = Buffer.repair(state, out);
+		state.setPort(0, out, GateAttributes.DELAY);
 	}
 }

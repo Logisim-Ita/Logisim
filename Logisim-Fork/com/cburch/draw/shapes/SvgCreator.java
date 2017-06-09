@@ -14,42 +14,18 @@ import com.cburch.draw.model.Handle;
 import com.cburch.logisim.data.Location;
 
 class SvgCreator {
-	private SvgCreator() {
+	private static boolean colorMatches(Color a, Color b) {
+		return a.getRed() == b.getRed() && a.getGreen() == b.getGreen() && a.getBlue() == b.getBlue();
 	}
 
-	public static Element createRectangle(Document doc, Rectangle rect) {
-		return createRectangular(doc, rect);
-	}
-
-	public static Element createRoundRectangle(Document doc, RoundRectangle rrect) {
-		Element elt = createRectangular(doc, rrect);
-		int r = rrect.getValue(DrawAttr.CORNER_RADIUS).intValue();
-		elt.setAttribute("rx", "" + r);
-		elt.setAttribute("ry", "" + r);
-		return elt;
-	}
-
-	private static Element createRectangular(Document doc, Rectangular rect) {
-		Element elt = doc.createElement("rect");
-		elt.setAttribute("x", "" + rect.getX());
-		elt.setAttribute("y", "" + rect.getY());
-		elt.setAttribute("width", "" + rect.getWidth());
-		elt.setAttribute("height", "" + rect.getHeight());
-		populateFill(elt, rect);
-		return elt;
-	}
-
-	public static Element createOval(Document doc, Oval oval) {
-		double x = oval.getX();
-		double y = oval.getY();
-		double width = oval.getWidth();
-		double height = oval.getHeight();
-		Element elt = doc.createElement("ellipse");
-		elt.setAttribute("cx", "" + (x + width / 2));
-		elt.setAttribute("cy", "" + (y + height / 2));
-		elt.setAttribute("rx", "" + (width / 2));
-		elt.setAttribute("ry", "" + (height / 2));
-		populateFill(elt, oval);
+	public static Element createCurve(Document doc, Curve curve) {
+		Element elt = doc.createElement("path");
+		Location e0 = curve.getEnd0();
+		Location e1 = curve.getEnd1();
+		Location ct = curve.getControl();
+		elt.setAttribute("d", "M" + e0.getX() + "," + e0.getY() + " Q" + ct.getX() + "," + ct.getY() + " " + e1.getX()
+				+ "," + e1.getY());
+		populateFill(elt, curve);
 		return elt;
 	}
 
@@ -65,14 +41,17 @@ class SvgCreator {
 		return elt;
 	}
 
-	public static Element createCurve(Document doc, Curve curve) {
-		Element elt = doc.createElement("path");
-		Location e0 = curve.getEnd0();
-		Location e1 = curve.getEnd1();
-		Location ct = curve.getControl();
-		elt.setAttribute("d", "M" + e0.getX() + "," + e0.getY() + " Q" + ct.getX() + "," + ct.getY() + " " + e1.getX()
-				+ "," + e1.getY());
-		populateFill(elt, curve);
+	public static Element createOval(Document doc, Oval oval) {
+		double x = oval.getX();
+		double y = oval.getY();
+		double width = oval.getWidth();
+		double height = oval.getHeight();
+		Element elt = doc.createElement("ellipse");
+		elt.setAttribute("cx", "" + (x + width / 2));
+		elt.setAttribute("cy", "" + (y + height / 2));
+		elt.setAttribute("rx", "" + (width / 2));
+		elt.setAttribute("ry", "" + (height / 2));
+		populateFill(elt, oval);
 		return elt;
 	}
 
@@ -95,6 +74,28 @@ class SvgCreator {
 		elt.setAttribute("points", points.toString());
 
 		populateFill(elt, poly);
+		return elt;
+	}
+
+	public static Element createRectangle(Document doc, Rectangle rect) {
+		return createRectangular(doc, rect);
+	}
+
+	private static Element createRectangular(Document doc, Rectangular rect) {
+		Element elt = doc.createElement("rect");
+		elt.setAttribute("x", "" + rect.getX());
+		elt.setAttribute("y", "" + rect.getY());
+		elt.setAttribute("width", "" + rect.getWidth());
+		elt.setAttribute("height", "" + rect.getHeight());
+		populateFill(elt, rect);
+		return elt;
+	}
+
+	public static Element createRoundRectangle(Document doc, RoundRectangle rrect) {
+		Element elt = createRectangular(doc, rrect);
+		int r = rrect.getValue(DrawAttr.CORNER_RADIUS).intValue();
+		elt.setAttribute("rx", "" + r);
+		elt.setAttribute("ry", "" + r);
 		return elt;
 	}
 
@@ -132,6 +133,15 @@ class SvgCreator {
 		return elt;
 	}
 
+	private static String getColorString(Color color) {
+		return String.format("#%02x%02x%02x", Integer.valueOf(color.getRed()), Integer.valueOf(color.getGreen()),
+				Integer.valueOf(color.getBlue()));
+	}
+
+	private static String getOpacityString(Color color) {
+		return String.format("%5.3f", Double.valueOf(color.getAlpha() / 255.0));
+	}
+
 	private static void populateFill(Element elt, AbstractCanvasObject shape) {
 		Object type = shape.getValue(DrawAttr.PAINT_TYPE);
 		if (type == DrawAttr.PAINT_FILL) {
@@ -167,20 +177,10 @@ class SvgCreator {
 		elt.setAttribute("fill", "none");
 	}
 
-	private static boolean colorMatches(Color a, Color b) {
-		return a.getRed() == b.getRed() && a.getGreen() == b.getGreen() && a.getBlue() == b.getBlue();
-	}
-
-	private static String getColorString(Color color) {
-		return String.format("#%02x%02x%02x", Integer.valueOf(color.getRed()), Integer.valueOf(color.getGreen()),
-				Integer.valueOf(color.getBlue()));
-	}
-
 	private static boolean showOpacity(Color color) {
 		return color.getAlpha() != 255;
 	}
 
-	private static String getOpacityString(Color color) {
-		return String.format("%5.3f", Double.valueOf(color.getAlpha() / 255.0));
+	private SvgCreator() {
 	}
 }

@@ -26,27 +26,27 @@ abstract class LogPanel extends JPanel {
 		this.logFrame = frame;
 	}
 
-	public abstract String getTitle();
-
 	public abstract String getHelpText();
-
-	public abstract void localeChanged();
-
-	public abstract void modelChanged(Model oldModel, Model newModel);
 
 	LogFrame getLogFrame() {
 		return logFrame;
-	}
-
-	Project getProject() {
-		return logFrame.getProject();
 	}
 
 	Model getModel() {
 		return logFrame.getModel();
 	}
 
+	Project getProject() {
+		return logFrame.getProject();
+	}
+
 	Selection getSelection() {
 		return logFrame.getModel().getSelection();
 	}
+
+	public abstract String getTitle();
+
+	public abstract void localeChanged();
+
+	public abstract void modelChanged(Model oldModel, Model newModel);
 }

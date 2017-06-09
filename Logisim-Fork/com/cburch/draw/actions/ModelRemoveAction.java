@@ -24,8 +24,8 @@ public class ModelRemoveAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.unmodifiableSet(removed.keySet());
+	void doSub(CanvasModel model) {
+		model.removeObjects(removed.keySet());
 	}
 
 	@Override
@@ -34,8 +34,8 @@ public class ModelRemoveAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.removeObjects(removed.keySet());
+	public Collection<CanvasObject> getObjects() {
+		return Collections.unmodifiableSet(removed.keySet());
 	}
 
 	@Override

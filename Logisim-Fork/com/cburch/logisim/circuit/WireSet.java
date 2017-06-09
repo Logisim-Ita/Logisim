@@ -30,11 +30,11 @@ public class WireSet {
 		}
 	}
 
-	public boolean containsWire(Wire w) {
-		return wires.contains(w);
-	}
-
 	public boolean containsLocation(Location loc) {
 		return points.contains(loc);
+	}
+
+	public boolean containsWire(Wire w) {
+		return wires.contains(w);
 	}
 }

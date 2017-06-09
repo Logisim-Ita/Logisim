@@ -35,6 +35,13 @@ public class Negator extends InstanceFactory {
 	}
 
 	@Override
+	public void paintInstance(InstancePainter painter) {
+		painter.drawBounds();
+		painter.drawPort(IN);
+		painter.drawPort(OUT, "-x", Direction.WEST);
+	}
+
+	@Override
 	public void propagate(InstanceState state) {
 		// get attributes
 		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
@@ -80,12 +87,5 @@ public class Negator extends InstanceFactory {
 		// propagate them
 		int delay = (dataWidth.getWidth() + 2) * Adder.PER_DELAY;
 		state.setPort(OUT, out, delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		painter.drawBounds();
-		painter.drawPort(IN);
-		painter.drawPort(OUT, "-x", Direction.WEST);
 	}
 }

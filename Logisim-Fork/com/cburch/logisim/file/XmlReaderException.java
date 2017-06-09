@@ -13,12 +13,12 @@ class XmlReaderException extends Exception {
 	private static final long serialVersionUID = -8185235093673186621L;
 	private List<String> messages;
 
-	public XmlReaderException(String message) {
-		this(Collections.singletonList(message));
-	}
-
 	public XmlReaderException(List<String> messages) {
 		this.messages = messages;
+	}
+
+	public XmlReaderException(String message) {
+		this(Collections.singletonList(message));
 	}
 
 	@Override

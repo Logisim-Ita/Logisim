@@ -11,13 +11,13 @@ public interface ZoomModel {
 
 	public void addPropertyChangeListener(String prop, PropertyChangeListener l);
 
-	public void removePropertyChangeListener(String prop, PropertyChangeListener l);
-
 	public boolean getShowGrid();
 
 	public double getZoomFactor();
 
 	public double[] getZoomOptions();
+
+	public void removePropertyChangeListener(String prop, PropertyChangeListener l);
 
 	public void setShowGrid(boolean value);
 

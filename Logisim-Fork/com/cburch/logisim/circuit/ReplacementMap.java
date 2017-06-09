@@ -17,6 +17,10 @@ public class ReplacementMap {
 	private HashMap<Component, HashSet<Component>> map;
 	private HashMap<Component, HashSet<Component>> inverse;
 
+	public ReplacementMap() {
+		this(new HashMap<Component, HashSet<Component>>(), new HashMap<Component, HashSet<Component>>());
+	}
+
 	public ReplacementMap(Component oldComp, Component newComp) {
 		this(new HashMap<Component, HashSet<Component>>(), new HashMap<Component, HashSet<Component>>());
 		HashSet<Component> oldSet = new HashSet<Component>(3);
@@ -27,34 +31,9 @@ public class ReplacementMap {
 		inverse.put(newComp, oldSet);
 	}
 
-	public ReplacementMap() {
-		this(new HashMap<Component, HashSet<Component>>(), new HashMap<Component, HashSet<Component>>());
-	}
-
 	private ReplacementMap(HashMap<Component, HashSet<Component>> map, HashMap<Component, HashSet<Component>> inverse) {
 		this.map = map;
 		this.inverse = inverse;
-	}
-
-	public void reset() {
-		map.clear();
-		inverse.clear();
-	}
-
-	public boolean isEmpty() {
-		return map.isEmpty() && inverse.isEmpty();
-	}
-
-	public Collection<Component> getReplacedComponents() {
-		return map.keySet();
-	}
-
-	public Collection<Component> get(Component prev) {
-		return map.get(prev);
-	}
-
-	void freeze() {
-		frozen = true;
 	}
 
 	public void add(Component comp) {
@@ -62,39 +41,6 @@ public class ReplacementMap {
 			throw new IllegalStateException("cannot change map after frozen");
 		}
 		inverse.put(comp, new HashSet<Component>(3));
-	}
-
-	public void remove(Component comp) {
-		if (frozen) {
-			throw new IllegalStateException("cannot change map after frozen");
-		}
-		map.put(comp, new HashSet<Component>(3));
-	}
-
-	public void replace(Component prev, Component next) {
-		put(prev, Collections.singleton(next));
-	}
-
-	public void put(Component prev, Collection<? extends Component> next) {
-		if (frozen) {
-			throw new IllegalStateException("cannot change map after frozen");
-		}
-
-		HashSet<Component> repl = map.get(prev);
-		if (repl == null) {
-			repl = new HashSet<Component>(next.size());
-			map.put(prev, repl);
-		}
-		repl.addAll(next);
-
-		for (Component n : next) {
-			repl = inverse.get(n);
-			if (repl == null) {
-				repl = new HashSet<Component>(3);
-				inverse.put(n, repl);
-			}
-			repl.add(prev);
-		}
 	}
 
 	void append(ReplacementMap next) {
@@ -141,20 +87,36 @@ public class ReplacementMap {
 		}
 	}
 
-	ReplacementMap getInverseMap() {
-		return new ReplacementMap(inverse, map);
+	void freeze() {
+		frozen = true;
+	}
+
+	public Collection<Component> get(Component prev) {
+		return map.get(prev);
+	}
+
+	public Collection<? extends Component> getAdditions() {
+		return inverse.keySet();
 	}
 
 	public Collection<Component> getComponentsReplacing(Component comp) {
 		return map.get(comp);
 	}
 
+	ReplacementMap getInverseMap() {
+		return new ReplacementMap(inverse, map);
+	}
+
 	public Collection<? extends Component> getRemovals() {
 		return map.keySet();
 	}
 
-	public Collection<? extends Component> getAdditions() {
-		return inverse.keySet();
+	public Collection<Component> getReplacedComponents() {
+		return map.keySet();
+	}
+
+	public boolean isEmpty() {
+		return map.isEmpty() && inverse.isEmpty();
 	}
 
 	public void print(PrintStream out) {
@@ -177,5 +139,43 @@ public class ReplacementMap {
 		}
 		if (!found)
 			out.println("  additions: none");
+	}
+
+	public void put(Component prev, Collection<? extends Component> next) {
+		if (frozen) {
+			throw new IllegalStateException("cannot change map after frozen");
+		}
+
+		HashSet<Component> repl = map.get(prev);
+		if (repl == null) {
+			repl = new HashSet<Component>(next.size());
+			map.put(prev, repl);
+		}
+		repl.addAll(next);
+
+		for (Component n : next) {
+			repl = inverse.get(n);
+			if (repl == null) {
+				repl = new HashSet<Component>(3);
+				inverse.put(n, repl);
+			}
+			repl.add(prev);
+		}
+	}
+
+	public void remove(Component comp) {
+		if (frozen) {
+			throw new IllegalStateException("cannot change map after frozen");
+		}
+		map.put(comp, new HashSet<Component>(3));
+	}
+
+	public void replace(Component prev, Component next) {
+		put(prev, Collections.singleton(next));
+	}
+
+	public void reset() {
+		map.clear();
+		inverse.clear();
 	}
 }

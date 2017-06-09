@@ -20,14 +20,6 @@ class RomAttributes extends AbstractAttributeSet {
 	private static WeakHashMap<MemContents, RomContentsListener> listenerRegistry = new WeakHashMap<MemContents, RomContentsListener>();
 	private static WeakHashMap<MemContents, HexFrame> windowRegistry = new WeakHashMap<MemContents, HexFrame>();
 
-	static void register(MemContents value, Project proj) {
-		if (proj == null || listenerRegistry.containsKey(value))
-			return;
-		RomContentsListener l = new RomContentsListener(proj);
-		value.addHexModelListener(l);
-		listenerRegistry.put(value, l);
-	}
-
 	static HexFrame getHexFrame(MemContents value, Project proj) {
 		synchronized (windowRegistry) {
 			HexFrame ret = windowRegistry.get(value);
@@ -39,16 +31,20 @@ class RomAttributes extends AbstractAttributeSet {
 		}
 	}
 
+	static void register(MemContents value, Project proj) {
+		if (proj == null || listenerRegistry.containsKey(value))
+			return;
+		RomContentsListener l = new RomContentsListener(proj);
+		value.addHexModelListener(l);
+		listenerRegistry.put(value, l);
+	}
+
 	private BitWidth addrBits = BitWidth.create(8);
 	private BitWidth dataBits = BitWidth.create(8);
 	private MemContents contents;
 
 	RomAttributes() {
 		contents = MemContents.create(addrBits.getWidth(), dataBits.getWidth());
-	}
-
-	void setProject(Project proj) {
-		register(contents, proj);
 	}
 
 	@Override
@@ -74,6 +70,10 @@ class RomAttributes extends AbstractAttributeSet {
 		if (attr == Rom.CONTENTS_ATTR)
 			return (V) contents;
 		return null;
+	}
+
+	void setProject(Project proj) {
+		register(contents, proj);
 	}
 
 	@Override

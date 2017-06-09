@@ -22,15 +22,26 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class PreferencesFrame extends LFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -569043750049698759L;
+	private class MyListener implements ActionListener, LocaleListener {
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			Object src = event.getSource();
+			if (src == close) {
+				WindowEvent e = new WindowEvent(PreferencesFrame.this, WindowEvent.WINDOW_CLOSING);
+				PreferencesFrame.this.processWindowEvent(e);
+			}
+		}
 
-	private static WindowMenuManager MENU_MANAGER = null;
-
-	public static void initializeManager() {
-		MENU_MANAGER = new WindowMenuManager();
+		@Override
+		public void localeChanged() {
+			setTitle(Strings.get("preferencesFrameTitle"));
+			for (int i = 0; i < panels.length; i++) {
+				tabbedPane.setTitleAt(i, panels[i].getTitle());
+				tabbedPane.setToolTipTextAt(i, panels[i].getToolTipText());
+				panels[i].localeChanged();
+			}
+			close.setText(Strings.get("closeButton"));
+		}
 	}
 
 	private static class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
@@ -58,32 +69,26 @@ public class PreferencesFrame extends LFrame {
 		}
 	}
 
-	private class MyListener implements ActionListener, LocaleListener {
-		@Override
-		public void actionPerformed(ActionEvent event) {
-			Object src = event.getSource();
-			if (src == close) {
-				WindowEvent e = new WindowEvent(PreferencesFrame.this, WindowEvent.WINDOW_CLOSING);
-				PreferencesFrame.this.processWindowEvent(e);
-			}
-		}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -569043750049698759L;
 
-		@Override
-		public void localeChanged() {
-			setTitle(Strings.get("preferencesFrameTitle"));
-			for (int i = 0; i < panels.length; i++) {
-				tabbedPane.setTitleAt(i, panels[i].getTitle());
-				tabbedPane.setToolTipTextAt(i, panels[i].getToolTipText());
-				panels[i].localeChanged();
-			}
-			close.setText(Strings.get("closeButton"));
-		}
+	private static WindowMenuManager MENU_MANAGER = null;
+
+	public static void initializeManager() {
+		MENU_MANAGER = new WindowMenuManager();
+	}
+
+	public static void showPreferences() {
+		JFrame frame = MENU_MANAGER.getJFrame(true);
+		frame.setVisible(true);
 	}
 
 	private MyListener myListener = new MyListener();
-
 	private OptionsPanel[] panels;
 	private JTabbedPane tabbedPane;
+
 	private JButton close = new JButton();
 
 	private PreferencesFrame() {
@@ -116,10 +121,5 @@ public class PreferencesFrame extends LFrame {
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 		pack();
-	}
-
-	public static void showPreferences() {
-		JFrame frame = MENU_MANAGER.getJFrame(true);
-		frame.setVisible(true);
 	}
 }

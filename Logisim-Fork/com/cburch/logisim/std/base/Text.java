@@ -52,25 +52,25 @@ public class Text extends InstanceFactory {
 		setShouldSnap(false);
 	}
 
+	private void configureLabel(Instance instance) {
+		TextAttributes attrs = (TextAttributes) instance.getAttributeSet();
+		Location loc = instance.getLocation();
+		instance.setTextField(ATTR_TEXT, ATTR_FONT, loc.getX(), loc.getY(), attrs.getHorizontalAlign(),
+				attrs.getVerticalAlign());
+	}
+
+	//
+	// methods for instances
+	//
 	@Override
-	public AttributeSet createAttributeSet() {
-		return new TextAttributes();
+	protected void configureNewInstance(Instance instance) {
+		configureLabel(instance);
+		instance.addAttributeListener();
 	}
 
 	@Override
-	public Bounds getOffsetBounds(AttributeSet attrsBase) {
-		TextAttributes attrs = (TextAttributes) attrsBase;
-		String text = attrs.getText();
-		if (text == null || text.equals("")) {
-			return Bounds.EMPTY_BOUNDS;
-		} else {
-			Bounds bds = attrs.getOffsetBounds();
-			if (bds == null) {
-				bds = estimateBounds(attrs);
-				attrs.setOffsetBounds(bds);
-			}
-			return bds == null ? Bounds.EMPTY_BOUNDS : bds;
-		}
+	public AttributeSet createAttributeSet() {
+		return new TextAttributes();
 	}
 
 	private Bounds estimateBounds(TextAttributes attrs) {
@@ -100,6 +100,29 @@ public class Text extends InstanceFactory {
 			y = -h;
 		}
 		return Bounds.create(x, y, w, h);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrsBase) {
+		TextAttributes attrs = (TextAttributes) attrsBase;
+		String text = attrs.getText();
+		if (text == null || text.equals("")) {
+			return Bounds.EMPTY_BOUNDS;
+		} else {
+			Bounds bds = attrs.getOffsetBounds();
+			if (bds == null) {
+				bds = estimateBounds(attrs);
+				attrs.setOffsetBounds(bds);
+			}
+			return bds == null ? Bounds.EMPTY_BOUNDS : bds;
+		}
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN) {
+			configureLabel(instance);
+		}
 	}
 
 	//
@@ -146,29 +169,6 @@ public class Text extends InstanceFactory {
 		g.setColor(Color.BLACK);
 		paintGhost(painter);
 		g.translate(-x, -y);
-	}
-
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		configureLabel(instance);
-		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN) {
-			configureLabel(instance);
-		}
-	}
-
-	private void configureLabel(Instance instance) {
-		TextAttributes attrs = (TextAttributes) instance.getAttributeSet();
-		Location loc = instance.getLocation();
-		instance.setTextField(ATTR_TEXT, ATTR_FONT, loc.getX(), loc.getY(), attrs.getHorizontalAlign(),
-				attrs.getVerticalAlign());
 	}
 
 	@Override

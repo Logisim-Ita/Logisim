@@ -26,22 +26,22 @@ public class Builtin extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Builtin";
-	}
-
-	@Override
 	public String getDisplayName() {
 		return Strings.get("builtinLibrary");
 	}
 
 	@Override
-	public List<Tool> getTools() {
-		return Collections.emptyList();
+	public List<Library> getLibraries() {
+		return libraries;
 	}
 
 	@Override
-	public List<Library> getLibraries() {
-		return libraries;
+	public String getName() {
+		return "Builtin";
+	}
+
+	@Override
+	public List<Tool> getTools() {
+		return Collections.emptyList();
 	}
 }

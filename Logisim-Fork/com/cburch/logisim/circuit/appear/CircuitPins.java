@@ -24,15 +24,6 @@ import com.cburch.logisim.std.wiring.Pin;
 public class CircuitPins {
 	private class MyComponentListener implements ComponentListener, AttributeListener {
 		@Override
-		public void endChanged(ComponentEvent e) {
-			appearanceManager.updatePorts();
-		}
-
-		@Override
-		public void componentInvalidated(ComponentEvent e) {
-		}
-
-		@Override
 		public void attributeListChanged(AttributeEvent e) {
 		}
 
@@ -42,6 +33,15 @@ public class CircuitPins {
 			if (attr == StdAttr.FACING || attr == StdAttr.LABEL || attr == Pin.ATTR_TYPE) {
 				appearanceManager.updatePorts();
 			}
+		}
+
+		@Override
+		public void componentInvalidated(ComponentEvent e) {
+		}
+
+		@Override
+		public void endChanged(ComponentEvent e) {
+			appearanceManager.updatePorts();
 		}
 	}
 
@@ -53,6 +53,10 @@ public class CircuitPins {
 		this.appearanceManager = appearanceManager;
 		myComponentListener = new MyComponentListener();
 		pins = new HashSet<Instance>();
+	}
+
+	public Collection<Instance> getPins() {
+		return new ArrayList<Instance>(pins);
 	}
 
 	public void transactionCompleted(ReplacementMap repl) {
@@ -92,9 +96,5 @@ public class CircuitPins {
 		}
 
 		appearanceManager.updatePorts(adds, removes, replaces, getPins());
-	}
-
-	public Collection<Instance> getPins() {
-		return new ArrayList<Instance>(pins);
 	}
 }

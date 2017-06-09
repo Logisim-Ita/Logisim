@@ -25,6 +25,30 @@ class OrGate extends AbstractGate {
 	}
 
 	@Override
+	protected Expression computeExpression(Expression[] inputs, int numInputs) {
+		Expression ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = Expressions.or(ret, inputs[i]);
+		}
+		return ret;
+	}
+
+	@Override
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
+		return GateFunctions.computeOr(inputs, numInputs);
+	}
+
+	@Override
+	protected Value getIdentity() {
+		return Value.FALSE;
+	}
+
+	@Override
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
+		PainterDin.paintOr(painter, width, height, false);
+	}
+
+	@Override
 	public void paintIconShaped(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.drawCenteredArc(g, 0, -5, 22, -90, 53);
@@ -38,32 +62,8 @@ class OrGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
-		PainterDin.paintOr(painter, width, height, false);
-	}
-
-	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
-		return GateFunctions.computeOr(inputs, numInputs);
-	}
-
-	@Override
 	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
 		boolean ret = !data.getPoint().equals(instance.getLocation());
 		return ret;
-	}
-
-	@Override
-	protected Expression computeExpression(Expression[] inputs, int numInputs) {
-		Expression ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = Expressions.or(ret, inputs[i]);
-		}
-		return ret;
-	}
-
-	@Override
-	protected Value getIdentity() {
-		return Value.FALSE;
 	}
 }

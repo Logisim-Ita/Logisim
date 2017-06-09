@@ -11,26 +11,6 @@ import java.util.Iterator;
 import com.cburch.draw.model.CanvasObject;
 
 public class MatchingSet<E extends CanvasObject> extends AbstractSet<E> {
-	private static class Member<E extends CanvasObject> {
-		E value;
-
-		public Member(E value) {
-			this.value = value;
-		}
-
-		@Override
-		public boolean equals(Object other) {
-			@SuppressWarnings("unchecked")
-			Member<E> that = (Member<E>) other;
-			return this.value.matches(that.value);
-		}
-
-		@Override
-		public int hashCode() {
-			return value.matchesHashCode();
-		}
-	}
-
 	private static class MatchIterator<E extends CanvasObject> implements Iterator<E> {
 		private Iterator<Member<E>> it;
 
@@ -55,6 +35,26 @@ public class MatchingSet<E extends CanvasObject> extends AbstractSet<E> {
 
 	}
 
+	private static class Member<E extends CanvasObject> {
+		E value;
+
+		public Member(E value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			@SuppressWarnings("unchecked")
+			Member<E> that = (Member<E>) other;
+			return this.value.matches(that.value);
+		}
+
+		@Override
+		public int hashCode() {
+			return value.matchesHashCode();
+		}
+	}
+
 	private HashSet<Member<E>> set;
 
 	public MatchingSet() {
@@ -74,13 +74,6 @@ public class MatchingSet<E extends CanvasObject> extends AbstractSet<E> {
 	}
 
 	@Override
-	public boolean remove(Object value) {
-		@SuppressWarnings("unchecked")
-		E eValue = (E) value;
-		return set.remove(new Member<E>(eValue));
-	}
-
-	@Override
 	public boolean contains(Object value) {
 		@SuppressWarnings("unchecked")
 		E eValue = (E) value;
@@ -90,6 +83,13 @@ public class MatchingSet<E extends CanvasObject> extends AbstractSet<E> {
 	@Override
 	public Iterator<E> iterator() {
 		return new MatchIterator<E>(set.iterator());
+	}
+
+	@Override
+	public boolean remove(Object value) {
+		@SuppressWarnings("unchecked")
+		E eValue = (E) value;
+		return set.remove(new Member<E>(eValue));
 	}
 
 	@Override

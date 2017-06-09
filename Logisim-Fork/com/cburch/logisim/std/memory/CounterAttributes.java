@@ -24,8 +24,18 @@ class CounterAttributes extends AbstractAttributeSet {
 	}
 
 	@Override
+	public boolean containsAttribute(Attribute<?> attr) {
+		return base.containsAttribute(attr);
+	}
+
+	@Override
 	public void copyInto(AbstractAttributeSet dest) {
 		((CounterAttributes) dest).base = (AttributeSet) this.base.clone();
+	}
+
+	@Override
+	public Attribute<?> getAttribute(String name) {
+		return base.getAttribute(name);
 	}
 
 	@Override
@@ -36,6 +46,16 @@ class CounterAttributes extends AbstractAttributeSet {
 	@Override
 	public <V> V getValue(Attribute<V> attr) {
 		return base.getValue(attr);
+	}
+
+	@Override
+	public boolean isReadOnly(Attribute<?> attr) {
+		return base.isReadOnly(attr);
+	}
+
+	@Override
+	public void setReadOnly(Attribute<?> attr, boolean value) {
+		base.setReadOnly(attr, value);
 	}
 
 	@Override
@@ -80,25 +100,5 @@ class CounterAttributes extends AbstractAttributeSet {
 			base.setValue(Counter.ATTR_MAX, newMax);
 			fireAttributeValueChanged(Counter.ATTR_MAX, newMax);
 		}
-	}
-
-	@Override
-	public boolean containsAttribute(Attribute<?> attr) {
-		return base.containsAttribute(attr);
-	}
-
-	@Override
-	public Attribute<?> getAttribute(String name) {
-		return base.getAttribute(name);
-	}
-
-	@Override
-	public boolean isReadOnly(Attribute<?> attr) {
-		return base.isReadOnly(attr);
-	}
-
-	@Override
-	public void setReadOnly(Attribute<?> attr, boolean value) {
-		base.setReadOnly(attr, value);
 	}
 }

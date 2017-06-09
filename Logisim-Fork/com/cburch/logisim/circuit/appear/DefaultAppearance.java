@@ -22,11 +22,6 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
 
 class DefaultAppearance {
-	private static final int OFFS = 50;
-
-	private DefaultAppearance() {
-	}
-
 	private static class CompareLocations implements Comparator<Instance> {
 		private boolean byX;
 
@@ -55,15 +50,7 @@ class DefaultAppearance {
 		}
 	}
 
-	static void sortPinList(List<Instance> pins, Direction facing) {
-		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
-			Comparator<Instance> sortHorizontal = new CompareLocations(true);
-			Collections.sort(pins, sortHorizontal);
-		} else {
-			Comparator<Instance> sortVertical = new CompareLocations(false);
-			Collections.sort(pins, sortVertical);
-		}
-	}
+	private static final int OFFS = 50;
 
 	public static List<CanvasObject> build(Collection<Instance> pins) {
 		Map<Direction, List<Instance>> edge;
@@ -175,5 +162,18 @@ class DefaultAppearance {
 			x += dx;
 			y += dy;
 		}
+	}
+
+	static void sortPinList(List<Instance> pins, Direction facing) {
+		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+			Comparator<Instance> sortHorizontal = new CompareLocations(true);
+			Collections.sort(pins, sortHorizontal);
+		} else {
+			Comparator<Instance> sortVertical = new CompareLocations(false);
+			Collections.sort(pins, sortVertical);
+		}
+	}
+
+	private DefaultAppearance() {
 	}
 }

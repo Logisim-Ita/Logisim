@@ -20,8 +20,18 @@ public class Test {
 		}
 
 		@Override
-		public void removeHexModelListener(HexModelListener l) {
-			listeners.remove(l);
+		public void fill(long start, long len, int value) {
+			int[] oldValues = new int[(int) len];
+			System.arraycopy(data, (int) (start - 11111), oldValues, 0, (int) len);
+			Arrays.fill(data, (int) (start - 11111), (int) len, value);
+			for (HexModelListener l : listeners) {
+				l.bytesChanged(this, start, len, oldValues);
+			}
+		}
+
+		@Override
+		public int get(long address) {
+			return data[(int) (address - 11111)];
 		}
 
 		@Override
@@ -40,8 +50,8 @@ public class Test {
 		}
 
 		@Override
-		public int get(long address) {
-			return data[(int) (address - 11111)];
+		public void removeHexModelListener(HexModelListener l) {
+			listeners.remove(l);
 		}
 
 		@Override
@@ -60,16 +70,6 @@ public class Test {
 			System.arraycopy(values, 0, data, (int) (start - 11111), values.length);
 			for (HexModelListener l : listeners) {
 				l.bytesChanged(this, start, values.length, oldValues);
-			}
-		}
-
-		@Override
-		public void fill(long start, long len, int value) {
-			int[] oldValues = new int[(int) len];
-			System.arraycopy(data, (int) (start - 11111), oldValues, 0, (int) len);
-			Arrays.fill(data, (int) (start - 11111), (int) len, value);
-			for (HexModelListener l : listeners) {
-				l.bytesChanged(this, start, len, oldValues);
 			}
 		}
 	}

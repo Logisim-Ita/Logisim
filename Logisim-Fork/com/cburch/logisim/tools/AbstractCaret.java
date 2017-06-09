@@ -28,32 +28,7 @@ public class AbstractCaret implements Caret {
 	}
 
 	@Override
-	public void removeCaretListener(CaretListener e) {
-		listeners.remove(e);
-	}
-
-	protected List<CaretListener> getCaretListeners() {
-		return listenersView;
-	}
-
-	// configuration methods
-	public void setBounds(Bounds value) {
-		bds = value;
-	}
-
-	// query/Graphics methods
-	@Override
-	public String getText() {
-		return "";
-	}
-
-	@Override
-	public Bounds getBounds(Graphics g) {
-		return bds;
-	}
-
-	@Override
-	public void draw(Graphics g) {
+	public void cancelEditing() {
 	}
 
 	// finishing
@@ -62,24 +37,22 @@ public class AbstractCaret implements Caret {
 	}
 
 	@Override
-	public void cancelEditing() {
+	public void draw(Graphics g) {
 	}
 
 	@Override
-	public void stopEditing() {
+	public Bounds getBounds(Graphics g) {
+		return bds;
 	}
 
-	// events to handle
-	@Override
-	public void mousePressed(MouseEvent e) {
+	protected List<CaretListener> getCaretListeners() {
+		return listenersView;
 	}
 
+	// query/Graphics methods
 	@Override
-	public void mouseDragged(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
+	public String getText() {
+		return "";
 	}
 
 	@Override
@@ -92,5 +65,32 @@ public class AbstractCaret implements Caret {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+	}
+
+	// events to handle
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void removeCaretListener(CaretListener e) {
+		listeners.remove(e);
+	}
+
+	// configuration methods
+	public void setBounds(Bounds value) {
+		bds = value;
+	}
+
+	@Override
+	public void stopEditing() {
 	}
 }

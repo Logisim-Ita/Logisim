@@ -30,56 +30,64 @@ class CircuitPoints {
 	}
 
 	//
-	// access methods
+	// update methods
 	//
-	Set<Location> getSplitLocations() {
-		return map.keySet();
-	}
-
-	BitWidth getWidth(Location loc) {
-		LocationData locData = map.get(loc);
-		return locData == null ? BitWidth.UNKNOWN : locData.width;
-	}
-
-	int getComponentCount(Location loc) {
-		LocationData locData = map.get(loc);
-		return locData == null ? 0 : locData.components.size();
-	}
-
-	Component getExclusive(Location loc) {
-		LocationData locData = map.get(loc);
-		if (locData == null)
-			return null;
-		int i = -1;
-		for (EndData endData : locData.ends) {
-			i++;
-			if (endData != null && endData.isExclusive()) {
-				return locData.components.get(i);
+	void add(Component comp) {
+		if (comp instanceof Wire) {
+			Wire w = (Wire) comp;
+			addSub(w.getEnd0(), w, null);
+			addSub(w.getEnd1(), w, null);
+		} else {
+			for (EndData endData : comp.getEnds()) {
+				if (endData != null) {
+					addSub(endData.getLocation(), comp, endData);
+				}
 			}
 		}
-		return null;
 	}
 
-	Collection<? extends Component> getComponents(Location loc) {
+	void add(Component comp, EndData endData) {
+		if (endData != null)
+			addSub(endData.getLocation(), comp, endData);
+	}
+
+	private void addSub(Location loc, Component comp, EndData endData) {
 		LocationData locData = map.get(loc);
-		if (locData == null)
-			return Collections.emptySet();
-		else
-			return locData.components;
+		if (locData == null) {
+			locData = new LocationData();
+			map.put(loc, locData);
+		}
+		locData.components.add(comp);
+		locData.ends.add(endData);
+		computeIncompatibilityData(loc, locData);
 	}
 
-	Collection<? extends Component> getSplitCauses(Location loc) {
-		return getComponents(loc);
-	}
+	private void computeIncompatibilityData(Location loc, LocationData locData) {
+		WidthIncompatibilityData error = null;
+		if (locData != null) {
+			BitWidth width = BitWidth.UNKNOWN;
+			for (EndData endData : locData.ends) {
+				if (endData != null) {
+					BitWidth endWidth = endData.getWidth();
+					if (width == BitWidth.UNKNOWN) {
+						width = endWidth;
+					} else if (width != endWidth && endWidth != BitWidth.UNKNOWN) {
+						if (error == null) {
+							error = new WidthIncompatibilityData();
+							error.add(loc, width);
+						}
+						error.add(loc, endWidth);
+					}
+				}
+			}
+			locData.width = width;
+		}
 
-	Collection<Wire> getWires(Location loc) {
-		@SuppressWarnings("unchecked")
-		Collection<Wire> ret = (Collection<Wire>) find(loc, true);
-		return ret;
-	}
-
-	Collection<? extends Component> getNonWires(Location loc) {
-		return find(loc, false);
+		if (error == null) {
+			incompatibilityData.remove(loc);
+		} else {
+			incompatibilityData.put(loc, error);
+		}
 	}
 
 	private Collection<? extends Component> find(Location loc, boolean isWire) {
@@ -117,8 +125,61 @@ class CircuitPoints {
 		return Arrays.asList(ret);
 	}
 
+	int getComponentCount(Location loc) {
+		LocationData locData = map.get(loc);
+		return locData == null ? 0 : locData.components.size();
+	}
+
+	Collection<? extends Component> getComponents(Location loc) {
+		LocationData locData = map.get(loc);
+		if (locData == null)
+			return Collections.emptySet();
+		else
+			return locData.components;
+	}
+
+	Component getExclusive(Location loc) {
+		LocationData locData = map.get(loc);
+		if (locData == null)
+			return null;
+		int i = -1;
+		for (EndData endData : locData.ends) {
+			i++;
+			if (endData != null && endData.isExclusive()) {
+				return locData.components.get(i);
+			}
+		}
+		return null;
+	}
+
+	Collection<? extends Component> getNonWires(Location loc) {
+		return find(loc, false);
+	}
+
+	Collection<? extends Component> getSplitCauses(Location loc) {
+		return getComponents(loc);
+	}
+
+	//
+	// access methods
+	//
+	Set<Location> getSplitLocations() {
+		return map.keySet();
+	}
+
+	BitWidth getWidth(Location loc) {
+		LocationData locData = map.get(loc);
+		return locData == null ? BitWidth.UNKNOWN : locData.width;
+	}
+
 	Collection<WidthIncompatibilityData> getWidthIncompatibilityData() {
 		return incompatibilityData.values();
+	}
+
+	Collection<Wire> getWires(Location loc) {
+		@SuppressWarnings("unchecked")
+		Collection<Wire> ret = (Collection<Wire>) find(loc, true);
+		return ret;
 	}
 
 	boolean hasConflict(Component comp) {
@@ -132,28 +193,6 @@ class CircuitPoints {
 			}
 			return false;
 		}
-	}
-
-	//
-	// update methods
-	//
-	void add(Component comp) {
-		if (comp instanceof Wire) {
-			Wire w = (Wire) comp;
-			addSub(w.getEnd0(), w, null);
-			addSub(w.getEnd1(), w, null);
-		} else {
-			for (EndData endData : comp.getEnds()) {
-				if (endData != null) {
-					addSub(endData.getLocation(), comp, endData);
-				}
-			}
-		}
-	}
-
-	void add(Component comp, EndData endData) {
-		if (endData != null)
-			addSub(endData.getLocation(), comp, endData);
 	}
 
 	void remove(Component comp) {
@@ -175,17 +214,6 @@ class CircuitPoints {
 			removeSub(endData.getLocation(), comp);
 	}
 
-	private void addSub(Location loc, Component comp, EndData endData) {
-		LocationData locData = map.get(loc);
-		if (locData == null) {
-			locData = new LocationData();
-			map.put(loc, locData);
-		}
-		locData.components.add(comp);
-		locData.ends.add(endData);
-		computeIncompatibilityData(loc, locData);
-	}
-
 	private void removeSub(Location loc, Component comp) {
 		LocationData locData = map.get(loc);
 		if (locData == null)
@@ -202,34 +230,6 @@ class CircuitPoints {
 			locData.components.remove(index);
 			locData.ends.remove(index);
 			computeIncompatibilityData(loc, locData);
-		}
-	}
-
-	private void computeIncompatibilityData(Location loc, LocationData locData) {
-		WidthIncompatibilityData error = null;
-		if (locData != null) {
-			BitWidth width = BitWidth.UNKNOWN;
-			for (EndData endData : locData.ends) {
-				if (endData != null) {
-					BitWidth endWidth = endData.getWidth();
-					if (width == BitWidth.UNKNOWN) {
-						width = endWidth;
-					} else if (width != endWidth && endWidth != BitWidth.UNKNOWN) {
-						if (error == null) {
-							error = new WidthIncompatibilityData();
-							error.add(loc, width);
-						}
-						error.add(loc, endWidth);
-					}
-				}
-			}
-			locData.width = width;
-		}
-
-		if (error == null) {
-			incompatibilityData.remove(loc);
-		} else {
-			incompatibilityData.put(loc, error);
 		}
 	}
 

@@ -36,15 +36,6 @@ import com.cburch.logisim.gui.generic.GridPainter;
 import com.cburch.logisim.proj.Project;
 
 public class AppearanceCanvas extends Canvas implements CanvasPaneContents, ActionDispatcher {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2997341273503780021L;
-	private static final int BOUNDS_BUFFER = 70;
-	// pixels shown in canvas beyond outermost boundaries
-	private static final int THRESH_SIZE_UPDATE = 10;
-	// don't bother to update the size if it hasn't changed more than this
-
 	private class Listener implements CanvasModelListener, PropertyChangeListener {
 		@Override
 		public void modelChanged(CanvasModelEvent event) {
@@ -62,7 +53,25 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			}
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2997341273503780021L;
+	private static final int BOUNDS_BUFFER = 70;
 
+	// pixels shown in canvas beyond outermost boundaries
+	private static final int THRESH_SIZE_UPDATE = 10;
+	// don't bother to update the size if it hasn't changed more than this
+
+	static int getMaxIndex(CanvasModel model) {
+		List<CanvasObject> objects = model.getObjectsFromBottom();
+		for (int i = objects.size() - 1; i >= 0; i--) {
+			if (!(objects.get(i) instanceof AppearanceElement)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 	private CanvasTool selectTool;
 	private Project proj;
 	private CircuitState circuitState;
@@ -70,6 +79,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	private GridPainter grid;
 	private CanvasPane canvasPane;
 	private Bounds oldPreferredSize;
+
 	private LayoutPopupManager popupManager;
 
 	public AppearanceCanvas(CanvasTool selectTool) {
@@ -86,56 +96,33 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		grid.addPropertyChangeListener(GridPainter.ZOOM_PROPERTY, listener);
 	}
 
-	@Override
-	public void setTool(CanvasTool value) {
+	private void computeSize(boolean immediate) {
 		hidePopup();
-		super.setTool(value);
-	}
-
-	@Override
-	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
-		if (tool == getTool() && tool != selectTool) {
-			setTool(selectTool);
-			if (created != null) {
-				getSelection().clearSelected();
-				getSelection().setSelected(created, true);
+		Bounds bounds;
+		CircuitState circState = circuitState;
+		if (circState == null) {
+			bounds = Bounds.create(0, 0, 50, 50);
+		} else {
+			bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
+		}
+		int width = bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER;
+		int height = bounds.getY() + bounds.getHeight() + BOUNDS_BUFFER;
+		Dimension dim;
+		if (canvasPane == null) {
+			dim = new Dimension(width, height);
+		} else {
+			dim = canvasPane.supportPreferredSize(width, height);
+		}
+		if (!immediate) {
+			Bounds old = oldPreferredSize;
+			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
+					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
+				return;
 			}
 		}
-	}
-
-	@Override
-	public void setModel(CanvasModel value, ActionDispatcher dispatcher) {
-		CanvasModel oldModel = super.getModel();
-		if (oldModel != null) {
-			oldModel.removeCanvasModelListener(listener);
-		}
-		super.setModel(value, dispatcher);
-		if (value != null) {
-			value.addCanvasModelListener(listener);
-		}
-	}
-
-	public void setCircuit(Project proj, CircuitState circuitState) {
-		this.proj = proj;
-		this.circuitState = circuitState;
-		Circuit circuit = circuitState.getCircuit();
-		setModel(circuit.getAppearance(), this);
-	}
-
-	Project getProject() {
-		return proj;
-	}
-
-	Circuit getCircuit() {
-		return circuitState.getCircuit();
-	}
-
-	CircuitState getCircuitState() {
-		return circuitState;
-	}
-
-	GridPainter getGridPainter() {
-		return grid;
+		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
+		setPreferredSize(dim);
+		revalidate();
 	}
 
 	@Override
@@ -193,148 +180,25 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		proj.doAction(new CanvasActionAdapter(circuit, canvasAction));
 	}
 
-	@Override
-	public double getZoomFactor() {
-		return grid.getZoomFactor();
+	Circuit getCircuit() {
+		return circuitState.getCircuit();
 	}
 
-	@Override
-	public int snapX(int x) {
-		if (x < 0) {
-			return -((-x + 5) / 10 * 10);
-		} else {
-			return (x + 5) / 10 * 10;
-		}
+	CircuitState getCircuitState() {
+		return circuitState;
 	}
 
-	@Override
-	public int snapY(int y) {
-		if (y < 0) {
-			return -((-y + 5) / 10 * 10);
-		} else {
-			return (y + 5) / 10 * 10;
-		}
-	}
-
-	@Override
-	protected void paintBackground(Graphics g) {
-		super.paintBackground(g);
-		grid.paintGrid(g);
-	}
-
-	@Override
-	protected void paintForeground(Graphics g) {
-		double zoom = grid.getZoomFactor();
-		Graphics gScaled = g.create();
-		if (zoom != 1.0 && zoom != 0.0 && gScaled instanceof Graphics2D) {
-			((Graphics2D) gScaled).scale(zoom, zoom);
-		}
-		super.paintForeground(gScaled);
-		gScaled.dispose();
-	}
-
-	@Override
-	public void repaintCanvasCoords(int x, int y, int width, int height) {
-		double zoom = grid.getZoomFactor();
-		if (zoom != 1.0) {
-			x = (int) (x * zoom - 1);
-			y = (int) (y * zoom - 1);
-			width = (int) (width * zoom + 4);
-			height = (int) (height * zoom + 4);
-		}
-		super.repaintCanvasCoords(x, y, width, height);
-	}
-
-	@Override
-	protected void processMouseEvent(MouseEvent e) {
-		repairEvent(e, grid.getZoomFactor());
-		super.processMouseEvent(e);
-	}
-
-	@Override
-	public JPopupMenu showPopupMenu(MouseEvent e, CanvasObject clicked) {
-		double zoom = grid.getZoomFactor();
-		int x = (int) Math.round(e.getX() * zoom);
-		int y = (int) Math.round(e.getY() * zoom);
-		if (clicked != null && getSelection().isSelected(clicked)) {
-			AppearanceEditPopup popup = new AppearanceEditPopup(this);
-			popup.show(this, x, y);
-			return popup;
-		}
-		return null;
-	}
-
-	@Override
-	protected void processMouseMotionEvent(MouseEvent e) {
-		repairEvent(e, grid.getZoomFactor());
-		super.processMouseMotionEvent(e);
-	}
-
-	private void hidePopup() {
-		LayoutPopupManager man = popupManager;
-		if (man != null) {
-			man.hideCurrentPopup();
-		}
-	}
-
-	private void repairEvent(MouseEvent e, double zoom) {
-		if (zoom != 1.0) {
-			int oldx = e.getX();
-			int oldy = e.getY();
-			int newx = (int) Math.round(e.getX() / zoom);
-			int newy = (int) Math.round(e.getY() / zoom);
-			e.translatePoint(newx - oldx, newy - oldy);
-		}
-	}
-
-	private void computeSize(boolean immediate) {
-		hidePopup();
-		Bounds bounds;
-		CircuitState circState = circuitState;
-		if (circState == null) {
-			bounds = Bounds.create(0, 0, 50, 50);
-		} else {
-			bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
-		}
-		int width = bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER;
-		int height = bounds.getY() + bounds.getHeight() + BOUNDS_BUFFER;
-		Dimension dim;
-		if (canvasPane == null) {
-			dim = new Dimension(width, height);
-		} else {
-			dim = canvasPane.supportPreferredSize(width, height);
-		}
-		if (!immediate) {
-			Bounds old = oldPreferredSize;
-			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
-					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
-				return;
-			}
-		}
-		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
-		setPreferredSize(dim);
-		revalidate();
-	}
-
-	//
-	// CanvasPaneContents methods
-	//
-	@Override
-	public void setCanvasPane(CanvasPane value) {
-		canvasPane = value;
-		computeSize(true);
-		popupManager = new LayoutPopupManager(value, this);
-	}
-
-	@Override
-	public void recomputeSize() {
-		computeSize(true);
-		repaint();
+	GridPainter getGridPainter() {
+		return grid;
 	}
 
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
+	}
+
+	Project getProject() {
+		return proj;
 	}
 
 	@Override
@@ -357,13 +221,149 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		return canvasPane.supportScrollableUnitIncrement(visibleRect, orientation, direction);
 	}
 
-	static int getMaxIndex(CanvasModel model) {
-		List<CanvasObject> objects = model.getObjectsFromBottom();
-		for (int i = objects.size() - 1; i >= 0; i--) {
-			if (!(objects.get(i) instanceof AppearanceElement)) {
-				return i;
+	@Override
+	public double getZoomFactor() {
+		return grid.getZoomFactor();
+	}
+
+	private void hidePopup() {
+		LayoutPopupManager man = popupManager;
+		if (man != null) {
+			man.hideCurrentPopup();
+		}
+	}
+
+	@Override
+	protected void paintBackground(Graphics g) {
+		super.paintBackground(g);
+		grid.paintGrid(g);
+	}
+
+	@Override
+	protected void paintForeground(Graphics g) {
+		double zoom = grid.getZoomFactor();
+		Graphics gScaled = g.create();
+		if (zoom != 1.0 && zoom != 0.0 && gScaled instanceof Graphics2D) {
+			((Graphics2D) gScaled).scale(zoom, zoom);
+		}
+		super.paintForeground(gScaled);
+		gScaled.dispose();
+	}
+
+	@Override
+	protected void processMouseEvent(MouseEvent e) {
+		repairEvent(e, grid.getZoomFactor());
+		super.processMouseEvent(e);
+	}
+
+	@Override
+	protected void processMouseMotionEvent(MouseEvent e) {
+		repairEvent(e, grid.getZoomFactor());
+		super.processMouseMotionEvent(e);
+	}
+
+	@Override
+	public void recomputeSize() {
+		computeSize(true);
+		repaint();
+	}
+
+	@Override
+	public void repaintCanvasCoords(int x, int y, int width, int height) {
+		double zoom = grid.getZoomFactor();
+		if (zoom != 1.0) {
+			x = (int) (x * zoom - 1);
+			y = (int) (y * zoom - 1);
+			width = (int) (width * zoom + 4);
+			height = (int) (height * zoom + 4);
+		}
+		super.repaintCanvasCoords(x, y, width, height);
+	}
+
+	private void repairEvent(MouseEvent e, double zoom) {
+		if (zoom != 1.0) {
+			int oldx = e.getX();
+			int oldy = e.getY();
+			int newx = (int) Math.round(e.getX() / zoom);
+			int newy = (int) Math.round(e.getY() / zoom);
+			e.translatePoint(newx - oldx, newy - oldy);
+		}
+	}
+
+	//
+	// CanvasPaneContents methods
+	//
+	@Override
+	public void setCanvasPane(CanvasPane value) {
+		canvasPane = value;
+		computeSize(true);
+		popupManager = new LayoutPopupManager(value, this);
+	}
+
+	public void setCircuit(Project proj, CircuitState circuitState) {
+		this.proj = proj;
+		this.circuitState = circuitState;
+		Circuit circuit = circuitState.getCircuit();
+		setModel(circuit.getAppearance(), this);
+	}
+
+	@Override
+	public void setModel(CanvasModel value, ActionDispatcher dispatcher) {
+		CanvasModel oldModel = super.getModel();
+		if (oldModel != null) {
+			oldModel.removeCanvasModelListener(listener);
+		}
+		super.setModel(value, dispatcher);
+		if (value != null) {
+			value.addCanvasModelListener(listener);
+		}
+	}
+
+	@Override
+	public void setTool(CanvasTool value) {
+		hidePopup();
+		super.setTool(value);
+	}
+
+	@Override
+	public JPopupMenu showPopupMenu(MouseEvent e, CanvasObject clicked) {
+		double zoom = grid.getZoomFactor();
+		int x = (int) Math.round(e.getX() * zoom);
+		int y = (int) Math.round(e.getY() * zoom);
+		if (clicked != null && getSelection().isSelected(clicked)) {
+			AppearanceEditPopup popup = new AppearanceEditPopup(this);
+			popup.show(this, x, y);
+			return popup;
+		}
+		return null;
+	}
+
+	@Override
+	public int snapX(int x) {
+		if (x < 0) {
+			return -((-x + 5) / 10 * 10);
+		} else {
+			return (x + 5) / 10 * 10;
+		}
+	}
+
+	@Override
+	public int snapY(int y) {
+		if (y < 0) {
+			return -((-y + 5) / 10 * 10);
+		} else {
+			return (y + 5) / 10 * 10;
+		}
+	}
+
+	@Override
+	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
+		if (tool == getTool() && tool != selectTool) {
+			setTool(selectTool);
+			if (created != null) {
+				getSelection().clearSelected();
+				getSelection().setSelected(created, true);
 			}
 		}
-		return -1;
 	}
 }

@@ -25,14 +25,6 @@ class PrefMonitorInt extends AbstractPrefMonitor<Integer> {
 	}
 
 	@Override
-	public void set(Integer newValue) {
-		int newVal = newValue.intValue();
-		if (value != newVal) {
-			AppPreferences.getPrefs().putInt(getIdentifier(), newVal);
-		}
-	}
-
-	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		Preferences prefs = event.getNode();
 		String prop = event.getKey();
@@ -44,6 +36,14 @@ class PrefMonitorInt extends AbstractPrefMonitor<Integer> {
 				value = newValue;
 				AppPreferences.firePropertyChange(name, Integer.valueOf(oldValue), Integer.valueOf(newValue));
 			}
+		}
+	}
+
+	@Override
+	public void set(Integer newValue) {
+		int newVal = newValue.intValue();
+		if (value != newVal) {
+			AppPreferences.getPrefs().putInt(getIdentifier(), newVal);
 		}
 	}
 }

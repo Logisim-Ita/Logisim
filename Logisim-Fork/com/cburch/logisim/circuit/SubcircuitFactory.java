@@ -48,8 +48,15 @@ public class SubcircuitFactory extends InstanceFactory {
 		}
 
 		@Override
-		public String get() {
-			return source.getName();
+		public void actionPerformed(ActionEvent e) {
+			CircuitState superState = proj.getCircuitState();
+			if (superState == null)
+				return;
+
+			CircuitState subState = getSubstate(superState, instance);
+			if (subState == null)
+				return;
+			proj.setCircuitState(subState);
 		}
 
 		@Override
@@ -63,15 +70,8 @@ public class SubcircuitFactory extends InstanceFactory {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			CircuitState superState = proj.getCircuitState();
-			if (superState == null)
-				return;
-
-			CircuitState subState = getSubstate(superState, instance);
-			if (subState == null)
-				return;
-			proj.setCircuitState(subState);
+		public String get() {
+			return source.getName();
 		}
 	}
 
@@ -83,62 +83,6 @@ public class SubcircuitFactory extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		setDefaultToolTip(new CircuitFeature(null));
 		setInstancePoker(SubcircuitPoker.class);
-	}
-
-	public Circuit getSubcircuit() {
-		return source;
-	}
-
-	@Override
-	public String getName() {
-		return source.getName();
-	}
-
-	@Override
-	public StringGetter getDisplayGetter() {
-		return StringUtil.constantGetter(source.getName());
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Direction facing = attrs.getValue(StdAttr.FACING);
-		Direction defaultFacing = source.getAppearance().getFacing();
-		Bounds bds = source.getAppearance().getOffsetBounds();
-		return bds.rotate(defaultFacing, facing, 0, 0);
-	}
-
-	@Override
-	public AttributeSet createAttributeSet() {
-		return new CircuitAttributes(source);
-	}
-
-	//
-	// methods for configuring instances
-	//
-	@Override
-	public void configureNewInstance(Instance instance) {
-		CircuitAttributes attrs = (CircuitAttributes) instance.getAttributeSet();
-		attrs.setSubcircuit(instance);
-
-		instance.addAttributeListener();
-		computePorts(instance);
-		// configureLabel(instance); already done in computePorts
-	}
-
-	@Override
-	public void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			computePorts(instance);
-		} else if (attr == CircuitAttributes.LABEL_LOCATION_ATTR) {
-			configureLabel(instance);
-		}
-	}
-
-	@Override
-	public Object getInstanceFeature(Instance instance, Object key) {
-		if (key == MenuExtender.class)
-			return new CircuitFeature(instance);
-		return super.getInstanceFeature(instance, key);
 	}
 
 	void computePorts(Instance instance) {
@@ -194,85 +138,21 @@ public class SubcircuitFactory extends InstanceFactory {
 	}
 
 	//
-	// propagation-oriented methods
+	// methods for configuring instances
 	//
-	public CircuitState getSubstate(CircuitState superState, Instance instance) {
-		return getSubstate(createInstanceState(superState, instance));
-	}
+	@Override
+	public void configureNewInstance(Instance instance) {
+		CircuitAttributes attrs = (CircuitAttributes) instance.getAttributeSet();
+		attrs.setSubcircuit(instance);
 
-	public CircuitState getSubstate(CircuitState superState, Component comp) {
-		return getSubstate(createInstanceState(superState, comp));
-	}
-
-	private CircuitState getSubstate(InstanceState instanceState) {
-		CircuitState subState = (CircuitState) instanceState.getData();
-		if (subState == null) {
-			subState = new CircuitState(instanceState.getProject(), source);
-			instanceState.setData(subState);
-			instanceState.fireInvalidated();
-		}
-		return subState;
+		instance.addAttributeListener();
+		computePorts(instance);
+		// configureLabel(instance); already done in computePorts
 	}
 
 	@Override
-	public void propagate(InstanceState superState) {
-		CircuitState subState = getSubstate(superState);
-
-		CircuitAttributes attrs = (CircuitAttributes) superState.getAttributeSet();
-		Instance[] pins = attrs.getPinInstances();
-		for (int i = 0; i < pins.length; i++) {
-			Instance pin = pins[i];
-			InstanceState pinState = subState.getInstanceState(pin);
-			if (Pin.FACTORY.isInputPin(pin)) {
-				Value newVal = superState.getPort(i);
-				Value oldVal = Pin.FACTORY.getValue(pinState);
-				if (!newVal.equals(oldVal)) {
-					Pin.FACTORY.setValue(pinState, newVal);
-					Pin.FACTORY.propagate(pinState);
-				}
-			} else { // it is output-only
-				Value val = pinState.getPort(0);
-				superState.setPort(i, val, 1);
-			}
-		}
-	}
-
-	//
-	// user interface features
-	//
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		Color fg = g.getColor();
-		int v = fg.getRed() + fg.getGreen() + fg.getBlue();
-		Composite oldComposite = null;
-		if (g instanceof Graphics2D && v > 50) {
-			oldComposite = ((Graphics2D) g).getComposite();
-			Composite c = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-			((Graphics2D) g).setComposite(c);
-		}
-		paintBase(painter, g);
-		if (oldComposite != null) {
-			((Graphics2D) g).setComposite(oldComposite);
-		}
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		paintBase(painter, painter.getGraphics());
-		painter.drawPorts();
-	}
-
-	private void paintBase(InstancePainter painter, Graphics g) {
-		CircuitAttributes attrs = (CircuitAttributes) painter.getAttributeSet();
-		Direction facing = attrs.getFacing();
-		Direction defaultFacing = source.getAppearance().getFacing();
-		Location loc = painter.getLocation();
-		g.translate(loc.getX(), loc.getY());
-		source.getAppearance().paintSubcircuit(g, facing);
-		drawCircuitLabel(painter, getOffsetBounds(attrs), facing, defaultFacing);
-		g.translate(-loc.getX(), -loc.getY());
-		painter.drawLabel();
+	public AttributeSet createAttributeSet() {
+		return new CircuitAttributes(source);
 	}
 
 	private void drawCircuitLabel(InstancePainter painter, Bounds bds, Direction facing, Direction defaultFacing) {
@@ -328,6 +208,126 @@ public class SubcircuitFactory extends InstanceFactory {
 				GraphicsUtil.drawText(g, label, x, y, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 			}
 			g.dispose();
+		}
+	}
+
+	@Override
+	public StringGetter getDisplayGetter() {
+		return StringUtil.constantGetter(source.getName());
+	}
+
+	@Override
+	public Object getInstanceFeature(Instance instance, Object key) {
+		if (key == MenuExtender.class)
+			return new CircuitFeature(instance);
+		return super.getInstanceFeature(instance, key);
+	}
+
+	@Override
+	public String getName() {
+		return source.getName();
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction facing = attrs.getValue(StdAttr.FACING);
+		Direction defaultFacing = source.getAppearance().getFacing();
+		Bounds bds = source.getAppearance().getOffsetBounds();
+		return bds.rotate(defaultFacing, facing, 0, 0);
+	}
+
+	public Circuit getSubcircuit() {
+		return source;
+	}
+
+	public CircuitState getSubstate(CircuitState superState, Component comp) {
+		return getSubstate(createInstanceState(superState, comp));
+	}
+
+	//
+	// propagation-oriented methods
+	//
+	public CircuitState getSubstate(CircuitState superState, Instance instance) {
+		return getSubstate(createInstanceState(superState, instance));
+	}
+
+	private CircuitState getSubstate(InstanceState instanceState) {
+		CircuitState subState = (CircuitState) instanceState.getData();
+		if (subState == null) {
+			subState = new CircuitState(instanceState.getProject(), source);
+			instanceState.setData(subState);
+			instanceState.fireInvalidated();
+		}
+		return subState;
+	}
+
+	@Override
+	public void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			computePorts(instance);
+		} else if (attr == CircuitAttributes.LABEL_LOCATION_ATTR) {
+			configureLabel(instance);
+		}
+	}
+
+	private void paintBase(InstancePainter painter, Graphics g) {
+		CircuitAttributes attrs = (CircuitAttributes) painter.getAttributeSet();
+		Direction facing = attrs.getFacing();
+		Direction defaultFacing = source.getAppearance().getFacing();
+		Location loc = painter.getLocation();
+		g.translate(loc.getX(), loc.getY());
+		source.getAppearance().paintSubcircuit(g, facing);
+		drawCircuitLabel(painter, getOffsetBounds(attrs), facing, defaultFacing);
+		g.translate(-loc.getX(), -loc.getY());
+		painter.drawLabel();
+	}
+
+	//
+	// user interface features
+	//
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		Color fg = g.getColor();
+		int v = fg.getRed() + fg.getGreen() + fg.getBlue();
+		Composite oldComposite = null;
+		if (g instanceof Graphics2D && v > 50) {
+			oldComposite = ((Graphics2D) g).getComposite();
+			Composite c = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+			((Graphics2D) g).setComposite(c);
+		}
+		paintBase(painter, g);
+		if (oldComposite != null) {
+			((Graphics2D) g).setComposite(oldComposite);
+		}
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		paintBase(painter, painter.getGraphics());
+		painter.drawPorts();
+	}
+
+	@Override
+	public void propagate(InstanceState superState) {
+		CircuitState subState = getSubstate(superState);
+
+		CircuitAttributes attrs = (CircuitAttributes) superState.getAttributeSet();
+		Instance[] pins = attrs.getPinInstances();
+		for (int i = 0; i < pins.length; i++) {
+			Instance pin = pins[i];
+			InstanceState pinState = subState.getInstanceState(pin);
+			if (Pin.FACTORY.isInputPin(pin)) {
+				Value newVal = superState.getPort(i);
+				Value oldVal = Pin.FACTORY.getValue(pinState);
+				if (!newVal.equals(oldVal)) {
+					Pin.FACTORY.setValue(pinState, newVal);
+					Pin.FACTORY.propagate(pinState);
+				}
+			} else { // it is output-only
+				Value val = pinState.getPort(0);
+				superState.setPort(i, val, 1);
+			}
 		}
 	}
 

@@ -27,102 +27,6 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.TableSorter;
 
 public class StatisticsDialog extends JDialog implements ActionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9150207567359379809L;
-
-	public static void show(JFrame parent, LogisimFile file, Circuit circuit) {
-		FileStatistics stats = FileStatistics.compute(file, circuit);
-		StatisticsDialog dlog = new StatisticsDialog(parent, circuit.getName(), new StatisticsTableModel(stats));
-		dlog.setVisible(true);
-	}
-
-	private static class StatisticsTableModel extends AbstractTableModel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -5034046697656011267L;
-		private FileStatistics stats;
-
-		StatisticsTableModel(FileStatistics stats) {
-			this.stats = stats;
-		}
-
-		@Override
-		public int getColumnCount() {
-			return 5;
-		}
-
-		@Override
-		public int getRowCount() {
-			return stats.getCounts().size() + 2;
-		}
-
-		@Override
-		public Class<?> getColumnClass(int column) {
-			return column < 2 ? String.class : Integer.class;
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			switch (column) {
-			case 0:
-				return Strings.get("statsComponentColumn");
-			case 1:
-				return Strings.get("statsLibraryColumn");
-			case 2:
-				return Strings.get("statsSimpleCountColumn");
-			case 3:
-				return Strings.get("statsUniqueCountColumn");
-			case 4:
-				return Strings.get("statsRecursiveCountColumn");
-			default:
-				return "??"; // should never happen
-			}
-		}
-
-		@Override
-		public Object getValueAt(int row, int column) {
-			List<FileStatistics.Count> counts = stats.getCounts();
-			int countsLen = counts.size();
-			if (row < 0 || row >= countsLen + 2)
-				return "";
-			FileStatistics.Count count;
-			if (row < countsLen)
-				count = counts.get(row);
-			else if (row == countsLen)
-				count = stats.getTotalWithoutSubcircuits();
-			else
-				count = stats.getTotalWithSubcircuits();
-			switch (column) {
-			case 0:
-				if (row < countsLen) {
-					return count.getFactory().getDisplayName();
-				} else if (row == countsLen) {
-					return Strings.get("statsTotalWithout");
-				} else {
-					return Strings.get("statsTotalWith");
-				}
-			case 1:
-				if (row < countsLen) {
-					Library lib = count.getLibrary();
-					return lib == null ? "-" : lib.getDisplayName();
-				} else {
-					return "";
-				}
-			case 2:
-				return Integer.valueOf(count.getSimpleCount());
-			case 3:
-				return Integer.valueOf(count.getUniqueCount());
-			case 4:
-				return Integer.valueOf(count.getRecursiveCount());
-			default:
-				return ""; // should never happen
-			}
-		}
-	}
-
 	private static class CompareString implements Comparator<String> {
 		private String[] fixedAtBottom;
 
@@ -169,6 +73,102 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 				column.setPreferredWidth((int) width);
 			}
 		}
+	}
+
+	private static class StatisticsTableModel extends AbstractTableModel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5034046697656011267L;
+		private FileStatistics stats;
+
+		StatisticsTableModel(FileStatistics stats) {
+			this.stats = stats;
+		}
+
+		@Override
+		public Class<?> getColumnClass(int column) {
+			return column < 2 ? String.class : Integer.class;
+		}
+
+		@Override
+		public int getColumnCount() {
+			return 5;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			switch (column) {
+			case 0:
+				return Strings.get("statsComponentColumn");
+			case 1:
+				return Strings.get("statsLibraryColumn");
+			case 2:
+				return Strings.get("statsSimpleCountColumn");
+			case 3:
+				return Strings.get("statsUniqueCountColumn");
+			case 4:
+				return Strings.get("statsRecursiveCountColumn");
+			default:
+				return "??"; // should never happen
+			}
+		}
+
+		@Override
+		public int getRowCount() {
+			return stats.getCounts().size() + 2;
+		}
+
+		@Override
+		public Object getValueAt(int row, int column) {
+			List<FileStatistics.Count> counts = stats.getCounts();
+			int countsLen = counts.size();
+			if (row < 0 || row >= countsLen + 2)
+				return "";
+			FileStatistics.Count count;
+			if (row < countsLen)
+				count = counts.get(row);
+			else if (row == countsLen)
+				count = stats.getTotalWithoutSubcircuits();
+			else
+				count = stats.getTotalWithSubcircuits();
+			switch (column) {
+			case 0:
+				if (row < countsLen) {
+					return count.getFactory().getDisplayName();
+				} else if (row == countsLen) {
+					return Strings.get("statsTotalWithout");
+				} else {
+					return Strings.get("statsTotalWith");
+				}
+			case 1:
+				if (row < countsLen) {
+					Library lib = count.getLibrary();
+					return lib == null ? "-" : lib.getDisplayName();
+				} else {
+					return "";
+				}
+			case 2:
+				return Integer.valueOf(count.getSimpleCount());
+			case 3:
+				return Integer.valueOf(count.getUniqueCount());
+			case 4:
+				return Integer.valueOf(count.getRecursiveCount());
+			default:
+				return ""; // should never happen
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9150207567359379809L;
+
+	public static void show(JFrame parent, LogisimFile file, Circuit circuit) {
+		FileStatistics stats = FileStatistics.compute(file, circuit);
+		StatisticsDialog dlog = new StatisticsDialog(parent, circuit.getName(), new StatisticsTableModel(stats));
+		dlog.setVisible(true);
 	}
 
 	private StatisticsDialog(JFrame parent, String circuitName, StatisticsTableModel model) {

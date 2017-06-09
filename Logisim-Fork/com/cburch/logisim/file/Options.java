@@ -38,6 +38,12 @@ public class Options {
 		toolbar = new ToolbarData();
 	}
 
+	public void copyFrom(Options other, LogisimFile dest) {
+		AttributeSets.copy(other.attrs, this.attrs);
+		this.toolbar.copyFrom(other.toolbar, dest);
+		this.mmappings.copyFrom(other.mmappings, dest);
+	}
+
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
@@ -48,11 +54,5 @@ public class Options {
 
 	public ToolbarData getToolbarData() {
 		return toolbar;
-	}
-
-	public void copyFrom(Options other, LogisimFile dest) {
-		AttributeSets.copy(other.attrs, this.attrs);
-		this.toolbar.copyFrom(other.toolbar, dest);
-		this.mmappings.copyFrom(other.mmappings, dest);
 	}
 }

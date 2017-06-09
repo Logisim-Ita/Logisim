@@ -114,73 +114,75 @@ public class GifEncoder {
 		}
 	}
 
-	private static class LZWStringTable {
-		private final static int RES_CODES = 2;
-		private final static short HASH_FREE = (short) 0xFFFF;
-		private final static short NEXT_FIRST = (short) 0xFFFF;
-		private final static int MAXBITS = 12;
-		private final static int MAXSTR = (1 << MAXBITS);
-		private final static short HASHSIZE = 9973;
-		private final static short HASHSTEP = 2039;
+	private static class BitUtils {
+		static byte BitsNeeded(int n) {
+			byte ret = 1;
 
-		byte strChr_[];
-		short strNxt_[];
-		short strHsh_[];
-		short numStrings_;
+			if (n-- == 0)
+				return 0;
 
-		LZWStringTable() {
-			strChr_ = new byte[MAXSTR];
-			strNxt_ = new short[MAXSTR];
-			strHsh_ = new short[HASHSIZE];
+			while ((n >>= 1) != 0)
+				++ret;
+
+			return ret;
 		}
 
-		int AddCharString(short index, byte b) {
-			int hshidx;
-
-			if (numStrings_ >= MAXSTR)
-				return 0xFFFF;
-
-			hshidx = Hash(index, b);
-			while (strHsh_[hshidx] != HASH_FREE)
-				hshidx = (hshidx + HASHSTEP) % HASHSIZE;
-
-			strHsh_[hshidx] = numStrings_;
-			strChr_[numStrings_] = b;
-			strNxt_[numStrings_] = (index != HASH_FREE) ? index : NEXT_FIRST;
-
-			return numStrings_++;
+		static void WriteString(OutputStream output, String string) throws IOException {
+			for (int loop = 0; loop < string.length(); ++loop)
+				output.write((byte) (string.charAt(loop)));
 		}
 
-		short FindCharString(short index, byte b) {
-			int hshidx, nxtidx;
+		static void WriteWord(OutputStream output, short w) throws IOException {
+			output.write(w & 0xFF);
+			output.write((w >> 8) & 0xFF);
+		}
+	}
 
-			if (index == HASH_FREE)
-				return b;
+	private static class ImageDescriptor {
+		byte separator_;
+		short leftPosition_, topPosition_, width_, height_;
+		private byte byte_;
 
-			hshidx = Hash(index, b);
-			while ((nxtidx = strHsh_[hshidx]) != HASH_FREE) {
-				if (strNxt_[nxtidx] == index && strChr_[nxtidx] == b)
-					return (short) nxtidx;
-				hshidx = (hshidx + HASHSTEP) % HASHSIZE;
-			}
-
-			return (short) 0xFFFF;
+		ImageDescriptor(short width, short height, char separator) {
+			separator_ = (byte) separator;
+			leftPosition_ = 0;
+			topPosition_ = 0;
+			width_ = width;
+			height_ = height;
+			SetLocalColorTableSize((byte) 0);
+			SetReserved((byte) 0);
+			SetSortFlag((byte) 0);
+			SetInterlaceFlag((byte) 0);
+			SetLocalColorTableFlag((byte) 0);
 		}
 
-		void ClearTable(int codesize) {
-			numStrings_ = 0;
-
-			for (int q = 0; q < HASHSIZE; q++) {
-				strHsh_[q] = HASH_FREE;
-			}
-
-			int w = (1 << codesize) + RES_CODES;
-			for (int q = 0; q < w; q++)
-				AddCharString((short) 0xFFFF, (byte) q);
+		void SetInterlaceFlag(byte num) {
+			byte_ |= (num & 1) << 6;
 		}
 
-		static int Hash(short index, byte lastbyte) {
-			return (((short) (lastbyte << 8) ^ index) & 0xFFFF) % HASHSIZE;
+		void SetLocalColorTableFlag(byte num) {
+			byte_ |= (num & 1) << 7;
+		}
+
+		void SetLocalColorTableSize(byte num) {
+			byte_ |= (num & 7);
+		}
+
+		void SetReserved(byte num) {
+			byte_ |= (num & 3) << 3;
+		}
+
+		void SetSortFlag(byte num) {
+			byte_ |= (num & 1) << 5;
+		}
+
+		void Write(OutputStream output) throws IOException {
+			output.write(separator_);
+			BitUtils.WriteWord(output, leftPosition_);
+			BitUtils.WriteWord(output, topPosition_);
+			BitUtils.WriteWord(output, width_);
+			BitUtils.WriteWord(output, height_);
+			output.write(byte_);
 		}
 	}
 
@@ -230,116 +232,73 @@ public class GifEncoder {
 		}
 	}
 
-	private static class ScreenDescriptor {
-		short localScreenWidth_, localScreenHeight_;
-		private byte byte_;
-		byte backgroundColorIndex_, pixelAspectRatio_;
+	private static class LZWStringTable {
+		private final static int RES_CODES = 2;
+		private final static short HASH_FREE = (short) 0xFFFF;
+		private final static short NEXT_FIRST = (short) 0xFFFF;
+		private final static int MAXBITS = 12;
+		private final static int MAXSTR = (1 << MAXBITS);
+		private final static short HASHSIZE = 9973;
+		private final static short HASHSTEP = 2039;
 
-		ScreenDescriptor(short width, short height, int numColors) {
-			localScreenWidth_ = width;
-			localScreenHeight_ = height;
-			SetGlobalColorTableSize((byte) (BitUtils.BitsNeeded(numColors) - 1));
-			SetGlobalColorTableFlag((byte) 1);
-			SetSortFlag((byte) 0);
-			SetColorResolution((byte) 7);
-			backgroundColorIndex_ = 0;
-			pixelAspectRatio_ = 0;
+		static int Hash(short index, byte lastbyte) {
+			return (((short) (lastbyte << 8) ^ index) & 0xFFFF) % HASHSIZE;
+		}
+		byte strChr_[];
+		short strNxt_[];
+		short strHsh_[];
+
+		short numStrings_;
+
+		LZWStringTable() {
+			strChr_ = new byte[MAXSTR];
+			strNxt_ = new short[MAXSTR];
+			strHsh_ = new short[HASHSIZE];
 		}
 
-		void Write(OutputStream output) throws IOException {
-			BitUtils.WriteWord(output, localScreenWidth_);
-			BitUtils.WriteWord(output, localScreenHeight_);
-			output.write(byte_);
-			output.write(backgroundColorIndex_);
-			output.write(pixelAspectRatio_);
+		int AddCharString(short index, byte b) {
+			int hshidx;
+
+			if (numStrings_ >= MAXSTR)
+				return 0xFFFF;
+
+			hshidx = Hash(index, b);
+			while (strHsh_[hshidx] != HASH_FREE)
+				hshidx = (hshidx + HASHSTEP) % HASHSIZE;
+
+			strHsh_[hshidx] = numStrings_;
+			strChr_[numStrings_] = b;
+			strNxt_[numStrings_] = (index != HASH_FREE) ? index : NEXT_FIRST;
+
+			return numStrings_++;
 		}
 
-		void SetGlobalColorTableSize(byte num) {
-			byte_ |= (num & 7);
+		void ClearTable(int codesize) {
+			numStrings_ = 0;
+
+			for (int q = 0; q < HASHSIZE; q++) {
+				strHsh_[q] = HASH_FREE;
+			}
+
+			int w = (1 << codesize) + RES_CODES;
+			for (int q = 0; q < w; q++)
+				AddCharString((short) 0xFFFF, (byte) q);
 		}
 
-		void SetSortFlag(byte num) {
-			byte_ |= (num & 1) << 3;
-		}
+		short FindCharString(short index, byte b) {
+			int hshidx, nxtidx;
 
-		void SetColorResolution(byte num) {
-			byte_ |= (num & 7) << 4;
-		}
+			if (index == HASH_FREE)
+				return b;
 
-		void SetGlobalColorTableFlag(byte num) {
-			byte_ |= (num & 1) << 7;
-		}
-	}
+			hshidx = Hash(index, b);
+			while ((nxtidx = strHsh_[hshidx]) != HASH_FREE) {
+				if (strNxt_[nxtidx] == index && strChr_[nxtidx] == b)
+					return (short) nxtidx;
+				hshidx = (hshidx + HASHSTEP) % HASHSIZE;
+			}
 
-	private static class ImageDescriptor {
-		byte separator_;
-		short leftPosition_, topPosition_, width_, height_;
-		private byte byte_;
-
-		ImageDescriptor(short width, short height, char separator) {
-			separator_ = (byte) separator;
-			leftPosition_ = 0;
-			topPosition_ = 0;
-			width_ = width;
-			height_ = height;
-			SetLocalColorTableSize((byte) 0);
-			SetReserved((byte) 0);
-			SetSortFlag((byte) 0);
-			SetInterlaceFlag((byte) 0);
-			SetLocalColorTableFlag((byte) 0);
-		}
-
-		void Write(OutputStream output) throws IOException {
-			output.write(separator_);
-			BitUtils.WriteWord(output, leftPosition_);
-			BitUtils.WriteWord(output, topPosition_);
-			BitUtils.WriteWord(output, width_);
-			BitUtils.WriteWord(output, height_);
-			output.write(byte_);
-		}
-
-		void SetLocalColorTableSize(byte num) {
-			byte_ |= (num & 7);
-		}
-
-		void SetReserved(byte num) {
-			byte_ |= (num & 3) << 3;
-		}
-
-		void SetSortFlag(byte num) {
-			byte_ |= (num & 1) << 5;
-		}
-
-		void SetInterlaceFlag(byte num) {
-			byte_ |= (num & 1) << 6;
-		}
-
-		void SetLocalColorTableFlag(byte num) {
-			byte_ |= (num & 1) << 7;
-		}
-	}
-
-	private static class BitUtils {
-		static byte BitsNeeded(int n) {
-			byte ret = 1;
-
-			if (n-- == 0)
-				return 0;
-
-			while ((n >>= 1) != 0)
-				++ret;
-
-			return ret;
-		}
-
-		static void WriteWord(OutputStream output, short w) throws IOException {
-			output.write(w & 0xFF);
-			output.write((w >> 8) & 0xFF);
-		}
-
-		static void WriteString(OutputStream output, String string) throws IOException {
-			for (int loop = 0; loop < string.length(); ++loop)
-				output.write((byte) (string.charAt(loop)));
+			return (short) 0xFFFF;
 		}
 	}
 
@@ -371,9 +330,96 @@ public class GifEncoder {
 		}
 	}
 
+	private static class ScreenDescriptor {
+		short localScreenWidth_, localScreenHeight_;
+		private byte byte_;
+		byte backgroundColorIndex_, pixelAspectRatio_;
+
+		ScreenDescriptor(short width, short height, int numColors) {
+			localScreenWidth_ = width;
+			localScreenHeight_ = height;
+			SetGlobalColorTableSize((byte) (BitUtils.BitsNeeded(numColors) - 1));
+			SetGlobalColorTableFlag((byte) 1);
+			SetSortFlag((byte) 0);
+			SetColorResolution((byte) 7);
+			backgroundColorIndex_ = 0;
+			pixelAspectRatio_ = 0;
+		}
+
+		void SetColorResolution(byte num) {
+			byte_ |= (num & 7) << 4;
+		}
+
+		void SetGlobalColorTableFlag(byte num) {
+			byte_ |= (num & 1) << 7;
+		}
+
+		void SetGlobalColorTableSize(byte num) {
+			byte_ |= (num & 7);
+		}
+
+		void SetSortFlag(byte num) {
+			byte_ |= (num & 1) << 3;
+		}
+
+		void Write(OutputStream output) throws IOException {
+			BitUtils.WriteWord(output, localScreenWidth_);
+			BitUtils.WriteWord(output, localScreenHeight_);
+			output.write(byte_);
+			output.write(backgroundColorIndex_);
+			output.write(pixelAspectRatio_);
+		}
+	}
+
+	public static void toFile(Image img, File file) throws IOException, AWTException {
+		toFile(img, file, null);
+	}
+	public static void toFile(Image img, File file, ProgressMonitor monitor) throws IOException, AWTException {
+		FileOutputStream out = new FileOutputStream(file);
+		new GifEncoder(img, monitor).write(out);
+		out.close();
+	}
+	public static void toFile(Image img, String filename) throws IOException, AWTException {
+		toFile(img, filename, null);
+	}
+
+	public static void toFile(Image img, String filename, ProgressMonitor monitor) throws IOException, AWTException {
+		FileOutputStream out = new FileOutputStream(filename);
+		new GifEncoder(img, monitor).write(out);
+		out.close();
+	}
+
 	private short width_, height_;
+
 	private int numColors_;
+
 	private byte pixels_[], colors_[];
+
+	/**
+	 * Construct a GifEncoder. The constructor will convert the image to an
+	 * indexed color array. <B>This may take some time.</B>
+	 * <P>
+	 *
+	 * Each array stores intensity values for the image. In other words, r[x][y]
+	 * refers to the red intensity of the pixel at column x, row y.
+	 * <P>
+	 *
+	 * @param r
+	 *            An array containing the red intensity values.
+	 * @param g
+	 *            An array containing the green intensity values.
+	 * @param b
+	 *            An array containing the blue intensity values.
+	 *
+	 * @exception AWTException
+	 *                Will be thrown if the image contains more than 256 colors.
+	 */
+	public GifEncoder(byte r[][], byte g[][], byte b[][]) throws AWTException {
+		width_ = (short) (r.length);
+		height_ = (short) (r[0].length);
+
+		ToIndexedColor(r, g, b);
+	}
 
 	/**
 	 * Construct a GIFEncoder. The constructor will convert the image to an
@@ -421,30 +467,35 @@ public class GifEncoder {
 		ToIndexedColor(r, g, b);
 	}
 
-	/**
-	 * Construct a GifEncoder. The constructor will convert the image to an
-	 * indexed color array. <B>This may take some time.</B>
-	 * <P>
-	 *
-	 * Each array stores intensity values for the image. In other words, r[x][y]
-	 * refers to the red intensity of the pixel at column x, row y.
-	 * <P>
-	 *
-	 * @param r
-	 *            An array containing the red intensity values.
-	 * @param g
-	 *            An array containing the green intensity values.
-	 * @param b
-	 *            An array containing the blue intensity values.
-	 *
-	 * @exception AWTException
-	 *                Will be thrown if the image contains more than 256 colors.
-	 */
-	public GifEncoder(byte r[][], byte g[][], byte b[][]) throws AWTException {
-		width_ = (short) (r.length);
-		height_ = (short) (r[0].length);
+	void ToIndexedColor(byte r[][], byte g[][], byte b[][]) throws AWTException {
+		pixels_ = new byte[width_ * height_];
+		colors_ = new byte[256 * 3];
+		int colornum = 0;
+		for (int x = 0; x < width_; ++x) {
+			for (int y = 0; y < height_; ++y) {
+				int search;
+				for (search = 0; search < colornum; ++search)
+					if (colors_[search * 3] == r[x][y] && colors_[search * 3 + 1] == g[x][y]
+							&& colors_[search * 3 + 2] == b[x][y])
+						break;
 
-		ToIndexedColor(r, g, b);
+				if (search > 255)
+					throw new AWTException(Strings.get("manyColorError"));
+
+				pixels_[y * width_ + x] = (byte) search;
+
+				if (search == colornum) {
+					colors_[search * 3] = r[x][y];
+					colors_[search * 3 + 1] = g[x][y];
+					colors_[search * 3 + 2] = b[x][y];
+					++colornum;
+				}
+			}
+		}
+		numColors_ = 1 << BitUtils.BitsNeeded(colornum);
+		byte copy[] = new byte[numColors_ * 3];
+		System.arraycopy(colors_, 0, copy, 0, numColors_ * 3);
+		colors_ = copy;
 	}
 
 	/**
@@ -482,57 +533,6 @@ public class GifEncoder {
 		id = new ImageDescriptor((byte) 0, (byte) 0, ';');
 		id.Write(output);
 		output.flush();
-	}
-
-	void ToIndexedColor(byte r[][], byte g[][], byte b[][]) throws AWTException {
-		pixels_ = new byte[width_ * height_];
-		colors_ = new byte[256 * 3];
-		int colornum = 0;
-		for (int x = 0; x < width_; ++x) {
-			for (int y = 0; y < height_; ++y) {
-				int search;
-				for (search = 0; search < colornum; ++search)
-					if (colors_[search * 3] == r[x][y] && colors_[search * 3 + 1] == g[x][y]
-							&& colors_[search * 3 + 2] == b[x][y])
-						break;
-
-				if (search > 255)
-					throw new AWTException(Strings.get("manyColorError"));
-
-				pixels_[y * width_ + x] = (byte) search;
-
-				if (search == colornum) {
-					colors_[search * 3] = r[x][y];
-					colors_[search * 3 + 1] = g[x][y];
-					colors_[search * 3 + 2] = b[x][y];
-					++colornum;
-				}
-			}
-		}
-		numColors_ = 1 << BitUtils.BitsNeeded(colornum);
-		byte copy[] = new byte[numColors_ * 3];
-		System.arraycopy(colors_, 0, copy, 0, numColors_ * 3);
-		colors_ = copy;
-	}
-
-	public static void toFile(Image img, String filename, ProgressMonitor monitor) throws IOException, AWTException {
-		FileOutputStream out = new FileOutputStream(filename);
-		new GifEncoder(img, monitor).write(out);
-		out.close();
-	}
-
-	public static void toFile(Image img, File file, ProgressMonitor monitor) throws IOException, AWTException {
-		FileOutputStream out = new FileOutputStream(file);
-		new GifEncoder(img, monitor).write(out);
-		out.close();
-	}
-
-	public static void toFile(Image img, String filename) throws IOException, AWTException {
-		toFile(img, filename, null);
-	}
-
-	public static void toFile(Image img, File file) throws IOException, AWTException {
-		toFile(img, file, null);
 	}
 
 }

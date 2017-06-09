@@ -19,10 +19,6 @@ public class HandleGesture {
 		this.modifiersEx = modifiersEx;
 	}
 
-	public Handle getHandle() {
-		return handle;
-	}
-
 	public int getDeltaX() {
 		return dx;
 	}
@@ -31,27 +27,31 @@ public class HandleGesture {
 		return dy;
 	}
 
+	public Handle getHandle() {
+		return handle;
+	}
+
 	public int getModifiersEx() {
 		return modifiersEx;
 	}
 
-	public boolean isShiftDown() {
-		return (modifiersEx & InputEvent.SHIFT_DOWN_MASK) != 0;
-	}
-
-	public boolean isControlDown() {
-		return (modifiersEx & InputEvent.CTRL_DOWN_MASK) != 0;
+	public Handle getResultingHandle() {
+		return resultingHandle;
 	}
 
 	public boolean isAltDown() {
 		return (modifiersEx & InputEvent.ALT_DOWN_MASK) != 0;
 	}
 
-	public void setResultingHandle(Handle value) {
-		resultingHandle = value;
+	public boolean isControlDown() {
+		return (modifiersEx & InputEvent.CTRL_DOWN_MASK) != 0;
 	}
 
-	public Handle getResultingHandle() {
-		return resultingHandle;
+	public boolean isShiftDown() {
+		return (modifiersEx & InputEvent.SHIFT_DOWN_MASK) != 0;
+	}
+
+	public void setResultingHandle(Handle value) {
+		resultingHandle = value;
 	}
 }

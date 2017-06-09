@@ -16,11 +16,6 @@ import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.LocaleManager;
 
 class IntlOptions extends OptionsPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4744314745082121590L;
-
 	private static class RestrictedLabel extends JLabel {
 		/**
 		 * 
@@ -32,6 +27,11 @@ class IntlOptions extends OptionsPanel {
 			return getPreferredSize();
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4744314745082121590L;
 
 	private JLabel localeLabel = new RestrictedLabel();
 	private JComponent locale;
@@ -70,13 +70,13 @@ class IntlOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("intlTitle");
+	public String getHelpText() {
+		return Strings.get("intlHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("intlHelp");
+	public String getTitle() {
+		return Strings.get("intlTitle");
 	}
 
 	@Override

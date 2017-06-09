@@ -63,158 +63,33 @@ public class EditableLabel implements Cloneable {
 		}
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof EditableLabel) {
-			EditableLabel that = (EditableLabel) other;
-			return this.x == that.x && this.y == that.y && this.text.equals(that.text) && this.font.equals(that.font)
-					&& this.color.equals(that.color) && this.horzAlign == that.horzAlign
-					&& this.vertAlign == that.vertAlign;
-		} else {
-			return false;
+	private void computeDimensions(Graphics g, Font font, FontMetrics fm) {
+		String s = text;
+		FontRenderContext frc = ((Graphics2D) g).getFontRenderContext();
+		width = fm.stringWidth(s);
+		ascent = fm.getAscent();
+		descent = fm.getDescent();
+		int[] xs = new int[s.length()];
+		int[] ys = new int[s.length()];
+		for (int i = 0; i < xs.length; i++) {
+			xs[i] = fm.stringWidth(s.substring(0, i + 1));
+			TextLayout lay = new TextLayout(s.substring(i, i + 1), font, frc);
+			Rectangle2D rect = lay.getBounds();
+			int asc = (int) Math.ceil(-rect.getMinY());
+			int desc = (int) Math.ceil(rect.getMaxY());
+			if (asc < 0)
+				asc = 0;
+			if (asc > 0xFFFF)
+				asc = 0xFFFF;
+			if (desc < 0)
+				desc = 0;
+			if (desc > 0xFFFF)
+				desc = 0xFFFF;
+			ys[i] = (asc << 16) | desc;
 		}
-	}
-
-	@Override
-	public int hashCode() {
-		int ret = x * 31 + y;
-		ret = ret * 31 + text.hashCode();
-		ret = ret * 31 + font.hashCode();
-		ret = ret * 31 + color.hashCode();
-		ret = ret * 31 + horzAlign;
-		ret = ret * 31 + vertAlign;
-		return ret;
-	}
-
-	//
-	// accessor methods
-	//
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setLocation(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String value) {
-		dimsKnown = false;
-		text = value;
-	}
-
-	public Font getFont() {
-		return font;
-	}
-
-	public void setFont(Font value) {
-		font = value;
-		dimsKnown = false;
-	}
-
-	public Color getColor() {
-		return color;
-	}
-
-	public void setColor(Color value) {
-		color = value;
-	}
-
-	public int getHorizontalAlignment() {
-		return horzAlign;
-	}
-
-	public void setHorizontalAlignment(int value) {
-		if (value != LEFT && value != CENTER && value != RIGHT) {
-			throw new IllegalArgumentException("argument must be LEFT, CENTER, or RIGHT");
-		}
-		horzAlign = value;
-		dimsKnown = false;
-	}
-
-	public int getVerticalAlignment() {
-		return vertAlign;
-	}
-
-	public void setVerticalAlignment(int value) {
-		if (value != TOP && value != MIDDLE && value != BASELINE && value != BOTTOM) {
-			throw new IllegalArgumentException("argument must be TOP, MIDDLE, BASELINE, or BOTTOM");
-		}
-		vertAlign = value;
-		dimsKnown = false;
-	}
-
-	//
-	// more complex methods
-	//
-	public Bounds getBounds() {
-		int x0 = getLeftX();
-		int y0 = getBaseY() - ascent;
-		int w = width;
-		int h = ascent + descent;
-		return Bounds.create(x0, y0, w, h);
-	}
-
-	public boolean contains(int qx, int qy) {
-		int x0 = getLeftX();
-		int y0 = getBaseY();
-		if (qx >= x0 && qx < x0 + width && qy >= y0 - ascent && qy < y0 + descent) {
-			int[] xs = charX;
-			int[] ys = charY;
-			if (xs == null || ys == null) {
-				return true;
-			} else {
-				int i = Arrays.binarySearch(xs, qx - x0);
-				if (i < 0)
-					i = -(i + 1);
-				if (i >= xs.length) {
-					return false;
-				} else {
-					int asc = (ys[i] >> 16) & 0xFFFF;
-					int desc = ys[i] & 0xFFFF;
-					int dy = y0 - qy;
-					return dy >= -desc && dy <= asc;
-				}
-			}
-		} else {
-			return false;
-		}
-	}
-
-	private int getLeftX() {
-		switch (horzAlign) {
-		case LEFT:
-			return x;
-		case CENTER:
-			return x - width / 2;
-		case RIGHT:
-			return x - width;
-		default:
-			return x;
-		}
-	}
-
-	private int getBaseY() {
-		switch (vertAlign) {
-		case TOP:
-			return y + ascent;
-		case MIDDLE:
-			return y + (ascent - descent) / 2;
-		case BASELINE:
-			return y;
-		case BOTTOM:
-			return y - descent;
-		default:
-			return y;
-		}
+		charX = xs;
+		charY = ys;
+		dimsKnown = true;
 	}
 
 	public void configureTextField(EditableLabelField field) {
@@ -270,6 +145,125 @@ public class EditableLabel implements Cloneable {
 		field.setBounds(x0, y0, w, h);
 	}
 
+	public boolean contains(int qx, int qy) {
+		int x0 = getLeftX();
+		int y0 = getBaseY();
+		if (qx >= x0 && qx < x0 + width && qy >= y0 - ascent && qy < y0 + descent) {
+			int[] xs = charX;
+			int[] ys = charY;
+			if (xs == null || ys == null) {
+				return true;
+			} else {
+				int i = Arrays.binarySearch(xs, qx - x0);
+				if (i < 0)
+					i = -(i + 1);
+				if (i >= xs.length) {
+					return false;
+				} else {
+					int asc = (ys[i] >> 16) & 0xFFFF;
+					int desc = ys[i] & 0xFFFF;
+					int dy = y0 - qy;
+					return dy >= -desc && dy <= asc;
+				}
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof EditableLabel) {
+			EditableLabel that = (EditableLabel) other;
+			return this.x == that.x && this.y == that.y && this.text.equals(that.text) && this.font.equals(that.font)
+					&& this.color.equals(that.color) && this.horzAlign == that.horzAlign
+					&& this.vertAlign == that.vertAlign;
+		} else {
+			return false;
+		}
+	}
+
+	private int getBaseY() {
+		switch (vertAlign) {
+		case TOP:
+			return y + ascent;
+		case MIDDLE:
+			return y + (ascent - descent) / 2;
+		case BASELINE:
+			return y;
+		case BOTTOM:
+			return y - descent;
+		default:
+			return y;
+		}
+	}
+
+	//
+	// more complex methods
+	//
+	public Bounds getBounds() {
+		int x0 = getLeftX();
+		int y0 = getBaseY() - ascent;
+		int w = width;
+		int h = ascent + descent;
+		return Bounds.create(x0, y0, w, h);
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public Font getFont() {
+		return font;
+	}
+
+	public int getHorizontalAlignment() {
+		return horzAlign;
+	}
+
+	private int getLeftX() {
+		switch (horzAlign) {
+		case LEFT:
+			return x;
+		case CENTER:
+			return x - width / 2;
+		case RIGHT:
+			return x - width;
+		default:
+			return x;
+		}
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public int getVerticalAlignment() {
+		return vertAlign;
+	}
+
+	//
+	// accessor methods
+	//
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	@Override
+	public int hashCode() {
+		int ret = x * 31 + y;
+		ret = ret * 31 + text.hashCode();
+		ret = ret * 31 + font.hashCode();
+		ret = ret * 31 + color.hashCode();
+		ret = ret * 31 + horzAlign;
+		ret = ret * 31 + vertAlign;
+		return ret;
+	}
+
 	public void paint(Graphics g) {
 		g.setFont(font);
 		if (!dimsKnown) {
@@ -281,32 +275,38 @@ public class EditableLabel implements Cloneable {
 		g.drawString(text, x0, y0);
 	}
 
-	private void computeDimensions(Graphics g, Font font, FontMetrics fm) {
-		String s = text;
-		FontRenderContext frc = ((Graphics2D) g).getFontRenderContext();
-		width = fm.stringWidth(s);
-		ascent = fm.getAscent();
-		descent = fm.getDescent();
-		int[] xs = new int[s.length()];
-		int[] ys = new int[s.length()];
-		for (int i = 0; i < xs.length; i++) {
-			xs[i] = fm.stringWidth(s.substring(0, i + 1));
-			TextLayout lay = new TextLayout(s.substring(i, i + 1), font, frc);
-			Rectangle2D rect = lay.getBounds();
-			int asc = (int) Math.ceil(-rect.getMinY());
-			int desc = (int) Math.ceil(rect.getMaxY());
-			if (asc < 0)
-				asc = 0;
-			if (asc > 0xFFFF)
-				asc = 0xFFFF;
-			if (desc < 0)
-				desc = 0;
-			if (desc > 0xFFFF)
-				desc = 0xFFFF;
-			ys[i] = (asc << 16) | desc;
+	public void setColor(Color value) {
+		color = value;
+	}
+
+	public void setFont(Font value) {
+		font = value;
+		dimsKnown = false;
+	}
+
+	public void setHorizontalAlignment(int value) {
+		if (value != LEFT && value != CENTER && value != RIGHT) {
+			throw new IllegalArgumentException("argument must be LEFT, CENTER, or RIGHT");
 		}
-		charX = xs;
-		charY = ys;
-		dimsKnown = true;
+		horzAlign = value;
+		dimsKnown = false;
+	}
+
+	public void setLocation(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public void setText(String value) {
+		dimsKnown = false;
+		text = value;
+	}
+
+	public void setVerticalAlignment(int value) {
+		if (value != TOP && value != MIDDLE && value != BASELINE && value != BOTTOM) {
+			throw new IllegalArgumentException("argument must be TOP, MIDDLE, BASELINE, or BOTTOM");
+		}
+		vertAlign = value;
+		dimsKnown = false;
 	}
 }

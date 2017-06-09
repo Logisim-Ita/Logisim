@@ -49,25 +49,6 @@ public class Subtractor extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		// get attributes
-		BitWidth data = state.getAttributeValue(StdAttr.WIDTH);
-
-		// compute outputs
-		Value a = state.getPort(IN0);
-		Value b = state.getPort(IN1);
-		Value b_in = state.getPort(B_IN);
-		if (b_in == Value.UNKNOWN || b_in == Value.NIL)
-			b_in = Value.FALSE;
-		Value[] outs = Adder.computeSum(data, a, b.not(), b_in.not());
-
-		// propagate them
-		int delay = (data.getWidth() + 4) * Adder.PER_DELAY;
-		state.setPort(OUT, outs[0], delay);
-		state.setPort(B_OUT, outs[1].not(), delay);
-	}
-
-	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		painter.drawBounds();
@@ -86,5 +67,24 @@ public class Subtractor extends InstanceFactory {
 		g.setColor(Color.BLACK);
 		g.drawLine(x - 15, y, x - 5, y);
 		GraphicsUtil.switchToWidth(g, 1);
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		// get attributes
+		BitWidth data = state.getAttributeValue(StdAttr.WIDTH);
+
+		// compute outputs
+		Value a = state.getPort(IN0);
+		Value b = state.getPort(IN1);
+		Value b_in = state.getPort(B_IN);
+		if (b_in == Value.UNKNOWN || b_in == Value.NIL)
+			b_in = Value.FALSE;
+		Value[] outs = Adder.computeSum(data, a, b.not(), b_in.not());
+
+		// propagate them
+		int delay = (data.getWidth() + 4) * Adder.PER_DELAY;
+		state.setPort(OUT, outs[0], delay);
+		state.setPort(B_OUT, outs[1].not(), delay);
 	}
 }

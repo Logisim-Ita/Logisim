@@ -20,9 +20,13 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class Curve extends FillableCanvasObject {
+	private static double[] toArray(Location loc) {
+		return new double[] { loc.getX(), loc.getY() };
+	}
 	private Location p0;
 	private Location p1;
 	private Location p2;
+
 	private Bounds bounds;
 
 	public Curve(Location end0, Location end1, Location ctrl) {
@@ -33,58 +37,8 @@ public class Curve extends FillableCanvasObject {
 	}
 
 	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof Curve) {
-			Curve that = (Curve) other;
-			return this.p0.equals(that.p0) && this.p1.equals(that.p1) && this.p2.equals(that.p2) && super.matches(that);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int matchesHashCode() {
-		int ret = p0.hashCode();
-		ret = ret * 31 * 31 + p1.hashCode();
-		ret = ret * 31 * 31 + p2.hashCode();
-		ret = ret * 31 + super.matchesHashCode();
-		return ret;
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		return SvgCreator.createCurve(doc, this);
-	}
-
-	public Location getEnd0() {
-		return p0;
-	}
-
-	public Location getEnd1() {
-		return p2;
-	}
-
-	public Location getControl() {
-		return p1;
-	}
-
-	public QuadCurve2D getCurve2D() {
-		return new QuadCurve2D.Double(p0.getX(), p0.getY(), p1.getX(), p1.getY(), p2.getX(), p2.getY());
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("shapeCurve");
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.getFillAttributes(getPaintType());
-	}
-
-	@Override
-	public Bounds getBounds() {
-		return bounds;
+	public boolean canMoveHandle(Handle handle) {
+		return true;
 	}
 
 	@Override
@@ -123,20 +77,39 @@ public class Curve extends FillableCanvasObject {
 	}
 
 	@Override
-	public void translate(int dx, int dy) {
-		p0 = p0.translate(dx, dy);
-		p1 = p1.translate(dx, dy);
-		p2 = p2.translate(dx, dy);
-		bounds = bounds.translate(dx, dy);
-	}
-
-	public List<Handle> getHandles() {
-		return UnmodifiableList.create(getHandleArray(null));
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.getFillAttributes(getPaintType());
 	}
 
 	@Override
-	public List<Handle> getHandles(HandleGesture gesture) {
-		return UnmodifiableList.create(getHandleArray(gesture));
+	public Bounds getBounds() {
+		return bounds;
+	}
+
+	public Location getControl() {
+		return p1;
+	}
+
+	private QuadCurve2D getCurve(HandleGesture gesture) {
+		Handle[] p = getHandleArray(gesture);
+		return new QuadCurve2D.Double(p[0].getX(), p[0].getY(), p[1].getX(), p[1].getY(), p[2].getX(), p[2].getY());
+	}
+
+	public QuadCurve2D getCurve2D() {
+		return new QuadCurve2D.Double(p0.getX(), p0.getY(), p1.getX(), p1.getY(), p2.getX(), p2.getY());
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("shapeCurve");
+	}
+
+	public Location getEnd0() {
+		return p0;
+	}
+
+	public Location getEnd1() {
+		return p2;
 	}
 
 	private Handle[] getHandleArray(HandleGesture gesture) {
@@ -189,9 +162,32 @@ public class Curve extends FillableCanvasObject {
 		}
 	}
 
+	public List<Handle> getHandles() {
+		return UnmodifiableList.create(getHandleArray(null));
+	}
+
 	@Override
-	public boolean canMoveHandle(Handle handle) {
-		return true;
+	public List<Handle> getHandles(HandleGesture gesture) {
+		return UnmodifiableList.create(getHandleArray(gesture));
+	}
+
+	@Override
+	public boolean matches(CanvasObject other) {
+		if (other instanceof Curve) {
+			Curve that = (Curve) other;
+			return this.p0.equals(that.p0) && this.p1.equals(that.p1) && this.p2.equals(that.p2) && super.matches(that);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		int ret = p0.hashCode();
+		ret = ret * 31 * 31 + p1.hashCode();
+		ret = ret * 31 * 31 + p2.hashCode();
+		ret = ret * 31 + super.matchesHashCode();
+		return ret;
 	}
 
 	@Override
@@ -225,12 +221,16 @@ public class Curve extends FillableCanvasObject {
 		}
 	}
 
-	private QuadCurve2D getCurve(HandleGesture gesture) {
-		Handle[] p = getHandleArray(gesture);
-		return new QuadCurve2D.Double(p[0].getX(), p[0].getY(), p[1].getX(), p[1].getY(), p[2].getX(), p[2].getY());
+	@Override
+	public Element toSvgElement(Document doc) {
+		return SvgCreator.createCurve(doc, this);
 	}
 
-	private static double[] toArray(Location loc) {
-		return new double[] { loc.getX(), loc.getY() };
+	@Override
+	public void translate(int dx, int dy) {
+		p0 = p0.translate(dx, dy);
+		p1 = p1.translate(dx, dy);
+		p2 = p2.translate(dx, dy);
+		bounds = bounds.translate(dx, dy);
 	}
 }

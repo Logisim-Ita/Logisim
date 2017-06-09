@@ -120,38 +120,30 @@ public class CircuitState implements InstanceData {
 		}
 	}
 
+	private static int lastId = 0;
 	private MyCircuitListener myCircuitListener = new MyCircuitListener();
 	private Propagator base = null; // base of tree of CircuitStates
 	private Project proj; // project where circuit lies
+
 	private Circuit circuit; // circuit being simulated
-
 	private CircuitState parentState = null; // parent in tree of CircuitStates
-	private Component parentComp = null; // subcircuit component containing this
-											// state
-	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();
+											private Component parentComp = null; // subcircuit component containing this
 
+	// state
+	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();
 	private CircuitWires.State wireData = null;
 	private HashMap<Component, Object> componentData = new HashMap<Component, Object>();
 	private Map<Location, Value> values = new HashMap<Location, Value>();
 	private SmallSet<Component> dirtyComponents = new SmallSet<Component>();
 	private SmallSet<Location> dirtyPoints = new SmallSet<Location>();
-	HashMap<Location, SetData> causes = new HashMap<Location, SetData>();
 
-	private static int lastId = 0;
+	HashMap<Location, SetData> causes = new HashMap<Location, SetData>();
 	private int id = lastId++;
 
 	public CircuitState(Project proj, Circuit circuit) {
 		this.proj = proj;
 		this.circuit = circuit;
 		circuit.addCircuitListener(myCircuitListener);
-	}
-
-	public Project getProject() {
-		return proj;
-	}
-
-	Component getSubcircuit() {
-		return parentComp;
 	}
 
 	@Override
@@ -211,9 +203,9 @@ public class CircuitState implements InstanceData {
 		this.dirtyPoints.addAll(src.dirtyPoints);
 	}
 
-	@Override
-	public String toString() {
-		return "State" + id + "[" + circuit.getName() + "]";
+	public void drawOscillatingPoints(ComponentDrawContext context) {
+		if (base != null)
+			base.drawOscillatingPoints(context);
 	}
 
 	//
@@ -223,88 +215,14 @@ public class CircuitState implements InstanceData {
 		return circuit;
 	}
 
-	public CircuitState getParentState() {
-		return parentState;
-	}
-
-	public Set<CircuitState> getSubstates() { // returns Set of CircuitStates
-		return substates;
-	}
-
-	public Propagator getPropagator() {
-		if (base == null) {
-			base = new Propagator(this);
-			markAllComponentsDirty();
-		}
-		return base;
-	}
-
-	public void drawOscillatingPoints(ComponentDrawContext context) {
-		if (base != null)
-			base.drawOscillatingPoints(context);
+	Value getComponentOutputAt(Location p) {
+		// for CircuitWires - to get values, ignoring wires' contributions
+		Propagator.SetData cause_list = causes.get(p);
+		return Propagator.computeValue(cause_list);
 	}
 
 	public Object getData(Component comp) {
 		return componentData.get(comp);
-	}
-
-	public void setData(Component comp, Object data) {
-		if (data instanceof CircuitState) {
-			CircuitState oldState = (CircuitState) componentData.get(comp);
-			CircuitState newState = (CircuitState) data;
-			if (oldState != newState) {
-				// There's something new going on with this subcircuit.
-				// Maybe the subcircuit is new, or perhaps it's being
-				// removed.
-				if (oldState != null && oldState.parentComp == comp) {
-					// it looks like it's being removed
-					substates.remove(oldState);
-					oldState.parentState = null;
-					oldState.parentComp = null;
-				}
-				if (newState != null && newState.parentState != this) {
-					// this is the first time I've heard about this CircuitState
-					substates.add(newState);
-					newState.base = this.base;
-					newState.parentState = this;
-					newState.parentComp = comp;
-					newState.markAllComponentsDirty();
-				}
-			}
-		}
-		componentData.put(comp, data);
-	}
-
-	public Value getValue(Location pt) {
-		Value ret = values.get(pt);
-		if (ret != null)
-			return ret;
-
-		BitWidth wid = circuit.getWidth(pt);
-		return Value.createUnknown(wid);
-	}
-
-	public void setValue(Location pt, Value val, Component cause, int delay) {
-		if (base != null)
-			base.setValue(this, pt, val, cause, delay);
-	}
-
-	public void markComponentAsDirty(Component comp) {
-		try {
-			dirtyComponents.add(comp);
-		} catch (RuntimeException e) {
-			SmallSet<Component> set = new SmallSet<Component>();
-			set.add(comp);
-			dirtyComponents = set;
-		}
-	}
-
-	public void markComponentsDirty(Collection<Component> comps) {
-		dirtyComponents.addAll(comps);
-	}
-
-	public void markPointAsDirty(Location pt) {
-		dirtyPoints.add(pt);
 	}
 
 	public InstanceState getInstanceState(Component comp) {
@@ -325,11 +243,77 @@ public class CircuitState implements InstanceData {
 		}
 	}
 
+	public CircuitState getParentState() {
+		return parentState;
+	}
+
+	public Project getProject() {
+		return proj;
+	}
+
+	public Propagator getPropagator() {
+		if (base == null) {
+			base = new Propagator(this);
+			markAllComponentsDirty();
+		}
+		return base;
+	}
+
+	Component getSubcircuit() {
+		return parentComp;
+	}
+
+	public Set<CircuitState> getSubstates() { // returns Set of CircuitStates
+		return substates;
+	}
+
+	public Value getValue(Location pt) {
+		Value ret = values.get(pt);
+		if (ret != null)
+			return ret;
+
+		BitWidth wid = circuit.getWidth(pt);
+		return Value.createUnknown(wid);
+	}
+
+	Value getValueByWire(Location p) {
+		return values.get(p);
+	}
+
+	CircuitWires.State getWireData() {
+		return wireData;
+	}
+
 	//
 	// methods for other classes within package
 	//
 	public boolean isSubstate() {
 		return parentState != null;
+	}
+
+	//
+	// private methods
+	//
+	private void markAllComponentsDirty() {
+		dirtyComponents.addAll(circuit.getNonWires());
+	}
+
+	public void markComponentAsDirty(Component comp) {
+		try {
+			dirtyComponents.add(comp);
+		} catch (RuntimeException e) {
+			SmallSet<Component> set = new SmallSet<Component>();
+			set.add(comp);
+			dirtyComponents = set;
+		}
+	}
+
+	public void markComponentsDirty(Collection<Component> comps) {
+		dirtyComponents.addAll(comps);
+	}
+
+	public void markPointAsDirty(Location pt) {
+		dirtyPoints.add(pt);
 	}
 
 	void processDirtyComponents() {
@@ -418,35 +402,36 @@ public class CircuitState implements InstanceData {
 		}
 	}
 
-	boolean tick(int ticks) {
-		boolean ret = false;
-		for (Component clock : circuit.getClocks()) {
-			ret |= Clock.tick(this, ticks, clock);
+	public void setData(Component comp, Object data) {
+		if (data instanceof CircuitState) {
+			CircuitState oldState = (CircuitState) componentData.get(comp);
+			CircuitState newState = (CircuitState) data;
+			if (oldState != newState) {
+				// There's something new going on with this subcircuit.
+				// Maybe the subcircuit is new, or perhaps it's being
+				// removed.
+				if (oldState != null && oldState.parentComp == comp) {
+					// it looks like it's being removed
+					substates.remove(oldState);
+					oldState.parentState = null;
+					oldState.parentComp = null;
+				}
+				if (newState != null && newState.parentState != this) {
+					// this is the first time I've heard about this CircuitState
+					substates.add(newState);
+					newState.base = this.base;
+					newState.parentState = this;
+					newState.parentComp = comp;
+					newState.markAllComponentsDirty();
+				}
+			}
 		}
-
-		CircuitState[] subs = new CircuitState[substates.size()];
-		for (CircuitState substate : substates.toArray(subs)) {
-			ret |= substate.tick(ticks);
-		}
-		return ret;
+		componentData.put(comp, data);
 	}
 
-	CircuitWires.State getWireData() {
-		return wireData;
-	}
-
-	void setWireData(CircuitWires.State data) {
-		wireData = data;
-	}
-
-	Value getComponentOutputAt(Location p) {
-		// for CircuitWires - to get values, ignoring wires' contributions
-		Propagator.SetData cause_list = causes.get(p);
-		return Propagator.computeValue(cause_list);
-	}
-
-	Value getValueByWire(Location p) {
-		return values.get(p);
+	public void setValue(Location pt, Value val, Component cause, int delay) {
+		if (base != null)
+			base.setValue(this, pt, val, cause, delay);
 	}
 
 	void setValueByWire(Location p, Value v) {
@@ -475,10 +460,25 @@ public class CircuitState implements InstanceData {
 		}
 	}
 
-	//
-	// private methods
-	//
-	private void markAllComponentsDirty() {
-		dirtyComponents.addAll(circuit.getNonWires());
+	void setWireData(CircuitWires.State data) {
+		wireData = data;
+	}
+
+	boolean tick(int ticks) {
+		boolean ret = false;
+		for (Component clock : circuit.getClocks()) {
+			ret |= Clock.tick(this, ticks, clock);
+		}
+
+		CircuitState[] subs = new CircuitState[substates.size()];
+		for (CircuitState substate : substates.toArray(subs)) {
+			ret |= substate.tick(ticks);
+		}
+		return ret;
+	}
+
+	@Override
+	public String toString() {
+		return "State" + id + "[" + circuit.getName() + "]";
 	}
 }

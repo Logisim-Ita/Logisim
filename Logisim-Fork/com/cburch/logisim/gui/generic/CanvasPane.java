@@ -18,12 +18,15 @@ import javax.swing.SwingConstants;
 import com.cburch.logisim.util.MacCompatibility;
 
 public class CanvasPane extends JScrollPane {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 404622249632842787L;
-
 	private class Listener implements ComponentListener, PropertyChangeListener {
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) {
+		}
 
 		//
 		// ComponentListener methods
@@ -34,15 +37,7 @@ public class CanvasPane extends JScrollPane {
 		}
 
 		@Override
-		public void componentMoved(ComponentEvent e) {
-		}
-
-		@Override
 		public void componentShown(ComponentEvent e) {
-		}
-
-		@Override
-		public void componentHidden(ComponentEvent e) {
 		}
 
 		@Override
@@ -65,6 +60,11 @@ public class CanvasPane extends JScrollPane {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 404622249632842787L;
+
 	private CanvasPaneContents contents;
 	private Listener listener;
 	private ZoomModel zoomModel;
@@ -83,6 +83,17 @@ public class CanvasPane extends JScrollPane {
 		contents.setCanvasPane(this);
 	}
 
+	public Dimension getViewportSize() {
+		Dimension size = new Dimension();
+		getViewport().getSize(size);
+		return size;
+	}
+
+	public double getZoomFactor() {
+		ZoomModel model = zoomModel;
+		return model == null ? 1.0 : model.getZoomFactor();
+	}
+
 	public void setZoomModel(ZoomModel model) {
 		ZoomModel oldModel = zoomModel;
 		if (oldModel != null) {
@@ -92,31 +103,6 @@ public class CanvasPane extends JScrollPane {
 		if (model != null) {
 			model.addPropertyChangeListener(ZoomModel.ZOOM, listener);
 		}
-	}
-
-	public double getZoomFactor() {
-		ZoomModel model = zoomModel;
-		return model == null ? 1.0 : model.getZoomFactor();
-	}
-
-	public Dimension getViewportSize() {
-		Dimension size = new Dimension();
-		getViewport().getSize(size);
-		return size;
-	}
-
-	public int supportScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		int unit = supportScrollableUnitIncrement(visibleRect, orientation, direction);
-		if (direction == SwingConstants.VERTICAL) {
-			return visibleRect.height / unit * unit;
-		} else {
-			return visibleRect.width / unit * unit;
-		}
-	}
-
-	public int supportScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-		double zoom = getZoomFactor();
-		return (int) Math.round(10 * zoom);
 	}
 
 	public Dimension supportPreferredSize(int width, int height) {
@@ -131,5 +117,19 @@ public class CanvasPane extends JScrollPane {
 		if (minSize.height > height)
 			height = minSize.height;
 		return new Dimension(width, height);
+	}
+
+	public int supportScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		int unit = supportScrollableUnitIncrement(visibleRect, orientation, direction);
+		if (direction == SwingConstants.VERTICAL) {
+			return visibleRect.height / unit * unit;
+		} else {
+			return visibleRect.width / unit * unit;
+		}
+	}
+
+	public int supportScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		double zoom = getZoomFactor();
+		return (int) Math.round(10 * zoom);
 	}
 }

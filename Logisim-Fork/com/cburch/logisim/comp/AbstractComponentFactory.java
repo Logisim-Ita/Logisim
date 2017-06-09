@@ -30,37 +30,23 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 	}
 
 	@Override
-	public String toString() {
-		return getName();
-	}
-
-	@Override
-	public abstract String getName();
-
-	@Override
-	public String getDisplayName() {
-		return getDisplayGetter().get();
-	}
-
-	@Override
-	public StringGetter getDisplayGetter() {
-		return StringUtil.constantGetter(getName());
-	}
-
-	@Override
-	public abstract Component createComponent(Location loc, AttributeSet attrs);
-
-	@Override
-	public abstract Bounds getOffsetBounds(AttributeSet attrs);
-
-	@Override
 	public AttributeSet createAttributeSet() {
 		return AttributeSets.EMPTY;
 	}
 
 	@Override
-	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
-		return false;
+	public abstract Component createComponent(Location loc, AttributeSet attrs);
+
+	//
+	// user interface methods
+	//
+	@Override
+	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs) {
+		Graphics g = context.getGraphics();
+		Bounds bds = getOffsetBounds(attrs);
+		g.setColor(color);
+		GraphicsUtil.switchToWidth(g, 2);
+		g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
 	}
 
 	@Override
@@ -73,16 +59,30 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 		return dfltSet.getValue(attr);
 	}
 
-	//
-	// user interface methods
-	//
 	@Override
-	public void drawGhost(ComponentDrawContext context, Color color, int x, int y, AttributeSet attrs) {
-		Graphics g = context.getGraphics();
-		Bounds bds = getOffsetBounds(attrs);
-		g.setColor(color);
-		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
+	public StringGetter getDisplayGetter() {
+		return StringUtil.constantGetter(getName());
+	}
+
+	@Override
+	public String getDisplayName() {
+		return getDisplayGetter().get();
+	}
+
+	@Override
+	public Object getFeature(Object key, AttributeSet attrs) {
+		return null;
+	}
+
+	@Override
+	public abstract String getName();
+
+	@Override
+	public abstract Bounds getOffsetBounds(AttributeSet attrs);
+
+	@Override
+	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
+		return false;
 	}
 
 	@Override
@@ -104,8 +104,8 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 	}
 
 	@Override
-	public Object getFeature(Object key, AttributeSet attrs) {
-		return null;
+	public String toString() {
+		return getName();
 	}
 
 }

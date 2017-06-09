@@ -18,11 +18,42 @@ import com.cburch.logisim.util.GraphicsUtil;
 class XorGate extends AbstractGate {
 	public static XorGate FACTORY = new XorGate();
 
+	protected static Expression xorExpression(Expression[] inputs, int numInputs) {
+		if (numInputs > 2) {
+			throw new UnsupportedOperationException("XorGate");
+		}
+		Expression ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = Expressions.xor(ret, inputs[i]);
+		}
+		return ret;
+	}
+
 	private XorGate() {
 		super("XOR Gate", Strings.getter("xorGateComponent"), true);
 		setAdditionalWidth(10);
 		setIconNames("xorGate.gif", "xorGateRect.gif", "dinXorGate.gif");
 		setPaintInputLines(true);
+	}
+
+	@Override
+	protected Expression computeExpression(Expression[] inputs, int numInputs) {
+		return xorExpression(inputs, numInputs);
+	}
+
+	@Override
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
+		Object behavior = state.getAttributeValue(GateAttributes.ATTR_XOR);
+		if (behavior == GateAttributes.XOR_ODD) {
+			return GateFunctions.computeOddParity(inputs, numInputs);
+		} else {
+			return GateFunctions.computeExactlyOne(inputs, numInputs);
+		}
+	}
+
+	@Override
+	protected Value getIdentity() {
+		return Value.FALSE;
 	}
 
 	@Override
@@ -41,6 +72,11 @@ class XorGate extends AbstractGate {
 	}
 
 	@Override
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
+		PainterDin.paintXor(painter, width, height, false);
+	}
+
+	@Override
 	public void paintIconShaped(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.drawCenteredArc(g, 2, -5, 22, -90, 53);
@@ -55,43 +91,7 @@ class XorGate extends AbstractGate {
 	}
 
 	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
-		PainterDin.paintXor(painter, width, height, false);
-	}
-
-	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
-		Object behavior = state.getAttributeValue(GateAttributes.ATTR_XOR);
-		if (behavior == GateAttributes.XOR_ODD) {
-			return GateFunctions.computeOddParity(inputs, numInputs);
-		} else {
-			return GateFunctions.computeExactlyOne(inputs, numInputs);
-		}
-	}
-
-	@Override
 	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
 		return !data.getPoint().equals(instance.getLocation());
-	}
-
-	@Override
-	protected Expression computeExpression(Expression[] inputs, int numInputs) {
-		return xorExpression(inputs, numInputs);
-	}
-
-	@Override
-	protected Value getIdentity() {
-		return Value.FALSE;
-	}
-
-	protected static Expression xorExpression(Expression[] inputs, int numInputs) {
-		if (numInputs > 2) {
-			throw new UnsupportedOperationException("XorGate");
-		}
-		Expression ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = Expressions.xor(ret, inputs[i]);
-		}
-		return ret;
 	}
 }

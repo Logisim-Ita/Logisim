@@ -36,28 +36,18 @@ public class BitAdder extends InstanceFactory {
 		setIconName("bitadder.gif");
 	}
 
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int inputs = attrs.getValue(NUM_INPUTS).intValue();
-		int h = Math.max(40, 10 * inputs);
-		int y = inputs < 4 ? 20 : (((inputs - 1) / 2) * 10 + 5);
-		return Bounds.create(-40, -y, 40, h);
+	private int computeOutputBits(int width, int inputs) {
+		int maxBits = width * inputs;
+		int outWidth = 1;
+		while ((1 << outWidth) <= maxBits)
+			outWidth++;
+		return outWidth;
 	}
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		configurePorts(instance);
 		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.WIDTH) {
-			configurePorts(instance);
-		} else if (attr == NUM_INPUTS) {
-			configurePorts(instance);
-			instance.recomputeBounds();
-		}
 	}
 
 	private void configurePorts(Instance instance) {
@@ -92,12 +82,38 @@ public class BitAdder extends InstanceFactory {
 		instance.setPorts(ps);
 	}
 
-	private int computeOutputBits(int width, int inputs) {
-		int maxBits = width * inputs;
-		int outWidth = 1;
-		while ((1 << outWidth) <= maxBits)
-			outWidth++;
-		return outWidth;
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		int inputs = attrs.getValue(NUM_INPUTS).intValue();
+		int h = Math.max(40, 10 * inputs);
+		int y = inputs < 4 ? 20 : (((inputs - 1) / 2) * 10 + 5);
+		return Bounds.create(-40, -y, 40, h);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.WIDTH) {
+			configurePorts(instance);
+		} else if (attr == NUM_INPUTS) {
+			configurePorts(instance);
+			instance.recomputeBounds();
+		}
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+		painter.drawPorts();
+
+		GraphicsUtil.switchToWidth(g, 2);
+		Location loc = painter.getLocation();
+		int x = loc.getX() - 10;
+		int y = loc.getY();
+		g.drawLine(x - 2, y - 5, x - 2, y + 5);
+		g.drawLine(x + 2, y - 5, x + 2, y + 5);
+		g.drawLine(x - 5, y - 2, x + 5, y - 2);
+		g.drawLine(x - 5, y + 2, x + 5, y + 2);
 	}
 
 	@Override
@@ -139,21 +155,5 @@ public class BitAdder extends InstanceFactory {
 
 		int delay = out.length * Adder.PER_DELAY;
 		state.setPort(0, Value.create(out), delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-		painter.drawPorts();
-
-		GraphicsUtil.switchToWidth(g, 2);
-		Location loc = painter.getLocation();
-		int x = loc.getX() - 10;
-		int y = loc.getY();
-		g.drawLine(x - 2, y - 5, x - 2, y + 5);
-		g.drawLine(x + 2, y - 5, x + 2, y + 5);
-		g.drawLine(x - 5, y - 2, x + 5, y - 2);
-		g.drawLine(x - 5, y + 2, x + 5, y + 2);
 	}
 }

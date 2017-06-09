@@ -7,9 +7,9 @@ import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Attribute;
 
 public interface CircuitMutator {
-	public void clear(Circuit circuit);
-
 	public void add(Circuit circuit, Component comp);
+
+	public void clear(Circuit circuit);
 
 	public void remove(Circuit circuit, Component comp);
 

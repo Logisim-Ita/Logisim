@@ -33,13 +33,34 @@ class InstancePokerAdapter extends AbstractCaret implements Pokable {
 		}
 	}
 
-	private void handleError(Throwable t, Class<? extends InstancePoker> pokerClass) {
-		String className = pokerClass.getName();
-		System.err.println("error while instantiating poker " + className // OK
-				+ ": " + t.getClass().getName());
-		String msg = t.getMessage();
-		if (msg != null)
-			System.err.println("  (" + msg + ")"); // OK
+	private void checkCurrent() {
+		if (state != null && canvas != null) {
+			CircuitState s0 = state.getCircuitState();
+			CircuitState s1 = canvas.getCircuitState();
+			if (s0 != s1) {
+				state = new InstanceStateImpl(s1, comp);
+			}
+		}
+	}
+
+	@Override
+	public void draw(Graphics g) {
+		if (poker != null) {
+			context.setGraphics(g);
+			InstancePainter painter = new InstancePainter(context, comp);
+			poker.paint(painter);
+		}
+	}
+
+	@Override
+	public Bounds getBounds(Graphics g) {
+		if (poker != null) {
+			context.setGraphics(g);
+			InstancePainter painter = new InstancePainter(context, comp);
+			return poker.getBounds(painter);
+		} else {
+			return Bounds.EMPTY_BOUNDS;
+		}
 	}
 
 	@Override
@@ -66,28 +87,13 @@ class InstancePokerAdapter extends AbstractCaret implements Pokable {
 		}
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (poker != null) {
-			poker.mousePressed(state, e);
-			checkCurrent();
-		}
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if (poker != null) {
-			poker.mouseDragged(state, e);
-			checkCurrent();
-		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		if (poker != null) {
-			poker.mouseReleased(state, e);
-			checkCurrent();
-		}
+	private void handleError(Throwable t, Class<? extends InstancePoker> pokerClass) {
+		String className = pokerClass.getName();
+		System.err.println("error while instantiating poker " + className // OK
+				+ ": " + t.getClass().getName());
+		String msg = t.getMessage();
+		if (msg != null)
+			System.err.println("  (" + msg + ")"); // OK
 	}
 
 	@Override
@@ -115,40 +121,34 @@ class InstancePokerAdapter extends AbstractCaret implements Pokable {
 	}
 
 	@Override
-	public void stopEditing() {
+	public void mouseDragged(MouseEvent e) {
 		if (poker != null) {
-			poker.stopEditing(state);
+			poker.mouseDragged(state, e);
 			checkCurrent();
 		}
 	}
 
 	@Override
-	public Bounds getBounds(Graphics g) {
+	public void mousePressed(MouseEvent e) {
 		if (poker != null) {
-			context.setGraphics(g);
-			InstancePainter painter = new InstancePainter(context, comp);
-			return poker.getBounds(painter);
-		} else {
-			return Bounds.EMPTY_BOUNDS;
+			poker.mousePressed(state, e);
+			checkCurrent();
 		}
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void mouseReleased(MouseEvent e) {
 		if (poker != null) {
-			context.setGraphics(g);
-			InstancePainter painter = new InstancePainter(context, comp);
-			poker.paint(painter);
+			poker.mouseReleased(state, e);
+			checkCurrent();
 		}
 	}
 
-	private void checkCurrent() {
-		if (state != null && canvas != null) {
-			CircuitState s0 = state.getCircuitState();
-			CircuitState s1 = canvas.getCircuitState();
-			if (s0 != s1) {
-				state = new InstanceStateImpl(s1, comp);
-			}
+	@Override
+	public void stopEditing() {
+		if (poker != null) {
+			poker.stopEditing(state);
+			checkCurrent();
 		}
 	}
 }

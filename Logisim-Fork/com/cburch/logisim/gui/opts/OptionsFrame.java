@@ -29,28 +29,6 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class OptionsFrame extends LFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -384355708919544617L;
-
-	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
-		WindowMenuManager() {
-			super(Strings.get("optionsFrameMenuItem"), false);
-		}
-
-		@Override
-		public JFrame getJFrame(boolean create) {
-			return OptionsFrame.this;
-		}
-
-		@Override
-		public void localeChanged() {
-			String title = project.getLogisimFile().getDisplayName();
-			setText(StringUtil.format(Strings.get("optionsFrameMenuItem"), title));
-		}
-	}
-
 	private class MyListener implements ActionListener, LibraryListener, LocaleListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -85,14 +63,41 @@ public class OptionsFrame extends LFrame {
 		}
 	}
 
+	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
+		WindowMenuManager() {
+			super(Strings.get("optionsFrameMenuItem"), false);
+		}
+
+		@Override
+		public JFrame getJFrame(boolean create) {
+			return OptionsFrame.this;
+		}
+
+		@Override
+		public void localeChanged() {
+			String title = project.getLogisimFile().getDisplayName();
+			setText(StringUtil.format(Strings.get("optionsFrameMenuItem"), title));
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -384355708919544617L;
+
+	private static String computeTitle(LogisimFile file) {
+		String name = file == null ? "???" : file.getName();
+		return StringUtil.format(Strings.get("optionsFrameTitle"), name);
+	}
 	private Project project;
 	private LogisimFile file;
 	private MyListener myListener = new MyListener();
-	private WindowMenuManager windowManager = new WindowMenuManager();
 
+	private WindowMenuManager windowManager = new WindowMenuManager();
 	private OptionsPanel[] panels;
 	private JTabbedPane tabbedPane;
 	private JButton revert = new JButton();
+
 	private JButton close = new JButton();
 
 	public OptionsFrame(Project project) {
@@ -125,10 +130,6 @@ public class OptionsFrame extends LFrame {
 		pack();
 	}
 
-	public Project getProject() {
-		return project;
-	}
-
 	public LogisimFile getLogisimFile() {
 		return file;
 	}
@@ -137,20 +138,19 @@ public class OptionsFrame extends LFrame {
 		return file.getOptions();
 	}
 
+	OptionsPanel[] getPrefPanels() {
+		return panels;
+	}
+
+	public Project getProject() {
+		return project;
+	}
+
 	@Override
 	public void setVisible(boolean value) {
 		if (value) {
 			windowManager.frameOpened(this);
 		}
 		super.setVisible(value);
-	}
-
-	OptionsPanel[] getPrefPanels() {
-		return panels;
-	}
-
-	private static String computeTitle(LogisimFile file) {
-		String name = file == null ? "???" : file.getName();
-		return StringUtil.format(Strings.get("optionsFrameTitle"), name);
 	}
 }

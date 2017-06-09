@@ -16,89 +16,6 @@ import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.ExpressionVisitor;
 
 class ExpressionView extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4343114997424679659L;
-	private static final int BADNESS_IDENT_BREAK = 10000;
-	private static final int BADNESS_BEFORE_SPACE = 500;
-	private static final int BADNESS_BEFORE_AND = 50;
-	private static final int BADNESS_BEFORE_XOR = 30;
-	private static final int BADNESS_BEFORE_OR = 0;
-	private static final int BADNESS_NOT_BREAK = 100;
-	private static final int BADNESS_PER_NOT_BREAK = 30;
-	private static final int BADNESS_PER_PIXEL = 1;
-
-	private static final int NOT_SEP = 3;
-	private static final int EXTRA_LEADING = 4;
-	private static final int MINIMUM_HEIGHT = 25;
-
-	private class MyListener implements ComponentListener {
-		@Override
-		public void componentResized(ComponentEvent arg0) {
-			int width = getWidth();
-			if (renderData != null && Math.abs(renderData.width - width) > 2) {
-				Graphics g = getGraphics();
-				FontMetrics fm = g == null ? null : g.getFontMetrics();
-				renderData = new RenderData(renderData.exprData, width, fm);
-				setPreferredSize(renderData.getPreferredSize());
-				revalidate();
-				repaint();
-			}
-		}
-
-		@Override
-		public void componentMoved(ComponentEvent arg0) {
-		}
-
-		@Override
-		public void componentShown(ComponentEvent arg0) {
-		}
-
-		@Override
-		public void componentHidden(ComponentEvent arg0) {
-		}
-	}
-
-	private MyListener myListener = new MyListener();
-	private RenderData renderData;
-
-	public ExpressionView() {
-		addComponentListener(myListener);
-		setExpression(null);
-	}
-
-	public void setExpression(Expression expr) {
-		ExpressionData exprData = new ExpressionData(expr);
-		Graphics g = getGraphics();
-		FontMetrics fm = g == null ? null : g.getFontMetrics();
-		renderData = new RenderData(exprData, getWidth(), fm);
-		setPreferredSize(renderData.getPreferredSize());
-		revalidate();
-		repaint();
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		if (renderData != null) {
-			int x = Math.max(0, (getWidth() - renderData.prefWidth) / 2);
-			int y = Math.max(0, (getHeight() - renderData.height) / 2);
-			renderData.paint(g, x, y);
-		}
-	}
-
-	void localeChanged() {
-		repaint();
-	}
-
-	private static class NotData {
-		int startIndex;
-		int stopIndex;
-		int depth;
-	}
-
 	private static class ExpressionData {
 		String text;
 		final ArrayList<NotData> nots = new ArrayList<NotData>();
@@ -112,68 +29,6 @@ class ExpressionView extends JPanel {
 				computeText(expr);
 				computeBadnesses();
 			}
-		}
-
-		private void computeText(Expression expr) {
-			final StringBuilder text = new StringBuilder();
-			expr.visit(new ExpressionVisitor<Object>() {
-				@Override
-				public Object visitAnd(Expression a, Expression b) {
-					return binary(a, b, Expression.AND_LEVEL, " ");
-				}
-
-				@Override
-				public Object visitOr(Expression a, Expression b) {
-					return binary(a, b, Expression.OR_LEVEL, " + ");
-				}
-
-				@Override
-				public Object visitXor(Expression a, Expression b) {
-					return binary(a, b, Expression.XOR_LEVEL, " ^ ");
-				}
-
-				private Object binary(Expression a, Expression b, int level, String op) {
-					if (a.getPrecedence() < level) {
-						text.append("(");
-						a.visit(this);
-						text.append(")");
-					} else {
-						a.visit(this);
-					}
-					text.append(op);
-					if (b.getPrecedence() < level) {
-						text.append("(");
-						b.visit(this);
-						text.append(")");
-					} else {
-						b.visit(this);
-					}
-					return null;
-				}
-
-				@Override
-				public Object visitNot(Expression a) {
-					NotData notData = new NotData();
-					notData.startIndex = text.length();
-					nots.add(notData);
-					a.visit(this);
-					notData.stopIndex = text.length();
-					return null;
-				}
-
-				@Override
-				public Object visitVariable(String name) {
-					text.append(name);
-					return null;
-				}
-
-				@Override
-				public Object visitConstant(int value) {
-					text.append("" + Integer.toString(value, 16));
-					return null;
-				}
-			});
-			this.text = text.toString();
 		}
 
 		private void computeBadnesses() {
@@ -232,8 +87,100 @@ class ExpressionView extends JPanel {
 				prev = cur;
 			}
 		}
-	}
 
+		private void computeText(Expression expr) {
+			final StringBuilder text = new StringBuilder();
+			expr.visit(new ExpressionVisitor<Object>() {
+				private Object binary(Expression a, Expression b, int level, String op) {
+					if (a.getPrecedence() < level) {
+						text.append("(");
+						a.visit(this);
+						text.append(")");
+					} else {
+						a.visit(this);
+					}
+					text.append(op);
+					if (b.getPrecedence() < level) {
+						text.append("(");
+						b.visit(this);
+						text.append(")");
+					} else {
+						b.visit(this);
+					}
+					return null;
+				}
+
+				@Override
+				public Object visitAnd(Expression a, Expression b) {
+					return binary(a, b, Expression.AND_LEVEL, " ");
+				}
+
+				@Override
+				public Object visitConstant(int value) {
+					text.append("" + Integer.toString(value, 16));
+					return null;
+				}
+
+				@Override
+				public Object visitNot(Expression a) {
+					NotData notData = new NotData();
+					notData.startIndex = text.length();
+					nots.add(notData);
+					a.visit(this);
+					notData.stopIndex = text.length();
+					return null;
+				}
+
+				@Override
+				public Object visitOr(Expression a, Expression b) {
+					return binary(a, b, Expression.OR_LEVEL, " + ");
+				}
+
+				@Override
+				public Object visitVariable(String name) {
+					text.append(name);
+					return null;
+				}
+
+				@Override
+				public Object visitXor(Expression a, Expression b) {
+					return binary(a, b, Expression.XOR_LEVEL, " ^ ");
+				}
+			});
+			this.text = text.toString();
+		}
+	}
+	private class MyListener implements ComponentListener {
+		@Override
+		public void componentHidden(ComponentEvent arg0) {
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent arg0) {
+		}
+
+		@Override
+		public void componentResized(ComponentEvent arg0) {
+			int width = getWidth();
+			if (renderData != null && Math.abs(renderData.width - width) > 2) {
+				Graphics g = getGraphics();
+				FontMetrics fm = g == null ? null : g.getFontMetrics();
+				renderData = new RenderData(renderData.exprData, width, fm);
+				setPreferredSize(renderData.getPreferredSize());
+				revalidate();
+				repaint();
+			}
+		}
+
+		@Override
+		public void componentShown(ComponentEvent arg0) {
+		}
+	}
+	private static class NotData {
+		int startIndex;
+		int stopIndex;
+		int depth;
+	}
 	private static class RenderData {
 		ExpressionData exprData;
 		int prefWidth;
@@ -266,6 +213,28 @@ class ExpressionView extends JPanel {
 				}
 				computeLineY(fm);
 				prefWidth = lineText.length > 1 ? width : fm.stringWidth(lineText[0]);
+			}
+		}
+
+		private void computeLineNots() {
+			ArrayList<NotData> allNots = exprData.nots;
+			lineNots = new ArrayList<ArrayList<NotData>>();
+			for (int i = 0; i < lineText.length; i++) {
+				lineNots.add(new ArrayList<NotData>());
+			}
+			for (NotData nd : allNots) {
+				int pos = 0;
+				for (int j = 0; j < lineNots.size() && pos < nd.stopIndex; j++) {
+					String line = lineText[j];
+					int nextPos = pos + line.length();
+					if (nextPos > nd.startIndex) {
+						NotData toAdd = new NotData();
+						toAdd.startIndex = Math.max(pos, nd.startIndex) - pos;
+						toAdd.stopIndex = Math.min(nextPos, nd.stopIndex) - pos;
+						lineNots.get(j).add(toAdd);
+					}
+					pos = nextPos;
+				}
 			}
 		}
 
@@ -310,26 +279,20 @@ class ExpressionView extends JPanel {
 			lineText = lines.toArray(new String[lines.size()]);
 		}
 
-		private void computeLineNots() {
-			ArrayList<NotData> allNots = exprData.nots;
-			lineNots = new ArrayList<ArrayList<NotData>>();
-			for (int i = 0; i < lineText.length; i++) {
-				lineNots.add(new ArrayList<NotData>());
-			}
-			for (NotData nd : allNots) {
-				int pos = 0;
-				for (int j = 0; j < lineNots.size() && pos < nd.stopIndex; j++) {
-					String line = lineText[j];
-					int nextPos = pos + line.length();
-					if (nextPos > nd.startIndex) {
-						NotData toAdd = new NotData();
-						toAdd.startIndex = Math.max(pos, nd.startIndex) - pos;
-						toAdd.stopIndex = Math.min(nextPos, nd.stopIndex) - pos;
-						lineNots.get(j).add(toAdd);
-					}
-					pos = nextPos;
+		private void computeLineY(FontMetrics fm) {
+			lineY = new int[lineNots.size()];
+			int curY = 0;
+			for (int i = 0; i < lineY.length; i++) {
+				int maxDepth = -1;
+				ArrayList<NotData> nots = lineNots.get(i);
+				for (NotData nd : nots) {
+					if (nd.depth > maxDepth)
+						maxDepth = nd.depth;
 				}
+				lineY[i] = curY + maxDepth * NOT_SEP;
+				curY = lineY[i] + fm.getHeight() + EXTRA_LEADING;
 			}
+			height = Math.max(MINIMUM_HEIGHT, curY - fm.getLeading() - EXTRA_LEADING);
 		}
 
 		private void computeNotDepths() {
@@ -357,22 +320,6 @@ class ExpressionView extends JPanel {
 			}
 		}
 
-		private void computeLineY(FontMetrics fm) {
-			lineY = new int[lineNots.size()];
-			int curY = 0;
-			for (int i = 0; i < lineY.length; i++) {
-				int maxDepth = -1;
-				ArrayList<NotData> nots = lineNots.get(i);
-				for (NotData nd : nots) {
-					if (nd.depth > maxDepth)
-						maxDepth = nd.depth;
-				}
-				lineY[i] = curY + maxDepth * NOT_SEP;
-				curY = lineY[i] + fm.getHeight() + EXTRA_LEADING;
-			}
-			height = Math.max(MINIMUM_HEIGHT, curY - fm.getLeading() - EXTRA_LEADING);
-		}
-
 		public Dimension getPreferredSize() {
 			return new Dimension(10, height);
 		}
@@ -393,5 +340,58 @@ class ExpressionView extends JPanel {
 				}
 			}
 		}
+	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4343114997424679659L;
+	private static final int BADNESS_IDENT_BREAK = 10000;
+	private static final int BADNESS_BEFORE_SPACE = 500;
+	private static final int BADNESS_BEFORE_AND = 50;
+	private static final int BADNESS_BEFORE_XOR = 30;
+
+	private static final int BADNESS_BEFORE_OR = 0;
+	private static final int BADNESS_NOT_BREAK = 100;
+	private static final int BADNESS_PER_NOT_BREAK = 30;
+
+	private static final int BADNESS_PER_PIXEL = 1;
+
+	private static final int NOT_SEP = 3;
+	private static final int EXTRA_LEADING = 4;
+
+	private static final int MINIMUM_HEIGHT = 25;
+
+	private MyListener myListener = new MyListener();
+
+	private RenderData renderData;
+
+	public ExpressionView() {
+		addComponentListener(myListener);
+		setExpression(null);
+	}
+
+	void localeChanged() {
+		repaint();
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
+		if (renderData != null) {
+			int x = Math.max(0, (getWidth() - renderData.prefWidth) / 2);
+			int y = Math.max(0, (getHeight() - renderData.height) / 2);
+			renderData.paint(g, x, y);
+		}
+	}
+
+	public void setExpression(Expression expr) {
+		ExpressionData exprData = new ExpressionData(expr);
+		Graphics g = getGraphics();
+		FontMetrics fm = g == null ? null : g.getFontMetrics();
+		renderData = new RenderData(exprData, getWidth(), fm);
+		setPreferredSize(renderData.getPreferredSize());
+		revalidate();
+		repaint();
 	}
 }

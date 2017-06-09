@@ -40,11 +40,29 @@ public class PullResistor extends InstanceFactory {
 	private static final Icon ICON_SHAPED = Icons.getIcon("pullshap.gif");
 	private static final Icon ICON_RECTANGULAR = Icons.getIcon("pullrect.gif");
 
+	private static Value getPullValue(AttributeSet attrs) {
+		AttributeOption opt = attrs.getValue(ATTR_PULL_TYPE);
+		return (Value) opt.getValue();
+	}
+
+	public static Value getPullValue(Instance instance) {
+		return getPullValue(instance.getAttributeSet());
+	}
+
 	public PullResistor() {
 		super("Pull Resistor", Strings.getter("pullComponent"));
 		setAttributes(new Attribute[] { StdAttr.FACING, ATTR_PULL_TYPE },
 				new Object[] { Direction.SOUTH, ATTR_PULL_TYPE.parse("0") });
 		setFacingAttribute(StdAttr.FACING);
+	}
+
+	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		instance.setPorts(new Port[] { new Port(0, 0, Port.INOUT, BitWidth.UNKNOWN) });
 	}
 
 	@Override
@@ -61,38 +79,13 @@ public class PullResistor extends InstanceFactory {
 		}
 	}
 
-	//
-	// graphics methods
-	//
 	@Override
-	public void paintIcon(InstancePainter painter) {
-		Icon icon;
-		if (painter.getGateShape() == AppPreferences.SHAPE_SHAPED) {
-			icon = ICON_SHAPED;
-		} else {
-			icon = ICON_RECTANGULAR;
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+		} else if (attr == ATTR_PULL_TYPE) {
+			instance.fireInvalidated();
 		}
-		icon.paintIcon(painter.getDestination(), painter.getGraphics(), 2, 2);
-	}
-
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		Value pull = getPullValue(painter.getAttributeSet());
-		paintBase(painter, pull, null, null);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		Graphics g = painter.getGraphics();
-		g.translate(x, y);
-		Value pull = getPullValue(painter.getAttributeSet());
-		Value actual = painter.getPort(0);
-		paintBase(painter, pull, pull.getColor(), actual.getColor());
-		g.translate(-x, -y);
-		painter.drawPorts();
 	}
 
 	private void paintBase(InstancePainter painter, Value pullValue, Color inColor, Color outColor) {
@@ -139,35 +132,42 @@ public class PullResistor extends InstanceFactory {
 		}
 	}
 
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		Value pull = getPullValue(painter.getAttributeSet());
+		paintBase(painter, pull, null, null);
+	}
+
 	//
-	// methods for instances
+	// graphics methods
 	//
 	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		instance.setPorts(new Port[] { new Port(0, 0, Port.INOUT, BitWidth.UNKNOWN) });
+	public void paintIcon(InstancePainter painter) {
+		Icon icon;
+		if (painter.getGateShape() == AppPreferences.SHAPE_SHAPED) {
+			icon = ICON_SHAPED;
+		} else {
+			icon = ICON_RECTANGULAR;
+		}
+		icon.paintIcon(painter.getDestination(), painter.getGraphics(), 2, 2);
 	}
 
 	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-		} else if (attr == ATTR_PULL_TYPE) {
-			instance.fireInvalidated();
-		}
+	public void paintInstance(InstancePainter painter) {
+		Location loc = painter.getLocation();
+		int x = loc.getX();
+		int y = loc.getY();
+		Graphics g = painter.getGraphics();
+		g.translate(x, y);
+		Value pull = getPullValue(painter.getAttributeSet());
+		Value actual = painter.getPort(0);
+		paintBase(painter, pull, pull.getColor(), actual.getColor());
+		g.translate(-x, -y);
+		painter.drawPorts();
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
 		; // nothing to do - handled by CircuitWires
-	}
-
-	public static Value getPullValue(Instance instance) {
-		return getPullValue(instance.getAttributeSet());
-	}
-
-	private static Value getPullValue(AttributeSet attrs) {
-		AttributeOption opt = attrs.getValue(ATTR_PULL_TYPE);
-		return (Value) opt.getValue();
 	}
 }

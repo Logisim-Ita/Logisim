@@ -4,11 +4,17 @@
 package com.cburch.logisim.util;
 
 public class StringUtil {
-	private StringUtil() {
-	}
-
 	public static String capitalize(String a) {
 		return Character.toTitleCase(a.charAt(0)) + a.substring(1);
+	}
+
+	public static StringGetter constantGetter(final String value) {
+		return new StringGetter() {
+			@Override
+			public String get() {
+				return value;
+			}
+		};
 	}
 
 	public static String format(String fmt, String a1) {
@@ -95,15 +101,6 @@ public class StringUtil {
 		};
 	}
 
-	public static StringGetter constantGetter(final String value) {
-		return new StringGetter() {
-			@Override
-			public String get() {
-				return value;
-			}
-		};
-	}
-
 	public static String toHexString(int bits, int value) {
 		if (bits < 32)
 			value &= (1 << bits) - 1;
@@ -114,5 +111,8 @@ public class StringUtil {
 		if (ret.length() > len)
 			ret = ret.substring(ret.length() - len);
 		return ret;
+	}
+
+	private StringUtil() {
 	}
 }

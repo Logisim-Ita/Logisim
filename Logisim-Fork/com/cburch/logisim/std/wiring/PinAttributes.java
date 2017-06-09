@@ -45,12 +45,12 @@ class PinAttributes extends ProbeAttributes {
 		return super.getValue(attr);
 	}
 
-	boolean isOutput() {
-		return type != EndData.INPUT_ONLY;
-	}
-
 	boolean isInput() {
 		return type != EndData.OUTPUT_ONLY;
+	}
+
+	boolean isOutput() {
+		return type != EndData.INPUT_ONLY;
 	}
 
 	@Override

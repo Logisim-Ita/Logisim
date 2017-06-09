@@ -21,15 +21,6 @@ import com.cburch.logisim.analyze.model.TruthTableListener;
 import com.cburch.logisim.util.GraphicsUtil;
 
 class TableTab extends JPanel implements TruthTablePanel, TabInterface {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8687487329361908314L;
-	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
-	private static final int COLUMN_SEP = 8;
-	private static final int HEADER_SEP = 4;
-
 	private class MyListener implements TruthTableListener {
 		@Override
 		public void cellsChanged(TruthTableEvent event) {
@@ -41,6 +32,15 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 			computePreferredSize();
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8687487329361908314L;
+	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
+	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
+	private static final int COLUMN_SEP = 8;
+
+	private static final int HEADER_SEP = 4;
 
 	private MyListener myListener = new MyListener();
 	private TruthTable table;
@@ -62,18 +62,87 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		clip = new TableTabClip(this);
 	}
 
+	private void computePreferredSize() {
+		int inputs = table.getInputColumnCount();
+		int outputs = table.getOutputColumnCount();
+		if (inputs == 0 && outputs == 0) {
+			setPreferredSize(new Dimension(0, 0));
+			return;
+		}
+
+		Graphics g = getGraphics();
+		if (g == null) {
+			cellHeight = 16;
+			cellWidth = 24;
+		} else {
+			FontMetrics fm = g.getFontMetrics(HEAD_FONT);
+			cellHeight = fm.getHeight();
+			cellWidth = 24;
+			if (inputs == 0 || outputs == 0) {
+				cellWidth = Math.max(cellWidth, fm.stringWidth(Strings.get("tableNullHeader")));
+			}
+			for (int i = 0; i < inputs + outputs; i++) {
+				String header = i < inputs ? table.getInputHeader(i) : table.getOutputHeader(i - inputs);
+				cellWidth = Math.max(cellWidth, fm.stringWidth(header));
+			}
+		}
+
+		if (inputs == 0)
+			inputs = 1;
+		if (outputs == 0)
+			outputs = 1;
+		tableWidth = (cellWidth + COLUMN_SEP) * (inputs + outputs) - COLUMN_SEP;
+		tableHeight = cellHeight * (1 + table.getRowCount()) + HEADER_SEP;
+		setPreferredSize(new Dimension(tableWidth, tableHeight));
+		revalidate();
+		repaint();
+	}
+
 	@Override
-	public TruthTable getTruthTable() {
-		return table;
+	public void copy() {
+		requestFocus();
+		clip.copy();
+	}
+
+	@Override
+	public void delete() {
+		requestFocus();
+		int r0 = caret.getCursorRow();
+		int r1 = caret.getMarkRow();
+		int c0 = caret.getCursorCol();
+		int c1 = caret.getMarkCol();
+		if (r0 < 0 || r1 < 0)
+			return;
+		if (r1 < r0) {
+			int t = r0;
+			r0 = r1;
+			r1 = t;
+		}
+		if (c1 < c0) {
+			int t = c0;
+			c0 = c1;
+			c1 = t;
+		}
+		int inputs = table.getInputColumnCount();
+		for (int c = c0; c <= c1; c++) {
+			if (c >= inputs) {
+				for (int r = r0; r <= r1; r++) {
+					table.setOutputEntry(r, c - inputs, Entry.DONT_CARE);
+				}
+			}
+		}
 	}
 
 	TableTabCaret getCaret() {
 		return caret;
 	}
 
-	void localeChanged() {
-		computePreferredSize();
-		repaint();
+	int getCellHeight() {
+		return cellHeight;
+	}
+
+	int getCellWidth() {
+		return cellWidth;
 	}
 
 	public int getColumn(MouseEvent event) {
@@ -114,21 +183,69 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	}
 
 	@Override
-	public void setEntryProvisional(int y, int x, Entry value) {
-		provisionalY = y;
-		provisionalX = x;
-		provisionalValue = value;
-
-		int top = (getHeight() - tableHeight) / 2 + cellHeight + HEADER_SEP + y * cellHeight;
-		repaint(0, top, getWidth(), cellHeight);
-	}
-
-	@Override
 	public String getToolTipText(MouseEvent event) {
 		int row = getRow(event);
 		int col = getOutputColumn(event);
 		Entry entry = table.getOutputEntry(row, col);
 		return entry.getErrorMessage();
+	}
+
+	@Override
+	public TruthTable getTruthTable() {
+		return table;
+	}
+
+	JScrollBar getVerticalScrollBar() {
+		return new JScrollBar() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 7084235376262867690L;
+
+			@Override
+			public int getBlockIncrement(int direction) {
+				int curY = getValue();
+				int curHeight = getVisibleAmount();
+				int numCells = curHeight / cellHeight - 1;
+				if (numCells <= 0)
+					numCells = 1;
+				if (direction > 0) {
+					return curY > 0 ? numCells * cellHeight : numCells * cellHeight + HEADER_SEP;
+				} else {
+					return curY > cellHeight + HEADER_SEP ? numCells * cellHeight : numCells * cellHeight + HEADER_SEP;
+				}
+			}
+
+			@Override
+			public int getUnitIncrement(int direction) {
+				int curY = getValue();
+				if (direction > 0) {
+					return curY > 0 ? cellHeight : cellHeight + HEADER_SEP;
+				} else {
+					return curY > cellHeight + HEADER_SEP ? cellHeight : cellHeight + HEADER_SEP;
+				}
+			}
+		};
+	}
+
+	int getX(int col) {
+		Dimension sz = getSize();
+		int left = Math.max(0, (sz.width - tableWidth) / 2);
+		int inputs = table.getInputColumnCount();
+		if (inputs == 0)
+			left += cellWidth + COLUMN_SEP;
+		return left + col * (cellWidth + COLUMN_SEP);
+	}
+
+	int getY(int row) {
+		Dimension sz = getSize();
+		int top = Math.max(0, (sz.height - tableHeight) / 2);
+		return top + cellHeight + HEADER_SEP + row * cellHeight;
+	}
+
+	void localeChanged() {
+		computePreferredSize();
+		repaint();
 	}
 
 	@Override
@@ -217,108 +334,10 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		caret.paintForeground(g);
 	}
 
-	int getCellWidth() {
-		return cellWidth;
-	}
-
-	int getCellHeight() {
-		return cellHeight;
-	}
-
-	int getX(int col) {
-		Dimension sz = getSize();
-		int left = Math.max(0, (sz.width - tableWidth) / 2);
-		int inputs = table.getInputColumnCount();
-		if (inputs == 0)
-			left += cellWidth + COLUMN_SEP;
-		return left + col * (cellWidth + COLUMN_SEP);
-	}
-
-	int getY(int row) {
-		Dimension sz = getSize();
-		int top = Math.max(0, (sz.height - tableHeight) / 2);
-		return top + cellHeight + HEADER_SEP + row * cellHeight;
-	}
-
 	private int paintHeader(String header, int x, int y, Graphics g, FontMetrics fm) {
 		int width = fm.stringWidth(header);
 		g.drawString(header, x + (cellWidth - width) / 2, y);
 		return x + cellWidth + COLUMN_SEP;
-	}
-
-	private void computePreferredSize() {
-		int inputs = table.getInputColumnCount();
-		int outputs = table.getOutputColumnCount();
-		if (inputs == 0 && outputs == 0) {
-			setPreferredSize(new Dimension(0, 0));
-			return;
-		}
-
-		Graphics g = getGraphics();
-		if (g == null) {
-			cellHeight = 16;
-			cellWidth = 24;
-		} else {
-			FontMetrics fm = g.getFontMetrics(HEAD_FONT);
-			cellHeight = fm.getHeight();
-			cellWidth = 24;
-			if (inputs == 0 || outputs == 0) {
-				cellWidth = Math.max(cellWidth, fm.stringWidth(Strings.get("tableNullHeader")));
-			}
-			for (int i = 0; i < inputs + outputs; i++) {
-				String header = i < inputs ? table.getInputHeader(i) : table.getOutputHeader(i - inputs);
-				cellWidth = Math.max(cellWidth, fm.stringWidth(header));
-			}
-		}
-
-		if (inputs == 0)
-			inputs = 1;
-		if (outputs == 0)
-			outputs = 1;
-		tableWidth = (cellWidth + COLUMN_SEP) * (inputs + outputs) - COLUMN_SEP;
-		tableHeight = cellHeight * (1 + table.getRowCount()) + HEADER_SEP;
-		setPreferredSize(new Dimension(tableWidth, tableHeight));
-		revalidate();
-		repaint();
-	}
-
-	JScrollBar getVerticalScrollBar() {
-		return new JScrollBar() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 7084235376262867690L;
-
-			@Override
-			public int getUnitIncrement(int direction) {
-				int curY = getValue();
-				if (direction > 0) {
-					return curY > 0 ? cellHeight : cellHeight + HEADER_SEP;
-				} else {
-					return curY > cellHeight + HEADER_SEP ? cellHeight : cellHeight + HEADER_SEP;
-				}
-			}
-
-			@Override
-			public int getBlockIncrement(int direction) {
-				int curY = getValue();
-				int curHeight = getVisibleAmount();
-				int numCells = curHeight / cellHeight - 1;
-				if (numCells <= 0)
-					numCells = 1;
-				if (direction > 0) {
-					return curY > 0 ? numCells * cellHeight : numCells * cellHeight + HEADER_SEP;
-				} else {
-					return curY > cellHeight + HEADER_SEP ? numCells * cellHeight : numCells * cellHeight + HEADER_SEP;
-				}
-			}
-		};
-	}
-
-	@Override
-	public void copy() {
-		requestFocus();
-		clip.copy();
 	}
 
 	@Override
@@ -328,36 +347,17 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	}
 
 	@Override
-	public void delete() {
-		requestFocus();
-		int r0 = caret.getCursorRow();
-		int r1 = caret.getMarkRow();
-		int c0 = caret.getCursorCol();
-		int c1 = caret.getMarkCol();
-		if (r0 < 0 || r1 < 0)
-			return;
-		if (r1 < r0) {
-			int t = r0;
-			r0 = r1;
-			r1 = t;
-		}
-		if (c1 < c0) {
-			int t = c0;
-			c0 = c1;
-			c1 = t;
-		}
-		int inputs = table.getInputColumnCount();
-		for (int c = c0; c <= c1; c++) {
-			if (c >= inputs) {
-				for (int r = r0; r <= r1; r++) {
-					table.setOutputEntry(r, c - inputs, Entry.DONT_CARE);
-				}
-			}
-		}
+	public void selectAll() {
+		caret.selectAll();
 	}
 
 	@Override
-	public void selectAll() {
-		caret.selectAll();
+	public void setEntryProvisional(int y, int x, Entry value) {
+		provisionalY = y;
+		provisionalX = x;
+		provisionalValue = value;
+
+		int top = (getHeight() - tableHeight) / 2 + cellHeight + HEADER_SEP + y * cellHeight;
+		repaint(0, top, getWidth(), cellHeight);
 	}
 }

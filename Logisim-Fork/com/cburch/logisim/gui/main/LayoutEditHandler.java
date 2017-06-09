@@ -31,6 +31,11 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
+	public void addControlPoint() {
+		; // not yet supported in layout mode
+	}
+
+	@Override
 	public void computeEnabled() {
 		Project proj = frame.getProject();
 		Selection sel = proj == null ? null : proj.getSelection();
@@ -58,13 +63,6 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
-	public void cut() {
-		Project proj = frame.getProject();
-		Selection sel = frame.getCanvas().getSelection();
-		proj.doAction(SelectionActions.cut(sel));
-	}
-
-	@Override
 	public void copy() {
 		Project proj = frame.getProject();
 		Selection sel = frame.getCanvas().getSelection();
@@ -72,14 +70,10 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
-	public void paste() {
+	public void cut() {
 		Project proj = frame.getProject();
 		Selection sel = frame.getCanvas().getSelection();
-		selectSelectTool(proj);
-		Action action = SelectionActions.pasteMaybe(proj, sel);
-		if (action != null) {
-			proj.doAction(action);
-		}
+		proj.doAction(SelectionActions.cut(sel));
 	}
 
 	@Override
@@ -97,28 +91,17 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
-	public void selectAll() {
-		Project proj = frame.getProject();
-		Selection sel = frame.getCanvas().getSelection();
-		selectSelectTool(proj);
-		Circuit circ = proj.getCurrentCircuit();
-		sel.addAll(circ.getWires());
-		sel.addAll(circ.getNonWires());
-		proj.repaintCanvas();
-	}
-
-	@Override
-	public void raise() {
-		; // not yet supported in layout mode
+	public void libraryChanged(LibraryEvent e) {
+		int action = e.getAction();
+		if (action == LibraryEvent.ADD_LIBRARY) {
+			computeEnabled();
+		} else if (action == LibraryEvent.REMOVE_LIBRARY) {
+			computeEnabled();
+		}
 	}
 
 	@Override
 	public void lower() {
-		; // not yet supported in layout mode
-	}
-
-	@Override
-	public void raiseTop() {
 		; // not yet supported in layout mode
 	}
 
@@ -128,23 +111,13 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
-	public void addControlPoint() {
-		; // not yet supported in layout mode
-	}
-
-	@Override
-	public void removeControlPoint() {
-		; // not yet supported in layout mode
-	}
-
-	private void selectSelectTool(Project proj) {
-		for (Library sub : proj.getLogisimFile().getLibraries()) {
-			if (sub instanceof Base) {
-				Base base = (Base) sub;
-				Tool tool = base.getTool("Edit Tool");
-				if (tool != null)
-					proj.setTool(tool);
-			}
+	public void paste() {
+		Project proj = frame.getProject();
+		Selection sel = frame.getCanvas().getSelection();
+		selectSelectTool(proj);
+		Action action = SelectionActions.pasteMaybe(proj, sel);
+		if (action != null) {
+			proj.doAction(action);
 		}
 	}
 
@@ -161,19 +134,46 @@ public class LayoutEditHandler extends EditHandler implements ProjectListener, L
 	}
 
 	@Override
-	public void libraryChanged(LibraryEvent e) {
-		int action = e.getAction();
-		if (action == LibraryEvent.ADD_LIBRARY) {
-			computeEnabled();
-		} else if (action == LibraryEvent.REMOVE_LIBRARY) {
+	public void propertyChange(PropertyChangeEvent event) {
+		if (event.getPropertyName().equals(Clipboard.contentsProperty)) {
 			computeEnabled();
 		}
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getPropertyName().equals(Clipboard.contentsProperty)) {
-			computeEnabled();
+	public void raise() {
+		; // not yet supported in layout mode
+	}
+
+	@Override
+	public void raiseTop() {
+		; // not yet supported in layout mode
+	}
+
+	@Override
+	public void removeControlPoint() {
+		; // not yet supported in layout mode
+	}
+
+	@Override
+	public void selectAll() {
+		Project proj = frame.getProject();
+		Selection sel = frame.getCanvas().getSelection();
+		selectSelectTool(proj);
+		Circuit circ = proj.getCurrentCircuit();
+		sel.addAll(circ.getWires());
+		sel.addAll(circ.getNonWires());
+		proj.repaintCanvas();
+	}
+
+	private void selectSelectTool(Project proj) {
+		for (Library sub : proj.getLogisimFile().getLibraries()) {
+			if (sub instanceof Base) {
+				Base base = (Base) sub;
+				Tool tool = base.getTool("Edit Tool");
+				if (tool != null)
+					proj.setTool(tool);
+			}
 		}
 	}
 }

@@ -47,20 +47,26 @@ import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.StringGetter;
 
 public class SelectTool extends Tool {
-	private static final Cursor selectCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-	private static final Cursor rectSelectCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-	private static final Cursor moveCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+	private static class ComputingMessage implements StringGetter {
+		private int dx;
+		private int dy;
 
-	private static final int IDLE = 0;
-	private static final int MOVING = 1;
-	private static final int RECT_SELECT = 2;
-	private static final Icon toolIcon = Icons.getIcon("select.gif");
+		public ComputingMessage(int dx, int dy) {
+			this.dx = dx;
+			this.dy = dy;
+		}
 
-	private static final Color COLOR_UNMATCHED = new Color(192, 0, 0);
-	private static final Color COLOR_COMPUTING = new Color(96, 192, 96);
-	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
-	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
-
+		@Override
+		public String get() {
+			return Strings.get("moveWorkingMsg");
+		}
+	}
+	private class Listener implements Selection.Listener {
+		@Override
+		public void selectionChanged(Event event) {
+			keyHandlers = null;
+		}
+	}
 	private static class MoveRequestHandler implements MoveRequestListener {
 		private Canvas canvas;
 
@@ -74,13 +80,31 @@ public class SelectTool extends Tool {
 		}
 	}
 
-	private class Listener implements Selection.Listener {
-		@Override
-		public void selectionChanged(Event event) {
-			keyHandlers = null;
+	private static final Cursor selectCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+	private static final Cursor rectSelectCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	private static final Cursor moveCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+	private static final int IDLE = 0;
+
+	private static final int MOVING = 1;
+	private static final int RECT_SELECT = 2;
+	private static final Icon toolIcon = Icons.getIcon("select.gif");
+	private static final Color COLOR_UNMATCHED = new Color(192, 0, 0);
+
+	private static final Color COLOR_COMPUTING = new Color(96, 192, 96);
+
+	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
+
+	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
+	private static void clearCanvasMessage(Canvas canvas, int dx, int dy) {
+		Object getter = canvas.getErrorMessage();
+		if (getter instanceof ComputingMessage) {
+			ComputingMessage msg = (ComputingMessage) getter;
+			if (msg.dx == dx && msg.dy == dy) {
+				canvas.setErrorMessage(null);
+				canvas.repaint();
+			}
 		}
 	}
-
 	private Location start;
 	private int state;
 	private int curDx;
@@ -88,7 +112,9 @@ public class SelectTool extends Tool {
 	private boolean drawConnections;
 	private MoveGesture moveGesture;
 	private HashMap<Component, KeyConfigurator> keyHandlers;
+
 	private HashSet<Selection> selectionsAdded;
+
 	private Listener selListener;
 
 	public SelectTool() {
@@ -99,39 +125,30 @@ public class SelectTool extends Tool {
 		keyHandlers = null;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		return other instanceof SelectTool;
+	private void computeDxDy(Project proj, MouseEvent e, Graphics g) {
+		Bounds bds = proj.getSelection().getBounds(g);
+		int dx;
+		int dy;
+		if (bds == Bounds.EMPTY_BOUNDS) {
+			dx = e.getX() - start.getX();
+			dy = e.getY() - start.getY();
+		} else {
+			dx = Math.max(e.getX() - start.getX(), -bds.getX());
+			dy = Math.max(e.getY() - start.getY(), -bds.getY());
+		}
+
+		Selection sel = proj.getSelection();
+		if (sel.shouldSnap()) {
+			dx = Canvas.snapXToGrid(dx);
+			dy = Canvas.snapYToGrid(dy);
+		}
+		curDx = dx;
+		curDy = dy;
 	}
 
 	@Override
-	public int hashCode() {
-		return SelectTool.class.hashCode();
-	}
-
-	@Override
-	public String getName() {
-		return "Select Tool";
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("selectTool");
-	}
-
-	@Override
-	public String getDescription() {
-		return Strings.get("selectToolDesc");
-	}
-
-	@Override
-	public AttributeSet getAttributeSet(Canvas canvas) {
-		return canvas.getSelection().getAttributeSet();
-	}
-
-	@Override
-	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
-		return true;
+	public void deselect(Canvas canvas) {
+		moveGesture = null;
 	}
 
 	@Override
@@ -210,16 +227,142 @@ public class SelectTool extends Tool {
 	}
 
 	@Override
-	public void select(Canvas canvas) {
-		Selection sel = canvas.getSelection();
-		if (!selectionsAdded.contains(sel)) {
-			sel.addListener(selListener);
+	public boolean equals(Object other) {
+		return other instanceof SelectTool;
+	}
+
+	@Override
+	public AttributeSet getAttributeSet(Canvas canvas) {
+		return canvas.getSelection().getAttributeSet();
+	}
+
+	@Override
+	public Cursor getCursor() {
+		return state == IDLE ? selectCursor : (state == RECT_SELECT ? rectSelectCursor : moveCursor);
+	}
+
+	@Override
+	public String getDescription() {
+		return Strings.get("selectToolDesc");
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Strings.get("selectTool");
+	}
+
+	@Override
+	public Set<Component> getHiddenComponents(Canvas canvas) {
+		if (state == MOVING) {
+			int dx = curDx;
+			int dy = curDy;
+			if (dx == 0 && dy == 0) {
+				return null;
+			}
+
+			Set<Component> sel = canvas.getSelection().getComponents();
+			MoveGesture gesture = moveGesture;
+			if (gesture != null && drawConnections) {
+				MoveResult result = gesture.findResult(dx, dy);
+				if (result != null) {
+					HashSet<Component> ret = new HashSet<Component>(sel);
+					ret.addAll(result.getReplacementMap().getRemovals());
+					return ret;
+				}
+			}
+			return sel;
+		} else {
+			return null;
 		}
 	}
 
 	@Override
-	public void deselect(Canvas canvas) {
-		moveGesture = null;
+	public String getName() {
+		return "Select Tool";
+	}
+
+	private void handleMoveDrag(Canvas canvas, int dx, int dy, int modsEx) {
+		boolean connect = shouldConnect(canvas, modsEx);
+		drawConnections = connect;
+		if (connect) {
+			MoveGesture gesture = moveGesture;
+			if (gesture == null) {
+				gesture = new MoveGesture(new MoveRequestHandler(canvas), canvas.getCircuit(),
+						canvas.getSelection().getAnchoredComponents());
+				moveGesture = gesture;
+			}
+			if (dx != 0 || dy != 0) {
+				boolean queued = gesture.enqueueRequest(dx, dy);
+				if (queued) {
+					canvas.setErrorMessage(new ComputingMessage(dx, dy), COLOR_COMPUTING);
+					// maybe CPU scheduled led the request to be satisfied
+					// just before the "if(queued)" statement. In any case, it
+					// doesn't hurt to check to ensure the message belongs.
+					if (gesture.findResult(dx, dy) != null) {
+						clearCanvasMessage(canvas, dx, dy);
+					}
+				}
+			}
+		}
+		canvas.repaint();
+	}
+
+	@Override
+	public int hashCode() {
+		return SelectTool.class.hashCode();
+	}
+
+	@Override
+	public boolean isAllDefaultValues(AttributeSet attrs, LogisimVersion ver) {
+		return true;
+	}
+
+	@Override
+	public void keyPressed(Canvas canvas, KeyEvent e) {
+		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
+			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
+		} else {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_BACK_SPACE:
+			case KeyEvent.VK_DELETE:
+				if (!canvas.getSelection().isEmpty()) {
+					Action act = SelectionActions.clear(canvas.getSelection());
+					canvas.getProject().doAction(act);
+					e.consume();
+				}
+				break;
+			default:
+				processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_PRESSED);
+			}
+		}
+	}
+
+	@Override
+	public void keyReleased(Canvas canvas, KeyEvent e) {
+		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
+			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
+		} else {
+			processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_RELEASED);
+		}
+	}
+
+	@Override
+	public void keyTyped(Canvas canvas, KeyEvent e) {
+		processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_TYPED);
+	}
+
+	@Override
+	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
+		if (state == MOVING) {
+			Project proj = canvas.getProject();
+			computeDxDy(proj, e, g);
+			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
+		} else if (state == RECT_SELECT) {
+			Project proj = canvas.getProject();
+			curDx = e.getX() - start.getX();
+			curDy = e.getY() - start.getY();
+			proj.repaintCanvas();
+		}
 	}
 
 	@Override
@@ -288,56 +431,6 @@ public class SelectTool extends Tool {
 	}
 
 	@Override
-	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
-		if (state == MOVING) {
-			Project proj = canvas.getProject();
-			computeDxDy(proj, e, g);
-			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
-		} else if (state == RECT_SELECT) {
-			Project proj = canvas.getProject();
-			curDx = e.getX() - start.getX();
-			curDy = e.getY() - start.getY();
-			proj.repaintCanvas();
-		}
-	}
-
-	private void handleMoveDrag(Canvas canvas, int dx, int dy, int modsEx) {
-		boolean connect = shouldConnect(canvas, modsEx);
-		drawConnections = connect;
-		if (connect) {
-			MoveGesture gesture = moveGesture;
-			if (gesture == null) {
-				gesture = new MoveGesture(new MoveRequestHandler(canvas), canvas.getCircuit(),
-						canvas.getSelection().getAnchoredComponents());
-				moveGesture = gesture;
-			}
-			if (dx != 0 || dy != 0) {
-				boolean queued = gesture.enqueueRequest(dx, dy);
-				if (queued) {
-					canvas.setErrorMessage(new ComputingMessage(dx, dy), COLOR_COMPUTING);
-					// maybe CPU scheduled led the request to be satisfied
-					// just before the "if(queued)" statement. In any case, it
-					// doesn't hurt to check to ensure the message belongs.
-					if (gesture.findResult(dx, dy) != null) {
-						clearCanvasMessage(canvas, dx, dy);
-					}
-				}
-			}
-		}
-		canvas.repaint();
-	}
-
-	private boolean shouldConnect(Canvas canvas, int modsEx) {
-		boolean shiftReleased = (modsEx & InputEvent.SHIFT_DOWN_MASK) == 0;
-		boolean dflt = AppPreferences.MOVE_KEEP_CONNECT.getBoolean();
-		if (shiftReleased) {
-			return dflt;
-		} else {
-			return !dflt;
-		}
-	}
-
-	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
 		Project proj = canvas.getProject();
 		if (state == MOVING) {
@@ -392,37 +485,16 @@ public class SelectTool extends Tool {
 	}
 
 	@Override
-	public void keyPressed(Canvas canvas, KeyEvent e) {
-		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
-			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
+	public void paintIcon(ComponentDrawContext c, int x, int y) {
+		Graphics g = c.getGraphics();
+		if (toolIcon != null) {
+			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
 		} else {
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_BACK_SPACE:
-			case KeyEvent.VK_DELETE:
-				if (!canvas.getSelection().isEmpty()) {
-					Action act = SelectionActions.clear(canvas.getSelection());
-					canvas.getProject().doAction(act);
-					e.consume();
-				}
-				break;
-			default:
-				processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_PRESSED);
-			}
+			int[] xp = { x + 5, x + 5, x + 9, x + 12, x + 14, x + 11, x + 16 };
+			int[] yp = { y, y + 17, y + 12, y + 18, y + 18, y + 12, y + 12 };
+			g.setColor(java.awt.Color.black);
+			g.fillPolygon(xp, yp, xp.length);
 		}
-	}
-
-	@Override
-	public void keyReleased(Canvas canvas, KeyEvent e) {
-		if (state == MOVING && e.getKeyCode() == KeyEvent.VK_SHIFT) {
-			handleMoveDrag(canvas, curDx, curDy, e.getModifiersEx());
-		} else {
-			processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_RELEASED);
-		}
-	}
-
-	@Override
-	public void keyTyped(Canvas canvas, KeyEvent e) {
-		processKeyEvent(canvas, e, KeyConfigurationEvent.KEY_TYPED);
 	}
 
 	private void processKeyEvent(Canvas canvas, KeyEvent e, int type) {
@@ -476,67 +548,11 @@ public class SelectTool extends Tool {
 		}
 	}
 
-	private void computeDxDy(Project proj, MouseEvent e, Graphics g) {
-		Bounds bds = proj.getSelection().getBounds(g);
-		int dx;
-		int dy;
-		if (bds == Bounds.EMPTY_BOUNDS) {
-			dx = e.getX() - start.getX();
-			dy = e.getY() - start.getY();
-		} else {
-			dx = Math.max(e.getX() - start.getX(), -bds.getX());
-			dy = Math.max(e.getY() - start.getY(), -bds.getY());
-		}
-
-		Selection sel = proj.getSelection();
-		if (sel.shouldSnap()) {
-			dx = Canvas.snapXToGrid(dx);
-			dy = Canvas.snapYToGrid(dy);
-		}
-		curDx = dx;
-		curDy = dy;
-	}
-
 	@Override
-	public void paintIcon(ComponentDrawContext c, int x, int y) {
-		Graphics g = c.getGraphics();
-		if (toolIcon != null) {
-			toolIcon.paintIcon(c.getDestination(), g, x + 2, y + 2);
-		} else {
-			int[] xp = { x + 5, x + 5, x + 9, x + 12, x + 14, x + 11, x + 16 };
-			int[] yp = { y, y + 17, y + 12, y + 18, y + 18, y + 12, y + 12 };
-			g.setColor(java.awt.Color.black);
-			g.fillPolygon(xp, yp, xp.length);
-		}
-	}
-
-	@Override
-	public Cursor getCursor() {
-		return state == IDLE ? selectCursor : (state == RECT_SELECT ? rectSelectCursor : moveCursor);
-	}
-
-	@Override
-	public Set<Component> getHiddenComponents(Canvas canvas) {
-		if (state == MOVING) {
-			int dx = curDx;
-			int dy = curDy;
-			if (dx == 0 && dy == 0) {
-				return null;
-			}
-
-			Set<Component> sel = canvas.getSelection().getComponents();
-			MoveGesture gesture = moveGesture;
-			if (gesture != null && drawConnections) {
-				MoveResult result = gesture.findResult(dx, dy);
-				if (result != null) {
-					HashSet<Component> ret = new HashSet<Component>(sel);
-					ret.addAll(result.getReplacementMap().getRemovals());
-					return ret;
-				}
-			}
-			return sel;
-		} else {
-			return null;
+	public void select(Canvas canvas) {
+		Selection sel = canvas.getSelection();
+		if (!selectionsAdded.contains(sel)) {
+			sel.addListener(selListener);
 		}
 	}
 
@@ -548,29 +564,13 @@ public class SelectTool extends Tool {
 		proj.getFrame().getCanvas().setCursor(getCursor());
 	}
 
-	private static void clearCanvasMessage(Canvas canvas, int dx, int dy) {
-		Object getter = canvas.getErrorMessage();
-		if (getter instanceof ComputingMessage) {
-			ComputingMessage msg = (ComputingMessage) getter;
-			if (msg.dx == dx && msg.dy == dy) {
-				canvas.setErrorMessage(null);
-				canvas.repaint();
-			}
-		}
-	}
-
-	private static class ComputingMessage implements StringGetter {
-		private int dx;
-		private int dy;
-
-		public ComputingMessage(int dx, int dy) {
-			this.dx = dx;
-			this.dy = dy;
-		}
-
-		@Override
-		public String get() {
-			return Strings.get("moveWorkingMsg");
+	private boolean shouldConnect(Canvas canvas, int modsEx) {
+		boolean shiftReleased = (modsEx & InputEvent.SHIFT_DOWN_MASK) == 0;
+		boolean dflt = AppPreferences.MOVE_KEEP_CONNECT.getBoolean();
+		if (shiftReleased) {
+			return dflt;
+		} else {
+			return !dflt;
 		}
 	}
 }

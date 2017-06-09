@@ -34,12 +34,15 @@ public class Simulator {
 		int tickRateTicks = 0;
 		long tickRateStart = System.currentTimeMillis();
 
-		public Propagator getPropagator() {
-			return propagator;
+		private void doTick() {
+			synchronized (this) {
+				ticksRequested--;
+			}
+			propagator.tick();
 		}
 
-		public void setPropagator(Propagator value) {
-			propagator = value;
+		public Propagator getPropagator() {
+			return propagator;
 		}
 
 		public synchronized void requestPropagate() {
@@ -60,11 +63,6 @@ public class Simulator {
 			if (ticksRequested < 16) {
 				ticksRequested++;
 			}
-			notifyAll();
-		}
-
-		public synchronized void shutDown() {
-			complete = true;
 			notifyAll();
 		}
 
@@ -145,11 +143,13 @@ public class Simulator {
 			}
 		}
 
-		private void doTick() {
-			synchronized (this) {
-				ticksRequested--;
-			}
-			propagator.tick();
+		public void setPropagator(Propagator value) {
+			propagator = value;
+		}
+
+		public synchronized void shutDown() {
+			complete = true;
+			notifyAll();
 		}
 	}
 
@@ -178,14 +178,33 @@ public class Simulator {
 		setTickFrequency(AppPreferences.TICK_FREQUENCY.get().doubleValue());
 	}
 
-	public void shutDown() {
-		ticker.shutDown();
-		manager.shutDown();
+	public void addSimulatorListener(SimulatorListener l) {
+		listeners.add(l);
 	}
 
-	public void setCircuitState(CircuitState state) {
-		manager.setPropagator(state.getPropagator());
-		renewTickerAwake();
+	public void drawStepPoints(ComponentDrawContext context) {
+		manager.stepPoints.draw(context);
+	}
+
+	void firePropagationCompleted() {
+		SimulatorEvent e = new SimulatorEvent(this);
+		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+			l.propagationCompleted(e);
+		}
+	}
+
+	void fireSimulatorStateChanged() {
+		SimulatorEvent e = new SimulatorEvent(this);
+		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+			l.simulatorStateChanged(e);
+		}
+	}
+
+	void fireTickCompleted() {
+		SimulatorEvent e = new SimulatorEvent(this);
+		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
+			l.tickCompleted(e);
+		}
 	}
 
 	public CircuitState getCircuitState() {
@@ -193,31 +212,46 @@ public class Simulator {
 		return prop == null ? null : prop.getRootState();
 	}
 
-	public void requestReset() {
-		manager.requestReset();
-	}
-
-	public void tick() {
-		ticker.tickOnce();
-	}
-
-	public void step() {
-		synchronized (manager) {
-			manager.stepsRequested++;
-			manager.notifyAll();
-		}
-	}
-
-	public void drawStepPoints(ComponentDrawContext context) {
-		manager.stepPoints.draw(context);
+	public double getTickFrequency() {
+		return tickFrequency;
 	}
 
 	public boolean isExceptionEncountered() {
 		return exceptionEncountered;
 	}
 
+	public boolean isOscillating() {
+		Propagator prop = manager.getPropagator();
+		return prop != null && prop.isOscillating();
+	}
+
 	public boolean isRunning() {
 		return isRunning;
+	}
+
+	public boolean isTicking() {
+		return isTicking;
+	}
+
+	public void removeSimulatorListener(SimulatorListener l) {
+		listeners.remove(l);
+	}
+
+	private void renewTickerAwake() {
+		ticker.setAwake(isRunning && isTicking && tickFrequency > 0);
+	}
+
+	public void requestPropagate() {
+		manager.requestPropagate();
+	}
+
+	public void requestReset() {
+		manager.requestReset();
+	}
+
+	public void setCircuitState(CircuitState state) {
+		manager.setPropagator(state.getPropagator());
+		renewTickerAwake();
 	}
 
 	public void setIsRunning(boolean value) {
@@ -231,24 +265,12 @@ public class Simulator {
 		}
 	}
 
-	public boolean isTicking() {
-		return isTicking;
-	}
-
 	public void setIsTicking(boolean value) {
 		if (isTicking != value) {
 			isTicking = value;
 			renewTickerAwake();
 			fireSimulatorStateChanged();
 		}
-	}
-
-	private void renewTickerAwake() {
-		ticker.setAwake(isRunning && isTicking && tickFrequency > 0);
-	}
-
-	public double getTickFrequency() {
-		return tickFrequency;
 	}
 
 	public void setTickFrequency(double freq) {
@@ -269,41 +291,19 @@ public class Simulator {
 		}
 	}
 
-	public void requestPropagate() {
-		manager.requestPropagate();
+	public void shutDown() {
+		ticker.shutDown();
+		manager.shutDown();
 	}
 
-	public boolean isOscillating() {
-		Propagator prop = manager.getPropagator();
-		return prop != null && prop.isOscillating();
-	}
-
-	public void addSimulatorListener(SimulatorListener l) {
-		listeners.add(l);
-	}
-
-	public void removeSimulatorListener(SimulatorListener l) {
-		listeners.remove(l);
-	}
-
-	void firePropagationCompleted() {
-		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
-			l.propagationCompleted(e);
+	public void step() {
+		synchronized (manager) {
+			manager.stepsRequested++;
+			manager.notifyAll();
 		}
 	}
 
-	void fireTickCompleted() {
-		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
-			l.tickCompleted(e);
-		}
-	}
-
-	void fireSimulatorStateChanged() {
-		SimulatorEvent e = new SimulatorEvent(this);
-		for (SimulatorListener l : new ArrayList<SimulatorListener>(listeners)) {
-			l.simulatorStateChanged(e);
-		}
+	public void tick() {
+		ticker.tickOnce();
 	}
 }

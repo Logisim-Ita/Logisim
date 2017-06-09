@@ -20,6 +20,14 @@ public class VariableList {
 		dataView = Collections.unmodifiableList(data);
 	}
 
+	public void add(String name) {
+		if (data.size() >= maxSize) {
+			throw new IllegalArgumentException("maximum size is " + maxSize);
+		}
+		data.add(name);
+		fireEvent(VariableListEvent.ADD, name);
+	}
+
 	//
 	// listener methods
 	//
@@ -27,8 +35,8 @@ public class VariableList {
 		listeners.add(l);
 	}
 
-	public void removeVariableListListener(VariableListListener l) {
-		listeners.remove(l);
+	public boolean contains(String value) {
+		return data.contains(value);
 	}
 
 	private void fireEvent(int type) {
@@ -48,6 +56,14 @@ public class VariableList {
 		}
 	}
 
+	public String get(int index) {
+		return data.get(index);
+	}
+
+	public List<String> getAll() {
+		return dataView;
+	}
+
 	//
 	// data methods
 	//
@@ -55,16 +71,8 @@ public class VariableList {
 		return maxSize;
 	}
 
-	public List<String> getAll() {
-		return dataView;
-	}
-
 	public int indexOf(String name) {
 		return data.indexOf(name);
-	}
-
-	public int size() {
-		return data.size();
 	}
 
 	public boolean isEmpty() {
@@ -73,43 +81,6 @@ public class VariableList {
 
 	public boolean isFull() {
 		return data.size() >= maxSize;
-	}
-
-	public String get(int index) {
-		return data.get(index);
-	}
-
-	public boolean contains(String value) {
-		return data.contains(value);
-	}
-
-	public String[] toArray(String[] dest) {
-		return data.toArray(dest);
-	}
-
-	public void setAll(List<String> values) {
-		if (values.size() > maxSize) {
-			throw new IllegalArgumentException("maximum size is " + maxSize);
-		}
-		data.clear();
-		data.addAll(values);
-		fireEvent(VariableListEvent.ALL_REPLACED);
-	}
-
-	public void add(String name) {
-		if (data.size() >= maxSize) {
-			throw new IllegalArgumentException("maximum size is " + maxSize);
-		}
-		data.add(name);
-		fireEvent(VariableListEvent.ADD, name);
-	}
-
-	public void remove(String name) {
-		int index = data.indexOf(name);
-		if (index < 0)
-			throw new NoSuchElementException("input " + name);
-		data.remove(index);
-		fireEvent(VariableListEvent.REMOVE, name, Integer.valueOf(index));
 	}
 
 	public void move(String name, int delta) {
@@ -130,6 +101,18 @@ public class VariableList {
 		fireEvent(VariableListEvent.MOVE, name, Integer.valueOf(newIndex - index));
 	}
 
+	public void remove(String name) {
+		int index = data.indexOf(name);
+		if (index < 0)
+			throw new NoSuchElementException("input " + name);
+		data.remove(index);
+		fireEvent(VariableListEvent.REMOVE, name, Integer.valueOf(index));
+	}
+
+	public void removeVariableListListener(VariableListListener l) {
+		listeners.remove(l);
+	}
+
 	public void replace(String oldName, String newName) {
 		int index = data.indexOf(oldName);
 		if (index < 0)
@@ -138,6 +121,23 @@ public class VariableList {
 			return;
 		data.set(index, newName);
 		fireEvent(VariableListEvent.REPLACE, oldName, Integer.valueOf(index));
+	}
+
+	public void setAll(List<String> values) {
+		if (values.size() > maxSize) {
+			throw new IllegalArgumentException("maximum size is " + maxSize);
+		}
+		data.clear();
+		data.addAll(values);
+		fireEvent(VariableListEvent.ALL_REPLACED);
+	}
+
+	public int size() {
+		return data.size();
+	}
+
+	public String[] toArray(String[] dest) {
+		return data.toArray(dest);
 	}
 
 }

@@ -34,7 +34,302 @@ import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
 public class SelectionActions {
-	private SelectionActions() {
+	private static class Copy extends Action {
+		private Selection sel;
+		private Clipboard oldClip;
+
+		Copy(Selection sel) {
+			this.sel = sel;
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			oldClip = Clipboard.get();
+			Clipboard.set(sel, sel.getAttributeSet());
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("copySelectionAction");
+		}
+
+		@Override
+		public boolean isModification() {
+			return false;
+		}
+
+		@Override
+		public void undo(Project proj) {
+			Clipboard.set(oldClip);
+		}
+	}
+
+	private static class Cut extends Action {
+		private Action first;
+		private Action second;
+
+		Cut(Selection sel) {
+			first = new Copy(sel);
+			second = new Delete(sel);
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			first.doIt(proj);
+			second.doIt(proj);
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("cutSelectionAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			second.undo(proj);
+			first.undo(proj);
+		}
+	}
+
+	private static class Delete extends Action {
+		private Selection sel;
+		private CircuitTransaction xnReverse;
+
+		Delete(Selection sel) {
+			this.sel = sel;
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			Circuit circuit = proj.getCurrentCircuit();
+			CircuitMutation xn = new CircuitMutation(circuit);
+			sel.deleteAllHelper(xn);
+			CircuitTransactionResult result = xn.execute();
+			xnReverse = result.getReverseTransaction();
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("deleteSelectionAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			xnReverse.execute();
+		}
+	}
+
+	private static class Drop extends Action {
+		private Selection sel;
+		private Component[] drops;
+		private int numDrops;
+		private SelectionSave before;
+		private CircuitTransaction xnReverse;
+
+		Drop(Selection sel, Collection<Component> toDrop, int numDrops) {
+			this.sel = sel;
+			this.drops = new Component[toDrop.size()];
+			toDrop.toArray(this.drops);
+			this.numDrops = numDrops;
+			this.before = SelectionSave.create(sel);
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			Circuit circuit = proj.getCurrentCircuit();
+			CircuitMutation xn = new CircuitMutation(circuit);
+			for (Component comp : drops) {
+				sel.remove(xn, comp);
+			}
+			CircuitTransactionResult result = xn.execute();
+			xnReverse = result.getReverseTransaction();
+		}
+
+		@Override
+		public String getName() {
+			return numDrops == 1 ? Strings.get("dropComponentAction") : Strings.get("dropComponentsAction");
+		}
+
+		@Override
+		public boolean shouldAppendTo(Action other) {
+			Action last;
+			if (other instanceof JoinedAction)
+				last = ((JoinedAction) other).getLastAction();
+			else
+				last = other;
+
+			SelectionSave otherAfter = null;
+			if (last instanceof Paste) {
+				otherAfter = ((Paste) last).after;
+			} else if (last instanceof Duplicate) {
+				otherAfter = ((Duplicate) last).after;
+			}
+			return otherAfter != null && otherAfter.equals(this.before);
+		}
+
+		@Override
+		public void undo(Project proj) {
+			xnReverse.execute();
+		}
+	}
+
+	private static class Duplicate extends Action {
+		private Selection sel;
+		private CircuitTransaction xnReverse;
+		private SelectionSave after;
+
+		Duplicate(Selection sel) {
+			this.sel = sel;
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			Circuit circuit = proj.getCurrentCircuit();
+			CircuitMutation xn = new CircuitMutation(circuit);
+			sel.duplicateHelper(xn);
+
+			CircuitTransactionResult result = xn.execute();
+			xnReverse = result.getReverseTransaction();
+			after = SelectionSave.create(sel);
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("duplicateSelectionAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			xnReverse.execute();
+		}
+	}
+
+	private static class Paste extends Action {
+		private Selection sel;
+		private CircuitTransaction xnReverse;
+		private SelectionSave after;
+		private HashMap<Component, Component> componentReplacements;
+
+		Paste(Selection sel, HashMap<Component, Component> replacements) {
+			this.sel = sel;
+			this.componentReplacements = replacements;
+		}
+
+		private Collection<Component> computeAdditions(Collection<Component> comps) {
+			HashMap<Component, Component> replMap = componentReplacements;
+			ArrayList<Component> toAdd = new ArrayList<Component>(comps.size());
+			for (Iterator<Component> it = comps.iterator(); it.hasNext();) {
+				Component comp = it.next();
+				if (replMap.containsKey(comp)) {
+					Component repl = replMap.get(comp);
+					if (repl != null) {
+						toAdd.add(repl);
+					}
+				} else {
+					toAdd.add(comp);
+				}
+			}
+			return toAdd;
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			Clipboard clip = Clipboard.get();
+			Circuit circuit = proj.getCurrentCircuit();
+			CircuitMutation xn = new CircuitMutation(circuit);
+			Collection<Component> comps = clip.getComponents();
+			Collection<Component> toAdd = computeAdditions(comps);
+			if (toAdd.size() > 0) {
+				sel.pasteHelper(xn, toAdd);
+				CircuitTransactionResult result = xn.execute();
+				xnReverse = result.getReverseTransaction();
+				after = SelectionSave.create(sel);
+			} else {
+				xnReverse = null;
+			}
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("pasteClipboardAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			if (xnReverse != null) {
+				xnReverse.execute();
+			}
+		}
+	}
+
+	private static class Translate extends Action {
+		private Selection sel;
+		private int dx;
+		private int dy;
+		private ReplacementMap replacements;
+		private SelectionSave before;
+		private CircuitTransaction xnReverse;
+
+		Translate(Selection sel, int dx, int dy, ReplacementMap replacements) {
+			this.sel = sel;
+			this.dx = dx;
+			this.dy = dy;
+			this.replacements = replacements;
+			this.before = SelectionSave.create(sel);
+		}
+
+		@Override
+		public void doIt(Project proj) {
+			Circuit circuit = proj.getCurrentCircuit();
+			CircuitMutation xn = new CircuitMutation(circuit);
+
+			sel.translateHelper(xn, dx, dy);
+			if (replacements != null) {
+				xn.replace(replacements);
+			}
+
+			CircuitTransactionResult result = xn.execute();
+			xnReverse = result.getReverseTransaction();
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("moveSelectionAction");
+		}
+
+		@Override
+		public boolean shouldAppendTo(Action other) {
+			Action last;
+			if (other instanceof JoinedAction)
+				last = ((JoinedAction) other).getLastAction();
+			else
+				last = other;
+
+			SelectionSave otherAfter = null;
+			if (last instanceof Paste) {
+				otherAfter = ((Paste) last).after;
+			} else if (last instanceof Duplicate) {
+				otherAfter = ((Duplicate) last).after;
+			}
+			return otherAfter != null && otherAfter.equals(this.before);
+		}
+
+		@Override
+		public void undo(Project proj) {
+			xnReverse.execute();
+		}
+	}
+
+	public static Action clear(Selection sel) {
+		return new Delete(sel);
+	}
+
+	public static Action copy(Selection sel) {
+		return new Copy(sel);
+	}
+
+	public static Action cut(Selection sel) {
+		return new Cut(sel);
 	}
 
 	public static Action drop(Selection sel, Collection<Component> comps) {
@@ -65,199 +360,31 @@ public class SelectionActions {
 		return drop(sel, sel.getComponents());
 	}
 
-	public static Action clear(Selection sel) {
-		return new Delete(sel);
-	}
-
 	public static Action duplicate(Selection sel) {
 		return new Duplicate(sel);
 	}
 
-	public static Action cut(Selection sel) {
-		return new Cut(sel);
-	}
-
-	public static Action copy(Selection sel) {
-		return new Copy(sel);
-	}
-
-	public static Action pasteMaybe(Project proj, Selection sel) {
-		HashMap<Component, Component> replacements = getReplacementMap(proj);
-		return new Paste(sel, replacements);
-	}
-
-	public static Action translate(Selection sel, int dx, int dy, ReplacementMap repl) {
-		return new Translate(sel, dx, dy, repl);
-	}
-
-	private static class Drop extends Action {
-		private Selection sel;
-		private Component[] drops;
-		private int numDrops;
-		private SelectionSave before;
-		private CircuitTransaction xnReverse;
-
-		Drop(Selection sel, Collection<Component> toDrop, int numDrops) {
-			this.sel = sel;
-			this.drops = new Component[toDrop.size()];
-			toDrop.toArray(this.drops);
-			this.numDrops = numDrops;
-			this.before = SelectionSave.create(sel);
-		}
-
-		@Override
-		public String getName() {
-			return numDrops == 1 ? Strings.get("dropComponentAction") : Strings.get("dropComponentsAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			Circuit circuit = proj.getCurrentCircuit();
-			CircuitMutation xn = new CircuitMutation(circuit);
-			for (Component comp : drops) {
-				sel.remove(xn, comp);
+	private static ComponentFactory findComponentFactory(ComponentFactory factory, ArrayList<Library> libs,
+			boolean acceptNameMatch) {
+		String name = factory.getName();
+		for (Library lib : libs) {
+			for (Tool tool : lib.getTools()) {
+				if (tool instanceof AddTool) {
+					AddTool addTool = (AddTool) tool;
+					if (name.equals(addTool.getName())) {
+						ComponentFactory fact = addTool.getFactory(true);
+						if (acceptNameMatch) {
+							return fact;
+						} else if (fact == factory) {
+							return fact;
+						} else if (fact.getClass() == factory.getClass() && !(fact instanceof SubcircuitFactory)) {
+							return fact;
+						}
+					}
+				}
 			}
-			CircuitTransactionResult result = xn.execute();
-			xnReverse = result.getReverseTransaction();
 		}
-
-		@Override
-		public void undo(Project proj) {
-			xnReverse.execute();
-		}
-
-		@Override
-		public boolean shouldAppendTo(Action other) {
-			Action last;
-			if (other instanceof JoinedAction)
-				last = ((JoinedAction) other).getLastAction();
-			else
-				last = other;
-
-			SelectionSave otherAfter = null;
-			if (last instanceof Paste) {
-				otherAfter = ((Paste) last).after;
-			} else if (last instanceof Duplicate) {
-				otherAfter = ((Duplicate) last).after;
-			}
-			return otherAfter != null && otherAfter.equals(this.before);
-		}
-	}
-
-	private static class Delete extends Action {
-		private Selection sel;
-		private CircuitTransaction xnReverse;
-
-		Delete(Selection sel) {
-			this.sel = sel;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("deleteSelectionAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			Circuit circuit = proj.getCurrentCircuit();
-			CircuitMutation xn = new CircuitMutation(circuit);
-			sel.deleteAllHelper(xn);
-			CircuitTransactionResult result = xn.execute();
-			xnReverse = result.getReverseTransaction();
-		}
-
-		@Override
-		public void undo(Project proj) {
-			xnReverse.execute();
-		}
-	}
-
-	private static class Duplicate extends Action {
-		private Selection sel;
-		private CircuitTransaction xnReverse;
-		private SelectionSave after;
-
-		Duplicate(Selection sel) {
-			this.sel = sel;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("duplicateSelectionAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			Circuit circuit = proj.getCurrentCircuit();
-			CircuitMutation xn = new CircuitMutation(circuit);
-			sel.duplicateHelper(xn);
-
-			CircuitTransactionResult result = xn.execute();
-			xnReverse = result.getReverseTransaction();
-			after = SelectionSave.create(sel);
-		}
-
-		@Override
-		public void undo(Project proj) {
-			xnReverse.execute();
-		}
-	}
-
-	private static class Cut extends Action {
-		private Action first;
-		private Action second;
-
-		Cut(Selection sel) {
-			first = new Copy(sel);
-			second = new Delete(sel);
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("cutSelectionAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			first.doIt(proj);
-			second.doIt(proj);
-		}
-
-		@Override
-		public void undo(Project proj) {
-			second.undo(proj);
-			first.undo(proj);
-		}
-	}
-
-	private static class Copy extends Action {
-		private Selection sel;
-		private Clipboard oldClip;
-
-		Copy(Selection sel) {
-			this.sel = sel;
-		}
-
-		@Override
-		public boolean isModification() {
-			return false;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("copySelectionAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			oldClip = Clipboard.get();
-			Clipboard.set(sel, sel.getAttributeSet());
-		}
-
-		@Override
-		public void undo(Project proj) {
-			Clipboard.set(oldClip);
-		}
+		return null;
 	}
 
 	private static HashMap<Component, Component> getReplacementMap(Project proj) {
@@ -353,142 +480,15 @@ public class SelectionActions {
 		return replMap;
 	}
 
-	private static ComponentFactory findComponentFactory(ComponentFactory factory, ArrayList<Library> libs,
-			boolean acceptNameMatch) {
-		String name = factory.getName();
-		for (Library lib : libs) {
-			for (Tool tool : lib.getTools()) {
-				if (tool instanceof AddTool) {
-					AddTool addTool = (AddTool) tool;
-					if (name.equals(addTool.getName())) {
-						ComponentFactory fact = addTool.getFactory(true);
-						if (acceptNameMatch) {
-							return fact;
-						} else if (fact == factory) {
-							return fact;
-						} else if (fact.getClass() == factory.getClass() && !(fact instanceof SubcircuitFactory)) {
-							return fact;
-						}
-					}
-				}
-			}
-		}
-		return null;
+	public static Action pasteMaybe(Project proj, Selection sel) {
+		HashMap<Component, Component> replacements = getReplacementMap(proj);
+		return new Paste(sel, replacements);
 	}
 
-	private static class Paste extends Action {
-		private Selection sel;
-		private CircuitTransaction xnReverse;
-		private SelectionSave after;
-		private HashMap<Component, Component> componentReplacements;
-
-		Paste(Selection sel, HashMap<Component, Component> replacements) {
-			this.sel = sel;
-			this.componentReplacements = replacements;
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("pasteClipboardAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			Clipboard clip = Clipboard.get();
-			Circuit circuit = proj.getCurrentCircuit();
-			CircuitMutation xn = new CircuitMutation(circuit);
-			Collection<Component> comps = clip.getComponents();
-			Collection<Component> toAdd = computeAdditions(comps);
-			if (toAdd.size() > 0) {
-				sel.pasteHelper(xn, toAdd);
-				CircuitTransactionResult result = xn.execute();
-				xnReverse = result.getReverseTransaction();
-				after = SelectionSave.create(sel);
-			} else {
-				xnReverse = null;
-			}
-		}
-
-		private Collection<Component> computeAdditions(Collection<Component> comps) {
-			HashMap<Component, Component> replMap = componentReplacements;
-			ArrayList<Component> toAdd = new ArrayList<Component>(comps.size());
-			for (Iterator<Component> it = comps.iterator(); it.hasNext();) {
-				Component comp = it.next();
-				if (replMap.containsKey(comp)) {
-					Component repl = replMap.get(comp);
-					if (repl != null) {
-						toAdd.add(repl);
-					}
-				} else {
-					toAdd.add(comp);
-				}
-			}
-			return toAdd;
-		}
-
-		@Override
-		public void undo(Project proj) {
-			if (xnReverse != null) {
-				xnReverse.execute();
-			}
-		}
+	public static Action translate(Selection sel, int dx, int dy, ReplacementMap repl) {
+		return new Translate(sel, dx, dy, repl);
 	}
 
-	private static class Translate extends Action {
-		private Selection sel;
-		private int dx;
-		private int dy;
-		private ReplacementMap replacements;
-		private SelectionSave before;
-		private CircuitTransaction xnReverse;
-
-		Translate(Selection sel, int dx, int dy, ReplacementMap replacements) {
-			this.sel = sel;
-			this.dx = dx;
-			this.dy = dy;
-			this.replacements = replacements;
-			this.before = SelectionSave.create(sel);
-		}
-
-		@Override
-		public String getName() {
-			return Strings.get("moveSelectionAction");
-		}
-
-		@Override
-		public void doIt(Project proj) {
-			Circuit circuit = proj.getCurrentCircuit();
-			CircuitMutation xn = new CircuitMutation(circuit);
-
-			sel.translateHelper(xn, dx, dy);
-			if (replacements != null) {
-				xn.replace(replacements);
-			}
-
-			CircuitTransactionResult result = xn.execute();
-			xnReverse = result.getReverseTransaction();
-		}
-
-		@Override
-		public void undo(Project proj) {
-			xnReverse.execute();
-		}
-
-		@Override
-		public boolean shouldAppendTo(Action other) {
-			Action last;
-			if (other instanceof JoinedAction)
-				last = ((JoinedAction) other).getLastAction();
-			else
-				last = other;
-
-			SelectionSave otherAfter = null;
-			if (last instanceof Paste) {
-				otherAfter = ((Paste) last).after;
-			} else if (last instanceof Duplicate) {
-				otherAfter = ((Duplicate) last).after;
-			}
-			return otherAfter != null && otherAfter.equals(this.before);
-		}
+	private SelectionActions() {
 	}
 }

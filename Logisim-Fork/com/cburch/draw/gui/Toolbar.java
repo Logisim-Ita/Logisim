@@ -20,14 +20,6 @@ import com.cburch.draw.tools.DrawingAttributeSet;
 import com.cburch.logisim.util.GraphicsUtil;
 
 class Toolbar extends JComponent {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 64497387805434962L;
-	private static int ICON_WIDTH = 16;
-	private static int ICON_HEIGHT = 16;
-	private static int ICON_SEP = 4;
-
 	private class Listener implements MouseListener, MouseMotionListener {
 		private AbstractTool toolPressed;
 		private boolean inTool;
@@ -39,11 +31,30 @@ class Toolbar extends JComponent {
 		}
 
 		@Override
+		public void mouseDragged(MouseEvent e) {
+			int mx = e.getX();
+			int my = e.getY();
+			int x0 = toolX;
+			int y0 = toolY;
+
+			boolean was = inTool;
+			boolean now = toolPressed != null && mx >= x0 && mx < x0 + ICON_WIDTH && my >= y0 && my < y0 + ICON_HEIGHT;
+			if (was != now) {
+				inTool = now;
+				repaint();
+			}
+		}
+
+		@Override
 		public void mouseEntered(MouseEvent e) {
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
 		}
 
 		@Override
@@ -79,26 +90,15 @@ class Toolbar extends JComponent {
 			inTool = false;
 		}
 
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			int mx = e.getX();
-			int my = e.getY();
-			int x0 = toolX;
-			int y0 = toolY;
-
-			boolean was = inTool;
-			boolean now = toolPressed != null && mx >= x0 && mx < x0 + ICON_WIDTH && my >= y0 && my < y0 + ICON_HEIGHT;
-			if (was != now) {
-				inTool = now;
-				repaint();
-			}
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-		}
-
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 64497387805434962L;
+	private static int ICON_WIDTH = 16;
+	private static int ICON_HEIGHT = 16;
+
+	private static int ICON_SEP = 4;
 
 	private Canvas canvas;
 	private AbstractTool[][] tools;

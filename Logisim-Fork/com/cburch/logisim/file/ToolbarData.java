@@ -29,15 +29,34 @@ public class ToolbarData {
 		contents = new ArrayList<Tool>();
 	}
 
-	//
-	// listener methods
-	//
-	public void addToolbarListener(ToolbarListener l) {
-		listeners.add(l);
+	private void addAttributeListeners(Tool tool) {
+		for (AttributeListener l : toolListeners) {
+			AttributeSet attrs = tool.getAttributeSet();
+			if (attrs != null)
+				attrs.addAttributeListener(l);
+		}
 	}
 
-	public void removeToolbarListener(ToolbarListener l) {
-		listeners.remove(l);
+	public void addSeparator() {
+		contents.add(null);
+		fireToolbarChanged();
+	}
+
+	public void addSeparator(int pos) {
+		contents.add(pos, null);
+		fireToolbarChanged();
+	}
+
+	public void addTool(int pos, Tool tool) {
+		contents.add(pos, tool);
+		addAttributeListeners(tool);
+		fireToolbarChanged();
+	}
+
+	public void addTool(Tool tool) {
+		contents.add(tool);
+		addAttributeListeners(tool);
+		fireToolbarChanged();
 	}
 
 	public void addToolAttributeListener(AttributeListener l) {
@@ -51,60 +70,11 @@ public class ToolbarData {
 		toolListeners.add(l);
 	}
 
-	public void removeToolAttributeListener(AttributeListener l) {
-		for (Tool tool : contents) {
-			if (tool != null) {
-				AttributeSet attrs = tool.getAttributeSet();
-				if (attrs != null)
-					attrs.removeAttributeListener(l);
-			}
-		}
-		toolListeners.remove(l);
-	}
-
-	private void addAttributeListeners(Tool tool) {
-		for (AttributeListener l : toolListeners) {
-			AttributeSet attrs = tool.getAttributeSet();
-			if (attrs != null)
-				attrs.addAttributeListener(l);
-		}
-	}
-
-	private void removeAttributeListeners(Tool tool) {
-		for (AttributeListener l : toolListeners) {
-			AttributeSet attrs = tool.getAttributeSet();
-			if (attrs != null)
-				attrs.removeAttributeListener(l);
-		}
-	}
-
-	public void fireToolbarChanged() {
-		for (ToolbarListener l : listeners) {
-			l.toolbarChanged();
-		}
-	}
-
 	//
-	// query methods
+	// listener methods
 	//
-	public List<Tool> getContents() {
-		return contents;
-	}
-
-	public Tool getFirstTool() {
-		for (Tool tool : contents) {
-			if (tool != null)
-				return tool;
-		}
-		return null;
-	}
-
-	public int size() {
-		return contents.size();
-	}
-
-	public Object get(int index) {
-		return contents.get(index);
+	public void addToolbarListener(ToolbarListener l) {
+		listeners.add(l);
 	}
 
 	//
@@ -135,26 +105,29 @@ public class ToolbarData {
 		fireToolbarChanged();
 	}
 
-	public void addSeparator() {
-		contents.add(null);
-		fireToolbarChanged();
+	public void fireToolbarChanged() {
+		for (ToolbarListener l : listeners) {
+			l.toolbarChanged();
+		}
 	}
 
-	public void addTool(Tool tool) {
-		contents.add(tool);
-		addAttributeListeners(tool);
-		fireToolbarChanged();
+	public Object get(int index) {
+		return contents.get(index);
 	}
 
-	public void addTool(int pos, Tool tool) {
-		contents.add(pos, tool);
-		addAttributeListeners(tool);
-		fireToolbarChanged();
+	//
+	// query methods
+	//
+	public List<Tool> getContents() {
+		return contents;
 	}
 
-	public void addSeparator(int pos) {
-		contents.add(pos, null);
-		fireToolbarChanged();
+	public Tool getFirstTool() {
+		for (Tool tool : contents) {
+			if (tool != null)
+				return tool;
+		}
+		return null;
 	}
 
 	public Object move(int from, int to) {
@@ -172,12 +145,27 @@ public class ToolbarData {
 		return ret;
 	}
 
-	boolean usesToolFromSource(Tool query) {
-		for (Tool tool : contents) {
-			if (tool != null && tool.sharesSource(query))
-				return true;
+	private void removeAttributeListeners(Tool tool) {
+		for (AttributeListener l : toolListeners) {
+			AttributeSet attrs = tool.getAttributeSet();
+			if (attrs != null)
+				attrs.removeAttributeListener(l);
 		}
-		return false;
+	}
+
+	public void removeToolAttributeListener(AttributeListener l) {
+		for (Tool tool : contents) {
+			if (tool != null) {
+				AttributeSet attrs = tool.getAttributeSet();
+				if (attrs != null)
+					attrs.removeAttributeListener(l);
+			}
+		}
+		toolListeners.remove(l);
+	}
+
+	public void removeToolbarListener(ToolbarListener l) {
+		listeners.remove(l);
 	}
 
 	//
@@ -203,5 +191,17 @@ public class ToolbarData {
 		}
 		if (changed)
 			fireToolbarChanged();
+	}
+
+	public int size() {
+		return contents.size();
+	}
+
+	boolean usesToolFromSource(Tool query) {
+		for (Tool tool : contents) {
+			if (tool != null && tool.sharesSource(query))
+				return true;
+		}
+		return false;
 	}
 }

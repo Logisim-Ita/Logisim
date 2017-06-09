@@ -31,11 +31,6 @@ public class BasicZoomModel implements ZoomModel {
 	}
 
 	@Override
-	public void removePropertyChangeListener(String prop, PropertyChangeListener l) {
-		support.removePropertyChangeListener(prop, l);
-	}
-
-	@Override
 	public boolean getShowGrid() {
 		return showGrid;
 	}
@@ -48,6 +43,11 @@ public class BasicZoomModel implements ZoomModel {
 	@Override
 	public double[] getZoomOptions() {
 		return zoomOptions;
+	}
+
+	@Override
+	public void removePropertyChangeListener(String prop, PropertyChangeListener l) {
+		support.removePropertyChangeListener(prop, l);
 	}
 
 	@Override

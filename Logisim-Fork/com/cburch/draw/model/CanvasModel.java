@@ -16,37 +16,37 @@ public interface CanvasModel {
 	// listener methods
 	public void addCanvasModelListener(CanvasModelListener l);
 
-	public void removeCanvasModelListener(CanvasModelListener l);
-
-	// methods that don't change any data in the model
-	public void paint(Graphics g, Selection selection);
-
-	public List<CanvasObject> getObjectsFromTop();
-
-	public List<CanvasObject> getObjectsFromBottom();
-
-	public Collection<CanvasObject> getObjectsIn(Bounds bds);
-
-	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape);
-
 	// methods that alter the model
 	public void addObjects(int index, Collection<? extends CanvasObject> shapes);
 
 	public void addObjects(Map<? extends CanvasObject, Integer> shapes);
 
-	public void removeObjects(Collection<? extends CanvasObject> shapes);
+	public Handle deleteHandle(Handle handle);
 
-	public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy);
+	public List<CanvasObject> getObjectsFromBottom();
 
-	public void reorderObjects(List<ReorderRequest> requests);
+	public List<CanvasObject> getObjectsFromTop();
 
-	public Handle moveHandle(HandleGesture gesture);
+	public Collection<CanvasObject> getObjectsIn(Bounds bds);
+
+	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject shape);
 
 	public void insertHandle(Handle desired, Handle previous);
 
-	public Handle deleteHandle(Handle handle);
+	public Handle moveHandle(HandleGesture gesture);
+
+	// methods that don't change any data in the model
+	public void paint(Graphics g, Selection selection);
+
+	public void removeCanvasModelListener(CanvasModelListener l);
+
+	public void removeObjects(Collection<? extends CanvasObject> shapes);
+
+	public void reorderObjects(List<ReorderRequest> requests);
 
 	public void setAttributeValues(Map<AttributeMapKey, Object> values);
 
 	public void setText(Text text, String value);
+
+	public void translateObjects(Collection<? extends CanvasObject> shapes, int dx, int dy);
 }

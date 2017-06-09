@@ -86,26 +86,6 @@ class MenuFile extends Menu implements ActionListener {
 		quit.addActionListener(this);
 	}
 
-	public void localeChanged() {
-		this.setText(Strings.get("fileMenu"));
-		newi.setText(Strings.get("fileNewItem"));
-		open.setText(Strings.get("fileOpenItem"));
-		openRecent.localeChanged();
-		close.setText(Strings.get("fileCloseItem"));
-		save.setText(Strings.get("fileSaveItem"));
-		saveAs.setText(Strings.get("fileSaveAsItem"));
-		exportImage.setText(Strings.get("fileExportImageItem"));
-		print.setText(Strings.get("filePrintItem"));
-		prefs.setText(Strings.get("filePreferencesItem"));
-		quit.setText(Strings.get("fileQuitItem"));
-	}
-
-	@Override
-	void computeEnabled() {
-		setEnabled(true);
-		menubar.fireEnableChanged();
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
@@ -131,5 +111,25 @@ class MenuFile extends Menu implements ActionListener {
 		} else if (src == quit) {
 			ProjectActions.doQuit();
 		}
+	}
+
+	@Override
+	void computeEnabled() {
+		setEnabled(true);
+		menubar.fireEnableChanged();
+	}
+
+	public void localeChanged() {
+		this.setText(Strings.get("fileMenu"));
+		newi.setText(Strings.get("fileNewItem"));
+		open.setText(Strings.get("fileOpenItem"));
+		openRecent.localeChanged();
+		close.setText(Strings.get("fileCloseItem"));
+		save.setText(Strings.get("fileSaveItem"));
+		saveAs.setText(Strings.get("fileSaveAsItem"));
+		exportImage.setText(Strings.get("fileExportImageItem"));
+		print.setText(Strings.get("filePrintItem"));
+		prefs.setText(Strings.get("filePreferencesItem"));
+		quit.setText(Strings.get("fileQuitItem"));
 	}
 }

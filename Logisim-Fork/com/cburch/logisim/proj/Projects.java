@@ -21,33 +21,10 @@ import com.cburch.logisim.util.MacCompatibility;
 import com.cburch.logisim.util.PropertyChangeWeakSupport;
 
 public class Projects {
-	public static final String projectListProperty = "projectList";
-
-	private static final WeakHashMap<Window, Point> frameLocations = new WeakHashMap<Window, Point>();
-
-	private static void projectRemoved(Project proj, Frame frame, MyListener listener) {
-		frame.removeWindowListener(listener);
-		openProjects.remove(proj);
-		proj.getSimulator().shutDown();
-		propertySupport.firePropertyChange(projectListProperty, null, null);
-	}
-
 	private static class MyListener extends WindowAdapter {
 		@Override
 		public void windowActivated(WindowEvent event) {
 			mostRecentFrame = (Frame) event.getSource();
-		}
-
-		@Override
-		public void windowClosing(WindowEvent event) {
-			Frame frame = (Frame) event.getSource();
-			if ((frame.getExtendedState() & java.awt.Frame.ICONIFIED) == 0) {
-				mostRecentFrame = frame;
-				try {
-					frameLocations.put(frame, frame.getLocationOnScreen());
-				} catch (Throwable t) {
-				}
-			}
 		}
 
 		@Override
@@ -64,6 +41,18 @@ public class Projects {
 		}
 
 		@Override
+		public void windowClosing(WindowEvent event) {
+			Frame frame = (Frame) event.getSource();
+			if ((frame.getExtendedState() & java.awt.Frame.ICONIFIED) == 0) {
+				mostRecentFrame = frame;
+				try {
+					frameLocations.put(frame, frame.getLocationOnScreen());
+				} catch (Throwable t) {
+				}
+			}
+		}
+
+		@Override
 		public void windowOpened(WindowEvent event) {
 			Frame frame = (Frame) event.getSource();
 			Project proj = frame.getProject();
@@ -75,12 +64,45 @@ public class Projects {
 		}
 	}
 
+	public static final String projectListProperty = "projectList";
+
+	private static final WeakHashMap<Window, Point> frameLocations = new WeakHashMap<Window, Point>();
+
 	private static final MyListener myListener = new MyListener();
+
 	private static final PropertyChangeWeakSupport propertySupport = new PropertyChangeWeakSupport(Projects.class);
 	private static ArrayList<Project> openProjects = new ArrayList<Project>();
 	private static Frame mostRecentFrame = null;
+	//
+	// PropertyChangeSource methods
+	//
+	public static void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertySupport.addPropertyChangeListener(listener);
+	}
 
-	private Projects() {
+	public static void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+		propertySupport.addPropertyChangeListener(propertyName, listener);
+	}
+
+	public static Project findProjectFor(File query) {
+		for (Project proj : openProjects) {
+			Loader loader = proj.getLogisimFile().getLoader();
+			if (loader == null)
+				continue;
+			File f = loader.getMainFile();
+			if (query.equals(f))
+				return proj;
+		}
+		return null;
+	}
+
+	public static Point getLocation(Window win) {
+		Point ret = frameLocations.get(win);
+		return ret == null ? null : (Point) ret.clone();
+	}
+
+	public static List<Project> getOpenProjects() {
+		return Collections.unmodifiableList(openProjects);
 	}
 
 	public static Frame getTopFrame() {
@@ -99,6 +121,21 @@ public class Projects {
 				ret = backup;
 		}
 		return ret;
+	}
+
+	private static void projectRemoved(Project proj, Frame frame, MyListener listener) {
+		frame.removeWindowListener(listener);
+		openProjects.remove(proj);
+		proj.getSimulator().shutDown();
+		propertySupport.firePropertyChange(projectListProperty, null, null);
+	}
+
+	public static void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertySupport.removePropertyChangeListener(listener);
+	}
+
+	public static void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+		propertySupport.removePropertyChangeListener(propertyName, listener);
 	}
 
 	static void windowCreated(Project proj, Frame oldFrame, Frame frame) {
@@ -137,10 +174,6 @@ public class Projects {
 		frame.addWindowListener(myListener);
 	}
 
-	public static List<Project> getOpenProjects() {
-		return Collections.unmodifiableList(openProjects);
-	}
-
 	public static boolean windowNamed(String name) {
 		for (Project proj : openProjects) {
 			if (proj.getLogisimFile().getName().equals(name))
@@ -149,39 +182,6 @@ public class Projects {
 		return false;
 	}
 
-	public static Project findProjectFor(File query) {
-		for (Project proj : openProjects) {
-			Loader loader = proj.getLogisimFile().getLoader();
-			if (loader == null)
-				continue;
-			File f = loader.getMainFile();
-			if (query.equals(f))
-				return proj;
-		}
-		return null;
-	}
-
-	//
-	// PropertyChangeSource methods
-	//
-	public static void addPropertyChangeListener(PropertyChangeListener listener) {
-		propertySupport.addPropertyChangeListener(listener);
-	}
-
-	public static void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-		propertySupport.addPropertyChangeListener(propertyName, listener);
-	}
-
-	public static void removePropertyChangeListener(PropertyChangeListener listener) {
-		propertySupport.removePropertyChangeListener(listener);
-	}
-
-	public static void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-		propertySupport.removePropertyChangeListener(propertyName, listener);
-	}
-
-	public static Point getLocation(Window win) {
-		Point ret = frameLocations.get(win);
-		return ret == null ? null : (Point) ret.clone();
+	private Projects() {
 	}
 }

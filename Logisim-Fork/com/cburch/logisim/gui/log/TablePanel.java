@@ -19,19 +19,20 @@ import com.cburch.logisim.data.Value;
 import com.cburch.logisim.util.GraphicsUtil;
 
 class TablePanel extends LogPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4651623644637992336L;
-	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
-	private static final int COLUMN_SEP = 8;
-	private static final int HEADER_SEP = 4;
-
 	private class MyListener implements ModelListener {
-		@Override
-		public void selectionChanged(ModelEvent event) {
-			computeRowCount();
+		private void computeRowCount() {
+			Model model = getModel();
+			Selection sel = model.getSelection();
+			int rows = 0;
+			for (int i = sel.size() - 1; i >= 0; i--) {
+				int x = model.getValueLog(sel.get(i)).size();
+				if (x > rows)
+					rows = x;
+			}
+			if (rowCount != rows) {
+				rowCount = rows;
+				computePreferredSize();
+			}
 		}
 
 		@Override
@@ -52,22 +53,11 @@ class TablePanel extends LogPanel {
 		public void filePropertyChanged(ModelEvent event) {
 		}
 
-		private void computeRowCount() {
-			Model model = getModel();
-			Selection sel = model.getSelection();
-			int rows = 0;
-			for (int i = sel.size() - 1; i >= 0; i--) {
-				int x = model.getValueLog(sel.get(i)).size();
-				if (x > rows)
-					rows = x;
-			}
-			if (rowCount != rows) {
-				rowCount = rows;
-				computePreferredSize();
-			}
+		@Override
+		public void selectionChanged(ModelEvent event) {
+			computeRowCount();
 		}
 	}
-
 	private class VerticalScrollBar extends JScrollBar implements ChangeListener {
 		/**
 		 * 
@@ -78,16 +68,6 @@ class TablePanel extends LogPanel {
 
 		public VerticalScrollBar() {
 			getModel().addChangeListener(this);
-		}
-
-		@Override
-		public int getUnitIncrement(int direction) {
-			int curY = getValue();
-			if (direction > 0) {
-				return curY > 0 ? cellHeight : cellHeight + HEADER_SEP;
-			} else {
-				return curY > cellHeight + HEADER_SEP ? cellHeight : cellHeight + HEADER_SEP;
-			}
 		}
 
 		@Override
@@ -105,6 +85,16 @@ class TablePanel extends LogPanel {
 		}
 
 		@Override
+		public int getUnitIncrement(int direction) {
+			int curY = getValue();
+			if (direction > 0) {
+				return curY > 0 ? cellHeight : cellHeight + HEADER_SEP;
+			} else {
+				return curY > cellHeight + HEADER_SEP ? cellHeight : cellHeight + HEADER_SEP;
+			}
+		}
+
+		@Override
 		public void stateChanged(ChangeEvent event) {
 			int newMaximum = getMaximum();
 			int newExtent = getVisibleAmount();
@@ -117,6 +107,16 @@ class TablePanel extends LogPanel {
 			}
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4651623644637992336L;
+	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
+	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
+
+	private static final int COLUMN_SEP = 8;
+
+	private static final int HEADER_SEP = 4;
 
 	private MyListener myListener = new MyListener();
 	private int cellWidth = 25; // reasonable start values
@@ -132,14 +132,65 @@ class TablePanel extends LogPanel {
 		modelChanged(null, getModel());
 	}
 
-	@Override
-	public String getTitle() {
-		return Strings.get("tableTab");
+	private void computePreferredSize() {
+		Model model = getModel();
+		Selection sel = model.getSelection();
+		int columns = sel.size();
+		if (columns == 0) {
+			setPreferredSize(new Dimension(0, 0));
+			return;
+		}
+
+		Graphics g = getGraphics();
+		if (g == null) {
+			cellHeight = 16;
+			cellWidth = 24;
+		} else {
+			FontMetrics fm = g.getFontMetrics(HEAD_FONT);
+			cellHeight = fm.getHeight();
+			cellWidth = 24;
+			for (int i = 0; i < columns; i++) {
+				String header = sel.get(i).toShortString();
+				cellWidth = Math.max(cellWidth, fm.stringWidth(header));
+			}
+		}
+
+		tableWidth = (cellWidth + COLUMN_SEP) * columns - COLUMN_SEP;
+		tableHeight = cellHeight * (1 + rowCount) + HEADER_SEP;
+		setPreferredSize(new Dimension(tableWidth, tableHeight));
+		revalidate();
+		repaint();
+	}
+
+	public int getColumn(MouseEvent event) {
+		int x = event.getX() - (getWidth() - tableWidth) / 2;
+		if (x < 0)
+			return -1;
+		Selection sel = getModel().getSelection();
+		int ret = (x + COLUMN_SEP / 2) / (cellWidth + COLUMN_SEP);
+		return ret >= 0 && ret < sel.size() ? ret : -1;
 	}
 
 	@Override
 	public String getHelpText() {
 		return Strings.get("tableHelp");
+	}
+
+	public int getRow(MouseEvent event) {
+		int y = event.getY() - (getHeight() - tableHeight) / 2;
+		if (y < cellHeight + HEADER_SEP)
+			return -1;
+		int ret = (y - cellHeight - HEADER_SEP) / cellHeight;
+		return ret >= 0 && ret < rowCount ? ret : -1;
+	}
+
+	@Override
+	public String getTitle() {
+		return Strings.get("tableTab");
+	}
+
+	JScrollBar getVerticalScrollBar() {
+		return vsb;
 	}
 
 	@Override
@@ -154,23 +205,6 @@ class TablePanel extends LogPanel {
 			oldModel.removeModelListener(myListener);
 		if (newModel != null)
 			newModel.addModelListener(myListener);
-	}
-
-	public int getColumn(MouseEvent event) {
-		int x = event.getX() - (getWidth() - tableWidth) / 2;
-		if (x < 0)
-			return -1;
-		Selection sel = getModel().getSelection();
-		int ret = (x + COLUMN_SEP / 2) / (cellWidth + COLUMN_SEP);
-		return ret >= 0 && ret < sel.size() ? ret : -1;
-	}
-
-	public int getRow(MouseEvent event) {
-		int y = event.getY() - (getHeight() - tableHeight) / 2;
-		if (y < cellHeight + HEADER_SEP)
-			return -1;
-		int ret = (y - cellHeight - HEADER_SEP) / cellHeight;
-		return ret >= 0 && ret < rowCount ? ret : -1;
 	}
 
 	@Override
@@ -232,39 +266,5 @@ class TablePanel extends LogPanel {
 		int width = fm.stringWidth(header);
 		g.drawString(header, x + (cellWidth - width) / 2, y);
 		return x + cellWidth + COLUMN_SEP;
-	}
-
-	private void computePreferredSize() {
-		Model model = getModel();
-		Selection sel = model.getSelection();
-		int columns = sel.size();
-		if (columns == 0) {
-			setPreferredSize(new Dimension(0, 0));
-			return;
-		}
-
-		Graphics g = getGraphics();
-		if (g == null) {
-			cellHeight = 16;
-			cellWidth = 24;
-		} else {
-			FontMetrics fm = g.getFontMetrics(HEAD_FONT);
-			cellHeight = fm.getHeight();
-			cellWidth = 24;
-			for (int i = 0; i < columns; i++) {
-				String header = sel.get(i).toShortString();
-				cellWidth = Math.max(cellWidth, fm.stringWidth(header));
-			}
-		}
-
-		tableWidth = (cellWidth + COLUMN_SEP) * columns - COLUMN_SEP;
-		tableHeight = cellHeight * (1 + rowCount) + HEADER_SEP;
-		setPreferredSize(new Dimension(tableWidth, tableHeight));
-		revalidate();
-		repaint();
-	}
-
-	JScrollBar getVerticalScrollBar() {
-		return vsb;
 	}
 }

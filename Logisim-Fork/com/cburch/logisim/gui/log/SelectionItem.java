@@ -41,85 +41,6 @@ class SelectionItem implements AttributeListener, CircuitListener {
 		comp.getAttributeSet().addAttributeListener(this);
 	}
 
-	private boolean computeDescriptors() {
-		boolean changed = false;
-
-		Loggable log = (Loggable) comp.getFeature(Loggable.class);
-		String newShort = log.getLogName(option);
-		if (newShort == null || newShort.equals("")) {
-			newShort = comp.getFactory().getDisplayName() + comp.getLocation().toString();
-			if (option != null) {
-				newShort += "." + option.toString();
-			}
-		}
-		if (!newShort.equals(shortDescriptor)) {
-			changed = true;
-			shortDescriptor = newShort;
-		}
-
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < path.length; i++) {
-			if (i > 0)
-				buf.append(".");
-			String label = path[i].getAttributeSet().getValue(StdAttr.LABEL);
-			if (label != null && !label.equals("")) {
-				buf.append(label);
-			} else {
-				buf.append(path[i].getFactory().getDisplayName());
-				buf.append(path[i].getLocation());
-			}
-			buf.append(".");
-		}
-		buf.append(shortDescriptor);
-		String newLong = buf.toString();
-		if (!newLong.equals(longDescriptor)) {
-			changed = true;
-			longDescriptor = newLong;
-		}
-
-		return changed;
-	}
-
-	public Component[] getPath() {
-		return path;
-	}
-
-	public Component getComponent() {
-		return comp;
-	}
-
-	public Object getOption() {
-		return option;
-	}
-
-	public int getRadix() {
-		return radix;
-	}
-
-	public void setRadix(int value) {
-		radix = value;
-		model.fireSelectionChanged(new ModelEvent());
-	}
-
-	public String toShortString() {
-		return shortDescriptor;
-	}
-
-	@Override
-	public String toString() {
-		return longDescriptor;
-	}
-
-	public Value fetchValue(CircuitState root) {
-		CircuitState cur = root;
-		for (int i = 0; i < path.length; i++) {
-			SubcircuitFactory circFact = (SubcircuitFactory) path[i].getFactory();
-			cur = circFact.getSubstate(cur, path[i]);
-		}
-		Loggable log = (Loggable) comp.getFeature(Loggable.class);
-		return log == null ? Value.NIL : log.getLogValue(cur, option);
-	}
-
 	@Override
 	public void attributeListChanged(AttributeEvent e) {
 	}
@@ -159,5 +80,84 @@ class SelectionItem implements AttributeListener, CircuitListener {
 				return;
 			model.getSelection().remove(index);
 		}
+	}
+
+	private boolean computeDescriptors() {
+		boolean changed = false;
+
+		Loggable log = (Loggable) comp.getFeature(Loggable.class);
+		String newShort = log.getLogName(option);
+		if (newShort == null || newShort.equals("")) {
+			newShort = comp.getFactory().getDisplayName() + comp.getLocation().toString();
+			if (option != null) {
+				newShort += "." + option.toString();
+			}
+		}
+		if (!newShort.equals(shortDescriptor)) {
+			changed = true;
+			shortDescriptor = newShort;
+		}
+
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < path.length; i++) {
+			if (i > 0)
+				buf.append(".");
+			String label = path[i].getAttributeSet().getValue(StdAttr.LABEL);
+			if (label != null && !label.equals("")) {
+				buf.append(label);
+			} else {
+				buf.append(path[i].getFactory().getDisplayName());
+				buf.append(path[i].getLocation());
+			}
+			buf.append(".");
+		}
+		buf.append(shortDescriptor);
+		String newLong = buf.toString();
+		if (!newLong.equals(longDescriptor)) {
+			changed = true;
+			longDescriptor = newLong;
+		}
+
+		return changed;
+	}
+
+	public Value fetchValue(CircuitState root) {
+		CircuitState cur = root;
+		for (int i = 0; i < path.length; i++) {
+			SubcircuitFactory circFact = (SubcircuitFactory) path[i].getFactory();
+			cur = circFact.getSubstate(cur, path[i]);
+		}
+		Loggable log = (Loggable) comp.getFeature(Loggable.class);
+		return log == null ? Value.NIL : log.getLogValue(cur, option);
+	}
+
+	public Component getComponent() {
+		return comp;
+	}
+
+	public Object getOption() {
+		return option;
+	}
+
+	public Component[] getPath() {
+		return path;
+	}
+
+	public int getRadix() {
+		return radix;
+	}
+
+	public void setRadix(int value) {
+		radix = value;
+		model.fireSelectionChanged(new ModelEvent());
+	}
+
+	public String toShortString() {
+		return shortDescriptor;
+	}
+
+	@Override
+	public String toString() {
+		return longDescriptor;
 	}
 }

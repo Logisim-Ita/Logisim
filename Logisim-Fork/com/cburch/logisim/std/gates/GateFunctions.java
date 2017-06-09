@@ -6,29 +6,10 @@ package com.cburch.logisim.std.gates;
 import com.cburch.logisim.data.Value;
 
 class GateFunctions {
-	private GateFunctions() {
-	}
-
-	static Value computeOr(Value[] inputs, int numInputs) {
-		Value ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = ret.or(inputs[i]);
-		}
-		return ret;
-	}
-
 	static Value computeAnd(Value[] inputs, int numInputs) {
 		Value ret = inputs[0];
 		for (int i = 1; i < numInputs; i++) {
 			ret = ret.and(inputs[i]);
-		}
-		return ret;
-	}
-
-	static Value computeOddParity(Value[] inputs, int numInputs) {
-		Value ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = ret.xor(inputs[i]);
 		}
 		return ret;
 	}
@@ -58,5 +39,24 @@ class GateFunctions {
 			}
 		}
 		return Value.create(ret);
+	}
+
+	static Value computeOddParity(Value[] inputs, int numInputs) {
+		Value ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = ret.xor(inputs[i]);
+		}
+		return ret;
+	}
+
+	static Value computeOr(Value[] inputs, int numInputs) {
+		Value ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = ret.or(inputs[i]);
+		}
+		return ret;
+	}
+
+	private GateFunctions() {
 	}
 }

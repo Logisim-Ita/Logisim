@@ -26,11 +26,10 @@ public class ProjectEvent {
 	private Object old_data;
 	private Object data;
 
-	ProjectEvent(int action, Project proj, Object old, Object data) {
+	ProjectEvent(int action, Project proj) {
 		this.action = action;
 		this.proj = proj;
-		this.old_data = old;
-		this.data = data;
+		this.data = null;
 	}
 
 	ProjectEvent(int action, Project proj, Object data) {
@@ -39,10 +38,11 @@ public class ProjectEvent {
 		this.data = data;
 	}
 
-	ProjectEvent(int action, Project proj) {
+	ProjectEvent(int action, Project proj, Object old, Object data) {
 		this.action = action;
 		this.proj = proj;
-		this.data = null;
+		this.old_data = old;
+		this.data = data;
 	}
 
 	// access methods
@@ -50,12 +50,8 @@ public class ProjectEvent {
 		return action;
 	}
 
-	public Project getProject() {
-		return proj;
-	}
-
-	public Object getOldData() {
-		return old_data;
+	public Circuit getCircuit() {
+		return proj.getCurrentCircuit();
 	}
 
 	public Object getData() {
@@ -67,8 +63,12 @@ public class ProjectEvent {
 		return proj.getLogisimFile();
 	}
 
-	public Circuit getCircuit() {
-		return proj.getCurrentCircuit();
+	public Object getOldData() {
+		return old_data;
+	}
+
+	public Project getProject() {
+		return proj;
 	}
 
 	public Tool getTool() {

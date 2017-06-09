@@ -24,37 +24,7 @@ import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.TableLayout;
 
 class ToolbarOptions extends OptionsPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8520398012707734655L;
-
 	private class Listener implements ProjectExplorer.Listener, ActionListener, ListSelectionListener {
-		@Override
-		public void selectionChanged(Event event) {
-			computeEnabled();
-		}
-
-		@Override
-		public void doubleClicked(Event event) {
-			Object target = event.getTarget();
-			if (target instanceof Tool)
-				doAddTool((Tool) target);
-		}
-
-		@Override
-		public void moveRequested(Event event, AddTool dragged, AddTool target) {
-		}
-
-		@Override
-		public void deleteRequested(Event event) {
-		}
-
-		@Override
-		public JPopupMenu menuRequested(Event event) {
-			return null;
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
@@ -75,17 +45,16 @@ class ToolbarOptions extends OptionsPanel {
 			}
 		}
 
-		@Override
-		public void valueChanged(ListSelectionEvent event) {
-			computeEnabled();
-		}
-
 		private void computeEnabled() {
 			int index = list.getSelectedIndex();
 			addTool.setEnabled(explorer.getSelectedTool() != null);
 			moveUp.setEnabled(index > 0);
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
+		}
+
+		@Override
+		public void deleteRequested(Event event) {
 		}
 
 		private void doAddTool(Tool tool) {
@@ -103,7 +72,38 @@ class ToolbarOptions extends OptionsPanel {
 				list.setSelectedIndex(newIndex);
 			}
 		}
+
+		@Override
+		public void doubleClicked(Event event) {
+			Object target = event.getTarget();
+			if (target instanceof Tool)
+				doAddTool((Tool) target);
+		}
+
+		@Override
+		public JPopupMenu menuRequested(Event event) {
+			return null;
+		}
+
+		@Override
+		public void moveRequested(Event event, AddTool dragged, AddTool target) {
+		}
+
+		@Override
+		public void selectionChanged(Event event) {
+			computeEnabled();
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			computeEnabled();
+		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8520398012707734655L;
 
 	private Listener listener = new Listener();
 
@@ -168,13 +168,13 @@ class ToolbarOptions extends OptionsPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("toolbarTitle");
+	public String getHelpText() {
+		return Strings.get("toolbarHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("toolbarHelp");
+	public String getTitle() {
+		return Strings.get("toolbarTitle");
 	}
 
 	@Override

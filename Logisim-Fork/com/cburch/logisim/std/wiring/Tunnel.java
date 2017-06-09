@@ -38,6 +38,66 @@ public class Tunnel extends InstanceFactory {
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
 
+	private Bounds computeBounds(TunnelAttributes attrs, int textWidth, int textHeight, Graphics g, String label) {
+		int x = attrs.getLabelX();
+		int y = attrs.getLabelY();
+		int halign = attrs.getLabelHAlign();
+		int valign = attrs.getLabelVAlign();
+
+		int minDim = ARROW_MIN_WIDTH - 2 * MARGIN;
+		int bw = Math.max(minDim, textWidth);
+		int bh = Math.max(minDim, textHeight);
+		int bx;
+		int by;
+		switch (halign) {
+		case TextField.H_LEFT:
+			bx = x;
+			break;
+		case TextField.H_RIGHT:
+			bx = x - bw;
+			break;
+		default:
+			bx = x - (bw / 2);
+		}
+		switch (valign) {
+		case TextField.V_TOP:
+			by = y;
+			break;
+		case TextField.V_BOTTOM:
+			by = y - bh;
+			break;
+		default:
+			by = y - (bh / 2);
+		}
+
+		if (g != null) {
+			GraphicsUtil.drawText(g, label, bx + bw / 2, by + bh / 2, GraphicsUtil.H_CENTER,
+					GraphicsUtil.V_CENTER_OVERALL);
+		}
+
+		return Bounds.create(bx, by, bw, bh).expand(MARGIN).add(0, 0);
+	}
+
+	//
+	// private methods
+	//
+	private void configureLabel(Instance instance) {
+		TunnelAttributes attrs = (TunnelAttributes) instance.getAttributeSet();
+		Location loc = instance.getLocation();
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, loc.getX() + attrs.getLabelX(),
+				loc.getY() + attrs.getLabelY(), attrs.getLabelHAlign(), attrs.getLabelVAlign());
+	}
+
+	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		instance.setPorts(new Port[] { new Port(0, 0, Port.INOUT, StdAttr.WIDTH) });
+		configureLabel(instance);
+	}
+
 	@Override
 	public AttributeSet createAttributeSet() {
 		return new TunnelAttributes();
@@ -55,6 +115,16 @@ public class Tunnel extends InstanceFactory {
 			bds = computeBounds(attrs, wd, ht, null, "");
 			attrs.setOffsetBounds(bds);
 			return bds;
+		}
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			configureLabel(instance);
+			instance.recomputeBounds();
+		} else if (attr == StdAttr.LABEL || attr == StdAttr.LABEL_FONT) {
+			instance.recomputeBounds();
 		}
 	}
 
@@ -138,78 +208,8 @@ public class Tunnel extends InstanceFactory {
 		painter.drawPorts();
 	}
 
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		instance.setPorts(new Port[] { new Port(0, 0, Port.INOUT, StdAttr.WIDTH) });
-		configureLabel(instance);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			configureLabel(instance);
-			instance.recomputeBounds();
-		} else if (attr == StdAttr.LABEL || attr == StdAttr.LABEL_FONT) {
-			instance.recomputeBounds();
-		}
-	}
-
 	@Override
 	public void propagate(InstanceState state) {
 		; // nothing to do - handled by circuit
-	}
-
-	//
-	// private methods
-	//
-	private void configureLabel(Instance instance) {
-		TunnelAttributes attrs = (TunnelAttributes) instance.getAttributeSet();
-		Location loc = instance.getLocation();
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, loc.getX() + attrs.getLabelX(),
-				loc.getY() + attrs.getLabelY(), attrs.getLabelHAlign(), attrs.getLabelVAlign());
-	}
-
-	private Bounds computeBounds(TunnelAttributes attrs, int textWidth, int textHeight, Graphics g, String label) {
-		int x = attrs.getLabelX();
-		int y = attrs.getLabelY();
-		int halign = attrs.getLabelHAlign();
-		int valign = attrs.getLabelVAlign();
-
-		int minDim = ARROW_MIN_WIDTH - 2 * MARGIN;
-		int bw = Math.max(minDim, textWidth);
-		int bh = Math.max(minDim, textHeight);
-		int bx;
-		int by;
-		switch (halign) {
-		case TextField.H_LEFT:
-			bx = x;
-			break;
-		case TextField.H_RIGHT:
-			bx = x - bw;
-			break;
-		default:
-			bx = x - (bw / 2);
-		}
-		switch (valign) {
-		case TextField.V_TOP:
-			by = y;
-			break;
-		case TextField.V_BOTTOM:
-			by = y - bh;
-			break;
-		default:
-			by = y - (bh / 2);
-		}
-
-		if (g != null) {
-			GraphicsUtil.drawText(g, label, bx + bw / 2, by + bh / 2, GraphicsUtil.H_CENTER,
-					GraphicsUtil.V_CENTER_OVERALL);
-		}
-
-		return Bounds.create(bx, by, bw, bh).expand(MARGIN).add(0, 0);
 	}
 }

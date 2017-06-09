@@ -30,13 +30,13 @@ public class ModelAddAction extends ModelAction {
 		this.addIndex = index;
 	}
 
-	public int getDestinationIndex() {
-		return addIndex;
+	@Override
+	void doSub(CanvasModel model) {
+		model.addObjects(addIndex, added);
 	}
 
-	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.unmodifiableList(added);
+	public int getDestinationIndex() {
+		return addIndex;
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class ModelAddAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.addObjects(addIndex, added);
+	public Collection<CanvasObject> getObjects() {
+		return Collections.unmodifiableList(added);
 	}
 
 	@Override

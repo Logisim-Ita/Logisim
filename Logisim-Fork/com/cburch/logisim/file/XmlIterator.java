@@ -12,10 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cloneable {
-	public static XmlIterator<Node> forChildren(Element node) {
-		return new XmlIterator<Node>(node.getChildNodes());
-	}
-
 	public static Iterable<Element> forChildElements(Element node) {
 		NodeList nodes = node.getChildNodes();
 		ArrayList<Element> ret = new ArrayList<Element>();
@@ -42,6 +38,10 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 		return ret;
 	}
 
+	public static XmlIterator<Node> forChildren(Element node) {
+		return new XmlIterator<Node>(node.getChildNodes());
+	}
+
 	public static Iterable<Element> forDescendantElements(Element node, String tagName) {
 		return new XmlIterator<Element>(node.getElementsByTagName(tagName));
 	}
@@ -66,15 +66,15 @@ public class XmlIterator<E extends Node> implements Iterable<E>, Iterator<E>, Cl
 	}
 
 	@Override
+	public boolean hasNext() {
+		return list != null && index < list.getLength();
+	}
+
+	@Override
 	public Iterator<E> iterator() {
 		XmlIterator<E> ret = this.clone();
 		ret.index = 0;
 		return ret;
-	}
-
-	@Override
-	public boolean hasNext() {
-		return list != null && index < list.getLength();
 	}
 
 	@Override

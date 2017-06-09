@@ -50,6 +50,41 @@ public class BitExtender extends InstanceFactory {
 	}
 
 	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		configurePorts(instance);
+		instance.addAttributeListener();
+	}
+
+	private void configurePorts(Instance instance) {
+		Port p0 = new Port(0, 0, Port.OUTPUT, ATTR_OUT_WIDTH);
+		Port p1 = new Port(-40, 0, Port.INPUT, ATTR_IN_WIDTH);
+		String type = getType(instance.getAttributeSet());
+		if (type.equals("input")) {
+			instance.setPorts(new Port[] { p0, p1, new Port(-20, -20, Port.INPUT, 1) });
+		} else {
+			instance.setPorts(new Port[] { p0, p1 });
+		}
+	}
+
+	private String getType(AttributeSet attrs) {
+		AttributeOption topt = attrs.getValue(ATTR_TYPE);
+		return (String) topt.getValue();
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == ATTR_TYPE) {
+			configurePorts(instance);
+			instance.fireInvalidated();
+		} else {
+			instance.fireInvalidated();
+		}
+	}
+
+	//
 	// graphics methods
 	//
 	@Override
@@ -88,36 +123,6 @@ public class BitExtender extends InstanceFactory {
 			painter.drawPort(2);
 	}
 
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		configurePorts(instance);
-		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_TYPE) {
-			configurePorts(instance);
-			instance.fireInvalidated();
-		} else {
-			instance.fireInvalidated();
-		}
-	}
-
-	private void configurePorts(Instance instance) {
-		Port p0 = new Port(0, 0, Port.OUTPUT, ATTR_OUT_WIDTH);
-		Port p1 = new Port(-40, 0, Port.INPUT, ATTR_IN_WIDTH);
-		String type = getType(instance.getAttributeSet());
-		if (type.equals("input")) {
-			instance.setPorts(new Port[] { p0, p1, new Port(-20, -20, Port.INPUT, 1) });
-		} else {
-			instance.setPorts(new Port[] { p0, p1 });
-		}
-	}
-
 	@Override
 	public void propagate(InstanceState state) {
 		Value in = state.getPort(1);
@@ -139,10 +144,5 @@ public class BitExtender extends InstanceFactory {
 
 		Value out = in.extendWidth(wout.getWidth(), extend);
 		state.setPort(0, out, 1);
-	}
-
-	private String getType(AttributeSet attrs) {
-		AttributeOption topt = attrs.getValue(ATTR_TYPE);
-		return (String) topt.getValue();
 	}
 }

@@ -22,13 +22,13 @@ public class Gates extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Gates";
+	public String getDisplayName() {
+		return Strings.get("gatesLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("gatesLibrary");
+	public String getName() {
+		return "Gates";
 	}
 
 	@Override

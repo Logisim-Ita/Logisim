@@ -26,13 +26,13 @@ class ScrollPanel extends LogPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return table.getTitle();
+	public String getHelpText() {
+		return table.getHelpText();
 	}
 
 	@Override
-	public String getHelpText() {
-		return table.getHelpText();
+	public String getTitle() {
+		return table.getTitle();
 	}
 
 	@Override

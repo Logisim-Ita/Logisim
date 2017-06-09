@@ -27,9 +27,6 @@ import com.cburch.logisim.util.JFileChoosers;
 import com.cburch.logisim.util.StringUtil;
 
 public class ProjectActions {
-	private ProjectActions() {
-	}
-
 	private static class CreateFrame implements Runnable {
 		private Loader loader;
 		private Project proj;
@@ -51,6 +48,85 @@ public class ProjectActions {
 			if (isStartupScreen)
 				proj.setStartupScreen(true);
 		}
+	}
+
+	private static Project completeProject(SplashScreen monitor, Loader loader, LogisimFile file, boolean isStartup) {
+		if (monitor != null)
+			monitor.setProgress(SplashScreen.PROJECT_CREATE);
+		Project ret = new Project(file);
+
+		if (monitor != null)
+			monitor.setProgress(SplashScreen.FRAME_CREATE);
+		SwingUtilities.invokeLater(new CreateFrame(loader, ret, isStartup));
+		return ret;
+	}
+
+	private static LogisimFile createEmptyFile(Loader loader) {
+		InputStream templReader = AppPreferences.getEmptyTemplate().createStream();
+		LogisimFile file;
+		try {
+			file = loader.openLogisimFile(templReader);
+		} catch (Throwable t) {
+			file = LogisimFile.createNew(loader);
+			file.addCircuit(new Circuit("main"));
+		} finally {
+			try {
+				templReader.close();
+			} catch (IOException e) {
+			}
+		}
+		return file;
+	}
+
+	private static Frame createFrame(Project sourceProject, Project newProject) {
+		if (sourceProject != null) {
+			Frame frame = sourceProject.getFrame();
+			if (frame != null) {
+				frame.savePreferences();
+			}
+		}
+		Frame newFrame = new Frame(newProject);
+		newProject.setFrame(newFrame);
+		return newFrame;
+	}
+
+	public static LogisimFile createNewFile(Project baseProject) {
+		Loader loader = new Loader(baseProject == null ? null : baseProject.getFrame());
+		InputStream templReader = AppPreferences.getTemplate().createStream();
+		LogisimFile file;
+		try {
+			file = loader.openLogisimFile(templReader);
+		} catch (IOException ex) {
+			displayException(baseProject.getFrame(), ex);
+			file = createEmptyFile(loader);
+		} catch (LoadFailedException ex) {
+			if (!ex.isShown()) {
+				displayException(baseProject.getFrame(), ex);
+			}
+			file = createEmptyFile(loader);
+		} finally {
+			try {
+				templReader.close();
+			} catch (IOException e) {
+			}
+		}
+		return file;
+	}
+
+	private static void displayException(Component parent, Exception ex) {
+		String msg = StringUtil.format(Strings.get("templateOpenError"), ex.toString());
+		String ttl = Strings.get("templateOpenErrorTitle");
+		JOptionPane.showMessageDialog(parent, msg, ttl, JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static Project doNew(Project baseProject) {
+		LogisimFile file = createNewFile(baseProject);
+		Project newProj = new Project(file);
+		Frame frame = createFrame(baseProject, newProj);
+		frame.setVisible(true);
+		frame.getCanvas().requestFocus();
+		newProj.getLogisimFile().getLoader().setParent(frame);
+		return newProj;
 	}
 
 	public static Project doNew(SplashScreen monitor) {
@@ -78,96 +154,6 @@ public class ProjectActions {
 		if (file == null)
 			file = createEmptyFile(loader);
 		return completeProject(monitor, loader, file, isStartupScreen);
-	}
-
-	private static void displayException(Component parent, Exception ex) {
-		String msg = StringUtil.format(Strings.get("templateOpenError"), ex.toString());
-		String ttl = Strings.get("templateOpenErrorTitle");
-		JOptionPane.showMessageDialog(parent, msg, ttl, JOptionPane.ERROR_MESSAGE);
-	}
-
-	private static LogisimFile createEmptyFile(Loader loader) {
-		InputStream templReader = AppPreferences.getEmptyTemplate().createStream();
-		LogisimFile file;
-		try {
-			file = loader.openLogisimFile(templReader);
-		} catch (Throwable t) {
-			file = LogisimFile.createNew(loader);
-			file.addCircuit(new Circuit("main"));
-		} finally {
-			try {
-				templReader.close();
-			} catch (IOException e) {
-			}
-		}
-		return file;
-	}
-
-	private static Project completeProject(SplashScreen monitor, Loader loader, LogisimFile file, boolean isStartup) {
-		if (monitor != null)
-			monitor.setProgress(SplashScreen.PROJECT_CREATE);
-		Project ret = new Project(file);
-
-		if (monitor != null)
-			monitor.setProgress(SplashScreen.FRAME_CREATE);
-		SwingUtilities.invokeLater(new CreateFrame(loader, ret, isStartup));
-		return ret;
-	}
-
-	public static LogisimFile createNewFile(Project baseProject) {
-		Loader loader = new Loader(baseProject == null ? null : baseProject.getFrame());
-		InputStream templReader = AppPreferences.getTemplate().createStream();
-		LogisimFile file;
-		try {
-			file = loader.openLogisimFile(templReader);
-		} catch (IOException ex) {
-			displayException(baseProject.getFrame(), ex);
-			file = createEmptyFile(loader);
-		} catch (LoadFailedException ex) {
-			if (!ex.isShown()) {
-				displayException(baseProject.getFrame(), ex);
-			}
-			file = createEmptyFile(loader);
-		} finally {
-			try {
-				templReader.close();
-			} catch (IOException e) {
-			}
-		}
-		return file;
-	}
-
-	private static Frame createFrame(Project sourceProject, Project newProject) {
-		if (sourceProject != null) {
-			Frame frame = sourceProject.getFrame();
-			if (frame != null) {
-				frame.savePreferences();
-			}
-		}
-		Frame newFrame = new Frame(newProject);
-		newProject.setFrame(newFrame);
-		return newFrame;
-	}
-
-	public static Project doNew(Project baseProject) {
-		LogisimFile file = createNewFile(baseProject);
-		Project newProj = new Project(file);
-		Frame frame = createFrame(baseProject, newProj);
-		frame.setVisible(true);
-		frame.getCanvas().requestFocus();
-		newProj.getLogisimFile().getLoader().setParent(frame);
-		return newProj;
-	}
-
-	public static Project doOpen(SplashScreen monitor, File source, Map<File, File> substitutions)
-			throws LoadFailedException {
-		if (monitor != null)
-			monitor.setProgress(SplashScreen.FILE_LOAD);
-		Loader loader = new Loader(monitor);
-		LogisimFile file = loader.openLogisimFile(source, substitutions);
-		AppPreferences.updateRecentFile(source);
-
-		return completeProject(monitor, loader, file, false);
 	}
 
 	public static void doOpen(Component parent, Project baseProject) {
@@ -251,6 +237,50 @@ public class ProjectActions {
 		return proj;
 	}
 
+	public static Project doOpen(SplashScreen monitor, File source, Map<File, File> substitutions)
+			throws LoadFailedException {
+		if (monitor != null)
+			monitor.setProgress(SplashScreen.FILE_LOAD);
+		Loader loader = new Loader(monitor);
+		LogisimFile file = loader.openLogisimFile(source, substitutions);
+		AppPreferences.updateRecentFile(source);
+
+		return completeProject(monitor, loader, file, false);
+	}
+
+	public static void doQuit() {
+		Frame top = Projects.getTopFrame();
+		top.savePreferences();
+
+		for (Project proj : new ArrayList<Project>(Projects.getOpenProjects())) {
+			if (!proj.confirmClose(Strings.get("confirmQuitTitle")))
+				return;
+		}
+		System.exit(0);
+	}
+
+	public static boolean doSave(Project proj) {
+		Loader loader = proj.getLogisimFile().getLoader();
+		File f = loader.getMainFile();
+		if (f == null)
+			return doSaveAs(proj);
+		else
+			return doSave(proj, f);
+	}
+
+	private static boolean doSave(Project proj, File f) {
+		Loader loader = proj.getLogisimFile().getLoader();
+		Tool oldTool = proj.getTool();
+		proj.setTool(null);
+		boolean ret = loader.save(proj.getLogisimFile(), f);
+		if (ret) {
+			AppPreferences.updateRecentFile(f);
+			proj.setFileAsClean();
+		}
+		proj.setTool(oldTool);
+		return ret;
+	}
+
 	// returns true if save is completed
 	public static boolean doSaveAs(Project proj) {
 		Loader loader = proj.getLogisimFile().getLoader();
@@ -300,36 +330,6 @@ public class ProjectActions {
 		return doSave(proj, f);
 	}
 
-	public static boolean doSave(Project proj) {
-		Loader loader = proj.getLogisimFile().getLoader();
-		File f = loader.getMainFile();
-		if (f == null)
-			return doSaveAs(proj);
-		else
-			return doSave(proj, f);
-	}
-
-	private static boolean doSave(Project proj, File f) {
-		Loader loader = proj.getLogisimFile().getLoader();
-		Tool oldTool = proj.getTool();
-		proj.setTool(null);
-		boolean ret = loader.save(proj.getLogisimFile(), f);
-		if (ret) {
-			AppPreferences.updateRecentFile(f);
-			proj.setFileAsClean();
-		}
-		proj.setTool(oldTool);
-		return ret;
-	}
-
-	public static void doQuit() {
-		Frame top = Projects.getTopFrame();
-		top.savePreferences();
-
-		for (Project proj : new ArrayList<Project>(Projects.getOpenProjects())) {
-			if (!proj.confirmClose(Strings.get("confirmQuitTitle")))
-				return;
-		}
-		System.exit(0);
+	private ProjectActions() {
 	}
 }

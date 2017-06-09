@@ -14,6 +14,10 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 
 public class Instance {
+	public static Component getComponentFor(Instance instance) {
+		return instance.comp;
+	}
+
 	public static Instance getInstanceFor(Component comp) {
 		if (comp instanceof InstanceComponent) {
 			return ((InstanceComponent) comp).getInstance();
@@ -22,18 +26,38 @@ public class Instance {
 		}
 	}
 
-	public static Component getComponentFor(Instance instance) {
-		return instance.comp;
-	}
-
 	private InstanceComponent comp;
 
 	Instance(InstanceComponent comp) {
 		this.comp = comp;
 	}
 
+	public void addAttributeListener() {
+		comp.addAttributeListener(this);
+	}
+
+	public void fireInvalidated() {
+		comp.fireInvalidated();
+	}
+
+	public AttributeSet getAttributeSet() {
+		return comp.getAttributeSet();
+	}
+
+	public <E> E getAttributeValue(Attribute<E> attr) {
+		return comp.getAttributeSet().getValue(attr);
+	}
+
+	public Bounds getBounds() {
+		return comp.getBounds();
+	}
+
 	InstanceComponent getComponent() {
 		return comp;
+	}
+
+	public InstanceData getData(CircuitState state) {
+		return (InstanceData) state.getData(comp);
 	}
 
 	public InstanceFactory getFactory() {
@@ -44,56 +68,32 @@ public class Instance {
 		return comp.getLocation();
 	}
 
-	public Bounds getBounds() {
-		return comp.getBounds();
-	}
-
-	public void setAttributeReadOnly(Attribute<?> attr, boolean value) {
-		comp.getAttributeSet().setReadOnly(attr, value);
-	}
-
-	public <E> E getAttributeValue(Attribute<E> attr) {
-		return comp.getAttributeSet().getValue(attr);
-	}
-
-	public void addAttributeListener() {
-		comp.addAttributeListener(this);
-	}
-
-	public AttributeSet getAttributeSet() {
-		return comp.getAttributeSet();
+	public Location getPortLocation(int index) {
+		return comp.getEnd(index).getLocation();
 	}
 
 	public List<Port> getPorts() {
 		return comp.getPorts();
 	}
 
-	public Location getPortLocation(int index) {
-		return comp.getEnd(index).getLocation();
-	}
-
-	public void setPorts(Port[] ports) {
-		comp.setPorts(ports);
-	}
-
 	public void recomputeBounds() {
 		comp.recomputeBounds();
 	}
 
-	public void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign,
-			int valign) {
-		comp.setTextField(labelAttr, fontAttr, x, y, halign, valign);
-	}
-
-	public InstanceData getData(CircuitState state) {
-		return (InstanceData) state.getData(comp);
+	public void setAttributeReadOnly(Attribute<?> attr, boolean value) {
+		comp.getAttributeSet().setReadOnly(attr, value);
 	}
 
 	public void setData(CircuitState state, InstanceData data) {
 		state.setData(comp, data);
 	}
 
-	public void fireInvalidated() {
-		comp.fireInvalidated();
+	public void setPorts(Port[] ports) {
+		comp.setPorts(ports);
+	}
+
+	public void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign,
+			int valign) {
+		comp.setTextField(labelAttr, fontAttr, x, y, halign, valign);
 	}
 }

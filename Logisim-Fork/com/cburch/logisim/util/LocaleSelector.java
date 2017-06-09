@@ -16,11 +16,6 @@ import com.cburch.logisim.prefs.AppPreferences;
 
 @SuppressWarnings("rawtypes")
 class LocaleSelector extends JList implements LocaleListener, ListSelectionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 865977125223322100L;
-
 	private static class LocaleOption implements Runnable {
 		private Locale locale;
 		private String text;
@@ -28,6 +23,14 @@ class LocaleSelector extends JList implements LocaleListener, ListSelectionListe
 		LocaleOption(Locale locale) {
 			this.locale = locale;
 			update(locale);
+		}
+
+		@Override
+		public void run() {
+			if (!LocaleManager.getLocale().equals(locale)) {
+				LocaleManager.setLocale(locale);
+				AppPreferences.LOCALE.set(locale.getLanguage());
+			}
 		}
 
 		@Override
@@ -42,15 +45,12 @@ class LocaleSelector extends JList implements LocaleListener, ListSelectionListe
 				text = locale.getDisplayName(locale) + " / " + locale.getDisplayName(current);
 			}
 		}
-
-		@Override
-		public void run() {
-			if (!LocaleManager.getLocale().equals(locale)) {
-				LocaleManager.setLocale(locale);
-				AppPreferences.LOCALE.set(locale.getLanguage());
-			}
-		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 865977125223322100L;
 
 	private LocaleOption[] items;
 

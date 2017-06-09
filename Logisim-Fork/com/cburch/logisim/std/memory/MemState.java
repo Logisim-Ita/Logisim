@@ -45,6 +45,33 @@ class MemState implements InstanceData, Cloneable, HexModelListener {
 		contents.addHexModelListener(this);
 	}
 
+	private int addrToX(Bounds bds, long addr) {
+		int addrBits = getAddrBits();
+		int boxX = bds.getX() + (addrBits <= 12 ? ENTRY_XOFFS12 : ENTRY_XOFFS32);
+		int boxW = addrBits <= 12 ? TABLE_WIDTH12 : TABLE_WIDTH32;
+
+		long topRow = curScroll / columns;
+		long row = addr / columns;
+		if (row < topRow || row >= topRow + ROWS)
+			return -1;
+		int col = (int) (addr - row * columns);
+		if (col < 0 || col >= columns)
+			return -1;
+		return boxX + boxW * col / columns;
+	}
+
+	private int addrToY(Bounds bds, long addr) {
+		long topRow = curScroll / columns;
+		long row = addr / columns;
+		if (row < topRow || row >= topRow + ROWS)
+			return -1;
+		return (int) (bds.getY() + ENTRY_YOFFS + ENTRY_HEIGHT * (row - topRow));
+	}
+
+	@Override
+	public void bytesChanged(HexModel source, long start, long numBytes, int[] oldValues) {
+	}
+
 	@Override
 	public MemState clone() {
 		try {
@@ -58,111 +85,10 @@ class MemState implements InstanceData, Cloneable, HexModelListener {
 	}
 
 	//
-	// methods for accessing the address bits
-	//
-	private void setBits(int addrBits, int dataBits) {
-		if (contents == null) {
-			contents = MemContents.create(addrBits, dataBits);
-		} else {
-			contents.setDimensions(addrBits, dataBits);
-		}
-		if (addrBits <= 12) {
-			if (dataBits <= 8) {
-				columns = dataBits <= 4 ? 8 : 4;
-			} else {
-				columns = dataBits <= 16 ? 2 : 1;
-			}
-		} else {
-			columns = dataBits <= 8 ? 2 : 1;
-		}
-		long newLast = contents.getLastOffset();
-		// I do subtraction in the next two conditions to account for
-		// possibility of overflow
-		if (cursorLoc > newLast)
-			cursorLoc = newLast;
-		if (curAddr - newLast > 0)
-			curAddr = -1;
-		long maxScroll = Math.max(0, newLast + 1 - (ROWS - 1) * columns);
-		if (curScroll > maxScroll)
-			curScroll = maxScroll;
-	}
-
-	public MemContents getContents() {
-		return contents;
-	}
-
-	//
 	// methods for accessing data within memory
 	//
 	int getAddrBits() {
 		return contents.getLogLength();
-	}
-
-	int getDataBits() {
-		return contents.getWidth();
-	}
-
-	long getLastAddress() {
-		return (1L << contents.getLogLength()) - 1;
-	}
-
-	boolean isValidAddr(long addr) {
-		int addrBits = contents.getLogLength();
-		return addr >>> addrBits == 0;
-	}
-
-	int getRows() {
-		return ROWS;
-	}
-
-	int getColumns() {
-		return columns;
-	}
-
-	//
-	// methods for manipulating cursor and scroll location
-	//
-	long getCursor() {
-		return cursorLoc;
-	}
-
-	long getCurrent() {
-		return curAddr;
-	}
-
-	long getScroll() {
-		return curScroll;
-	}
-
-	void setCursor(long value) {
-		cursorLoc = isValidAddr(value) ? value : -1L;
-	}
-
-	void setCurrent(long value) {
-		curAddr = isValidAddr(value) ? value : -1L;
-	}
-
-	void scrollToShow(long addr) {
-		if (isValidAddr(addr)) {
-			addr = addr / columns * columns;
-			long curTop = curScroll / columns * columns;
-			if (addr < curTop) {
-				curScroll = addr;
-			} else if (addr >= curTop + ROWS * columns) {
-				curScroll = addr - (ROWS - 1) * columns;
-				if (curScroll < 0)
-					curScroll = 0;
-			}
-		}
-	}
-
-	void setScroll(long addr) {
-		long maxAddr = getLastAddress() - ROWS * columns;
-		if (addr > maxAddr)
-			addr = maxAddr; // note: maxAddr could be negative
-		if (addr < 0)
-			addr = 0;
-		curScroll = addr;
 	}
 
 	//
@@ -197,6 +123,51 @@ class MemState implements InstanceData, Cloneable, HexModelListener {
 			int bdsY = addrToY(bds, addr);
 			return Bounds.create(bdsX, bdsY, boxW / columns, ENTRY_HEIGHT);
 		}
+	}
+
+	int getColumns() {
+		return columns;
+	}
+
+	public MemContents getContents() {
+		return contents;
+	}
+
+	long getCurrent() {
+		return curAddr;
+	}
+
+	//
+	// methods for manipulating cursor and scroll location
+	//
+	long getCursor() {
+		return cursorLoc;
+	}
+
+	int getDataBits() {
+		return contents.getWidth();
+	}
+
+	long getLastAddress() {
+		return (1L << contents.getLogLength()) - 1;
+	}
+
+	int getRows() {
+		return ROWS;
+	}
+
+	long getScroll() {
+		return curScroll;
+	}
+
+	boolean isValidAddr(long addr) {
+		int addrBits = contents.getLogLength();
+		return addr >>> addrBits == 0;
+	}
+
+	@Override
+	public void metainfoChanged(HexModel source) {
+		setBits(contents.getLogLength(), contents.getWidth());
 	}
 
 	public void paint(Graphics g, int leftX, int topY) {
@@ -239,35 +210,64 @@ class MemState implements InstanceData, Cloneable, HexModelListener {
 		}
 	}
 
-	private int addrToX(Bounds bds, long addr) {
-		int addrBits = getAddrBits();
-		int boxX = bds.getX() + (addrBits <= 12 ? ENTRY_XOFFS12 : ENTRY_XOFFS32);
-		int boxW = addrBits <= 12 ? TABLE_WIDTH12 : TABLE_WIDTH32;
-
-		long topRow = curScroll / columns;
-		long row = addr / columns;
-		if (row < topRow || row >= topRow + ROWS)
-			return -1;
-		int col = (int) (addr - row * columns);
-		if (col < 0 || col >= columns)
-			return -1;
-		return boxX + boxW * col / columns;
+	void scrollToShow(long addr) {
+		if (isValidAddr(addr)) {
+			addr = addr / columns * columns;
+			long curTop = curScroll / columns * columns;
+			if (addr < curTop) {
+				curScroll = addr;
+			} else if (addr >= curTop + ROWS * columns) {
+				curScroll = addr - (ROWS - 1) * columns;
+				if (curScroll < 0)
+					curScroll = 0;
+			}
+		}
 	}
 
-	private int addrToY(Bounds bds, long addr) {
-		long topRow = curScroll / columns;
-		long row = addr / columns;
-		if (row < topRow || row >= topRow + ROWS)
-			return -1;
-		return (int) (bds.getY() + ENTRY_YOFFS + ENTRY_HEIGHT * (row - topRow));
+	//
+	// methods for accessing the address bits
+	//
+	private void setBits(int addrBits, int dataBits) {
+		if (contents == null) {
+			contents = MemContents.create(addrBits, dataBits);
+		} else {
+			contents.setDimensions(addrBits, dataBits);
+		}
+		if (addrBits <= 12) {
+			if (dataBits <= 8) {
+				columns = dataBits <= 4 ? 8 : 4;
+			} else {
+				columns = dataBits <= 16 ? 2 : 1;
+			}
+		} else {
+			columns = dataBits <= 8 ? 2 : 1;
+		}
+		long newLast = contents.getLastOffset();
+		// I do subtraction in the next two conditions to account for
+		// possibility of overflow
+		if (cursorLoc > newLast)
+			cursorLoc = newLast;
+		if (curAddr - newLast > 0)
+			curAddr = -1;
+		long maxScroll = Math.max(0, newLast + 1 - (ROWS - 1) * columns);
+		if (curScroll > maxScroll)
+			curScroll = maxScroll;
 	}
 
-	@Override
-	public void metainfoChanged(HexModel source) {
-		setBits(contents.getLogLength(), contents.getWidth());
+	void setCurrent(long value) {
+		curAddr = isValidAddr(value) ? value : -1L;
 	}
 
-	@Override
-	public void bytesChanged(HexModel source, long start, long numBytes, int[] oldValues) {
+	void setCursor(long value) {
+		cursorLoc = isValidAddr(value) ? value : -1L;
+	}
+
+	void setScroll(long addr) {
+		long maxAddr = getLastAddress() - ROWS * columns;
+		if (addr > maxAddr)
+			addr = maxAddr; // note: maxAddr could be negative
+		if (addr < 0)
+			addr = 0;
+		curScroll = addr;
 	}
 }

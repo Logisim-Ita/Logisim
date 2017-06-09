@@ -13,6 +13,13 @@ public abstract class AbstractAttributeSet implements Cloneable, AttributeSet {
 	}
 
 	@Override
+	public void addAttributeListener(AttributeListener l) {
+		if (listeners == null)
+			listeners = new ArrayList<AttributeListener>();
+		listeners.add(l);
+	}
+
+	@Override
 	public Object clone() {
 		AbstractAttributeSet ret;
 		try {
@@ -26,28 +33,11 @@ public abstract class AbstractAttributeSet implements Cloneable, AttributeSet {
 	}
 
 	@Override
-	public void addAttributeListener(AttributeListener l) {
-		if (listeners == null)
-			listeners = new ArrayList<AttributeListener>();
-		listeners.add(l);
+	public boolean containsAttribute(Attribute<?> attr) {
+		return getAttributes().contains(attr);
 	}
 
-	@Override
-	public void removeAttributeListener(AttributeListener l) {
-		listeners.remove(l);
-		if (listeners.isEmpty())
-			listeners = null;
-	}
-
-	protected <V> void fireAttributeValueChanged(Attribute<? super V> attr, V value) {
-		if (listeners != null) {
-			AttributeEvent event = new AttributeEvent(this, attr, value);
-			List<AttributeListener> ls = new ArrayList<AttributeListener>(listeners);
-			for (AttributeListener l : ls) {
-				l.attributeValueChanged(event);
-			}
-		}
-	}
+	protected abstract void copyInto(AbstractAttributeSet dest);
 
 	protected void fireAttributeListChanged() {
 		if (listeners != null) {
@@ -59,9 +49,14 @@ public abstract class AbstractAttributeSet implements Cloneable, AttributeSet {
 		}
 	}
 
-	@Override
-	public boolean containsAttribute(Attribute<?> attr) {
-		return getAttributes().contains(attr);
+	protected <V> void fireAttributeValueChanged(Attribute<? super V> attr, V value) {
+		if (listeners != null) {
+			AttributeEvent event = new AttributeEvent(this, attr, value);
+			List<AttributeListener> ls = new ArrayList<AttributeListener>(listeners);
+			for (AttributeListener l : ls) {
+				l.attributeValueChanged(event);
+			}
+		}
 	}
 
 	@Override
@@ -75,13 +70,14 @@ public abstract class AbstractAttributeSet implements Cloneable, AttributeSet {
 	}
 
 	@Override
-	public boolean isReadOnly(Attribute<?> attr) {
-		return false;
-	}
+	public abstract List<Attribute<?>> getAttributes();
 
 	@Override
-	public void setReadOnly(Attribute<?> attr, boolean value) {
-		throw new UnsupportedOperationException();
+	public abstract <V> V getValue(Attribute<V> attr);
+
+	@Override
+	public boolean isReadOnly(Attribute<?> attr) {
+		return false;
 	}
 
 	@Override
@@ -89,13 +85,17 @@ public abstract class AbstractAttributeSet implements Cloneable, AttributeSet {
 		return true;
 	}
 
-	protected abstract void copyInto(AbstractAttributeSet dest);
+	@Override
+	public void removeAttributeListener(AttributeListener l) {
+		listeners.remove(l);
+		if (listeners.isEmpty())
+			listeners = null;
+	}
 
 	@Override
-	public abstract List<Attribute<?>> getAttributes();
-
-	@Override
-	public abstract <V> V getValue(Attribute<V> attr);
+	public void setReadOnly(Attribute<?> attr, boolean value) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public abstract <V> void setValue(Attribute<V> attr, V value);

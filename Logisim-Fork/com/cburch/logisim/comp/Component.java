@@ -15,28 +15,30 @@ public interface Component {
 	// listener methods
 	public void addComponentListener(ComponentListener l);
 
-	public void removeComponentListener(ComponentListener l);
+	public boolean contains(Location pt);
 
-	// basic information methods
-	public ComponentFactory getFactory();
+	public boolean contains(Location pt, Graphics g);
+
+	public void draw(ComponentDrawContext context);
+
+	public boolean endsAt(Location pt);
+
+	// user interface methods
+	public void expose(ComponentDrawContext context);
 
 	public AttributeSet getAttributeSet();
-
-	// location/extent methods
-	public Location getLocation();
 
 	public Bounds getBounds();
 
 	public Bounds getBounds(Graphics g);
 
-	public boolean contains(Location pt);
+	public EndData getEnd(int index);
 
-	public boolean contains(Location pt, Graphics g);
+	// propagation methods
+	public List<EndData> getEnds(); // list of EndDatas
 
-	// user interface methods
-	public void expose(ComponentDrawContext context);
-
-	public void draw(ComponentDrawContext context);
+	// basic information methods
+	public ComponentFactory getFactory();
 
 	/**
 	 * Retrieves information about a special-purpose feature for this component.
@@ -62,12 +64,10 @@ public interface Component {
 	 */
 	public Object getFeature(Object key);
 
-	// propagation methods
-	public List<EndData> getEnds(); // list of EndDatas
-
-	public EndData getEnd(int index);
-
-	public boolean endsAt(Location pt);
+	// location/extent methods
+	public Location getLocation();
 
 	public void propagate(CircuitState state);
+
+	public void removeComponentListener(ComponentListener l);
 }

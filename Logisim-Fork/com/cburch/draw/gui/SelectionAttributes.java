@@ -26,32 +26,26 @@ import com.cburch.logisim.data.AttributeSet;
 public class SelectionAttributes extends AbstractAttributeSet {
 	private class Listener implements SelectionListener, AttributeListener {
 		//
-		// SelectionListener
+		// AttributeSet listener
 		//
 		@Override
-		public void selectionChanged(SelectionEvent ex) {
-			Map<AttributeSet, CanvasObject> oldSel = selected;
-			Map<AttributeSet, CanvasObject> newSel = new HashMap<AttributeSet, CanvasObject>();
-			for (CanvasObject o : selection.getSelected()) {
-				newSel.put(o.getAttributeSet(), o);
-			}
-			selected = newSel;
-			boolean change = false;
-			for (AttributeSet attrs : oldSel.keySet()) {
-				if (!newSel.containsKey(attrs)) {
-					change = true;
-					attrs.removeAttributeListener(this);
+		public void attributeListChanged(AttributeEvent e) {
+			// show selection attributes
+			computeAttributeList(selected.keySet());
+		}
+
+		@Override
+		public void attributeValueChanged(AttributeEvent e) {
+			if (selected.containsKey(e.getSource())) {
+				@SuppressWarnings("unchecked")
+				Attribute<Object> attr = (Attribute<Object>) e.getAttribute();
+				Attribute<?>[] attrs = SelectionAttributes.this.selAttrs;
+				Object[] values = SelectionAttributes.this.selValues;
+				for (int i = 0; i < attrs.length; i++) {
+					if (attrs[i] == attr) {
+						values[i] = getSelectionValue(attr, selected.keySet());
+					}
 				}
-			}
-			for (AttributeSet attrs : newSel.keySet()) {
-				if (!oldSel.containsKey(attrs)) {
-					change = true;
-					attrs.addAttributeListener(this);
-				}
-			}
-			if (change) {
-				computeAttributeList(newSel.keySet());
-				fireAttributeListChanged();
 			}
 		}
 
@@ -87,35 +81,58 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		}
 
 		//
-		// AttributeSet listener
+		// SelectionListener
 		//
 		@Override
-		public void attributeListChanged(AttributeEvent e) {
-			// show selection attributes
-			computeAttributeList(selected.keySet());
-		}
-
-		@Override
-		public void attributeValueChanged(AttributeEvent e) {
-			if (selected.containsKey(e.getSource())) {
-				@SuppressWarnings("unchecked")
-				Attribute<Object> attr = (Attribute<Object>) e.getAttribute();
-				Attribute<?>[] attrs = SelectionAttributes.this.selAttrs;
-				Object[] values = SelectionAttributes.this.selValues;
-				for (int i = 0; i < attrs.length; i++) {
-					if (attrs[i] == attr) {
-						values[i] = getSelectionValue(attr, selected.keySet());
-					}
+		public void selectionChanged(SelectionEvent ex) {
+			Map<AttributeSet, CanvasObject> oldSel = selected;
+			Map<AttributeSet, CanvasObject> newSel = new HashMap<AttributeSet, CanvasObject>();
+			for (CanvasObject o : selection.getSelected()) {
+				newSel.put(o.getAttributeSet(), o);
+			}
+			selected = newSel;
+			boolean change = false;
+			for (AttributeSet attrs : oldSel.keySet()) {
+				if (!newSel.containsKey(attrs)) {
+					change = true;
+					attrs.removeAttributeListener(this);
 				}
+			}
+			for (AttributeSet attrs : newSel.keySet()) {
+				if (!oldSel.containsKey(attrs)) {
+					change = true;
+					attrs.addAttributeListener(this);
+				}
+			}
+			if (change) {
+				computeAttributeList(newSel.keySet());
+				fireAttributeListChanged();
 			}
 		}
 	}
 
+	private static Object getSelectionValue(Attribute<?> attr, Set<AttributeSet> sel) {
+		Object ret = null;
+		for (AttributeSet attrs : sel) {
+			if (attrs.containsAttribute(attr)) {
+				Object val = attrs.getValue(attr);
+				if (ret == null) {
+					ret = val;
+				} else if (val != null && val.equals(ret)) {
+					; // keep on, making sure everything else matches
+				} else {
+					return null;
+				}
+			}
+		}
+		return ret;
+	}
 	private Selection selection;
 	private Listener listener;
 	private Map<AttributeSet, CanvasObject> selected;
 	private Attribute<?>[] selAttrs;
 	private Object[] selValues;
+
 	private List<Attribute<?>> attrsView;
 
 	public SelectionAttributes(Selection selection) {
@@ -130,13 +147,6 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		listener.selectionChanged(null);
 	}
 
-	public Iterable<Map.Entry<AttributeSet, CanvasObject>> entries() {
-		Set<Map.Entry<AttributeSet, CanvasObject>> raw = selected.entrySet();
-		ArrayList<Map.Entry<AttributeSet, CanvasObject>> ret;
-		ret = new ArrayList<Map.Entry<AttributeSet, CanvasObject>>(raw);
-		return ret;
-	}
-
 	//
 	// AbstractAttributeSet methods
 	//
@@ -144,6 +154,13 @@ public class SelectionAttributes extends AbstractAttributeSet {
 	protected void copyInto(AbstractAttributeSet dest) {
 		listener = new Listener();
 		selection.addSelectionListener(listener);
+	}
+
+	public Iterable<Map.Entry<AttributeSet, CanvasObject>> entries() {
+		Set<Map.Entry<AttributeSet, CanvasObject>> raw = selected.entrySet();
+		ArrayList<Map.Entry<AttributeSet, CanvasObject>> ret;
+		ret = new ArrayList<Map.Entry<AttributeSet, CanvasObject>>(raw);
+		return ret;
 	}
 
 	@Override
@@ -181,22 +198,5 @@ public class SelectionAttributes extends AbstractAttributeSet {
 				break;
 			}
 		}
-	}
-
-	private static Object getSelectionValue(Attribute<?> attr, Set<AttributeSet> sel) {
-		Object ret = null;
-		for (AttributeSet attrs : sel) {
-			if (attrs.containsAttribute(attr)) {
-				Object val = attrs.getValue(attr);
-				if (ret == null) {
-					ret = val;
-				} else if (val != null && val.equals(ret)) {
-					; // keep on, making sure everything else matches
-				} else {
-					return null;
-				}
-			}
-		}
-		return ret;
 	}
 }

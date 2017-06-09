@@ -16,6 +16,16 @@ public class ToolbarSeparator implements ToolbarItem {
 	}
 
 	@Override
+	public Dimension getDimension(Object orientation) {
+		return new Dimension(size, size);
+	}
+
+	@Override
+	public String getToolTip() {
+		return null;
+	}
+
+	@Override
 	public boolean isSelectable() {
 		return false;
 	}
@@ -40,15 +50,5 @@ public class ToolbarSeparator implements ToolbarItem {
 			h = 2;
 		}
 		g.fillRect(x, y, w, h);
-	}
-
-	@Override
-	public String getToolTip() {
-		return null;
-	}
-
-	@Override
-	public Dimension getDimension(Object orientation) {
-		return new Dimension(size, size);
 	}
 }

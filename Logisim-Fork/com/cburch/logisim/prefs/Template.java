@@ -10,16 +10,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 public class Template {
-	public static Template createEmpty() {
-		String circName = Strings.get("newCircuitName");
-		StringBuilder buf = new StringBuilder();
-		buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		buf.append("<project version=\"1.0\">");
-		buf.append(" <circuit name=\"" + circName + "\" />");
-		buf.append("</project>");
-		return new Template(buf.toString());
-	}
-
 	public static Template create(InputStream in) {
 		InputStreamReader reader = new InputStreamReader(in);
 		char[] buf = new char[4096];
@@ -35,6 +25,16 @@ public class Template {
 			}
 		}
 		return new Template(dest.toString());
+	}
+
+	public static Template createEmpty() {
+		String circName = Strings.get("newCircuitName");
+		StringBuilder buf = new StringBuilder();
+		buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		buf.append("<project version=\"1.0\">");
+		buf.append(" <circuit name=\"" + circName + "\" />");
+		buf.append("</project>");
+		return new Template(buf.toString());
 	}
 
 	private String contents;

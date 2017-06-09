@@ -10,8 +10,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class SmallSet<E> extends AbstractSet<E> {
-	private static final int HASH_POINT = 4;
-
 	private class ArrayIterator implements Iterator<E> {
 		int itVersion = version;
 		Object myValues;
@@ -84,71 +82,42 @@ public class SmallSet<E> extends AbstractSet<E> {
 		}
 	}
 
+	private static final int HASH_POINT = 4;
+
+	public static void main(String[] args) throws java.io.IOException {
+		SmallSet<String> set = new SmallSet<String>();
+		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+		while (true) {
+			System.out.print(set.size() + ":"); // OK
+			for (Iterator<String> it = set.iterator(); it.hasNext();) {
+				System.out.print(" " + it.next()); // OK
+			}
+			System.out.println(); // OK
+			System.out.print("> "); // OK
+			String cmd = in.readLine();
+			if (cmd == null)
+				break;
+			cmd = cmd.trim();
+			if (cmd.equals("")) {
+				;
+			} else if (cmd.startsWith("+")) {
+				set.add(cmd.substring(1));
+			} else if (cmd.startsWith("-")) {
+				set.remove(cmd.substring(1));
+			} else if (cmd.startsWith("?")) {
+				boolean ret = set.contains(cmd.substring(1));
+				System.out.println("  " + ret); // OK
+			} else {
+				System.out.println("unrecognized command"); // OK
+			}
+		}
+	}
 	private int size = 0;
 	private int version = 0;
+
 	private Object values = null;
 
 	public SmallSet() {
-	}
-
-	@Override
-	public SmallSet<E> clone() {
-		SmallSet<E> ret = new SmallSet<E>();
-		ret.size = this.size;
-		if (size == 1) {
-			ret.values = this.values;
-		} else if (size <= HASH_POINT) {
-			Object[] oldVals = (Object[]) this.values;
-			Object[] retVals = new Object[size];
-			for (int i = size - 1; i >= 0; i--)
-				retVals[i] = oldVals[i];
-		} else {
-			@SuppressWarnings("unchecked")
-			HashSet<E> oldVals = (HashSet<E>) this.values;
-			values = oldVals.clone();
-		}
-		return ret;
-	}
-
-	@Override
-	public Object[] toArray() {
-		Object vals = values;
-		int sz = size;
-		if (sz == 1) {
-			return new Object[] { vals };
-		} else if (sz <= HASH_POINT) {
-			Object[] ret = new Object[sz];
-			System.arraycopy(vals, 0, ret, 0, sz);
-			return ret;
-		} else {
-			HashSet<?> hash = (HashSet<?>) vals;
-			return hash.toArray();
-		}
-	}
-
-	@Override
-	public void clear() {
-		size = 0;
-		values = null;
-		++version;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		if (size <= HASH_POINT) {
-			return size == 0;
-		} else {
-			return ((HashSet<?>) values).isEmpty();
-		}
-	}
-
-	@Override
-	public int size() {
-		if (size <= HASH_POINT) {
-			return size;
-		} else {
-			return ((HashSet<?>) values).size();
-		}
 	}
 
 	@Override
@@ -214,6 +183,32 @@ public class SmallSet<E> extends AbstractSet<E> {
 	}
 
 	@Override
+	public void clear() {
+		size = 0;
+		values = null;
+		++version;
+	}
+
+	@Override
+	public SmallSet<E> clone() {
+		SmallSet<E> ret = new SmallSet<E>();
+		ret.size = this.size;
+		if (size == 1) {
+			ret.values = this.values;
+		} else if (size <= HASH_POINT) {
+			Object[] oldVals = (Object[]) this.values;
+			Object[] retVals = new Object[size];
+			for (int i = size - 1; i >= 0; i--)
+				retVals[i] = oldVals[i];
+		} else {
+			@SuppressWarnings("unchecked")
+			HashSet<E> oldVals = (HashSet<E>) this.values;
+			values = oldVals.clone();
+		}
+		return ret;
+	}
+
+	@Override
 	public boolean contains(Object value) {
 		if (size <= 2) {
 			if (size == 0) {
@@ -236,6 +231,15 @@ public class SmallSet<E> extends AbstractSet<E> {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		if (size <= HASH_POINT) {
+			return size == 0;
+		} else {
+			return ((HashSet<?>) values).isEmpty();
+		}
+	}
+
+	@Override
 	public Iterator<E> iterator() {
 		if (size <= HASH_POINT) {
 			if (size == 0) {
@@ -250,32 +254,28 @@ public class SmallSet<E> extends AbstractSet<E> {
 		}
 	}
 
-	public static void main(String[] args) throws java.io.IOException {
-		SmallSet<String> set = new SmallSet<String>();
-		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-		while (true) {
-			System.out.print(set.size() + ":"); // OK
-			for (Iterator<String> it = set.iterator(); it.hasNext();) {
-				System.out.print(" " + it.next()); // OK
-			}
-			System.out.println(); // OK
-			System.out.print("> "); // OK
-			String cmd = in.readLine();
-			if (cmd == null)
-				break;
-			cmd = cmd.trim();
-			if (cmd.equals("")) {
-				;
-			} else if (cmd.startsWith("+")) {
-				set.add(cmd.substring(1));
-			} else if (cmd.startsWith("-")) {
-				set.remove(cmd.substring(1));
-			} else if (cmd.startsWith("?")) {
-				boolean ret = set.contains(cmd.substring(1));
-				System.out.println("  " + ret); // OK
-			} else {
-				System.out.println("unrecognized command"); // OK
-			}
+	@Override
+	public int size() {
+		if (size <= HASH_POINT) {
+			return size;
+		} else {
+			return ((HashSet<?>) values).size();
+		}
+	}
+
+	@Override
+	public Object[] toArray() {
+		Object vals = values;
+		int sz = size;
+		if (sz == 1) {
+			return new Object[] { vals };
+		} else if (sz <= HASH_POINT) {
+			Object[] ret = new Object[sz];
+			System.arraycopy(vals, 0, ret, 0, sz);
+			return ret;
+		} else {
+			HashSet<?> hash = (HashSet<?>) vals;
+			return hash.toArray();
 		}
 	}
 }

@@ -25,27 +25,89 @@ public class SimulationTreeModel implements TreeModel {
 		this.currentView = null;
 	}
 
-	public CircuitState getRootState() {
-		return root.getCircuitState();
+	@Override
+	public void addTreeModelListener(TreeModelListener l) {
+		listeners.add(l);
+	}
+
+	private TreePath findPath(Object node) {
+		ArrayList<Object> path = new ArrayList<Object>();
+		Object current = node;
+		while (current instanceof TreeNode) {
+			path.add(0, current);
+			current = ((TreeNode) current).getParent();
+		}
+		if (current != null) {
+			path.add(0, current);
+		}
+		return new TreePath(path.toArray());
+	}
+
+	protected void fireNodeChanged(Object node) {
+		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
+		for (TreeModelListener l : listeners) {
+			l.treeNodesChanged(e);
+		}
+	}
+
+	protected void fireStructureChanged(Object node) {
+		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
+		for (TreeModelListener l : listeners) {
+			l.treeStructureChanged(e);
+		}
+	}
+
+	@Override
+	public Object getChild(Object parent, int index) {
+		if (parent instanceof TreeNode) {
+			return ((TreeNode) parent).getChildAt(index);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public int getChildCount(Object parent) {
+		if (parent instanceof TreeNode) {
+			return ((TreeNode) parent).getChildCount();
+		} else {
+			return 0;
+		}
 	}
 
 	public CircuitState getCurrentView() {
 		return currentView;
 	}
 
-	public void setCurrentView(CircuitState value) {
-		CircuitState oldView = currentView;
-		if (oldView != value) {
-			currentView = value;
-
-			SimulationTreeCircuitNode node1 = mapToNode(oldView);
-			if (node1 != null)
-				fireNodeChanged(node1);
-
-			SimulationTreeCircuitNode node2 = mapToNode(value);
-			if (node2 != null)
-				fireNodeChanged(node2);
+	@Override
+	public int getIndexOfChild(Object parent, Object child) {
+		if (parent instanceof TreeNode && child instanceof TreeNode) {
+			return ((TreeNode) parent).getIndex((TreeNode) child);
+		} else {
+			return -1;
 		}
+	}
+
+	@Override
+	public Object getRoot() {
+		return root;
+	}
+
+	public CircuitState getRootState() {
+		return root.getCircuitState();
+	}
+
+	@Override
+	public boolean isLeaf(Object node) {
+		if (node instanceof TreeNode) {
+			return ((TreeNode) node).getChildCount() == 0;
+		} else {
+			return true;
+		}
+	}
+
+	protected SimulationTreeNode mapComponentToNode(Component comp) {
+		return null;
 	}
 
 	private SimulationTreeCircuitNode mapToNode(CircuitState state) {
@@ -95,85 +157,23 @@ public class SimulationTreeModel implements TreeModel {
 		return new TreePath(pathNodes);
 	}
 
-	protected SimulationTreeNode mapComponentToNode(Component comp) {
-		return null;
-	}
-
-	@Override
-	public void addTreeModelListener(TreeModelListener l) {
-		listeners.add(l);
-	}
-
 	@Override
 	public void removeTreeModelListener(TreeModelListener l) {
 		listeners.remove(l);
 	}
 
-	protected void fireNodeChanged(Object node) {
-		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
-		for (TreeModelListener l : listeners) {
-			l.treeNodesChanged(e);
-		}
-	}
+	public void setCurrentView(CircuitState value) {
+		CircuitState oldView = currentView;
+		if (oldView != value) {
+			currentView = value;
 
-	protected void fireStructureChanged(Object node) {
-		TreeModelEvent e = new TreeModelEvent(this, findPath(node));
-		for (TreeModelListener l : listeners) {
-			l.treeStructureChanged(e);
-		}
-	}
+			SimulationTreeCircuitNode node1 = mapToNode(oldView);
+			if (node1 != null)
+				fireNodeChanged(node1);
 
-	private TreePath findPath(Object node) {
-		ArrayList<Object> path = new ArrayList<Object>();
-		Object current = node;
-		while (current instanceof TreeNode) {
-			path.add(0, current);
-			current = ((TreeNode) current).getParent();
-		}
-		if (current != null) {
-			path.add(0, current);
-		}
-		return new TreePath(path.toArray());
-	}
-
-	@Override
-	public Object getRoot() {
-		return root;
-	}
-
-	@Override
-	public int getChildCount(Object parent) {
-		if (parent instanceof TreeNode) {
-			return ((TreeNode) parent).getChildCount();
-		} else {
-			return 0;
-		}
-	}
-
-	@Override
-	public Object getChild(Object parent, int index) {
-		if (parent instanceof TreeNode) {
-			return ((TreeNode) parent).getChildAt(index);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public int getIndexOfChild(Object parent, Object child) {
-		if (parent instanceof TreeNode && child instanceof TreeNode) {
-			return ((TreeNode) parent).getIndex((TreeNode) child);
-		} else {
-			return -1;
-		}
-	}
-
-	@Override
-	public boolean isLeaf(Object node) {
-		if (node instanceof TreeNode) {
-			return ((TreeNode) node).getChildCount() == 0;
-		} else {
-			return true;
+			SimulationTreeCircuitNode node2 = mapToNode(value);
+			if (node2 != null)
+				fireNodeChanged(node2);
 		}
 	}
 

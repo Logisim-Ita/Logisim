@@ -21,8 +21,22 @@ public class ToolbarToolItem implements ToolbarItem {
 		this.icon = tool.getIcon();
 	}
 
+	@Override
+	public Dimension getDimension(Object orientation) {
+		if (icon == null) {
+			return new Dimension(16, 16);
+		} else {
+			return new Dimension(icon.getIconWidth() + 8, icon.getIconHeight() + 8);
+		}
+	}
+
 	public AbstractTool getTool() {
 		return tool;
+	}
+
+	@Override
+	public String getToolTip() {
+		return tool.getDescription();
 	}
 
 	@Override
@@ -41,20 +55,6 @@ public class ToolbarToolItem implements ToolbarItem {
 			g.drawRect(4, 4, 8, 8);
 		} else {
 			icon.paintIcon(destination, g, 4, 4);
-		}
-	}
-
-	@Override
-	public String getToolTip() {
-		return tool.getDescription();
-	}
-
-	@Override
-	public Dimension getDimension(Object orientation) {
-		if (icon == null) {
-			return new Dimension(16, 16);
-		} else {
-			return new Dimension(icon.getIconWidth() + 8, icon.getIconHeight() + 8);
 		}
 	}
 }

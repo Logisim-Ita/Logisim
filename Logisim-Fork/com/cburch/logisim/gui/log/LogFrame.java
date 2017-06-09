@@ -34,47 +34,6 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class LogFrame extends LFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1483284271691290378L;
-
-	// TODO should automatically repaint icons when component attr change
-	// TODO ? moving a component using Select tool removes it from selection
-	private class WindowMenuManager extends WindowMenuItemManager
-			implements LocaleListener, ProjectListener, LibraryListener {
-		WindowMenuManager() {
-			super(Strings.get("logFrameMenuItem"), false);
-			project.addProjectListener(this);
-			project.addLibraryListener(this);
-		}
-
-		@Override
-		public JFrame getJFrame(boolean create) {
-			return LogFrame.this;
-		}
-
-		@Override
-		public void localeChanged() {
-			String title = project.getLogisimFile().getDisplayName();
-			setText(StringUtil.format(Strings.get("logFrameMenuItem"), title));
-		}
-
-		@Override
-		public void projectChanged(ProjectEvent event) {
-			if (event.getAction() == ProjectEvent.ACTION_SET_FILE) {
-				localeChanged();
-			}
-		}
-
-		@Override
-		public void libraryChanged(LibraryEvent event) {
-			if (event.getAction() == LibraryEvent.SET_NAME) {
-				localeChanged();
-			}
-		}
-	}
-
 	private class MyListener
 			implements ActionListener, ProjectListener, LibraryListener, SimulatorListener, LocaleListener {
 		@Override
@@ -83,16 +42,6 @@ public class LogFrame extends LFrame {
 			if (src == close) {
 				WindowEvent e = new WindowEvent(LogFrame.this, WindowEvent.WINDOW_CLOSING);
 				LogFrame.this.processWindowEvent(e);
-			}
-		}
-
-		@Override
-		public void projectChanged(ProjectEvent event) {
-			int action = event.getAction();
-			if (action == ProjectEvent.ACTION_SET_STATE) {
-				setSimulator(event.getProject().getSimulator(), event.getProject().getCircuitState());
-			} else if (action == ProjectEvent.ACTION_SET_FILE) {
-				setTitle(computeTitle(curModel, project));
 			}
 		}
 
@@ -117,28 +66,84 @@ public class LogFrame extends LFrame {
 		}
 
 		@Override
+		public void projectChanged(ProjectEvent event) {
+			int action = event.getAction();
+			if (action == ProjectEvent.ACTION_SET_STATE) {
+				setSimulator(event.getProject().getSimulator(), event.getProject().getCircuitState());
+			} else if (action == ProjectEvent.ACTION_SET_FILE) {
+				setTitle(computeTitle(curModel, project));
+			}
+		}
+
+		@Override
 		public void propagationCompleted(SimulatorEvent e) {
 			curModel.propagationCompleted();
 		}
 
 		@Override
-		public void tickCompleted(SimulatorEvent e) {
+		public void simulatorStateChanged(SimulatorEvent e) {
 		}
 
 		@Override
-		public void simulatorStateChanged(SimulatorEvent e) {
+		public void tickCompleted(SimulatorEvent e) {
 		}
 	}
 
+	// TODO should automatically repaint icons when component attr change
+	// TODO ? moving a component using Select tool removes it from selection
+	private class WindowMenuManager extends WindowMenuItemManager
+			implements LocaleListener, ProjectListener, LibraryListener {
+		WindowMenuManager() {
+			super(Strings.get("logFrameMenuItem"), false);
+			project.addProjectListener(this);
+			project.addLibraryListener(this);
+		}
+
+		@Override
+		public JFrame getJFrame(boolean create) {
+			return LogFrame.this;
+		}
+
+		@Override
+		public void libraryChanged(LibraryEvent event) {
+			if (event.getAction() == LibraryEvent.SET_NAME) {
+				localeChanged();
+			}
+		}
+
+		@Override
+		public void localeChanged() {
+			String title = project.getLogisimFile().getDisplayName();
+			setText(StringUtil.format(Strings.get("logFrameMenuItem"), title));
+		}
+
+		@Override
+		public void projectChanged(ProjectEvent event) {
+			if (event.getAction() == ProjectEvent.ACTION_SET_FILE) {
+				localeChanged();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1483284271691290378L;
+
+	private static String computeTitle(Model data, Project proj) {
+		String name = data == null ? "???" : data.getCircuitState().getCircuit().getName();
+		return StringUtil.format(Strings.get("logFrameTitle"), name, proj.getLogisimFile().getDisplayName());
+	}
 	private Project project;
 	private Simulator curSimulator = null;
 	private Model curModel;
 	private Map<CircuitState, Model> modelMap = new HashMap<CircuitState, Model>();
 	private MyListener myListener = new MyListener();
-	private WindowMenuManager windowManager;
 
+	private WindowMenuManager windowManager;
 	private LogPanel[] panels;
 	private JTabbedPane tabbedPane;
+
 	private JButton close = new JButton();
 
 	public LogFrame(Project project) {
@@ -171,12 +176,16 @@ public class LogFrame extends LFrame {
 		pack();
 	}
 
-	public Project getProject() {
-		return project;
-	}
-
 	Model getModel() {
 		return curModel;
+	}
+
+	LogPanel[] getPrefPanels() {
+		return panels;
+	}
+
+	public Project getProject() {
+		return project;
 	}
 
 	private void setSimulator(Simulator value, CircuitState state) {
@@ -223,14 +232,5 @@ public class LogFrame extends LFrame {
 			windowManager.frameOpened(this);
 		}
 		super.setVisible(value);
-	}
-
-	LogPanel[] getPrefPanels() {
-		return panels;
-	}
-
-	private static String computeTitle(Model data, Project proj) {
-		String name = data == null ? "???" : data.getCircuitState().getCircuit().getName();
-		return StringUtil.format(Strings.get("logFrameTitle"), name, proj.getLogisimFile().getDisplayName());
 	}
 }

@@ -25,11 +25,6 @@ import com.cburch.logisim.analyze.model.OutputExpressionsEvent;
 import com.cburch.logisim.analyze.model.OutputExpressionsListener;
 
 class MinimizedTab extends AnalyzerTab {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9156728023775005564L;
-
 	@SuppressWarnings("rawtypes")
 	private static class FormatModel extends AbstractListModel implements ComboBoxModel {
 		/**
@@ -55,10 +50,9 @@ class MinimizedTab extends AnalyzerTab {
 			localeChanged();
 		}
 
-		void localeChanged() {
-			choices[0] = Strings.get("minimizedSumOfProducts");
-			choices[1] = Strings.get("minimizedProductOfSums");
-			fireContentsChanged(this, 0, choices.length);
+		@Override
+		public Object getElementAt(int index) {
+			return choices[index];
 		}
 
 		int getSelectedFormat() {
@@ -71,18 +65,19 @@ class MinimizedTab extends AnalyzerTab {
 		}
 
 		@Override
+		public Object getSelectedItem() {
+			return choices[selected];
+		}
+
+		@Override
 		public int getSize() {
 			return choices.length;
 		}
 
-		@Override
-		public Object getElementAt(int index) {
-			return choices[index];
-		}
-
-		@Override
-		public Object getSelectedItem() {
-			return choices[selected];
+		void localeChanged() {
+			choices[0] = Strings.get("minimizedSumOfProducts");
+			choices[1] = Strings.get("minimizedProductOfSums");
+			fireContentsChanged(this, 0, choices.length);
 		}
 
 		@Override
@@ -97,6 +92,14 @@ class MinimizedTab extends AnalyzerTab {
 
 	private class MyListener implements OutputExpressionsListener, ActionListener, ItemListener {
 		@Override
+		public void actionPerformed(ActionEvent event) {
+			String output = getCurrentVariable();
+			int format = outputExprs.getMinimizedFormat(output);
+			formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
+			outputExprs.setExpression(output, outputExprs.getMinimalExpression(output));
+		}
+
+		@Override
 		public void expressionChanged(OutputExpressionsEvent event) {
 			String output = getCurrentVariable();
 			if (event.getType() == OutputExpressionsEvent.OUTPUT_MINIMAL && event.getVariable().equals(output)) {
@@ -106,14 +109,6 @@ class MinimizedTab extends AnalyzerTab {
 			setAsExpr.setEnabled(output != null && !outputExprs.isExpressionMinimal(output));
 			int format = outputExprs.getMinimizedFormat(output);
 			formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent event) {
-			String output = getCurrentVariable();
-			int format = outputExprs.getMinimizedFormat(output);
-			formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
-			outputExprs.setExpression(output, outputExprs.getMinimalExpression(output));
 		}
 
 		@Override
@@ -127,6 +122,11 @@ class MinimizedTab extends AnalyzerTab {
 			}
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9156728023775005564L;
 
 	private OutputSelector selector;
 	private KarnaughMapPanel karnaughMap;
@@ -204,6 +204,10 @@ class MinimizedTab extends AnalyzerTab {
 		gc.insets = oldInsets;
 	}
 
+	private String getCurrentVariable() {
+		return selector.getSelectedOutput();
+	}
+
 	@Override
 	void localeChanged() {
 		selector.localeChanged();
@@ -222,9 +226,5 @@ class MinimizedTab extends AnalyzerTab {
 		formatChoice.setSelectedIndex(FormatModel.getFormatIndex(format));
 		minimizedExpr.setExpression(outputExprs.getMinimalExpression(output));
 		setAsExpr.setEnabled(output != null && !outputExprs.isExpressionMinimal(output));
-	}
-
-	private String getCurrentVariable() {
-		return selector.getSelectedOutput();
 	}
 }

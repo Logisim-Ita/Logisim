@@ -6,10 +6,16 @@ package com.cburch.logisim.circuit;
 import com.cburch.logisim.util.StringUtil;
 
 public class AnalyzeException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1053839875326704219L;
+	public static class CannotHandle extends AnalyzeException {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1601707682203573221L;
+
+		public CannotHandle(String reason) {
+			super(StringUtil.format(Strings.get("analyzeCannotHandleError"), reason));
+		}
+	}
 
 	public static class Circular extends AnalyzeException {
 		/**
@@ -33,16 +39,10 @@ public class AnalyzeException extends Exception {
 		}
 	}
 
-	public static class CannotHandle extends AnalyzeException {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1601707682203573221L;
-
-		public CannotHandle(String reason) {
-			super(StringUtil.format(Strings.get("analyzeCannotHandleError"), reason));
-		}
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1053839875326704219L;
 
 	public AnalyzeException() {
 	}

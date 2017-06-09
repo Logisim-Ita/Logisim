@@ -23,13 +23,6 @@ class CanvasPaintThread extends Thread {
 		nextRepaint = System.currentTimeMillis();
 	}
 
-	public void requestStop() {
-		synchronized (lock) {
-			alive = false;
-			lock.notifyAll();
-		}
-	}
-
 	public void requentRepaint(Rectangle rect) {
 		synchronized (lock) {
 			if (repaintRequested) {
@@ -51,6 +44,13 @@ class CanvasPaintThread extends Thread {
 				repaintRectangle = null;
 				lock.notifyAll();
 			}
+		}
+	}
+
+	public void requestStop() {
+		synchronized (lock) {
+			alive = false;
+			lock.notifyAll();
 		}
 	}
 

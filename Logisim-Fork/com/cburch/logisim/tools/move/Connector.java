@@ -23,13 +23,10 @@ class Connector {
 	private static final int MAX_ORDERING_TRIES = 10;
 	private static final int MAX_SEARCH_ITERATIONS = 20000;
 
-	private Connector() {
-	}
-
 	static final String ALLOW_NEITHER = "neither";
+
 	static final String ALLOW_VERTICAL = "vert";
 	static final String ALLOW_HORIZONTAL = "horz";
-
 	static MoveResult computeWires(MoveRequest req) {
 		MoveGesture gesture = req.getMoveGesture();
 		int dx = req.getDeltaX();
@@ -112,130 +109,23 @@ class Connector {
 		return bestResult;
 	}
 
-	private static ArrayList<ConnectionData> pruneImpossible(ArrayList<ConnectionData> connects, AvoidanceMap avoid,
-			int dx, int dy) {
-		ArrayList<Wire> pathWires = new ArrayList<Wire>();
-		for (ConnectionData conn : connects) {
-			for (Wire w : conn.getWirePath()) {
-				pathWires.add(w);
+	private static ArrayList<Location> convertToPath(SearchNode last) {
+		SearchNode next = last;
+		SearchNode prev = last.getPrevious();
+		ArrayList<Location> ret = new ArrayList<Location>();
+		ret.add(next.getLocation());
+		while (prev != null) {
+			if (prev.getDirection() != next.getDirection()) {
+				ret.add(prev.getLocation());
 			}
+			next = prev;
+			prev = prev.getPrevious();
 		}
-
-		ArrayList<ConnectionData> impossible = new ArrayList<ConnectionData>();
-		for (Iterator<ConnectionData> it = connects.iterator(); it.hasNext();) {
-			ConnectionData conn = it.next();
-			Location dest = conn.getLocation().translate(dx, dy);
-			if (avoid.get(dest) != null) {
-				boolean isInPath = false;
-				for (Wire w : pathWires) {
-					if (w.contains(dest)) {
-						isInPath = true;
-						break;
-					}
-				}
-				if (!isInPath) {
-					it.remove();
-					impossible.add(conn);
-				}
-			}
+		if (!ret.get(ret.size() - 1).equals(next.getLocation())) {
+			ret.add(next.getLocation());
 		}
-		return impossible;
-	}
-
-	/**
-	 * Creates a list of the connections to make, sorted according to their
-	 * location. If, for example, we are moving an east-facing AND gate
-	 * southeast, then we prefer to connect the inputs from the top down to
-	 * minimize the chances that the created wires will interfere with each
-	 * other - but if we are moving that gate northeast, we prefer to connect
-	 * the inputs from the bottom up.
-	 */
-	private static void sortConnects(ArrayList<ConnectionData> connects, final int dx, final int dy) {
-		Collections.sort(connects, new Comparator<ConnectionData>() {
-			@Override
-			public int compare(ConnectionData ac, ConnectionData bc) {
-				Location a = ac.getLocation();
-				Location b = bc.getLocation();
-				int abx = a.getX() - b.getX();
-				int aby = a.getY() - b.getY();
-				return abx * dx + aby * dy;
-			}
-		});
-	}
-
-	private static void processConnection(ConnectionData conn, int dx, int dy, HashSet<Location> connLocs,
-			ArrayList<SearchNode> connNodes, AvoidanceMap selAvoid) {
-		Location cur = conn.getLocation();
-		Location dest = cur.translate(dx, dy);
-		if (selAvoid.get(cur) == null) {
-			Direction preferred = conn.getDirection();
-			if (preferred == null) {
-				if (Math.abs(dx) > Math.abs(dy)) {
-					preferred = dx > 0 ? Direction.EAST : Direction.WEST;
-				} else {
-					preferred = dy > 0 ? Direction.SOUTH : Direction.NORTH;
-				}
-			}
-
-			connLocs.add(cur);
-			connNodes.add(new SearchNode(conn, cur, preferred, dest));
-		}
-
-		for (Wire w : conn.getWirePath()) {
-			for (Location loc : w) {
-				if (selAvoid.get(loc) == null || loc.equals(dest)) {
-					boolean added = connLocs.add(loc);
-					if (added) {
-						Direction dir = null;
-						if (w.endsAt(loc)) {
-							if (w.isVertical()) {
-								int y0 = loc.getY();
-								int y1 = w.getOtherEnd(loc).getY();
-								dir = y0 < y1 ? Direction.NORTH : Direction.SOUTH;
-							} else {
-								int x0 = loc.getX();
-								int x1 = w.getOtherEnd(loc).getX();
-								dir = x0 < x1 ? Direction.WEST : Direction.EAST;
-							}
-						}
-						connNodes.add(new SearchNode(conn, loc, dir, dest));
-					}
-				}
-			}
-		}
-	}
-
-	private static MoveResult tryList(MoveRequest req, MoveGesture gesture, ArrayList<ConnectionData> connects, int dx,
-			int dy, HashMap<ConnectionData, Set<Location>> pathLocs,
-			HashMap<ConnectionData, List<SearchNode>> initNodes, long stopTime) {
-		AvoidanceMap avoid = gesture.getFixedAvoidanceMap().cloneMap();
-		avoid.markAll(gesture.getSelected(), dx, dy);
-
-		ReplacementMap replacements = new ReplacementMap();
-		ArrayList<ConnectionData> unconnected = new ArrayList<ConnectionData>();
-		int totalDistance = 0;
-		for (ConnectionData conn : connects) {
-			if (ConnectorThread.isOverrideRequested()) {
-				return null;
-			}
-			if (System.currentTimeMillis() - stopTime > 0) {
-				unconnected.add(conn);
-				continue;
-			}
-			List<SearchNode> connNodes = initNodes.get(conn);
-			Set<Location> connPathLocs = pathLocs.get(conn);
-			SearchNode n = findShortestPath(connNodes, connPathLocs, avoid);
-			if (n != null) { // normal case - a path was found
-				totalDistance += n.getDistance();
-				ArrayList<Location> path = convertToPath(n);
-				processPath(path, conn, avoid, replacements, connPathLocs);
-			} else if (ConnectorThread.isOverrideRequested()) {
-				return null; // search was aborted: return null to indicate this
-			} else {
-				unconnected.add(conn);
-			}
-		}
-		return new MoveResult(req, replacements, unconnected, totalDistance);
+		Collections.reverse(ret);
+		return ret;
 	}
 
 	private static SearchNode findShortestPath(List<SearchNode> nodes, Set<Location> pathLocs, AvoidanceMap avoid) {
@@ -314,23 +204,46 @@ class Connector {
 		return null;
 	}
 
-	private static ArrayList<Location> convertToPath(SearchNode last) {
-		SearchNode next = last;
-		SearchNode prev = last.getPrevious();
-		ArrayList<Location> ret = new ArrayList<Location>();
-		ret.add(next.getLocation());
-		while (prev != null) {
-			if (prev.getDirection() != next.getDirection()) {
-				ret.add(prev.getLocation());
+	private static void processConnection(ConnectionData conn, int dx, int dy, HashSet<Location> connLocs,
+			ArrayList<SearchNode> connNodes, AvoidanceMap selAvoid) {
+		Location cur = conn.getLocation();
+		Location dest = cur.translate(dx, dy);
+		if (selAvoid.get(cur) == null) {
+			Direction preferred = conn.getDirection();
+			if (preferred == null) {
+				if (Math.abs(dx) > Math.abs(dy)) {
+					preferred = dx > 0 ? Direction.EAST : Direction.WEST;
+				} else {
+					preferred = dy > 0 ? Direction.SOUTH : Direction.NORTH;
+				}
 			}
-			next = prev;
-			prev = prev.getPrevious();
+
+			connLocs.add(cur);
+			connNodes.add(new SearchNode(conn, cur, preferred, dest));
 		}
-		if (!ret.get(ret.size() - 1).equals(next.getLocation())) {
-			ret.add(next.getLocation());
+
+		for (Wire w : conn.getWirePath()) {
+			for (Location loc : w) {
+				if (selAvoid.get(loc) == null || loc.equals(dest)) {
+					boolean added = connLocs.add(loc);
+					if (added) {
+						Direction dir = null;
+						if (w.endsAt(loc)) {
+							if (w.isVertical()) {
+								int y0 = loc.getY();
+								int y1 = w.getOtherEnd(loc).getY();
+								dir = y0 < y1 ? Direction.NORTH : Direction.SOUTH;
+							} else {
+								int x0 = loc.getX();
+								int x1 = w.getOtherEnd(loc).getX();
+								dir = x0 < x1 ? Direction.WEST : Direction.EAST;
+							}
+						}
+						connNodes.add(new SearchNode(conn, loc, dir, dest));
+					}
+				}
+			}
 		}
-		Collections.reverse(ret);
-		return ret;
 	}
 
 	private static void processPath(ArrayList<Location> path, ConnectionData conn, AvoidanceMap avoid,
@@ -365,5 +278,92 @@ class Connector {
 			avoid.markWire(newWire, 0, 0);
 			loc0 = loc1;
 		}
+	}
+
+	private static ArrayList<ConnectionData> pruneImpossible(ArrayList<ConnectionData> connects, AvoidanceMap avoid,
+			int dx, int dy) {
+		ArrayList<Wire> pathWires = new ArrayList<Wire>();
+		for (ConnectionData conn : connects) {
+			for (Wire w : conn.getWirePath()) {
+				pathWires.add(w);
+			}
+		}
+
+		ArrayList<ConnectionData> impossible = new ArrayList<ConnectionData>();
+		for (Iterator<ConnectionData> it = connects.iterator(); it.hasNext();) {
+			ConnectionData conn = it.next();
+			Location dest = conn.getLocation().translate(dx, dy);
+			if (avoid.get(dest) != null) {
+				boolean isInPath = false;
+				for (Wire w : pathWires) {
+					if (w.contains(dest)) {
+						isInPath = true;
+						break;
+					}
+				}
+				if (!isInPath) {
+					it.remove();
+					impossible.add(conn);
+				}
+			}
+		}
+		return impossible;
+	}
+
+	/**
+	 * Creates a list of the connections to make, sorted according to their
+	 * location. If, for example, we are moving an east-facing AND gate
+	 * southeast, then we prefer to connect the inputs from the top down to
+	 * minimize the chances that the created wires will interfere with each
+	 * other - but if we are moving that gate northeast, we prefer to connect
+	 * the inputs from the bottom up.
+	 */
+	private static void sortConnects(ArrayList<ConnectionData> connects, final int dx, final int dy) {
+		Collections.sort(connects, new Comparator<ConnectionData>() {
+			@Override
+			public int compare(ConnectionData ac, ConnectionData bc) {
+				Location a = ac.getLocation();
+				Location b = bc.getLocation();
+				int abx = a.getX() - b.getX();
+				int aby = a.getY() - b.getY();
+				return abx * dx + aby * dy;
+			}
+		});
+	}
+
+	private static MoveResult tryList(MoveRequest req, MoveGesture gesture, ArrayList<ConnectionData> connects, int dx,
+			int dy, HashMap<ConnectionData, Set<Location>> pathLocs,
+			HashMap<ConnectionData, List<SearchNode>> initNodes, long stopTime) {
+		AvoidanceMap avoid = gesture.getFixedAvoidanceMap().cloneMap();
+		avoid.markAll(gesture.getSelected(), dx, dy);
+
+		ReplacementMap replacements = new ReplacementMap();
+		ArrayList<ConnectionData> unconnected = new ArrayList<ConnectionData>();
+		int totalDistance = 0;
+		for (ConnectionData conn : connects) {
+			if (ConnectorThread.isOverrideRequested()) {
+				return null;
+			}
+			if (System.currentTimeMillis() - stopTime > 0) {
+				unconnected.add(conn);
+				continue;
+			}
+			List<SearchNode> connNodes = initNodes.get(conn);
+			Set<Location> connPathLocs = pathLocs.get(conn);
+			SearchNode n = findShortestPath(connNodes, connPathLocs, avoid);
+			if (n != null) { // normal case - a path was found
+				totalDistance += n.getDistance();
+				ArrayList<Location> path = convertToPath(n);
+				processPath(path, conn, avoid, replacements, connPathLocs);
+			} else if (ConnectorThread.isOverrideRequested()) {
+				return null; // search was aborted: return null to indicate this
+			} else {
+				unconnected.add(conn);
+			}
+		}
+		return new MoveResult(req, replacements, unconnected, totalDistance);
+	}
+
+	private Connector() {
 	}
 }

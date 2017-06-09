@@ -59,6 +59,14 @@ class AttrTableSelectionModel extends AttributeSetTableModel implements Selectio
 		}
 	}
 
+	//
+	// SelectionListener method
+	//
+	@Override
+	public void selectionChanged(SelectionEvent e) {
+		fireTitleChanged();
+	}
+
 	@Override
 	public void setValueRequested(Attribute<Object> attr, Object value) throws AttrTableSetException {
 		SelectionAttributes attrs = (SelectionAttributes) getAttributeSet();
@@ -73,13 +81,5 @@ class AttrTableSelectionModel extends AttributeSetTableModel implements Selectio
 		}
 		CanvasModel model = canvas.getModel();
 		canvas.doAction(new ModelChangeAttributeAction(model, oldVals, newVals));
-	}
-
-	//
-	// SelectionListener method
-	//
-	@Override
-	public void selectionChanged(SelectionEvent e) {
-		fireTitleChanged();
 	}
 }

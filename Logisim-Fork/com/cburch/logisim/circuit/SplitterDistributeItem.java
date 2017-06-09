@@ -39,14 +39,6 @@ class SplitterDistributeItem extends JMenuItem implements ActionListener {
 		setText(toGetter().get());
 	}
 
-	private StringGetter toGetter() {
-		if (order > 0) {
-			return Strings.getter("splitterDistributeAscending");
-		} else {
-			return Strings.getter("splitterDistributeDescending");
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		SplitterAttributes attrs = (SplitterAttributes) splitter.getAttributeSet();
@@ -59,5 +51,13 @@ class SplitterDistributeItem extends JMenuItem implements ActionListener {
 			}
 		}
 		proj.doAction(xn.toAction(toGetter()));
+	}
+
+	private StringGetter toGetter() {
+		if (order > 0) {
+			return Strings.getter("splitterDistributeAscending");
+		} else {
+			return Strings.getter("splitterDistributeDescending");
+		}
 	}
 }

@@ -18,26 +18,23 @@ public abstract class Attribute<V> {
 		this.disp = disp;
 	}
 
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getDisplayName() {
-		return disp.get();
+	protected java.awt.Component getCellEditor(V value) {
+		return new JTextField(toDisplayString(value));
 	}
 
 	public java.awt.Component getCellEditor(Window source, V value) {
 		return getCellEditor(value);
 	}
 
-	protected java.awt.Component getCellEditor(V value) {
-		return new JTextField(toDisplayString(value));
+	public String getDisplayName() {
+		return disp.get();
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public abstract V parse(String value);
 
 	public String toDisplayString(V value) {
 		return value == null ? "" : value.toString();
@@ -47,5 +44,8 @@ public abstract class Attribute<V> {
 		return value.toString();
 	}
 
-	public abstract V parse(String value);
+	@Override
+	public String toString() {
+		return name;
+	}
 }

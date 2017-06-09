@@ -21,11 +21,19 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class DisplayDecoder extends InstanceFactory {
 
+	public int decval;// decimal output's value
+
 	public DisplayDecoder() {
 		super("DisplayDecoder", Strings.getter("DisplayDecoderComponent"));
 		setAttributes(new Attribute[] { StdAttr.FACING }, new Object[] { Direction.EAST });
 		setIconName("displaydecoder.gif");
 		setFacingAttribute(StdAttr.FACING);
+	}
+
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updatePorts(instance);
 	}
 
 	@Override
@@ -46,65 +54,25 @@ public class DisplayDecoder extends InstanceFactory {
 	}
 
 	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		updatePorts(instance);
-	}
-
-	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		instance.recomputeBounds();
 		updatePorts(instance);
 	}
 
-	private void updatePorts(Instance instance) {
-		Object dir = instance.getAttributeValue(StdAttr.FACING);
-		int in = 4;
-		int out = 7;
-		char cin = 65;// Letter A (to D in for)
-		char cout = 97;// Letter a (to g in for)
-		Port[] ps = new Port[in + out + 1];
-		if (dir == Direction.NORTH || dir == Direction.SOUTH) {// horizzontal
-			int y = dir == Direction.NORTH ? 40 : -40;
-			for (int i = 0; i < in; i++) {// inputs
-				ps[i] = new Port(20 * i - 30, y, Port.INPUT, 1); // total lenght
-																	// should be
-																	// 80(10-A-20-B-20-C-20-D-10)
-				ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
-				cin++;
-			}
-			int j = in;
-			for (int i = 0; i < out; i++) {// outputs
-				ps[j] = new Port(10 * i - 30, 0, Port.OUTPUT, 1); // total
-																	// lenght
-																	// should be
-																	// 80(10-a-10-b-10-c-10-d-10-e-10-f-10-g-10)
-				ps[j].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
-				cout++;
-				j++;
-			}
-			ps[in + out] = new Port(-40, y / 2, Port.INPUT, 1); // enable input
-		} else {// vertical
-			int x = dir == Direction.EAST ? -40 : 40;
-			for (int i = 0; i < in; i++) {// inputs
-				ps[i] = new Port(x, 20 * i - 30, Port.INPUT, 1);
-				ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
-				cin++;
-			}
-			int j = in;
-			for (int i = 0; i < out; i++) {// outputs
-				ps[j] = new Port(0, 10 * i - 30, Port.OUTPUT, 1);
-				ps[j].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
-				cout++;
-				j++;
-			}
-			ps[in + out] = new Port(x / 2, -40, Port.INPUT, 1); // enable input
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+		Bounds bds = painter.getBounds();
+		g.setColor(Color.BLACK);
+		painter.drawPorts();
+		if (decval != -1) {// draw the dec number on the component
+			GraphicsUtil.drawCenteredText(g, Integer.toString(decval), bds.getX() + bds.getWidth() / 2,
+					bds.getY() + bds.getHeight() / 2);
+		} else {// unknown --> draw '-'
+			GraphicsUtil.drawCenteredText(g, "-", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		}
-		ps[in + out].setToolTip(Strings.getter("priorityEncoderEnableInTip"));
-		instance.setPorts(ps);
 	}
-
-	public int decval;// decimal output's value
 
 	@Override
 	public void propagate(InstanceState state) {
@@ -283,18 +251,50 @@ public class DisplayDecoder extends InstanceFactory {
 		}
 	}
 
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-		Bounds bds = painter.getBounds();
-		g.setColor(Color.BLACK);
-		painter.drawPorts();
-		if (decval != -1) {// draw the dec number on the component
-			GraphicsUtil.drawCenteredText(g, Integer.toString(decval), bds.getX() + bds.getWidth() / 2,
-					bds.getY() + bds.getHeight() / 2);
-		} else {// unknown --> draw '-'
-			GraphicsUtil.drawCenteredText(g, "-", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
+	private void updatePorts(Instance instance) {
+		Object dir = instance.getAttributeValue(StdAttr.FACING);
+		int in = 4;
+		int out = 7;
+		char cin = 65;// Letter A (to D in for)
+		char cout = 97;// Letter a (to g in for)
+		Port[] ps = new Port[in + out + 1];
+		if (dir == Direction.NORTH || dir == Direction.SOUTH) {// horizzontal
+			int y = dir == Direction.NORTH ? 40 : -40;
+			for (int i = 0; i < in; i++) {// inputs
+				ps[i] = new Port(20 * i - 30, y, Port.INPUT, 1); // total lenght
+																	// should be
+																	// 80(10-A-20-B-20-C-20-D-10)
+				ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
+				cin++;
+			}
+			int j = in;
+			for (int i = 0; i < out; i++) {// outputs
+				ps[j] = new Port(10 * i - 30, 0, Port.OUTPUT, 1); // total
+																	// lenght
+																	// should be
+																	// 80(10-a-10-b-10-c-10-d-10-e-10-f-10-g-10)
+				ps[j].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
+				cout++;
+				j++;
+			}
+			ps[in + out] = new Port(-40, y / 2, Port.INPUT, 1); // enable input
+		} else {// vertical
+			int x = dir == Direction.EAST ? -40 : 40;
+			for (int i = 0; i < in; i++) {// inputs
+				ps[i] = new Port(x, 20 * i - 30, Port.INPUT, 1);
+				ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
+				cin++;
+			}
+			int j = in;
+			for (int i = 0; i < out; i++) {// outputs
+				ps[j] = new Port(0, 10 * i - 30, Port.OUTPUT, 1);
+				ps[j].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
+				cout++;
+				j++;
+			}
+			ps[in + out] = new Port(x / 2, -40, Port.INPUT, 1); // enable input
 		}
+		ps[in + out].setToolTip(Strings.getter("priorityEncoderEnableInTip"));
+		instance.setPorts(ps);
 	}
 }

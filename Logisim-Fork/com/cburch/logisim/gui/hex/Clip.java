@@ -18,23 +18,11 @@ import com.cburch.hex.HexEditor;
 import com.cburch.hex.HexModel;
 
 class Clip implements ClipboardOwner {
-	private static final DataFlavor binaryFlavor = new DataFlavor(int[].class, "Binary data");
-
 	private static class Data implements Transferable {
 		private int[] data;
 
 		Data(int[] data) {
 			this.data = data;
-		}
-
-		@Override
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[] { binaryFlavor, DataFlavor.stringFlavor };
-		}
-
-		@Override
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
 		}
 
 		@Override
@@ -67,12 +55,30 @@ class Clip implements ClipboardOwner {
 				throw new UnsupportedFlavorException(flavor);
 			}
 		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { binaryFlavor, DataFlavor.stringFlavor };
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return flavor == binaryFlavor || flavor == DataFlavor.stringFlavor;
+		}
 	}
+
+	private static final DataFlavor binaryFlavor = new DataFlavor(int[].class, "Binary data");
 
 	private HexEditor editor;
 
 	Clip(HexEditor editor) {
 		this.editor = editor;
+	}
+
+	public boolean canPaste() {
+		Clipboard clip = editor.getToolkit().getSystemClipboard();
+		Transferable xfer = clip.getContents(this);
+		return xfer.isDataFlavorSupported(binaryFlavor);
 	}
 
 	public void copy() {
@@ -98,10 +104,8 @@ class Clip implements ClipboardOwner {
 		clip.setContents(new Data(data), this);
 	}
 
-	public boolean canPaste() {
-		Clipboard clip = editor.getToolkit().getSystemClipboard();
-		Transferable xfer = clip.getContents(this);
-		return xfer.isDataFlavorSupported(binaryFlavor);
+	@Override
+	public void lostOwnership(Clipboard clip, Transferable transfer) {
 	}
 
 	public void paste() {
@@ -169,10 +173,6 @@ class Clip implements ClipboardOwner {
 						Strings.get("hexPasteErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
-	}
-
-	@Override
-	public void lostOwnership(Clipboard clip, Transferable transfer) {
 	}
 
 }

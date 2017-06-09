@@ -12,24 +12,31 @@ import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.util.StringUtil;
 
 class OptionsActions {
-	private OptionsActions() {
-	}
+	private static class RemoveMapping extends Action {
+		MouseMappings mm;
+		Integer mods;
+		Tool oldtool;
 
-	public static Action setAttribute(AttributeSet attrs, Attribute<?> attr, Object value) {
-		Object oldValue = attrs.getValue(attr);
-		if (!oldValue.equals(value)) {
-			return new SetAction(attrs, attr, value);
-		} else {
-			return null;
+		RemoveMapping(MouseMappings mm, Integer mods) {
+			this.mm = mm;
+			this.mods = mods;
 		}
-	}
 
-	public static Action setMapping(MouseMappings mm, Integer mods, Tool tool) {
-		return new SetMapping(mm, mods, tool);
-	}
+		@Override
+		public void doIt(Project proj) {
+			oldtool = mm.getToolFor(mods);
+			mm.setToolFor(mods, null);
+		}
 
-	public static Action removeMapping(MouseMappings mm, Integer mods) {
-		return new RemoveMapping(mm, mods);
+		@Override
+		public String getName() {
+			return Strings.get("removeMouseMappingAction");
+		}
+
+		@Override
+		public void undo(Project proj) {
+			mm.setToolFor(mods, oldtool);
+		}
 	}
 
 	private static class SetAction extends Action {
@@ -47,14 +54,14 @@ class OptionsActions {
 		}
 
 		@Override
-		public String getName() {
-			return StringUtil.format(Strings.get("setOptionAction"), attr.getDisplayName());
-		}
-
-		@Override
 		public void doIt(Project proj) {
 			oldval = attrs.getValue(attr);
 			attrs.setValue(attr, newval);
+		}
+
+		@Override
+		public String getName() {
+			return StringUtil.format(Strings.get("setOptionAction"), attr.getDisplayName());
 		}
 
 		@Override
@@ -76,14 +83,14 @@ class OptionsActions {
 		}
 
 		@Override
-		public String getName() {
-			return Strings.get("addMouseMappingAction");
-		}
-
-		@Override
 		public void doIt(Project proj) {
 			oldtool = mm.getToolFor(mods);
 			mm.setToolFor(mods, tool);
+		}
+
+		@Override
+		public String getName() {
+			return Strings.get("addMouseMappingAction");
 		}
 
 		@Override
@@ -92,30 +99,23 @@ class OptionsActions {
 		}
 	}
 
-	private static class RemoveMapping extends Action {
-		MouseMappings mm;
-		Integer mods;
-		Tool oldtool;
+	public static Action removeMapping(MouseMappings mm, Integer mods) {
+		return new RemoveMapping(mm, mods);
+	}
 
-		RemoveMapping(MouseMappings mm, Integer mods) {
-			this.mm = mm;
-			this.mods = mods;
+	public static Action setAttribute(AttributeSet attrs, Attribute<?> attr, Object value) {
+		Object oldValue = attrs.getValue(attr);
+		if (!oldValue.equals(value)) {
+			return new SetAction(attrs, attr, value);
+		} else {
+			return null;
 		}
+	}
 
-		@Override
-		public String getName() {
-			return Strings.get("removeMouseMappingAction");
-		}
+	public static Action setMapping(MouseMappings mm, Integer mods, Tool tool) {
+		return new SetMapping(mm, mods, tool);
+	}
 
-		@Override
-		public void doIt(Project proj) {
-			oldtool = mm.getToolFor(mods);
-			mm.setToolFor(mods, null);
-		}
-
-		@Override
-		public void undo(Project proj) {
-			mm.setToolFor(mods, oldtool);
-		}
+	private OptionsActions() {
 	}
 }

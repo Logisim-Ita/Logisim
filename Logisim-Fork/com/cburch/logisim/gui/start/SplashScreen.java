@@ -17,6 +17,15 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 public class SplashScreen extends JWindow implements ActionListener {
+	private static class Marker {
+		int count;
+		String message;
+
+		Marker(int count, String message) {
+			this.count = count;
+			this.message = message;
+		}
+	}
 	/**
 	 * 
 	 */
@@ -30,20 +39,11 @@ public class SplashScreen extends JWindow implements ActionListener {
 	public static final int FILE_CREATE = 6;
 	public static final int FILE_LOAD = 7;
 	public static final int PROJECT_CREATE = 8;
+
 	public static final int FRAME_CREATE = 9;
-
 	private static final int PROGRESS_MAX = 3568;
+
 	private static final boolean PRINT_TIMES = false;
-
-	private static class Marker {
-		int count;
-		String message;
-
-		Marker(int count, String message) {
-			this.count = count;
-			this.message = message;
-		}
-	}
 
 	Marker[] markers = new Marker[] { new Marker(377, Strings.get("progressLibraries")),
 			new Marker(990, Strings.get("progressTemplateCreate")),
@@ -84,6 +84,29 @@ public class SplashScreen extends JWindow implements ActionListener {
 		setContentPane(contents);
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if (src == cancel) {
+			System.exit(0);
+		} else if (src == close) {
+			close();
+		}
+	}
+
+	public void close() {
+		if (inClose)
+			return;
+		inClose = true;
+		setVisible(false);
+		inClose = false;
+		if (PRINT_TIMES) {
+			System.err.println((System.currentTimeMillis() - startTime) // OK
+					+ " closed");
+		}
+		markers = null;
+	}
+
 	public void setProgress(int markerId) {
 		final Marker marker = markers == null ? null : markers[markerId];
 		if (marker != null) {
@@ -115,28 +138,5 @@ public class SplashScreen extends JWindow implements ActionListener {
 			setLocation(x, y);
 		}
 		super.setVisible(value);
-	}
-
-	public void close() {
-		if (inClose)
-			return;
-		inClose = true;
-		setVisible(false);
-		inClose = false;
-		if (PRINT_TIMES) {
-			System.err.println((System.currentTimeMillis() - startTime) // OK
-					+ " closed");
-		}
-		markers = null;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-		if (src == cancel) {
-			System.exit(0);
-		} else if (src == close) {
-			close();
-		}
 	}
 }

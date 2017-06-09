@@ -8,14 +8,14 @@ public class AttributeEvent {
 	private Attribute<?> attr;
 	private Object value;
 
+	public AttributeEvent(AttributeSet source) {
+		this(source, null, null);
+	}
+
 	public AttributeEvent(AttributeSet source, Attribute<?> attr, Object value) {
 		this.source = source;
 		this.attr = attr;
 		this.value = value;
-	}
-
-	public AttributeEvent(AttributeSet source) {
-		this(source, null, null);
 	}
 
 	public Attribute<?> getAttribute() {

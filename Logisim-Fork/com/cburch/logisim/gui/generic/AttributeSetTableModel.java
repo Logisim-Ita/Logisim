@@ -25,6 +25,12 @@ public abstract class AttributeSetTableModel implements AttrTableModel, Attribut
 		}
 
 		@Override
+		public Component getEditor(Window parent) {
+			Object value = attrs.getValue(attr);
+			return attr.getCellEditor(parent, value);
+		}
+
+		@Override
 		public String getLabel() {
 			return attr.getDisplayName();
 		}
@@ -46,12 +52,6 @@ public abstract class AttributeSetTableModel implements AttrTableModel, Attribut
 		@Override
 		public boolean isValueEditable() {
 			return !attrs.isReadOnly(attr);
-		}
-
-		@Override
-		public Component getEditor(Window parent) {
-			Object value = attrs.getValue(attr);
-			return attr.getCellEditor(parent, value);
 		}
 
 		@Override
@@ -99,73 +99,12 @@ public abstract class AttributeSetTableModel implements AttrTableModel, Attribut
 	}
 
 	@Override
-	public abstract String getTitle();
-
-	public AttributeSet getAttributeSet() {
-		return attrs;
-	}
-
-	public void setAttributeSet(AttributeSet value) {
-		if (attrs != value) {
-			if (!listeners.isEmpty()) {
-				attrs.removeAttributeListener(this);
-			}
-			attrs = value;
-			if (!listeners.isEmpty()) {
-				attrs.addAttributeListener(this);
-			}
-			attributeListChanged(null);
-		}
-	}
-
-	@Override
 	public void addAttrTableModelListener(AttrTableModelListener listener) {
 		if (listeners.isEmpty() && attrs != null) {
 			attrs.addAttributeListener(this);
 		}
 		listeners.add(listener);
 	}
-
-	@Override
-	public void removeAttrTableModelListener(AttrTableModelListener listener) {
-		listeners.remove(listener);
-		if (listeners.isEmpty() && attrs != null) {
-			attrs.removeAttributeListener(this);
-		}
-	}
-
-	protected void fireTitleChanged() {
-		AttrTableModelEvent event = new AttrTableModelEvent(this);
-		for (AttrTableModelListener l : listeners) {
-			l.attrTitleChanged(event);
-		}
-	}
-
-	protected void fireStructureChanged() {
-		AttrTableModelEvent event = new AttrTableModelEvent(this);
-		for (AttrTableModelListener l : listeners) {
-			l.attrStructureChanged(event);
-		}
-	}
-
-	protected void fireValueChanged(int index) {
-		AttrTableModelEvent event = new AttrTableModelEvent(this, index);
-		for (AttrTableModelListener l : listeners) {
-			l.attrValueChanged(event);
-		}
-	}
-
-	@Override
-	public int getRowCount() {
-		return rows.size();
-	}
-
-	@Override
-	public AttrTableModelRow getRow(int rowIndex) {
-		return rows.get(rowIndex);
-	}
-
-	protected abstract void setValueRequested(Attribute<Object> attr, Object value) throws AttrTableSetException;
 
 	//
 	// AttributeListener methods
@@ -218,5 +157,66 @@ public abstract class AttributeSetTableModel implements AttrTableModel, Attribut
 			}
 		}
 	}
+
+	protected void fireStructureChanged() {
+		AttrTableModelEvent event = new AttrTableModelEvent(this);
+		for (AttrTableModelListener l : listeners) {
+			l.attrStructureChanged(event);
+		}
+	}
+
+	protected void fireTitleChanged() {
+		AttrTableModelEvent event = new AttrTableModelEvent(this);
+		for (AttrTableModelListener l : listeners) {
+			l.attrTitleChanged(event);
+		}
+	}
+
+	protected void fireValueChanged(int index) {
+		AttrTableModelEvent event = new AttrTableModelEvent(this, index);
+		for (AttrTableModelListener l : listeners) {
+			l.attrValueChanged(event);
+		}
+	}
+
+	public AttributeSet getAttributeSet() {
+		return attrs;
+	}
+
+	@Override
+	public AttrTableModelRow getRow(int rowIndex) {
+		return rows.get(rowIndex);
+	}
+
+	@Override
+	public int getRowCount() {
+		return rows.size();
+	}
+
+	@Override
+	public abstract String getTitle();
+
+	@Override
+	public void removeAttrTableModelListener(AttrTableModelListener listener) {
+		listeners.remove(listener);
+		if (listeners.isEmpty() && attrs != null) {
+			attrs.removeAttributeListener(this);
+		}
+	}
+
+	public void setAttributeSet(AttributeSet value) {
+		if (attrs != value) {
+			if (!listeners.isEmpty()) {
+				attrs.removeAttributeListener(this);
+			}
+			attrs = value;
+			if (!listeners.isEmpty()) {
+				attrs.addAttributeListener(this);
+			}
+			attributeListChanged(null);
+		}
+	}
+
+	protected abstract void setValueRequested(Attribute<Object> attr, Object value) throws AttrTableSetException;
 
 }

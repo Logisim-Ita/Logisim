@@ -34,6 +34,22 @@ import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 
 abstract class Mem extends InstanceFactory {
+	static class MemListener implements HexModelListener {
+		Instance instance;
+
+		MemListener(Instance instance) {
+			this.instance = instance;
+		}
+
+		@Override
+		public void bytesChanged(HexModel source, long start, long numBytes, int[] values) {
+			instance.fireInvalidated();
+		}
+
+		@Override
+		public void metainfoChanged(HexModel source) {
+		}
+	}
 	// Note: The code is meant to be able to handle up to 32-bit addresses, but
 	// it
 	// hasn't been debugged thoroughly. There are two definite changes I would
@@ -48,13 +64,14 @@ abstract class Mem extends InstanceFactory {
 	// to 14 so that its "page table" isn't quite so big.
 	public static final Attribute<BitWidth> ADDR_ATTR = Attributes.forBitWidth("addrWidth",
 			Strings.getter("ramAddrWidthAttr"), 2, 24);
+
 	public static final Attribute<BitWidth> DATA_ATTR = Attributes.forBitWidth("dataWidth",
 			Strings.getter("ramDataWidthAttr"));
-
 	// port-related constants
 	static final int DATA = 0;
 	static final int ADDR = 1;
 	static final int CS = 2;
+
 	static final int MEM_INPUTS = 3;
 
 	// other constants
@@ -72,24 +89,12 @@ abstract class Mem extends InstanceFactory {
 		setOffsetBounds(Bounds.create(-140, -40, 140, 80));
 	}
 
-	abstract void configurePorts(Instance instance);
-
-	@Override
-	public abstract AttributeSet createAttributeSet();
-
-	abstract MemState getState(InstanceState state);
-
-	abstract MemState getState(Instance instance, CircuitState state);
-
-	abstract HexFrame getHexFrame(Project proj, Instance instance, CircuitState state);
-
-	@Override
-	public abstract void propagate(InstanceState state);
-
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		configurePorts(instance);
 	}
+
+	abstract void configurePorts(Instance instance);
 
 	void configureStandardPorts(Instance instance, Port[] ps) {
 		ps[DATA] = new Port(0, 0, Port.INOUT, DATA_ATTR);
@@ -98,6 +103,32 @@ abstract class Mem extends InstanceFactory {
 		ps[DATA].setToolTip(Strings.getter("memDataTip"));
 		ps[ADDR].setToolTip(Strings.getter("memAddrTip"));
 		ps[CS].setToolTip(Strings.getter("memCSTip"));
+	}
+
+	@Override
+	public abstract AttributeSet createAttributeSet();
+
+	File getCurrentImage(Instance instance) {
+		return currentInstanceFiles.get(instance);
+	}
+
+	abstract HexFrame getHexFrame(Project proj, Instance instance, CircuitState state);
+
+	@Override
+	protected Object getInstanceFeature(Instance instance, Object key) {
+		if (key == MenuExtender.class)
+			return new MemMenu(this, instance);
+		return super.getInstanceFeature(instance, key);
+	}
+
+	abstract MemState getState(Instance instance, CircuitState state);
+
+	abstract MemState getState(InstanceState state);
+
+	public void loadImage(InstanceState instanceState, File imageFile) throws IOException {
+		MemState s = this.getState(instanceState);
+		HexFile.open(s.getContents(), imageFile);
+		this.setCurrentImage(instanceState.getInstance(), imageFile);
 	}
 
 	@Override
@@ -148,41 +179,10 @@ abstract class Mem extends InstanceFactory {
 		painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
 	}
 
-	File getCurrentImage(Instance instance) {
-		return currentInstanceFiles.get(instance);
-	}
+	@Override
+	public abstract void propagate(InstanceState state);
 
 	void setCurrentImage(Instance instance, File value) {
 		currentInstanceFiles.put(instance, value);
-	}
-
-	public void loadImage(InstanceState instanceState, File imageFile) throws IOException {
-		MemState s = this.getState(instanceState);
-		HexFile.open(s.getContents(), imageFile);
-		this.setCurrentImage(instanceState.getInstance(), imageFile);
-	}
-
-	@Override
-	protected Object getInstanceFeature(Instance instance, Object key) {
-		if (key == MenuExtender.class)
-			return new MemMenu(this, instance);
-		return super.getInstanceFeature(instance, key);
-	}
-
-	static class MemListener implements HexModelListener {
-		Instance instance;
-
-		MemListener(Instance instance) {
-			this.instance = instance;
-		}
-
-		@Override
-		public void metainfoChanged(HexModel source) {
-		}
-
-		@Override
-		public void bytesChanged(HexModel source, long start, long numBytes, int[] values) {
-			instance.fireInvalidated();
-		}
 	}
 }

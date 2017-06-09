@@ -8,23 +8,6 @@ import javax.swing.JComboBox;
 import com.cburch.logisim.util.StringGetter;
 
 class PrefOption {
-	private Object value;
-	private StringGetter getter;
-
-	PrefOption(String value, StringGetter getter) {
-		this.value = value;
-		this.getter = getter;
-	}
-
-	@Override
-	public String toString() {
-		return getter.get();
-	}
-
-	public Object getValue() {
-		return value;
-	}
-
 	@SuppressWarnings("rawtypes")
 	static void setSelected(JComboBox combo, Object value) {
 		for (int i = combo.getItemCount() - 1; i >= 0; i--) {
@@ -35,6 +18,23 @@ class PrefOption {
 			}
 		}
 		combo.setSelectedItem(combo.getItemAt(0));
+	}
+	private Object value;
+
+	private StringGetter getter;
+
+	PrefOption(String value, StringGetter getter) {
+		this.value = value;
+		this.getter = getter;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	@Override
+	public String toString() {
+		return getter.get();
 	}
 
 }

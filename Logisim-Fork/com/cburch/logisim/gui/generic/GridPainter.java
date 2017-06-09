@@ -15,14 +15,6 @@ import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 
 public class GridPainter {
-	public static final String ZOOM_PROPERTY = "zoom";
-	public static final String SHOW_GRID_PROPERTY = "showgrid";
-
-	private static final int GRID_DOT_COLOR = 0xFF777777;
-	private static final int GRID_DOT_ZOOMED_COLOR = 0xFFCCCCCC;
-
-	private static final Color GRID_ZOOMED_OUT_COLOR = new Color(210, 210, 210);
-
 	private class Listener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
@@ -37,6 +29,14 @@ public class GridPainter {
 			}
 		}
 	}
+	public static final String ZOOM_PROPERTY = "zoom";
+
+	public static final String SHOW_GRID_PROPERTY = "showgrid";
+	private static final int GRID_DOT_COLOR = 0xFF777777;
+
+	private static final int GRID_DOT_ZOOMED_COLOR = 0xFFCCCCCC;
+
+	private static final Color GRID_ZOOMED_OUT_COLOR = new Color(210, 210, 210);
 
 	private Component destination;
 	private PropertyChangeSupport support;
@@ -61,57 +61,16 @@ public class GridPainter {
 		support.addPropertyChangeListener(prop, listener);
 	}
 
-	public void removePropertyChangeListener(String prop, PropertyChangeListener listener) {
-		support.removePropertyChangeListener(prop, listener);
-	}
-
 	public boolean getShowGrid() {
 		return showGrid;
-	}
-
-	public void setShowGrid(boolean value) {
-		if (showGrid != value) {
-			showGrid = value;
-			support.firePropertyChange(SHOW_GRID_PROPERTY, !value, value);
-		}
 	}
 
 	public double getZoomFactor() {
 		return zoomFactor;
 	}
 
-	public void setZoomFactor(double value) {
-		double oldValue = zoomFactor;
-		if (oldValue != value) {
-			zoomFactor = value;
-			updateGridImage(gridSize, value);
-			support.firePropertyChange(ZOOM_PROPERTY, Double.valueOf(oldValue), Double.valueOf(value));
-		}
-	}
-
 	public ZoomModel getZoomModel() {
 		return zoomModel;
-	}
-
-	public void setZoomModel(ZoomModel model) {
-		ZoomModel old = zoomModel;
-		if (model != old) {
-			if (listener == null) {
-				listener = new Listener();
-			}
-			if (old != null) {
-				old.removePropertyChangeListener(ZoomModel.ZOOM, listener);
-				old.removePropertyChangeListener(ZoomModel.SHOW_GRID, listener);
-			}
-			zoomModel = model;
-			if (model != null) {
-				model.addPropertyChangeListener(ZoomModel.ZOOM, listener);
-				model.addPropertyChangeListener(ZoomModel.SHOW_GRID, listener);
-			}
-			setShowGrid(model.getShowGrid());
-			setZoomFactor(model.getZoomFactor());
-			destination.repaint();
-		}
 	}
 
 	public void paintGrid(Graphics g) {
@@ -190,6 +149,47 @@ public class GridPainter {
 			 * { int sx = (int) Math.round(f * x); int sy = (int) Math.round(f *
 			 * y); g.fillRect(sx, sy, 1, 1); } } } }
 			 */
+		}
+	}
+
+	public void removePropertyChangeListener(String prop, PropertyChangeListener listener) {
+		support.removePropertyChangeListener(prop, listener);
+	}
+
+	public void setShowGrid(boolean value) {
+		if (showGrid != value) {
+			showGrid = value;
+			support.firePropertyChange(SHOW_GRID_PROPERTY, !value, value);
+		}
+	}
+
+	public void setZoomFactor(double value) {
+		double oldValue = zoomFactor;
+		if (oldValue != value) {
+			zoomFactor = value;
+			updateGridImage(gridSize, value);
+			support.firePropertyChange(ZOOM_PROPERTY, Double.valueOf(oldValue), Double.valueOf(value));
+		}
+	}
+
+	public void setZoomModel(ZoomModel model) {
+		ZoomModel old = zoomModel;
+		if (model != old) {
+			if (listener == null) {
+				listener = new Listener();
+			}
+			if (old != null) {
+				old.removePropertyChangeListener(ZoomModel.ZOOM, listener);
+				old.removePropertyChangeListener(ZoomModel.SHOW_GRID, listener);
+			}
+			zoomModel = model;
+			if (model != null) {
+				model.addPropertyChangeListener(ZoomModel.ZOOM, listener);
+				model.addPropertyChangeListener(ZoomModel.SHOW_GRID, listener);
+			}
+			setShowGrid(model.getShowGrid());
+			setZoomFactor(model.getZoomFactor());
+			destination.repaint();
 		}
 	}
 

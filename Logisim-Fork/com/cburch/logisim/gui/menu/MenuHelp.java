@@ -51,21 +51,6 @@ class MenuHelp extends JMenu implements ActionListener {
 		}
 	}
 
-	public void localeChanged() {
-		this.setText(Strings.get("helpMenu"));
-		if (helpFrame != null) {
-			helpFrame.setTitle(Strings.get("helpWindowTitle"));
-		}
-		tutorial.setText(Strings.get("helpTutorialItem"));
-		guide.setText(Strings.get("helpGuideItem"));
-		library.setText(Strings.get("helpLibraryItem"));
-		about.setText(Strings.get("helpAboutItem"));
-		if (helpFrame != null) {
-			helpFrame.setLocale(Locale.getDefault());
-			loadBroker();
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
@@ -78,6 +63,12 @@ class MenuHelp extends JMenu implements ActionListener {
 		} else if (src == about) {
 			About.showAboutDialog(menubar.getParentWindow());
 		}
+	}
+
+	private void disableHelp() {
+		guide.setEnabled(false);
+		tutorial.setEnabled(false);
+		library.setEnabled(false);
 	}
 
 	private void loadBroker() {
@@ -116,6 +107,21 @@ class MenuHelp extends JMenu implements ActionListener {
 		}
 	}
 
+	public void localeChanged() {
+		this.setText(Strings.get("helpMenu"));
+		if (helpFrame != null) {
+			helpFrame.setTitle(Strings.get("helpWindowTitle"));
+		}
+		tutorial.setText(Strings.get("helpTutorialItem"));
+		guide.setText(Strings.get("helpGuideItem"));
+		library.setText(Strings.get("helpLibraryItem"));
+		about.setText(Strings.get("helpAboutItem"));
+		if (helpFrame != null) {
+			helpFrame.setLocale(Locale.getDefault());
+			loadBroker();
+		}
+	}
+
 	private void showHelp(String target) {
 		loadBroker();
 		try {
@@ -127,11 +133,5 @@ class MenuHelp extends JMenu implements ActionListener {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(menubar.getParentWindow(), Strings.get("helpDisplayError"));
 		}
-	}
-
-	private void disableHelp() {
-		guide.setEnabled(false);
-		tutorial.setEnabled(false);
-		library.setEnabled(false);
 	}
 }

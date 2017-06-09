@@ -67,6 +67,11 @@ public class Circuit {
 
 	private class MyComponentListener implements ComponentListener {
 		@Override
+		public void componentInvalidated(ComponentEvent e) {
+			fireEvent(CircuitEvent.ACTION_INVALIDATE, e.getSource());
+		}
+
+		@Override
 		public void endChanged(ComponentEvent e) {
 			locker.checkForWritePermission("ends changed");
 			Component comp = e.getSource();
@@ -93,25 +98,27 @@ public class Circuit {
 			}
 			return map;
 		}
-
-		@Override
-		public void componentInvalidated(ComponentEvent e) {
-			fireEvent(CircuitEvent.ACTION_INVALIDATE, e.getSource());
-		}
 	}
 
+	//
+	// helper methods for other classes in package
+	//
+	public static boolean isInput(Component comp) {
+		return comp.getEnd(0).getType() != EndData.INPUT_ONLY;
+	}
 	private MyComponentListener myComponentListener = new MyComponentListener();
 	private CircuitAppearance appearance;
 	private AttributeSet staticAttrs;
 	private SubcircuitFactory subcircuitFactory;
 	private EventSourceWeakSupport<CircuitListener> listeners = new EventSourceWeakSupport<CircuitListener>();
-	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
-																	// include
+																	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
+	// include
 																	// wires
 	CircuitWires wires = new CircuitWires();
 	// wires is package-protected for CircuitState and Analyze only.
 	private ArrayList<Component> clocks = new ArrayList<Component>();
 	private CircuitLocker locker;
+
 	private WeakHashMap<Component, Circuit> circuitsUsingThis;
 
 	public Circuit(String name) {
@@ -122,39 +129,6 @@ public class Circuit {
 		circuitsUsingThis = new WeakHashMap<Component, Circuit>();
 	}
 
-	CircuitLocker getLocker() {
-		return locker;
-	}
-
-	public Collection<Circuit> getCircuitsUsingThis() {
-		return circuitsUsingThis.values();
-	}
-
-	public void mutatorClear() {
-		locker.checkForWritePermission("clear");
-
-		Set<Component> oldComps = comps;
-		comps = new HashSet<Component>();
-		wires = new CircuitWires();
-		clocks.clear();
-		for (Component comp : oldComps) {
-			if (comp.getFactory() instanceof SubcircuitFactory) {
-				SubcircuitFactory sub = (SubcircuitFactory) comp.getFactory();
-				sub.getSubcircuit().circuitsUsingThis.remove(comp);
-			}
-		}
-		fireEvent(CircuitEvent.ACTION_CLEAR, oldComps);
-	}
-
-	@Override
-	public String toString() {
-		return staticAttrs.getValue(CircuitAttributes.NAME_ATTR);
-	}
-
-	public AttributeSet getStaticAttributes() {
-		return staticAttrs;
-	}
-
 	//
 	// Listener methods
 	//
@@ -162,12 +136,48 @@ public class Circuit {
 		listeners.add(what);
 	}
 
-	public void removeCircuitListener(CircuitListener what) {
-		listeners.remove(what);
+	public boolean contains(Component c) {
+		return comps.contains(c) || wires.getWires().contains(c);
 	}
 
-	void fireEvent(int action, Object data) {
-		fireEvent(new CircuitEvent(action, this, data));
+	//
+	// Graphics methods
+	//
+	public void draw(ComponentDrawContext context, Collection<Component> hidden) {
+		Graphics g = context.getGraphics();
+		Graphics g_copy = g.create();
+		context.setGraphics(g_copy);
+		wires.draw(context, hidden);
+
+		if (hidden == null || hidden.size() == 0) {
+			for (Component c : comps) {
+				Graphics g_new = g.create();
+				context.setGraphics(g_new);
+				g_copy.dispose();
+				g_copy = g_new;
+
+				c.draw(context);
+			}
+		} else {
+			for (Component c : comps) {
+				if (!hidden.contains(c)) {
+					Graphics g_new = g.create();
+					context.setGraphics(g_new);
+					g_copy.dispose();
+					g_copy = g_new;
+
+					try {
+						c.draw(context);
+					} catch (RuntimeException e) {
+						// this is a JAR developer error - display it and move
+						// on
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		context.setGraphics(g);
+		g_copy.dispose();
 	}
 
 	private void fireEvent(CircuitEvent event) {
@@ -176,83 +186,8 @@ public class Circuit {
 		}
 	}
 
-	//
-	// access methods
-	//
-	public String getName() {
-		return staticAttrs.getValue(CircuitAttributes.NAME_ATTR);
-	}
-
-	public CircuitAppearance getAppearance() {
-		return appearance;
-	}
-
-	public SubcircuitFactory getSubcircuitFactory() {
-		return subcircuitFactory;
-	}
-
-	public Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
-		return wires.getWidthIncompatibilityData();
-	}
-
-	public BitWidth getWidth(Location p) {
-		return wires.getWidth(p);
-	}
-
-	public Location getWidthDeterminant(Location p) {
-		return wires.getWidthDeterminant(p);
-	}
-
-	public boolean hasConflict(Component comp) {
-		return wires.points.hasConflict(comp);
-	}
-
-	public Component getExclusive(Location loc) {
-		return wires.points.getExclusive(loc);
-	}
-
-	private Set<Component> getComponents() {
-		return CollectionUtil.createUnmodifiableSetUnion(comps, wires.getWires());
-	}
-
-	public boolean contains(Component c) {
-		return comps.contains(c) || wires.getWires().contains(c);
-	}
-
-	public Set<Wire> getWires() {
-		return wires.getWires();
-	}
-
-	public Set<Component> getNonWires() {
-		return comps;
-	}
-
-	public Collection<? extends Component> getComponents(Location loc) {
-		return wires.points.getComponents(loc);
-	}
-
-	public Collection<? extends Component> getSplitCauses(Location loc) {
-		return wires.points.getSplitCauses(loc);
-	}
-
-	public Collection<Wire> getWires(Location loc) {
-		return wires.points.getWires(loc);
-	}
-
-	public Collection<? extends Component> getNonWires(Location loc) {
-		return wires.points.getNonWires(loc);
-	}
-
-	public boolean isConnected(Location loc, Component ignore) {
-		for (Component o : wires.points.getComponents(loc)) {
-			if (o != ignore)
-				return true;
-		}
-		return false;
-	}
-
-	public Set<Location> getSplitLocations() {
-		return wires.points.getSplitLocations();
+	void fireEvent(int action, Object data) {
+		fireEvent(new CircuitEvent(action, this, data));
 	}
 
 	public Collection<Component> getAllContaining(Location pt) {
@@ -291,8 +226,8 @@ public class Circuit {
 		return ret;
 	}
 
-	public WireSet getWireSet(Wire start) {
-		return wires.getWireSet(start);
+	public CircuitAppearance getAppearance() {
+		return appearance;
 	}
 
 	public Bounds getBounds() {
@@ -364,15 +299,95 @@ public class Circuit {
 		return Bounds.create(xMin, yMin, xMax - xMin, yMax - yMin);
 	}
 
+	public Collection<Circuit> getCircuitsUsingThis() {
+		return circuitsUsingThis.values();
+	}
+
 	ArrayList<Component> getClocks() {
 		return clocks;
 	}
 
+	private Set<Component> getComponents() {
+		return CollectionUtil.createUnmodifiableSetUnion(comps, wires.getWires());
+	}
+
+	public Collection<? extends Component> getComponents(Location loc) {
+		return wires.points.getComponents(loc);
+	}
+
+	public Component getExclusive(Location loc) {
+		return wires.points.getExclusive(loc);
+	}
+
+	CircuitLocker getLocker() {
+		return locker;
+	}
+
 	//
-	// action methods
+	// access methods
 	//
-	public void setName(String name) {
-		staticAttrs.setValue(CircuitAttributes.NAME_ATTR, name);
+	public String getName() {
+		return staticAttrs.getValue(CircuitAttributes.NAME_ATTR);
+	}
+
+	public Set<Component> getNonWires() {
+		return comps;
+	}
+
+	public Collection<? extends Component> getNonWires(Location loc) {
+		return wires.points.getNonWires(loc);
+	}
+
+	public Collection<? extends Component> getSplitCauses(Location loc) {
+		return wires.points.getSplitCauses(loc);
+	}
+
+	public Set<Location> getSplitLocations() {
+		return wires.points.getSplitLocations();
+	}
+
+	public AttributeSet getStaticAttributes() {
+		return staticAttrs;
+	}
+
+	public SubcircuitFactory getSubcircuitFactory() {
+		return subcircuitFactory;
+	}
+
+	public BitWidth getWidth(Location p) {
+		return wires.getWidth(p);
+	}
+
+	public Location getWidthDeterminant(Location p) {
+		return wires.getWidthDeterminant(p);
+	}
+
+	public Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
+		return wires.getWidthIncompatibilityData();
+	}
+
+	public Set<Wire> getWires() {
+		return wires.getWires();
+	}
+
+	public Collection<Wire> getWires(Location loc) {
+		return wires.points.getWires(loc);
+	}
+
+	public WireSet getWireSet(Wire start) {
+		return wires.getWireSet(start);
+	}
+
+	public boolean hasConflict(Component comp) {
+		return wires.points.hasConflict(comp);
+	}
+
+	public boolean isConnected(Location loc, Component ignore) {
+		for (Component o : wires.points.getComponents(loc)) {
+			if (o != ignore)
+				return true;
+		}
+		return false;
 	}
 
 	void mutatorAdd(Component c) {
@@ -404,6 +419,22 @@ public class Circuit {
 		fireEvent(CircuitEvent.ACTION_ADD, c);
 	}
 
+	public void mutatorClear() {
+		locker.checkForWritePermission("clear");
+
+		Set<Component> oldComps = comps;
+		comps = new HashSet<Component>();
+		wires = new CircuitWires();
+		clocks.clear();
+		for (Component comp : oldComps) {
+			if (comp.getFactory() instanceof SubcircuitFactory) {
+				SubcircuitFactory sub = (SubcircuitFactory) comp.getFactory();
+				sub.getSubcircuit().circuitsUsingThis.remove(comp);
+			}
+		}
+		fireEvent(CircuitEvent.ACTION_CLEAR, oldComps);
+	}
+
 	void mutatorRemove(Component c) {
 		locker.checkForWritePermission("remove");
 
@@ -424,50 +455,19 @@ public class Circuit {
 		fireEvent(CircuitEvent.ACTION_REMOVE, c);
 	}
 
-	//
-	// Graphics methods
-	//
-	public void draw(ComponentDrawContext context, Collection<Component> hidden) {
-		Graphics g = context.getGraphics();
-		Graphics g_copy = g.create();
-		context.setGraphics(g_copy);
-		wires.draw(context, hidden);
-
-		if (hidden == null || hidden.size() == 0) {
-			for (Component c : comps) {
-				Graphics g_new = g.create();
-				context.setGraphics(g_new);
-				g_copy.dispose();
-				g_copy = g_new;
-
-				c.draw(context);
-			}
-		} else {
-			for (Component c : comps) {
-				if (!hidden.contains(c)) {
-					Graphics g_new = g.create();
-					context.setGraphics(g_new);
-					g_copy.dispose();
-					g_copy = g_new;
-
-					try {
-						c.draw(context);
-					} catch (RuntimeException e) {
-						// this is a JAR developer error - display it and move
-						// on
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		context.setGraphics(g);
-		g_copy.dispose();
+	public void removeCircuitListener(CircuitListener what) {
+		listeners.remove(what);
 	}
 
 	//
-	// helper methods for other classes in package
+	// action methods
 	//
-	public static boolean isInput(Component comp) {
-		return comp.getEnd(0).getType() != EndData.INPUT_ONLY;
+	public void setName(String name) {
+		staticAttrs.setValue(CircuitAttributes.NAME_ATTR, name);
+	}
+
+	@Override
+	public String toString() {
+		return staticAttrs.getValue(CircuitAttributes.NAME_ATTR);
 	}
 }

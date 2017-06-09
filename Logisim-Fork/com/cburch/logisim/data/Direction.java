@@ -40,62 +40,19 @@ public class Direction implements AttributeOptionInterface {
 		this.id = id;
 	}
 
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	@Override
-	public String toDisplayString() {
-		return disp.get();
-	}
-
 	public StringGetter getDisplayGetter() {
 		return disp;
 	}
 
-	public String toVerticalDisplayString() {
-		return vert.get();
-	}
-
-	@Override
-	public int hashCode() {
-		return id;
-	}
-
-	public double toRadians() {
+	public Direction getLeft() {
 		if (this == Direction.EAST)
-			return 0.0;
-		if (this == Direction.WEST)
-			return Math.PI;
-		if (this == Direction.NORTH)
-			return Math.PI / 2.0;
-		if (this == Direction.SOUTH)
-			return -Math.PI / 2.0;
-		return 0.0;
-	}
-
-	public int toDegrees() {
-		if (this == Direction.EAST)
-			return 0;
-		if (this == Direction.WEST)
-			return 180;
-		if (this == Direction.NORTH)
-			return 90;
-		if (this == Direction.SOUTH)
-			return 270;
-		return 0;
-	}
-
-	public Direction reverse() {
-		if (this == Direction.EAST)
-			return Direction.WEST;
-		if (this == Direction.WEST)
-			return Direction.EAST;
-		if (this == Direction.NORTH)
-			return Direction.SOUTH;
-		if (this == Direction.SOUTH)
 			return Direction.NORTH;
+		if (this == Direction.WEST)
+			return Direction.SOUTH;
+		if (this == Direction.NORTH)
+			return Direction.WEST;
+		if (this == Direction.SOUTH)
+			return Direction.EAST;
 		return Direction.WEST;
 	}
 
@@ -111,21 +68,64 @@ public class Direction implements AttributeOptionInterface {
 		return Direction.WEST;
 	}
 
-	public Direction getLeft() {
-		if (this == Direction.EAST)
-			return Direction.NORTH;
-		if (this == Direction.WEST)
-			return Direction.SOUTH;
-		if (this == Direction.NORTH)
-			return Direction.WEST;
-		if (this == Direction.SOUTH)
-			return Direction.EAST;
-		return Direction.WEST;
-	}
-
 	// for AttributeOptionInterface
 	@Override
 	public Object getValue() {
 		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		return id;
+	}
+
+	public Direction reverse() {
+		if (this == Direction.EAST)
+			return Direction.WEST;
+		if (this == Direction.WEST)
+			return Direction.EAST;
+		if (this == Direction.NORTH)
+			return Direction.SOUTH;
+		if (this == Direction.SOUTH)
+			return Direction.NORTH;
+		return Direction.WEST;
+	}
+
+	public int toDegrees() {
+		if (this == Direction.EAST)
+			return 0;
+		if (this == Direction.WEST)
+			return 180;
+		if (this == Direction.NORTH)
+			return 90;
+		if (this == Direction.SOUTH)
+			return 270;
+		return 0;
+	}
+
+	@Override
+	public String toDisplayString() {
+		return disp.get();
+	}
+
+	public double toRadians() {
+		if (this == Direction.EAST)
+			return 0.0;
+		if (this == Direction.WEST)
+			return Math.PI;
+		if (this == Direction.NORTH)
+			return Math.PI / 2.0;
+		if (this == Direction.SOUTH)
+			return -Math.PI / 2.0;
+		return 0.0;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public String toVerticalDisplayString() {
+		return vert.get();
 	}
 }

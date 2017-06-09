@@ -21,32 +21,16 @@ public class Rectangle extends Rectangular {
 	}
 
 	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof Rectangle) {
-			return super.matches(other);
-		} else {
-			return false;
-		}
+	protected boolean contains(int x, int y, int w, int h, Location q) {
+		return isInRect(q.getX(), q.getY(), x, y, w, h);
 	}
 
 	@Override
-	public int matchesHashCode() {
-		return super.matchesHashCode();
-	}
-
-	@Override
-	public String toString() {
-		return "Rectangle:" + getBounds();
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("shapeRect");
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		return SvgCreator.createRectangle(doc, this);
+	public void draw(Graphics g, int x, int y, int w, int h) {
+		if (setForFill(g))
+			g.fillRect(x, y, w, h);
+		if (setForStroke(g))
+			g.drawRect(x, y, w, h);
 	}
 
 	@Override
@@ -55,8 +39,8 @@ public class Rectangle extends Rectangular {
 	}
 
 	@Override
-	protected boolean contains(int x, int y, int w, int h, Location q) {
-		return isInRect(q.getX(), q.getY(), x, y, w, h);
+	public String getDisplayName() {
+		return Strings.get("shapeRect");
 	}
 
 	@Override
@@ -90,10 +74,26 @@ public class Rectangle extends Rectangular {
 	}
 
 	@Override
-	public void draw(Graphics g, int x, int y, int w, int h) {
-		if (setForFill(g))
-			g.fillRect(x, y, w, h);
-		if (setForStroke(g))
-			g.drawRect(x, y, w, h);
+	public boolean matches(CanvasObject other) {
+		if (other instanceof Rectangle) {
+			return super.matches(other);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		return super.matchesHashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "Rectangle:" + getBounds();
+	}
+
+	@Override
+	public Element toSvgElement(Document doc) {
+		return SvgCreator.createRectangle(doc, this);
 	}
 }

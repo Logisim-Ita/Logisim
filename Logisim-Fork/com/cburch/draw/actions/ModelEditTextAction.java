@@ -23,8 +23,8 @@ public class ModelEditTextAction extends ModelAction {
 	}
 
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.singleton((CanvasObject) text);
+	void doSub(CanvasModel model) {
+		model.setText(text, newValue);
 	}
 
 	@Override
@@ -33,8 +33,8 @@ public class ModelEditTextAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.setText(text, newValue);
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton((CanvasObject) text);
 	}
 
 	@Override

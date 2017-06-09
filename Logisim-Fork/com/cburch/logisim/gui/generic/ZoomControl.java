@@ -18,10 +18,74 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 public class ZoomControl extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7823904346559070108L;
+	private class GridIcon extends JComponent implements MouseListener, PropertyChangeListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3780961019640263926L;
+		boolean state = true;
+
+		public GridIcon() {
+			addMouseListener(this);
+			setPreferredSize(new Dimension(15, 15));
+			setToolTipText("Show grid");
+			setFocusable(true);
+		}
+
+		@Override
+		public String getToolTipText(MouseEvent e) {
+			return Strings.get("zoomShowGrid");
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			model.setShowGrid(!state);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			int width = getWidth();
+			int height = getHeight();
+			g.setColor(state ? Color.black : getBackground().darker());
+			int dim = (Math.min(width, height) - 4) / 3 * 3 + 1;
+			int xoff = (width - dim) / 2;
+			int yoff = (height - dim) / 2;
+			for (int x = 0; x < dim; x += 3) {
+				for (int y = 0; y < dim; y += 3) {
+					g.drawLine(x + xoff, y + yoff, x + xoff, y + yoff);
+				}
+			}
+		}
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			update();
+		}
+
+		private void update() {
+			boolean grid = model.getShowGrid();
+			if (grid != state) {
+				state = grid;
+				repaint();
+			}
+		}
+	}
 
 	public class SpinnerModel extends AbstractSpinnerModel implements PropertyChangeListener {
 		/**
@@ -59,14 +123,9 @@ public class ZoomControl extends JPanel {
 			return toString(zoom * 100.0);
 		}
 
-		private String toString(double factor) {
-			if (factor > 10) {
-				return "Zoom: " + (int) (factor + 0.5) + "%";
-			} else if (factor > 0.1) {
-				return "Zoom: " + (int) (factor * 100 + 0.5) / 100.0 + "%";
-			} else {
-				return "Zoom: " + factor + "%";
-			}
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			fireStateChanged();
 		}
 
 		@Override
@@ -84,84 +143,25 @@ public class ZoomControl extends JPanel {
 			}
 		}
 
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			fireStateChanged();
+		private String toString(double factor) {
+			if (factor > 10) {
+				return "Zoom: " + (int) (factor + 0.5) + "%";
+			} else if (factor > 0.1) {
+				return "Zoom: " + (int) (factor * 100 + 0.5) / 100.0 + "%";
+			} else {
+				return "Zoom: " + factor + "%";
+			}
 		}
 	}
 
-	private class GridIcon extends JComponent implements MouseListener, PropertyChangeListener {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3780961019640263926L;
-		boolean state = true;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7823904346559070108L;
 
-		public GridIcon() {
-			addMouseListener(this);
-			setPreferredSize(new Dimension(15, 15));
-			setToolTipText("Show grid");
-			setFocusable(true);
-		}
-
-		@Override
-		public String getToolTipText(MouseEvent e) {
-			return Strings.get("zoomShowGrid");
-		}
-
-		private void update() {
-			boolean grid = model.getShowGrid();
-			if (grid != state) {
-				state = grid;
-				repaint();
-			}
-		}
-
-		@Override
-		protected void paintComponent(Graphics g) {
-			int width = getWidth();
-			int height = getHeight();
-			g.setColor(state ? Color.black : getBackground().darker());
-			int dim = (Math.min(width, height) - 4) / 3 * 3 + 1;
-			int xoff = (width - dim) / 2;
-			int yoff = (height - dim) / 2;
-			for (int x = 0; x < dim; x += 3) {
-				for (int y = 0; y < dim; y += 3) {
-					g.drawLine(x + xoff, y + yoff, x + xoff, y + yoff);
-				}
-			}
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-			model.setShowGrid(!state);
-		}
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			update();
-		}
-	}
-
+	public static SpinnerModel spinnerModel;
 	private ZoomModel model;
 	private JSpinner spinner;
-	public static SpinnerModel spinnerModel;
 	private GridIcon grid;
 
 	public ZoomControl(ZoomModel model) {

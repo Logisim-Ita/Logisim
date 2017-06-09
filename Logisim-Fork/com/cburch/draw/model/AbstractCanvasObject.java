@@ -32,51 +32,8 @@ public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject
 	}
 
 	@Override
-	public AttributeSet getAttributeSet() {
-		return this;
-	}
-
-	@Override
-	public abstract String getDisplayName();
-
-	public abstract Element toSvgElement(Document doc);
-
-	@Override
-	public abstract boolean matches(CanvasObject other);
-
-	@Override
-	public abstract int matchesHashCode();
-
-	@Override
-	public abstract Bounds getBounds();
-
-	@Override
-	public abstract boolean contains(Location loc, boolean assumeFilled);
-
-	@Override
-	public abstract void translate(int dx, int dy);
-
-	@Override
-	public abstract List<Handle> getHandles(HandleGesture gesture);
-
-	protected abstract void updateValue(Attribute<?> attr, Object value);
-
-	@Override
-	public abstract void paint(Graphics g, HandleGesture gesture);
-
-	@Override
-	public boolean canRemove() {
-		return true;
-	}
-
-	@Override
-	public boolean canMoveHandle(Handle handle) {
-		return false;
-	}
-
-	@Override
-	public Handle canInsertHandle(Location desired) {
-		return null;
+	public void addAttributeListener(AttributeListener l) {
+		listeners.add(l);
 	}
 
 	@Override
@@ -85,9 +42,93 @@ public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject
 	}
 
 	@Override
-	public Handle moveHandle(HandleGesture gesture) {
-		throw new UnsupportedOperationException("moveHandle");
+	public Handle canInsertHandle(Location desired) {
+		return null;
 	}
+
+	@Override
+	public boolean canMoveHandle(Handle handle) {
+		return false;
+	}
+
+	@Override
+	public boolean canRemove() {
+		return true;
+	}
+
+	@Override
+	public CanvasObject clone() {
+		try {
+			AbstractCanvasObject ret = (AbstractCanvasObject) super.clone();
+			ret.listeners = new EventSourceWeakSupport<AttributeListener>();
+			return ret;
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public abstract boolean contains(Location loc, boolean assumeFilled);
+
+	@Override
+	public boolean containsAttribute(Attribute<?> attr) {
+		return getAttributes().contains(attr);
+	}
+
+	@Override
+	public Handle deleteHandle(Handle handle) {
+		throw new UnsupportedOperationException("deleteHandle");
+	}
+
+	protected void fireAttributeListChanged() {
+		AttributeEvent e = new AttributeEvent(this);
+		for (AttributeListener listener : listeners) {
+			listener.attributeListChanged(e);
+		}
+	}
+
+	@Override
+	public Attribute<?> getAttribute(String name) {
+		for (Attribute<?> attr : getAttributes()) {
+			if (attr.getName().equals(name))
+				return attr;
+		}
+		return null;
+	}
+
+	// methods required by AttributeSet interface
+	@Override
+	public abstract List<Attribute<?>> getAttributes();
+
+	@Override
+	public AttributeSet getAttributeSet() {
+		return this;
+	}
+
+	@Override
+	public abstract Bounds getBounds();
+
+	@Override
+	public abstract String getDisplayName();
+
+	@Override
+	public abstract List<Handle> getHandles(HandleGesture gesture);
+
+	protected Location getRandomPoint(Bounds bds, Random rand) {
+		int x = bds.getX();
+		int y = bds.getY();
+		int w = bds.getWidth();
+		int h = bds.getHeight();
+		for (int i = 0; i < GENERATE_RANDOM_TRIES; i++) {
+			Location loc = Location.create(x + rand.nextInt(w), y + rand.nextInt(h));
+			if (contains(loc, false))
+				return loc;
+		}
+		return null;
+	}
+
+	@Override
+	public abstract <V> V getValue(Attribute<V> attr);
 
 	@Override
 	public void insertHandle(Handle desired, Handle previous) {
@@ -95,8 +136,24 @@ public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject
 	}
 
 	@Override
-	public Handle deleteHandle(Handle handle) {
-		throw new UnsupportedOperationException("deleteHandle");
+	public boolean isReadOnly(Attribute<?> attr) {
+		return false;
+	}
+
+	@Override
+	public boolean isToSave(Attribute<?> attr) {
+		return true;
+	}
+
+	@Override
+	public abstract boolean matches(CanvasObject other);
+
+	@Override
+	public abstract int matchesHashCode();
+
+	@Override
+	public Handle moveHandle(HandleGesture gesture) {
+		throw new UnsupportedOperationException("moveHandle");
 	}
 
 	@Override
@@ -131,93 +188,29 @@ public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject
 		}
 	}
 
-	protected Location getRandomPoint(Bounds bds, Random rand) {
-		int x = bds.getX();
-		int y = bds.getY();
-		int w = bds.getWidth();
-		int h = bds.getHeight();
-		for (int i = 0; i < GENERATE_RANDOM_TRIES; i++) {
-			Location loc = Location.create(x + rand.nextInt(w), y + rand.nextInt(h));
-			if (contains(loc, false))
-				return loc;
-		}
-		return null;
-	}
-
-	// methods required by AttributeSet interface
 	@Override
-	public abstract List<Attribute<?>> getAttributes();
-
-	@Override
-	public abstract <V> V getValue(Attribute<V> attr);
-
-	@Override
-	public void addAttributeListener(AttributeListener l) {
-		listeners.add(l);
-	}
+	public abstract void paint(Graphics g, HandleGesture gesture);
 
 	@Override
 	public void removeAttributeListener(AttributeListener l) {
 		listeners.remove(l);
 	}
 
-	@Override
-	public CanvasObject clone() {
-		try {
-			AbstractCanvasObject ret = (AbstractCanvasObject) super.clone();
-			ret.listeners = new EventSourceWeakSupport<AttributeListener>();
-			return ret;
-		} catch (CloneNotSupportedException e) {
-			return null;
+	protected boolean setForFill(Graphics g) {
+		List<Attribute<?>> attrs = getAttributes();
+		if (attrs.contains(DrawAttr.PAINT_TYPE)) {
+			Object value = getValue(DrawAttr.PAINT_TYPE);
+			if (value == DrawAttr.PAINT_STROKE)
+				return false;
 		}
-	}
 
-	@Override
-	public boolean containsAttribute(Attribute<?> attr) {
-		return getAttributes().contains(attr);
-	}
-
-	@Override
-	public Attribute<?> getAttribute(String name) {
-		for (Attribute<?> attr : getAttributes()) {
-			if (attr.getName().equals(name))
-				return attr;
-		}
-		return null;
-	}
-
-	@Override
-	public boolean isReadOnly(Attribute<?> attr) {
-		return false;
-	}
-
-	@Override
-	public void setReadOnly(Attribute<?> attr, boolean value) {
-		throw new UnsupportedOperationException("setReadOnly");
-	}
-
-	@Override
-	public boolean isToSave(Attribute<?> attr) {
-		return true;
-	}
-
-	@Override
-	public final <V> void setValue(Attribute<V> attr, V value) {
-		Object old = getValue(attr);
-		boolean same = old == null ? value == null : old.equals(value);
-		if (!same) {
-			updateValue(attr, value);
-			AttributeEvent e = new AttributeEvent(this, attr, value);
-			for (AttributeListener listener : listeners) {
-				listener.attributeValueChanged(e);
-			}
-		}
-	}
-
-	protected void fireAttributeListChanged() {
-		AttributeEvent e = new AttributeEvent(this);
-		for (AttributeListener listener : listeners) {
-			listener.attributeListChanged(e);
+		Color color = getValue(DrawAttr.FILL_COLOR);
+		if (color != null && color.getAlpha() == 0) {
+			return false;
+		} else {
+			if (color != null)
+				g.setColor(color);
+			return true;
 		}
 	}
 
@@ -245,22 +238,29 @@ public abstract class AbstractCanvasObject implements AttributeSet, CanvasObject
 		}
 	}
 
-	protected boolean setForFill(Graphics g) {
-		List<Attribute<?>> attrs = getAttributes();
-		if (attrs.contains(DrawAttr.PAINT_TYPE)) {
-			Object value = getValue(DrawAttr.PAINT_TYPE);
-			if (value == DrawAttr.PAINT_STROKE)
-				return false;
-		}
+	@Override
+	public void setReadOnly(Attribute<?> attr, boolean value) {
+		throw new UnsupportedOperationException("setReadOnly");
+	}
 
-		Color color = getValue(DrawAttr.FILL_COLOR);
-		if (color != null && color.getAlpha() == 0) {
-			return false;
-		} else {
-			if (color != null)
-				g.setColor(color);
-			return true;
+	@Override
+	public final <V> void setValue(Attribute<V> attr, V value) {
+		Object old = getValue(attr);
+		boolean same = old == null ? value == null : old.equals(value);
+		if (!same) {
+			updateValue(attr, value);
+			AttributeEvent e = new AttributeEvent(this, attr, value);
+			for (AttributeListener listener : listeners) {
+				listener.attributeValueChanged(e);
+			}
 		}
 	}
+
+	public abstract Element toSvgElement(Document doc);
+
+	@Override
+	public abstract void translate(int dx, int dy);
+
+	protected abstract void updateValue(Attribute<?> attr, Object value);
 
 }

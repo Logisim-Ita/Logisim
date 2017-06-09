@@ -42,35 +42,6 @@ public class Power extends InstanceFactory {
 		instance.addAttributeListener();
 	}
 
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-		}
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		return Bounds.create(0, -8, 15, 16).rotate(Direction.EAST, attrs.getValue(StdAttr.FACING), 0, 0);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
-		state.setPort(0, Value.repeat(Value.TRUE, width.getWidth()), 1);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		drawInstance(painter, false);
-		painter.drawPorts();
-	}
-
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		drawInstance(painter, true);
-	}
-
 	private void drawInstance(InstancePainter painter, boolean isGhost) {
 		Graphics2D g = (Graphics2D) painter.getGraphics().create();
 		Location loc = painter.getLocation();
@@ -95,5 +66,34 @@ public class Power extends InstanceFactory {
 		g.drawPolygon(new int[] { 6, 14, 6 }, new int[] { -8, 0, 8 }, 3);
 
 		g.dispose();
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		return Bounds.create(0, -8, 15, 16).rotate(Direction.EAST, attrs.getValue(StdAttr.FACING), 0, 0);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		drawInstance(painter, true);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		drawInstance(painter, false);
+		painter.drawPorts();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
+		state.setPort(0, Value.repeat(Value.TRUE, width.getWidth()), 1);
 	}
 }

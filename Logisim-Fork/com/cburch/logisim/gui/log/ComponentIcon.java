@@ -23,10 +23,6 @@ class ComponentIcon implements Icon {
 		this.comp = comp;
 	}
 
-	public void setTriangleState(int value) {
-		triangleState = value;
-	}
-
 	@Override
 	public int getIconHeight() {
 		return 20;
@@ -60,5 +56,9 @@ class ComponentIcon implements Icon {
 			g.setColor(Color.DARK_GRAY);
 			g.drawPolygon(xp, yp, 3);
 		}
+	}
+
+	public void setTriangleState(int value) {
+		triangleState = value;
 	}
 }

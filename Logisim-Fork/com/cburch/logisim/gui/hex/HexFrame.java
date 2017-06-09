@@ -33,25 +33,54 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class HexFrame extends LFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3382498162653014279L;
+	private class EditListener implements ActionListener, ChangeListener {
+		private Clip clip = null;
 
-	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
-		WindowMenuManager() {
-			super(Strings.get("hexFrameMenuItem"), false);
-			LocaleManager.addLocaleListener(this);
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+			if (src == LogisimMenuBar.CUT) {
+				getClip().copy();
+				editor.delete();
+			} else if (src == LogisimMenuBar.COPY) {
+				getClip().copy();
+			} else if (src == LogisimMenuBar.PASTE) {
+				getClip().paste();
+			} else if (src == LogisimMenuBar.DELETE) {
+				editor.delete();
+			} else if (src == LogisimMenuBar.SELECT_ALL) {
+				editor.selectAll();
+			}
+		}
+
+		private void enableItems(LogisimMenuBar menubar) {
+			boolean sel = editor.selectionExists();
+			boolean clip = true; // TODO editor.clipboardExists();
+			menubar.setEnabled(LogisimMenuBar.CUT, sel);
+			menubar.setEnabled(LogisimMenuBar.COPY, sel);
+			menubar.setEnabled(LogisimMenuBar.PASTE, clip);
+			menubar.setEnabled(LogisimMenuBar.DELETE, sel);
+			menubar.setEnabled(LogisimMenuBar.SELECT_ALL, true);
+		}
+
+		private Clip getClip() {
+			if (clip == null)
+				clip = new Clip(editor);
+			return clip;
+		}
+
+		private void register(LogisimMenuBar menubar) {
+			menubar.addActionListener(LogisimMenuBar.CUT, this);
+			menubar.addActionListener(LogisimMenuBar.COPY, this);
+			menubar.addActionListener(LogisimMenuBar.PASTE, this);
+			menubar.addActionListener(LogisimMenuBar.DELETE, this);
+			menubar.addActionListener(LogisimMenuBar.SELECT_ALL, this);
+			enableItems(menubar);
 		}
 
 		@Override
-		public JFrame getJFrame(boolean create) {
-			return HexFrame.this;
-		}
-
-		@Override
-		public void localeChanged() {
-			setText(Strings.get("hexFrameMenuItem"));
+		public void stateChanged(ChangeEvent e) {
+			enableItems((LogisimMenuBar) getJMenuBar());
 		}
 	}
 
@@ -104,56 +133,27 @@ public class HexFrame extends LFrame {
 		}
 	}
 
-	private class EditListener implements ActionListener, ChangeListener {
-		private Clip clip = null;
-
-		private Clip getClip() {
-			if (clip == null)
-				clip = new Clip(editor);
-			return clip;
-		}
-
-		private void register(LogisimMenuBar menubar) {
-			menubar.addActionListener(LogisimMenuBar.CUT, this);
-			menubar.addActionListener(LogisimMenuBar.COPY, this);
-			menubar.addActionListener(LogisimMenuBar.PASTE, this);
-			menubar.addActionListener(LogisimMenuBar.DELETE, this);
-			menubar.addActionListener(LogisimMenuBar.SELECT_ALL, this);
-			enableItems(menubar);
+	private class WindowMenuManager extends WindowMenuItemManager implements LocaleListener {
+		WindowMenuManager() {
+			super(Strings.get("hexFrameMenuItem"), false);
+			LocaleManager.addLocaleListener(this);
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			Object src = e.getSource();
-			if (src == LogisimMenuBar.CUT) {
-				getClip().copy();
-				editor.delete();
-			} else if (src == LogisimMenuBar.COPY) {
-				getClip().copy();
-			} else if (src == LogisimMenuBar.PASTE) {
-				getClip().paste();
-			} else if (src == LogisimMenuBar.DELETE) {
-				editor.delete();
-			} else if (src == LogisimMenuBar.SELECT_ALL) {
-				editor.selectAll();
-			}
-		}
-
-		private void enableItems(LogisimMenuBar menubar) {
-			boolean sel = editor.selectionExists();
-			boolean clip = true; // TODO editor.clipboardExists();
-			menubar.setEnabled(LogisimMenuBar.CUT, sel);
-			menubar.setEnabled(LogisimMenuBar.COPY, sel);
-			menubar.setEnabled(LogisimMenuBar.PASTE, clip);
-			menubar.setEnabled(LogisimMenuBar.DELETE, sel);
-			menubar.setEnabled(LogisimMenuBar.SELECT_ALL, true);
+		public JFrame getJFrame(boolean create) {
+			return HexFrame.this;
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			enableItems((LogisimMenuBar) getJMenuBar());
+		public void localeChanged() {
+			setText(Strings.get("hexFrameMenuItem"));
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3382498162653014279L;
 
 	private WindowMenuManager windowManager = new WindowMenuManager();
 	private EditListener editListener = new EditListener();

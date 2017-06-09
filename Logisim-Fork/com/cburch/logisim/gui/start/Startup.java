@@ -54,199 +54,6 @@ public class Startup {
 			startupTemp.doPrintFile(file);
 	}
 
-	private void doOpenFile(File file) {
-		if (initialized) {
-			ProjectActions.doOpen(null, null, file);
-		} else {
-			filesToOpen.add(file);
-		}
-	}
-
-	private void doPrintFile(File file) {
-		if (initialized) {
-			Project toPrint = ProjectActions.doOpen(null, null, file);
-			Print.doPrint(toPrint);
-			toPrint.getFrame().dispose();
-		} else {
-			filesToPrint.add(file);
-		}
-	}
-
-	private static void registerHandler() {
-		try {
-			Class<?> needed1 = Class.forName("com.apple.eawt.Application");
-			if (needed1 == null)
-				return;
-			Class<?> needed2 = Class.forName("com.apple.eawt.ApplicationAdapter");
-			if (needed2 == null)
-				return;
-			MacOsAdapter.register();
-			MacOsAdapter.addListeners(true);
-		} catch (ClassNotFoundException e) {
-			return;
-		} catch (Throwable t) {
-			try {
-				MacOsAdapter.addListeners(false);
-			} catch (Throwable t2) {
-			}
-		}
-	}
-
-	// based on command line
-	boolean isTty;
-	private File templFile = null;
-	private boolean templEmpty = false;
-	private boolean templPlain = false;
-	private ArrayList<File> filesToOpen = new ArrayList<File>();
-	private boolean showSplash;
-	private boolean updatecanceled = false;
-	private File loadFile;
-	private HashMap<File, File> substitutions = new HashMap<File, File>();
-	private int ttyFormat = 0;
-
-	// from other sources
-	private boolean initialized = false;
-	private SplashScreen monitor = null;
-	UpdateScreen updatescreen = null;
-	private ArrayList<File> filesToPrint = new ArrayList<File>();
-
-	public Startup(boolean isTty) {
-		this.isTty = isTty;
-		this.showSplash = !isTty;
-	}
-
-	List<File> getFilesToOpen() {
-		return filesToOpen;
-	}
-
-	File getLoadFile() {
-		return loadFile;
-	}
-
-	int getTtyFormat() {
-		return ttyFormat;
-	}
-
-	Map<File, File> getSubstitutions() {
-		return Collections.unmodifiableMap(substitutions);
-	}
-
-	public void run() {
-		if (isTty) {
-			try {
-				TtyInterface.run(this);
-				return;
-			} catch (Throwable t) {
-				t.printStackTrace();
-				System.exit(-1);
-				return;
-			}
-		}
-
-		// kick off the progress monitor
-		// (The values used for progress values are based on a single run where
-		// I loaded a large file.)
-		if (showSplash) {
-			try {
-				monitor = new SplashScreen();
-				monitor.setVisible(true);
-			} catch (Throwable t) {
-				monitor = null;
-				showSplash = false;
-			}
-		}
-
-		// pre-load the two basic component libraries, just so that the time
-		// taken is shown separately in the progress bar.
-		if (showSplash)
-			monitor.setProgress(SplashScreen.LIBRARIES);
-		Loader templLoader = new Loader(monitor);
-		int count = templLoader.getBuiltin().getLibrary("Base").getTools().size()
-				+ templLoader.getBuiltin().getLibrary("Gates").getTools().size();
-		if (count < 0) {
-			// this will never happen, but the optimizer doesn't know that...
-			System.err.println("FATAL ERROR - no components"); // OK
-			System.exit(-1);
-		}
-
-		// load in template
-		loadTemplate(templLoader, templFile, templEmpty);
-
-		// now that the splash screen is almost gone, we do some last-minute
-		// interface initialization
-		if (showSplash)
-			monitor.setProgress(SplashScreen.GUI_INIT);
-		WindowManagers.initialize();
-		if (MacCompatibility.isSwingUsingScreenMenuBar()) {
-			MacCompatibility.setFramelessJMenuBar(new LogisimMenuBar(null, null));
-		} else {
-			new LogisimMenuBar(null, null);
-			// most of the time occupied here will be in loading menus, which
-			// will occur eventually anyway; we might as well do it when the
-			// monitor says we are
-		}
-
-		// if user has double-clicked a file to open, we'll
-		// use that as the file to open now.
-		initialized = true;
-
-		// load file
-		if (filesToOpen.isEmpty()) {
-			ProjectActions.doNew(monitor, true);
-			if (showSplash)
-				monitor.close();
-		} else {
-			boolean first = true;
-			for (File fileToOpen : filesToOpen) {
-				try {
-					ProjectActions.doOpen(monitor, fileToOpen, substitutions);
-				} catch (LoadFailedException ex) {
-					System.err.println(fileToOpen.getName() + ": " + ex.getMessage()); // OK
-					System.exit(-1);
-				}
-				if (first) {
-					first = false;
-					if (showSplash)
-						monitor.close();
-					monitor = null;
-				}
-			}
-		}
-
-		for (File fileToPrint : filesToPrint) {
-			doPrintFile(fileToPrint);
-		}
-	}
-
-	private static void setLocale(String lang) {
-		Locale[] opts = Strings.getLocaleOptions();
-		for (int i = 0; i < opts.length; i++) {
-			if (lang.equals(opts[i].toString())) {
-				LocaleManager.setLocale(opts[i]);
-				return;
-			}
-		}
-		System.err.println(Strings.get("invalidLocaleError")); // OK
-		System.err.println(Strings.get("invalidLocaleOptionsHeader")); // OK
-		for (int i = 0; i < opts.length; i++) {
-			System.err.println("   " + opts[i].toString()); // OK
-		}
-		System.exit(-1);
-	}
-
-	private void loadTemplate(Loader loader, File templFile, boolean templEmpty) {
-		if (showSplash)
-			monitor.setProgress(SplashScreen.TEMPLATE_OPEN);
-		if (templFile != null) {
-			AppPreferences.setTemplateFile(templFile);
-			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_CUSTOM);
-		} else if (templEmpty) {
-			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_EMPTY);
-		} else if (templPlain) {
-			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_PLAIN);
-		}
-	}
-
 	public static Startup parseArgs(String[] args) {
 		// see whether we'll be using any graphics
 		boolean isTty = false;
@@ -448,6 +255,65 @@ public class Startup {
 		System.exit(-1);
 	}
 
+	private static void registerHandler() {
+		try {
+			Class<?> needed1 = Class.forName("com.apple.eawt.Application");
+			if (needed1 == null)
+				return;
+			Class<?> needed2 = Class.forName("com.apple.eawt.ApplicationAdapter");
+			if (needed2 == null)
+				return;
+			MacOsAdapter.register();
+			MacOsAdapter.addListeners(true);
+		} catch (ClassNotFoundException e) {
+			return;
+		} catch (Throwable t) {
+			try {
+				MacOsAdapter.addListeners(false);
+			} catch (Throwable t2) {
+			}
+		}
+	}
+
+	private static void setLocale(String lang) {
+		Locale[] opts = Strings.getLocaleOptions();
+		for (int i = 0; i < opts.length; i++) {
+			if (lang.equals(opts[i].toString())) {
+				LocaleManager.setLocale(opts[i]);
+				return;
+			}
+		}
+		System.err.println(Strings.get("invalidLocaleError")); // OK
+		System.err.println(Strings.get("invalidLocaleOptionsHeader")); // OK
+		for (int i = 0; i < opts.length; i++) {
+			System.err.println("   " + opts[i].toString()); // OK
+		}
+		System.exit(-1);
+	}
+	// based on command line
+	boolean isTty;
+	private File templFile = null;
+	private boolean templEmpty = false;
+	private boolean templPlain = false;
+	private ArrayList<File> filesToOpen = new ArrayList<File>();
+	private boolean showSplash;
+	private boolean updatecanceled = false;
+	private File loadFile;
+	private HashMap<File, File> substitutions = new HashMap<File, File>();
+
+	private int ttyFormat = 0;
+	// from other sources
+	private boolean initialized = false;
+	private SplashScreen monitor = null;
+	UpdateScreen updatescreen = null;
+
+	private ArrayList<File> filesToPrint = new ArrayList<File>();
+
+	public Startup(boolean isTty) {
+		this.isTty = isTty;
+		this.showSplash = !isTty;
+	}
+
 	/**
 	 * Auto-update Logisim if a new version is available
 	 * 
@@ -501,7 +367,7 @@ public class Startup {
 			}
 			try {
 				updatescreen = new UpdateScreen();
-				updatescreen.Message(Strings.get("Connectioncheck")+"...");
+				updatescreen.Message(Strings.get("Connectioncheck") + "...");
 				updatescreen.setVisible(true);
 
 			} catch (Throwable t) {
@@ -541,6 +407,24 @@ public class Startup {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 		return (false);
+	}
+
+	private void doOpenFile(File file) {
+		if (initialized) {
+			ProjectActions.doOpen(null, null, file);
+		} else {
+			filesToOpen.add(file);
+		}
+	}
+
+	private void doPrintFile(File file) {
+		if (initialized) {
+			Project toPrint = ProjectActions.doOpen(null, null, file);
+			Print.doPrint(toPrint);
+			toPrint.getFrame().dispose();
+		} else {
+			filesToPrint.add(file);
+		}
 	}
 
 	/**
@@ -640,7 +524,7 @@ public class Startup {
 				deplacement += currentBit;
 			}
 			updatescreen.Clear();
-			updatescreen.Message(Strings.get("Installing")+"...");
+			updatescreen.Message(Strings.get("Installing") + "...");
 			updatescreen.Repaint();
 
 		} catch (IOException e) {
@@ -696,6 +580,35 @@ public class Startup {
 		return 1;
 	}
 
+	List<File> getFilesToOpen() {
+		return filesToOpen;
+	}
+
+	File getLoadFile() {
+		return loadFile;
+	}
+
+	Map<File, File> getSubstitutions() {
+		return Collections.unmodifiableMap(substitutions);
+	}
+
+	int getTtyFormat() {
+		return ttyFormat;
+	}
+
+	private void loadTemplate(Loader loader, File templFile, boolean templEmpty) {
+		if (showSplash)
+			monitor.setProgress(SplashScreen.TEMPLATE_OPEN);
+		if (templFile != null) {
+			AppPreferences.setTemplateFile(templFile);
+			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_CUSTOM);
+		} else if (templEmpty) {
+			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_EMPTY);
+		} else if (templPlain) {
+			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_PLAIN);
+		}
+	}
+
 	/**
 	 * Check if network connection is available.
 	 * 
@@ -721,5 +634,92 @@ public class Startup {
 			return (false);
 		}
 		return (false);
+	}
+
+	public void run() {
+		if (isTty) {
+			try {
+				TtyInterface.run(this);
+				return;
+			} catch (Throwable t) {
+				t.printStackTrace();
+				System.exit(-1);
+				return;
+			}
+		}
+
+		// kick off the progress monitor
+		// (The values used for progress values are based on a single run where
+		// I loaded a large file.)
+		if (showSplash) {
+			try {
+				monitor = new SplashScreen();
+				monitor.setVisible(true);
+			} catch (Throwable t) {
+				monitor = null;
+				showSplash = false;
+			}
+		}
+
+		// pre-load the two basic component libraries, just so that the time
+		// taken is shown separately in the progress bar.
+		if (showSplash)
+			monitor.setProgress(SplashScreen.LIBRARIES);
+		Loader templLoader = new Loader(monitor);
+		int count = templLoader.getBuiltin().getLibrary("Base").getTools().size()
+				+ templLoader.getBuiltin().getLibrary("Gates").getTools().size();
+		if (count < 0) {
+			// this will never happen, but the optimizer doesn't know that...
+			System.err.println("FATAL ERROR - no components"); // OK
+			System.exit(-1);
+		}
+
+		// load in template
+		loadTemplate(templLoader, templFile, templEmpty);
+
+		// now that the splash screen is almost gone, we do some last-minute
+		// interface initialization
+		if (showSplash)
+			monitor.setProgress(SplashScreen.GUI_INIT);
+		WindowManagers.initialize();
+		if (MacCompatibility.isSwingUsingScreenMenuBar()) {
+			MacCompatibility.setFramelessJMenuBar(new LogisimMenuBar(null, null));
+		} else {
+			new LogisimMenuBar(null, null);
+			// most of the time occupied here will be in loading menus, which
+			// will occur eventually anyway; we might as well do it when the
+			// monitor says we are
+		}
+
+		// if user has double-clicked a file to open, we'll
+		// use that as the file to open now.
+		initialized = true;
+
+		// load file
+		if (filesToOpen.isEmpty()) {
+			ProjectActions.doNew(monitor, true);
+			if (showSplash)
+				monitor.close();
+		} else {
+			boolean first = true;
+			for (File fileToOpen : filesToOpen) {
+				try {
+					ProjectActions.doOpen(monitor, fileToOpen, substitutions);
+				} catch (LoadFailedException ex) {
+					System.err.println(fileToOpen.getName() + ": " + ex.getMessage()); // OK
+					System.exit(-1);
+				}
+				if (first) {
+					first = false;
+					if (showSplash)
+						monitor.close();
+					monitor = null;
+				}
+			}
+		}
+
+		for (File fileToPrint : filesToPrint) {
+			doPrintFile(fileToPrint);
+		}
 	}
 }

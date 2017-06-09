@@ -15,11 +15,6 @@ import com.cburch.logisim.data.Value;
 @SuppressWarnings("rawtypes")
 class SelectionList extends JList {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3343339830472123692L;
-
 	private class Model extends AbstractListModel implements ModelListener {
 		/**
 		 * 
@@ -27,8 +22,11 @@ class SelectionList extends JList {
 		private static final long serialVersionUID = 6084476713875063923L;
 
 		@Override
-		public int getSize() {
-			return selection == null ? 0 : selection.size();
+		public void entryAdded(ModelEvent event, Value[] values) {
+		}
+
+		@Override
+		public void filePropertyChanged(ModelEvent event) {
 		}
 
 		@Override
@@ -37,16 +35,13 @@ class SelectionList extends JList {
 		}
 
 		@Override
+		public int getSize() {
+			return selection == null ? 0 : selection.size();
+		}
+
+		@Override
 		public void selectionChanged(ModelEvent event) {
 			fireContentsChanged(this, 0, getSize());
-		}
-
-		@Override
-		public void entryAdded(ModelEvent event, Value[] values) {
-		}
-
-		@Override
-		public void filePropertyChanged(ModelEvent event) {
 		}
 	}
 
@@ -71,6 +66,11 @@ class SelectionList extends JList {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3343339830472123692L;
+
 	private Selection selection;
 
 	@SuppressWarnings("unchecked")
@@ -79,6 +79,10 @@ class SelectionList extends JList {
 		setModel(new Model());
 		setCellRenderer(new MyCellRenderer());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+
+	public void localeChanged() {
+		repaint();
 	}
 
 	public void setSelection(Selection value) {
@@ -91,9 +95,5 @@ class SelectionList extends JList {
 				selection.addModelListener(model);
 			model.selectionChanged(null);
 		}
-	}
-
-	public void localeChanged() {
-		repaint();
 	}
 }

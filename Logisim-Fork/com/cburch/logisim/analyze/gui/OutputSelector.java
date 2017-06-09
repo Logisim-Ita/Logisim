@@ -26,8 +26,8 @@ class OutputSelector {
 		private Object selected;
 
 		@Override
-		public void setSelectedItem(Object value) {
-			selected = value;
+		public Object getElementAt(int index) {
+			return source.get(index);
 		}
 
 		@Override
@@ -38,11 +38,6 @@ class OutputSelector {
 		@Override
 		public int getSize() {
 			return source.size();
-		}
-
-		@Override
-		public Object getElementAt(int index) {
-			return source.get(index);
 		}
 
 		@Override
@@ -100,6 +95,11 @@ class OutputSelector {
 				break;
 			}
 		}
+
+		@Override
+		public void setSelectedItem(Object value) {
+			selected = value;
+		}
 	}
 
 	private VariableList source;
@@ -117,45 +117,8 @@ class OutputSelector {
 		source.addVariableListListener(listModel);
 	}
 
-	public JPanel createPanel() {
-		JPanel ret = new JPanel();
-		ret.add(label);
-		ret.add(select);
-		return ret;
-	}
-
-	public JLabel getLabel() {
-		return label;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public JComboBox getComboBox() {
-		return select;
-	}
-
-	void localeChanged() {
-		label.setText(Strings.get("outputSelectLabel"));
-	}
-
 	public void addItemListener(ItemListener l) {
 		select.addItemListener(l);
-	}
-
-	public void removeItemListener(ItemListener l) {
-		select.removeItemListener(l);
-	}
-
-	public String getSelectedOutput() {
-		String value = (String) select.getSelectedItem();
-		if (value != null && !source.contains(value)) {
-			if (source.isEmpty()) {
-				value = null;
-			} else {
-				value = source.get(0);
-			}
-			select.setSelectedItem(value);
-		}
-		return value;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -176,5 +139,42 @@ class OutputSelector {
 			select.setPrototypeDisplayValue(prototypeValue + "xx");
 			select.revalidate();
 		}
+	}
+
+	public JPanel createPanel() {
+		JPanel ret = new JPanel();
+		ret.add(label);
+		ret.add(select);
+		return ret;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public JComboBox getComboBox() {
+		return select;
+	}
+
+	public JLabel getLabel() {
+		return label;
+	}
+
+	public String getSelectedOutput() {
+		String value = (String) select.getSelectedItem();
+		if (value != null && !source.contains(value)) {
+			if (source.isEmpty()) {
+				value = null;
+			} else {
+				value = source.get(0);
+			}
+			select.setSelectedItem(value);
+		}
+		return value;
+	}
+
+	void localeChanged() {
+		label.setText(Strings.get("outputSelectLabel"));
+	}
+
+	public void removeItemListener(ItemListener l) {
+		select.removeItemListener(l);
 	}
 }

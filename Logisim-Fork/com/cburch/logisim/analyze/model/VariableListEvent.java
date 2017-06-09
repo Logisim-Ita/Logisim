@@ -22,6 +22,10 @@ public class VariableListEvent {
 		this.data = data;
 	}
 
+	public Object getData() {
+		return data;
+	}
+
 	public VariableList getSource() {
 		return source;
 	}
@@ -32,9 +36,5 @@ public class VariableListEvent {
 
 	public String getVariable() {
 		return variable;
-	}
-
-	public Object getData() {
-		return data;
 	}
 }

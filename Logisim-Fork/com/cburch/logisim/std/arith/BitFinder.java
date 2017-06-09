@@ -36,24 +36,17 @@ public class BitFinder extends InstanceFactory {
 		setIconName("bitfindr.gif");
 	}
 
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		return Bounds.create(-40, -20, 40, 40);
+	private int computeOutputBits(int maxBits) {
+		int outWidth = 1;
+		while ((1 << outWidth) <= maxBits)
+			outWidth++;
+		return outWidth;
 	}
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		configurePorts(instance);
 		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.WIDTH) {
-			configurePorts(instance);
-		} else if (attr == TYPE) {
-			instance.fireInvalidated();
-		}
 	}
 
 	private void configurePorts(Instance instance) {
@@ -83,11 +76,50 @@ public class BitFinder extends InstanceFactory {
 		instance.setPorts(ps);
 	}
 
-	private int computeOutputBits(int maxBits) {
-		int outWidth = 1;
-		while ((1 << outWidth) <= maxBits)
-			outWidth++;
-		return outWidth;
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		return Bounds.create(-40, -20, 40, 40);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.WIDTH) {
+			configurePorts(instance);
+		} else if (attr == TYPE) {
+			instance.fireInvalidated();
+		}
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+		painter.drawPorts();
+
+		String top = Strings.get("bitFinderFindLabel");
+		String mid;
+		String bot;
+		Object type = painter.getAttributeValue(TYPE);
+		if (type == HIGH_ZERO) {
+			mid = Strings.get("bitFinderHighLabel");
+			bot = "0";
+		} else if (type == LOW_ZERO) {
+			mid = Strings.get("bitFinderLowLabel");
+			bot = "0";
+		} else if (type == HIGH_ONE) {
+			mid = Strings.get("bitFinderHighLabel");
+			bot = "1";
+		} else {
+			mid = Strings.get("bitFinderLowLabel");
+			bot = "1";
+		}
+
+		Bounds bds = painter.getBounds();
+		int x = bds.getX() + bds.getWidth() / 2;
+		int y0 = bds.getY();
+		GraphicsUtil.drawCenteredText(g, top, x, y0 + 8);
+		GraphicsUtil.drawCenteredText(g, mid, x, y0 + 20);
+		GraphicsUtil.drawCenteredText(g, bot, x, y0 + 32);
 	}
 
 	@Override
@@ -133,37 +165,5 @@ public class BitFinder extends InstanceFactory {
 		int delay = outWidth * Adder.PER_DELAY;
 		state.setPort(0, present, delay);
 		state.setPort(1, index, delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-		painter.drawPorts();
-
-		String top = Strings.get("bitFinderFindLabel");
-		String mid;
-		String bot;
-		Object type = painter.getAttributeValue(TYPE);
-		if (type == HIGH_ZERO) {
-			mid = Strings.get("bitFinderHighLabel");
-			bot = "0";
-		} else if (type == LOW_ZERO) {
-			mid = Strings.get("bitFinderLowLabel");
-			bot = "0";
-		} else if (type == HIGH_ONE) {
-			mid = Strings.get("bitFinderHighLabel");
-			bot = "1";
-		} else {
-			mid = Strings.get("bitFinderLowLabel");
-			bot = "1";
-		}
-
-		Bounds bds = painter.getBounds();
-		int x = bds.getX() + bds.getWidth() / 2;
-		int y0 = bds.getY();
-		GraphicsUtil.drawCenteredText(g, top, x, y0 + 8);
-		GraphicsUtil.drawCenteredText(g, mid, x, y0 + 20);
-		GraphicsUtil.drawCenteredText(g, bot, x, y0 + 32);
 	}
 }

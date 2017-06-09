@@ -28,52 +28,7 @@ import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 
 public class Analyzer extends LFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5392356049016488231L;
-	// used by circuit analysis to select the relevant tab automatically.
-	public static final int INPUTS_TAB = 0;
-	public static final int OUTPUTS_TAB = 1;
-	public static final int TABLE_TAB = 2;
-	public static final int EXPRESSION_TAB = 3;
-	public static final int MINIMIZED_TAB = 4;
-
-	private class MyListener implements LocaleListener {
-		@Override
-		public void localeChanged() {
-			Analyzer.this.setTitle(Strings.get("analyzerWindowTitle"));
-			tabbedPane.setTitleAt(INPUTS_TAB, Strings.get("inputsTab"));
-			tabbedPane.setTitleAt(OUTPUTS_TAB, Strings.get("outputsTab"));
-			tabbedPane.setTitleAt(TABLE_TAB, Strings.get("tableTab"));
-			tabbedPane.setTitleAt(EXPRESSION_TAB, Strings.get("expressionTab"));
-			tabbedPane.setTitleAt(MINIMIZED_TAB, Strings.get("minimizedTab"));
-			tabbedPane.setToolTipTextAt(INPUTS_TAB, Strings.get("inputsTabTip"));
-			tabbedPane.setToolTipTextAt(OUTPUTS_TAB, Strings.get("outputsTabTip"));
-			tabbedPane.setToolTipTextAt(TABLE_TAB, Strings.get("tableTabTip"));
-			tabbedPane.setToolTipTextAt(EXPRESSION_TAB, Strings.get("expressionTabTip"));
-			tabbedPane.setToolTipTextAt(MINIMIZED_TAB, Strings.get("minimizedTabTip"));
-			buildCircuit.setText(Strings.get("buildCircuitButton"));
-			inputsPanel.localeChanged();
-			outputsPanel.localeChanged();
-			truthTablePanel.localeChanged();
-			expressionPanel.localeChanged();
-			minimizedPanel.localeChanged();
-			buildCircuit.localeChanged();
-		}
-	}
-
 	private class EditListener implements ActionListener, ChangeListener {
-		private void register(LogisimMenuBar menubar) {
-			menubar.addActionListener(LogisimMenuBar.CUT, this);
-			menubar.addActionListener(LogisimMenuBar.COPY, this);
-			menubar.addActionListener(LogisimMenuBar.PASTE, this);
-			menubar.addActionListener(LogisimMenuBar.DELETE, this);
-			menubar.addActionListener(LogisimMenuBar.SELECT_ALL, this);
-			tabbedPane.addChangeListener(this);
-			enableItems(menubar);
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
@@ -111,6 +66,16 @@ public class Analyzer extends LFrame {
 			menubar.setEnabled(LogisimMenuBar.SELECT_ALL, support);
 		}
 
+		private void register(LogisimMenuBar menubar) {
+			menubar.addActionListener(LogisimMenuBar.CUT, this);
+			menubar.addActionListener(LogisimMenuBar.COPY, this);
+			menubar.addActionListener(LogisimMenuBar.PASTE, this);
+			menubar.addActionListener(LogisimMenuBar.DELETE, this);
+			menubar.addActionListener(LogisimMenuBar.SELECT_ALL, this);
+			tabbedPane.addChangeListener(this);
+			enableItems(menubar);
+		}
+
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			enableItems((LogisimMenuBar) getJMenuBar());
@@ -124,17 +89,59 @@ public class Analyzer extends LFrame {
 			}
 		}
 	}
+	private class MyListener implements LocaleListener {
+		@Override
+		public void localeChanged() {
+			Analyzer.this.setTitle(Strings.get("analyzerWindowTitle"));
+			tabbedPane.setTitleAt(INPUTS_TAB, Strings.get("inputsTab"));
+			tabbedPane.setTitleAt(OUTPUTS_TAB, Strings.get("outputsTab"));
+			tabbedPane.setTitleAt(TABLE_TAB, Strings.get("tableTab"));
+			tabbedPane.setTitleAt(EXPRESSION_TAB, Strings.get("expressionTab"));
+			tabbedPane.setTitleAt(MINIMIZED_TAB, Strings.get("minimizedTab"));
+			tabbedPane.setToolTipTextAt(INPUTS_TAB, Strings.get("inputsTabTip"));
+			tabbedPane.setToolTipTextAt(OUTPUTS_TAB, Strings.get("outputsTabTip"));
+			tabbedPane.setToolTipTextAt(TABLE_TAB, Strings.get("tableTabTip"));
+			tabbedPane.setToolTipTextAt(EXPRESSION_TAB, Strings.get("expressionTabTip"));
+			tabbedPane.setToolTipTextAt(MINIMIZED_TAB, Strings.get("minimizedTabTip"));
+			buildCircuit.setText(Strings.get("buildCircuitButton"));
+			inputsPanel.localeChanged();
+			outputsPanel.localeChanged();
+			truthTablePanel.localeChanged();
+			expressionPanel.localeChanged();
+			minimizedPanel.localeChanged();
+			buildCircuit.localeChanged();
+		}
+	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5392356049016488231L;
+	// used by circuit analysis to select the relevant tab automatically.
+	public static final int INPUTS_TAB = 0;
+	public static final int OUTPUTS_TAB = 1;
+	public static final int TABLE_TAB = 2;
 
+	public static final int EXPRESSION_TAB = 3;
+
+	public static final int MINIMIZED_TAB = 4;
+
+	public static void main(String[] args) {
+		Analyzer frame = new Analyzer();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+	}
 	private MyListener myListener = new MyListener();
 	private EditListener editListener = new EditListener();
 	private AnalyzerModel model = new AnalyzerModel();
-	private JTabbedPane tabbedPane = new JTabbedPane();
 
+	private JTabbedPane tabbedPane = new JTabbedPane();
 	private VariableTab inputsPanel;
 	private VariableTab outputsPanel;
 	private TableTab truthTablePanel;
 	private ExpressionTab expressionPanel;
 	private MinimizedTab minimizedPanel;
+
 	private BuildCircuitButton buildCircuit;
 
 	Analyzer() {
@@ -187,9 +194,7 @@ public class Analyzer extends LFrame {
 		}
 		pane.addComponentListener(new ComponentListener() {
 			@Override
-			public void componentResized(ComponentEvent event) {
-				int width = pane.getViewport().getWidth();
-				comp.setSize(new Dimension(width, comp.getHeight()));
+			public void componentHidden(ComponentEvent arg0) {
 			}
 
 			@Override
@@ -197,11 +202,13 @@ public class Analyzer extends LFrame {
 			}
 
 			@Override
-			public void componentShown(ComponentEvent arg0) {
+			public void componentResized(ComponentEvent event) {
+				int width = pane.getViewport().getWidth();
+				comp.setSize(new Dimension(width, comp.getHeight()));
 			}
 
 			@Override
-			public void componentHidden(ComponentEvent arg0) {
+			public void componentShown(ComponentEvent arg0) {
 			}
 		});
 		tabbedPane.insertTab("Untitled", null, pane, null, index);
@@ -217,12 +224,5 @@ public class Analyzer extends LFrame {
 			((AnalyzerTab) found).updateTab();
 		}
 		tabbedPane.setSelectedIndex(index);
-	}
-
-	public static void main(String[] args) {
-		Analyzer frame = new Analyzer();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

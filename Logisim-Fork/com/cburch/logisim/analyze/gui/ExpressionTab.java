@@ -32,11 +32,6 @@ import com.cburch.logisim.analyze.model.ParserException;
 import com.cburch.logisim.util.StringGetter;
 
 class ExpressionTab extends AnalyzerTab implements TabInterface {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4349747751518665612L;
-
 	private class MyListener extends AbstractAction
 			implements DocumentListener, OutputExpressionsListener, ItemListener {
 		/**
@@ -73,45 +68,8 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		}
 
 		@Override
-		public void insertUpdate(DocumentEvent event) {
-			String curText = field.getText();
-			edited = curText.length() != curExprStringLength || !curText.equals(getCurrentString());
-
-			boolean enable = (edited && getCurrentVariable() != null);
-			clear.setEnabled(curText.length() > 0);
-			revert.setEnabled(enable);
-			enter.setEnabled(enable);
-		}
-
-		@Override
-		public void removeUpdate(DocumentEvent event) {
-			insertUpdate(event);
-		}
-
-		@Override
 		public void changedUpdate(DocumentEvent event) {
 			insertUpdate(event);
-		}
-
-		@Override
-		public void expressionChanged(OutputExpressionsEvent event) {
-			if (event.getType() == OutputExpressionsEvent.OUTPUT_EXPRESSION) {
-				String output = event.getVariable();
-				if (output.equals(getCurrentVariable())) {
-					prettyView.setExpression(model.getOutputExpressions().getExpression(output));
-					currentStringChanged();
-				}
-			}
-		}
-
-		@Override
-		public void itemStateChanged(ItemEvent event) {
-			updateTab();
-		}
-
-		private String getCurrentString() {
-			String output = getCurrentVariable();
-			return output == null ? "" : model.getOutputExpressions().getExpressionString(output);
 		}
 
 		private void currentStringChanged() {
@@ -125,7 +83,49 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 				insertUpdate(null);
 			}
 		}
+
+		@Override
+		public void expressionChanged(OutputExpressionsEvent event) {
+			if (event.getType() == OutputExpressionsEvent.OUTPUT_EXPRESSION) {
+				String output = event.getVariable();
+				if (output.equals(getCurrentVariable())) {
+					prettyView.setExpression(model.getOutputExpressions().getExpression(output));
+					currentStringChanged();
+				}
+			}
+		}
+
+		private String getCurrentString() {
+			String output = getCurrentVariable();
+			return output == null ? "" : model.getOutputExpressions().getExpressionString(output);
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent event) {
+			String curText = field.getText();
+			edited = curText.length() != curExprStringLength || !curText.equals(getCurrentString());
+
+			boolean enable = (edited && getCurrentVariable() != null);
+			clear.setEnabled(curText.length() > 0);
+			revert.setEnabled(enable);
+			enter.setEnabled(enable);
+		}
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			updateTab();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent event) {
+			insertUpdate(event);
+		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4349747751518665612L;
 
 	private OutputSelector selector;
 	private ExpressionView prettyView = new ExpressionView();
@@ -193,6 +193,22 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 	}
 
 	@Override
+	public void copy() {
+		field.requestFocus();
+		field.copy();
+	}
+
+	@Override
+	public void delete() {
+		field.requestFocus();
+		field.replaceSelection("");
+	}
+
+	String getCurrentVariable() {
+		return selector.getSelectedOutput();
+	}
+
+	@Override
 	void localeChanged() {
 		selector.localeChanged();
 		prettyView.localeChanged();
@@ -205,18 +221,19 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 	}
 
 	@Override
-	void updateTab() {
-		String output = getCurrentVariable();
-		prettyView.setExpression(model.getOutputExpressions().getExpression(output));
-		myListener.currentStringChanged();
+	public void paste() {
+		field.requestFocus();
+		field.paste();
 	}
 
 	void registerDefaultButtons(DefaultRegistry registry) {
 		registry.registerDefaultButton(field, enter);
 	}
 
-	String getCurrentVariable() {
-		return selector.getSelectedOutput();
+	@Override
+	public void selectAll() {
+		field.requestFocus();
+		field.selectAll();
 	}
 
 	private void setError(StringGetter msg) {
@@ -230,26 +247,9 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 	}
 
 	@Override
-	public void copy() {
-		field.requestFocus();
-		field.copy();
-	}
-
-	@Override
-	public void paste() {
-		field.requestFocus();
-		field.paste();
-	}
-
-	@Override
-	public void delete() {
-		field.requestFocus();
-		field.replaceSelection("");
-	}
-
-	@Override
-	public void selectAll() {
-		field.requestFocus();
-		field.selectAll();
+	void updateTab() {
+		String output = getCurrentVariable();
+		prettyView.setExpression(model.getOutputExpressions().getExpression(output));
+		myListener.currentStringChanged();
 	}
 }

@@ -31,74 +31,6 @@ import com.cburch.logisim.analyze.model.VariableListListener;
 import com.cburch.logisim.util.StringUtil;
 
 class VariableTab extends AnalyzerTab implements TabInterface {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5549146127134246159L;
-
-	@SuppressWarnings("rawtypes")
-	private static class VariableListModel extends AbstractListModel implements VariableListListener {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3099969233885603766L;
-		private VariableList list;
-		private String[] listCopy;
-
-		public VariableListModel(VariableList list) {
-			this.list = list;
-			updateCopy();
-			list.addVariableListListener(this);
-		}
-
-		private void updateCopy() {
-			listCopy = list.toArray(new String[list.size()]);
-		}
-
-		@Override
-		public int getSize() {
-			return listCopy.length;
-		}
-
-		@Override
-		public Object getElementAt(int index) {
-			return index >= 0 && index < listCopy.length ? listCopy[index] : null;
-		}
-
-		private void update() {
-			String[] oldCopy = listCopy;
-			updateCopy();
-			fireContentsChanged(this, 0, oldCopy.length);
-		}
-
-		@Override
-		public void listChanged(VariableListEvent event) {
-			String[] oldCopy = listCopy;
-			updateCopy();
-			int index;
-			switch (event.getType()) {
-			case VariableListEvent.ALL_REPLACED:
-				fireContentsChanged(this, 0, oldCopy.length);
-				return;
-			case VariableListEvent.ADD:
-				index = list.indexOf(event.getVariable());
-				fireIntervalAdded(this, index, index);
-				return;
-			case VariableListEvent.REMOVE:
-				index = ((Integer) event.getData()).intValue();
-				fireIntervalRemoved(this, index, index);
-				return;
-			case VariableListEvent.MOVE:
-				fireContentsChanged(this, 0, getSize());
-				return;
-			case VariableListEvent.REPLACE:
-				index = ((Integer) event.getData()).intValue();
-				fireContentsChanged(this, index, index);
-				return;
-			}
-		}
-	}
-
 	private class MyListener implements ActionListener, DocumentListener, ListSelectionListener {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -141,6 +73,11 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		}
 
 		@Override
+		public void changedUpdate(DocumentEvent event) {
+			insertUpdate(event);
+		}
+
+		@Override
 		public void insertUpdate(DocumentEvent event) {
 			computeEnabled();
 		}
@@ -151,15 +88,78 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		}
 
 		@Override
-		public void changedUpdate(DocumentEvent event) {
-			insertUpdate(event);
-		}
-
-		@Override
 		public void valueChanged(ListSelectionEvent event) {
 			computeEnabled();
 		}
 	}
+
+	@SuppressWarnings("rawtypes")
+	private static class VariableListModel extends AbstractListModel implements VariableListListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3099969233885603766L;
+		private VariableList list;
+		private String[] listCopy;
+
+		public VariableListModel(VariableList list) {
+			this.list = list;
+			updateCopy();
+			list.addVariableListListener(this);
+		}
+
+		@Override
+		public Object getElementAt(int index) {
+			return index >= 0 && index < listCopy.length ? listCopy[index] : null;
+		}
+
+		@Override
+		public int getSize() {
+			return listCopy.length;
+		}
+
+		@Override
+		public void listChanged(VariableListEvent event) {
+			String[] oldCopy = listCopy;
+			updateCopy();
+			int index;
+			switch (event.getType()) {
+			case VariableListEvent.ALL_REPLACED:
+				fireContentsChanged(this, 0, oldCopy.length);
+				return;
+			case VariableListEvent.ADD:
+				index = list.indexOf(event.getVariable());
+				fireIntervalAdded(this, index, index);
+				return;
+			case VariableListEvent.REMOVE:
+				index = ((Integer) event.getData()).intValue();
+				fireIntervalRemoved(this, index, index);
+				return;
+			case VariableListEvent.MOVE:
+				fireContentsChanged(this, 0, getSize());
+				return;
+			case VariableListEvent.REPLACE:
+				index = ((Integer) event.getData()).intValue();
+				fireContentsChanged(this, index, index);
+				return;
+			}
+		}
+
+		private void update() {
+			String[] oldCopy = listCopy;
+			updateCopy();
+			fireContentsChanged(this, 0, oldCopy.length);
+		}
+
+		private void updateCopy() {
+			listCopy = list.toArray(new String[list.size()]);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5549146127134246159L;
 
 	private VariableList data;
 	private MyListener myListener = new MyListener();
@@ -242,26 +242,6 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		computeEnabled();
 	}
 
-	@Override
-	void localeChanged() {
-		remove.setText(Strings.get("variableRemoveButton"));
-		moveUp.setText(Strings.get("variableMoveUpButton"));
-		moveDown.setText(Strings.get("variableMoveDownButton"));
-		add.setText(Strings.get("variableAddButton"));
-		rename.setText(Strings.get("variableRenameButton"));
-		validateInput();
-	}
-
-	@Override
-	void updateTab() {
-		VariableListModel model = (VariableListModel) list.getModel();
-		model.update();
-	}
-
-	void registerDefaultButtons(DefaultRegistry registry) {
-		registry.registerDefaultButton(field, add);
-	}
-
 	private void computeEnabled() {
 		int index = list.getSelectedIndex();
 		int max = list.getModel().getSize();
@@ -273,6 +253,50 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		boolean ok = validateInput();
 		add.setEnabled(ok && data.size() < data.getMaximumSize());
 		rename.setEnabled(ok && selected);
+	}
+
+	@Override
+	public void copy() {
+		field.requestFocus();
+		field.copy();
+	}
+
+	@Override
+	public void delete() {
+		field.requestFocus();
+		field.replaceSelection("");
+	}
+
+	@Override
+	void localeChanged() {
+		remove.setText(Strings.get("variableRemoveButton"));
+		moveUp.setText(Strings.get("variableMoveUpButton"));
+		moveDown.setText(Strings.get("variableMoveDownButton"));
+		add.setText(Strings.get("variableAddButton"));
+		rename.setText(Strings.get("variableRenameButton"));
+		validateInput();
+	}
+
+	@Override
+	public void paste() {
+		field.requestFocus();
+		field.paste();
+	}
+
+	void registerDefaultButtons(DefaultRegistry registry) {
+		registry.registerDefaultButton(field, add);
+	}
+
+	@Override
+	public void selectAll() {
+		field.requestFocus();
+		field.selectAll();
+	}
+
+	@Override
+	void updateTab() {
+		VariableListModel model = (VariableListModel) list.getModel();
+		model.update();
 	}
 
 	private boolean validateInput() {
@@ -311,29 +335,5 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 			}
 		}
 		return ok;
-	}
-
-	@Override
-	public void copy() {
-		field.requestFocus();
-		field.copy();
-	}
-
-	@Override
-	public void paste() {
-		field.requestFocus();
-		field.paste();
-	}
-
-	@Override
-	public void delete() {
-		field.requestFocus();
-		field.replaceSelection("");
-	}
-
-	@Override
-	public void selectAll() {
-		field.requestFocus();
-		field.selectAll();
 	}
 }

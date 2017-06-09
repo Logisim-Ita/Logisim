@@ -47,86 +47,45 @@ class CanvasPainter implements PropertyChangeListener {
 		AppPreferences.ATTRIBUTE_HALO.addPropertyChangeListener(this);
 	}
 
-	//
-	// accessor methods
-	//
-	GridPainter getGridPainter() {
-		return grid;
-	}
-
-	Component getHaloedComponent() {
-		return haloedComponent;
-	}
-
-	//
-	// mutator methods
-	//
-	void setHighlightedWires(WireSet value) {
-		highlightedWires = value == null ? WireSet.EMPTY : value;
-	}
-
-	void setHaloedComponent(Circuit circ, Component comp) {
-		if (comp == haloedComponent)
+	private void drawWidthIncompatibilityData(Graphics base, Graphics g, Project proj) {
+		Set<WidthIncompatibilityData> exceptions;
+		exceptions = proj.getCurrentCircuit().getWidthIncompatibilityData();
+		if (exceptions == null || exceptions.size() == 0)
 			return;
-		Graphics g = canvas.getGraphics();
-		exposeHaloedComponent(g);
-		haloedCircuit = circ;
-		haloedComponent = comp;
-		exposeHaloedComponent(g);
-	}
 
-	private void exposeHaloedComponent(Graphics g) {
-		Component c = haloedComponent;
-		if (c == null)
-			return;
-		Bounds bds = c.getBounds(g).expand(7);
-		int w = bds.getWidth();
-		int h = bds.getHeight();
-		double a = Canvas.SQRT_2 * w;
-		double b = Canvas.SQRT_2 * h;
-		canvas.repaint((int) Math.round(bds.getX() + w / 2.0 - a / 2.0),
-				(int) Math.round(bds.getY() + h / 2.0 - b / 2.0), (int) Math.round(a), (int) Math.round(b));
-	}
+		g.setColor(Value.WIDTH_ERROR_COLOR);
+		GraphicsUtil.switchToWidth(g, 2);
+		FontMetrics fm = base.getFontMetrics(g.getFont());
+		for (WidthIncompatibilityData ex : exceptions) {
+			for (int i = 0; i < ex.size(); i++) {
+				Location p = ex.getPoint(i);
+				BitWidth w = ex.getBitWidth(i);
 
-	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		if (AppPreferences.PRINTER_VIEW.isSource(event) || AppPreferences.ATTRIBUTE_HALO.isSource(event)) {
-			canvas.repaint();
+				// ensure it hasn't already been drawn
+				boolean drawn = false;
+				for (int j = 0; j < i; j++) {
+					if (ex.getPoint(j).equals(p)) {
+						drawn = true;
+						break;
+					}
+				}
+				if (drawn)
+					continue;
+
+				// compute the caption combining all similar points
+				String caption = "" + w.getWidth();
+				for (int j = i + 1; j < ex.size(); j++) {
+					if (ex.getPoint(j).equals(p)) {
+						caption += "/" + ex.getBitWidth(j);
+						break;
+					}
+				}
+				g.drawOval(p.getX() - 4, p.getY() - 4, 8, 8);
+				g.drawString(caption, p.getX() + 5, p.getY() + 2 + fm.getAscent());
+			}
 		}
-	}
-
-	//
-	// painting methods
-	//
-	void paintContents(Graphics g, Project proj) {
-		Rectangle clip = g.getClipBounds();
-		Dimension size = canvas.getSize();
-		double zoomFactor = canvas.getZoomFactor();
-		if (canvas.ifPaintDirtyReset() || clip == null) {
-			clip = new Rectangle(0, 0, size.width, size.height);
-		}
-		g.setColor(Color.white);
-		g.fillRect(clip.x, clip.y, clip.width, clip.height);
-
-		grid.paintGrid(g);
-		g.setColor(Color.black);
-
-		Graphics gScaled = g.create();
-		if (zoomFactor != 1.0 && gScaled instanceof Graphics2D) {
-			((Graphics2D) gScaled).scale(zoomFactor, zoomFactor);
-		}
-		drawWithUserState(g, gScaled, proj);
-		drawWidthIncompatibilityData(g, gScaled, proj);
-		Circuit circ = proj.getCurrentCircuit();
-
-		CircuitState circState = proj.getCircuitState();
-		ComponentDrawContext ptContext = new ComponentDrawContext(canvas, circ, circState, g, gScaled);
-		ptContext.setHighlightedWires(highlightedWires);
-		gScaled.setColor(Color.RED);
-		circState.drawOscillatingPoints(ptContext);
-		gScaled.setColor(Color.BLUE);
-		proj.getSimulator().drawStepPoints(ptContext);
-		gScaled.dispose();
+		g.setColor(Color.BLACK);
+		GraphicsUtil.switchToWidth(g, 1);
 	}
 
 	private void drawWithUserState(Graphics base, Graphics g, Project proj) {
@@ -176,44 +135,85 @@ class CanvasPainter implements PropertyChangeListener {
 		}
 	}
 
-	private void drawWidthIncompatibilityData(Graphics base, Graphics g, Project proj) {
-		Set<WidthIncompatibilityData> exceptions;
-		exceptions = proj.getCurrentCircuit().getWidthIncompatibilityData();
-		if (exceptions == null || exceptions.size() == 0)
+	private void exposeHaloedComponent(Graphics g) {
+		Component c = haloedComponent;
+		if (c == null)
 			return;
+		Bounds bds = c.getBounds(g).expand(7);
+		int w = bds.getWidth();
+		int h = bds.getHeight();
+		double a = Canvas.SQRT_2 * w;
+		double b = Canvas.SQRT_2 * h;
+		canvas.repaint((int) Math.round(bds.getX() + w / 2.0 - a / 2.0),
+				(int) Math.round(bds.getY() + h / 2.0 - b / 2.0), (int) Math.round(a), (int) Math.round(b));
+	}
 
-		g.setColor(Value.WIDTH_ERROR_COLOR);
-		GraphicsUtil.switchToWidth(g, 2);
-		FontMetrics fm = base.getFontMetrics(g.getFont());
-		for (WidthIncompatibilityData ex : exceptions) {
-			for (int i = 0; i < ex.size(); i++) {
-				Location p = ex.getPoint(i);
-				BitWidth w = ex.getBitWidth(i);
+	//
+	// accessor methods
+	//
+	GridPainter getGridPainter() {
+		return grid;
+	}
 
-				// ensure it hasn't already been drawn
-				boolean drawn = false;
-				for (int j = 0; j < i; j++) {
-					if (ex.getPoint(j).equals(p)) {
-						drawn = true;
-						break;
-					}
-				}
-				if (drawn)
-					continue;
+	Component getHaloedComponent() {
+		return haloedComponent;
+	}
 
-				// compute the caption combining all similar points
-				String caption = "" + w.getWidth();
-				for (int j = i + 1; j < ex.size(); j++) {
-					if (ex.getPoint(j).equals(p)) {
-						caption += "/" + ex.getBitWidth(j);
-						break;
-					}
-				}
-				g.drawOval(p.getX() - 4, p.getY() - 4, 8, 8);
-				g.drawString(caption, p.getX() + 5, p.getY() + 2 + fm.getAscent());
-			}
+	//
+	// painting methods
+	//
+	void paintContents(Graphics g, Project proj) {
+		Rectangle clip = g.getClipBounds();
+		Dimension size = canvas.getSize();
+		double zoomFactor = canvas.getZoomFactor();
+		if (canvas.ifPaintDirtyReset() || clip == null) {
+			clip = new Rectangle(0, 0, size.width, size.height);
 		}
-		g.setColor(Color.BLACK);
-		GraphicsUtil.switchToWidth(g, 1);
+		g.setColor(Color.white);
+		g.fillRect(clip.x, clip.y, clip.width, clip.height);
+
+		grid.paintGrid(g);
+		g.setColor(Color.black);
+
+		Graphics gScaled = g.create();
+		if (zoomFactor != 1.0 && gScaled instanceof Graphics2D) {
+			((Graphics2D) gScaled).scale(zoomFactor, zoomFactor);
+		}
+		drawWithUserState(g, gScaled, proj);
+		drawWidthIncompatibilityData(g, gScaled, proj);
+		Circuit circ = proj.getCurrentCircuit();
+
+		CircuitState circState = proj.getCircuitState();
+		ComponentDrawContext ptContext = new ComponentDrawContext(canvas, circ, circState, g, gScaled);
+		ptContext.setHighlightedWires(highlightedWires);
+		gScaled.setColor(Color.RED);
+		circState.drawOscillatingPoints(ptContext);
+		gScaled.setColor(Color.BLUE);
+		proj.getSimulator().drawStepPoints(ptContext);
+		gScaled.dispose();
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		if (AppPreferences.PRINTER_VIEW.isSource(event) || AppPreferences.ATTRIBUTE_HALO.isSource(event)) {
+			canvas.repaint();
+		}
+	}
+
+	void setHaloedComponent(Circuit circ, Component comp) {
+		if (comp == haloedComponent)
+			return;
+		Graphics g = canvas.getGraphics();
+		exposeHaloedComponent(g);
+		haloedCircuit = circ;
+		haloedComponent = comp;
+		exposeHaloedComponent(g);
+	}
+
+	//
+	// mutator methods
+	//
+	void setHighlightedWires(WireSet value) {
+		highlightedWires = value == null ? WireSet.EMPTY : value;
 	}
 }

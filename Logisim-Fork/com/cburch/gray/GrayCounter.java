@@ -65,18 +65,6 @@ class GrayCounter extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		// This is the same as with SimpleGrayCounter, except that we use the
-		// StdAttr.WIDTH attribute to determine the bit width to work with.
-		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
-		CounterData cur = CounterData.get(state, width);
-		boolean trigger = cur.updateClock(state.getPort(0));
-		if (trigger)
-			cur.setValue(GrayIncrementer.nextGray(cur.getValue()));
-		state.setPort(1, cur.getValue(), 9);
-	}
-
-	@Override
 	public void paintInstance(InstancePainter painter) {
 		// This is essentially the same as with SimpleGrayCounter, except for
 		// the invocation of painter.drawLabel to make the label be drawn.
@@ -93,5 +81,17 @@ class GrayCounter extends InstanceFactory {
 					StringUtil.toHexString(width.getWidth(), state.getValue().toIntValue()),
 					bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		}
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		// This is the same as with SimpleGrayCounter, except that we use the
+		// StdAttr.WIDTH attribute to determine the bit width to work with.
+		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
+		CounterData cur = CounterData.get(state, width);
+		boolean trigger = cur.updateClock(state.getPort(0));
+		if (trigger)
+			cur.setValue(GrayIncrementer.nextGray(cur.getValue()));
+		state.setPort(1, cur.getValue(), 9);
 	}
 }

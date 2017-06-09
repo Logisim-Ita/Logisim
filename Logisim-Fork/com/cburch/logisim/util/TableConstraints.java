@@ -16,11 +16,11 @@ public class TableConstraints {
 		this.row = row;
 	}
 
-	int getRow() {
-		return row;
-	}
-
 	int getCol() {
 		return col;
+	}
+
+	int getRow() {
+		return row;
 	}
 }

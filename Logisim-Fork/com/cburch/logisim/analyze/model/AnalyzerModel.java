@@ -29,6 +29,10 @@ public class AnalyzerModel {
 		outputExpressions = new OutputExpressions(this);
 	}
 
+	public Circuit getCurrentCircuit() {
+		return currentCircuit;
+	}
+
 	//
 	// access methods
 	//
@@ -36,12 +40,12 @@ public class AnalyzerModel {
 		return currentProject;
 	}
 
-	public Circuit getCurrentCircuit() {
-		return currentCircuit;
-	}
-
 	public VariableList getInputs() {
 		return inputs;
+	}
+
+	public OutputExpressions getOutputExpressions() {
+		return outputExpressions;
 	}
 
 	public VariableList getOutputs() {
@@ -50,10 +54,6 @@ public class AnalyzerModel {
 
 	public TruthTable getTruthTable() {
 		return table;
-	}
-
-	public OutputExpressions getOutputExpressions() {
-		return outputExpressions;
 	}
 
 	//

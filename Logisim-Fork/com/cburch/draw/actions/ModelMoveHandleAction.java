@@ -20,13 +20,9 @@ public class ModelMoveHandleAction extends ModelAction {
 		this.gesture = gesture;
 	}
 
-	public Handle getNewHandle() {
-		return newHandle;
-	}
-
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return Collections.singleton(gesture.getHandle().getObject());
+	void doSub(CanvasModel model) {
+		newHandle = model.moveHandle(gesture);
 	}
 
 	@Override
@@ -34,9 +30,13 @@ public class ModelMoveHandleAction extends ModelAction {
 		return Strings.get("actionMoveHandle");
 	}
 
+	public Handle getNewHandle() {
+		return newHandle;
+	}
+
 	@Override
-	void doSub(CanvasModel model) {
-		newHandle = model.moveHandle(gesture);
+	public Collection<CanvasObject> getObjects() {
+		return Collections.singleton(gesture.getHandle().getObject());
 	}
 
 	@Override

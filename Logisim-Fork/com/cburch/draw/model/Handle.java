@@ -20,6 +20,20 @@ public class Handle {
 		this(object, loc.getX(), loc.getY());
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Handle) {
+			Handle that = (Handle) other;
+			return this.object.equals(that.object) && this.x == that.x && this.y == that.y;
+		} else {
+			return false;
+		}
+	}
+
+	public Location getLocation() {
+		return Location.create(x, y);
+	}
+
 	public CanvasObject getObject() {
 		return object;
 	}
@@ -32,30 +46,16 @@ public class Handle {
 		return y;
 	}
 
-	public Location getLocation() {
-		return Location.create(x, y);
-	}
-
-	public boolean isAt(Location loc) {
-		return x == loc.getX() && y == loc.getY();
+	@Override
+	public int hashCode() {
+		return (this.object.hashCode() * 31 + x) * 31 + y;
 	}
 
 	public boolean isAt(int xq, int yq) {
 		return x == xq && y == yq;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof Handle) {
-			Handle that = (Handle) other;
-			return this.object.equals(that.object) && this.x == that.x && this.y == that.y;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		return (this.object.hashCode() * 31 + x) * 31 + y;
+	public boolean isAt(Location loc) {
+		return x == loc.getX() && y == loc.getY();
 	}
 }

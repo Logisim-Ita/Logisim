@@ -21,27 +21,6 @@ class SimulatorTicker extends Thread {
 		complete = false;
 	}
 
-	public synchronized void setTickFrequency(int millis, int ticks) {
-		millisPerTickPhase = millis;
-		ticksPerTickPhase = ticks;
-	}
-
-	synchronized void setAwake(boolean value) {
-		shouldTick = value;
-		if (shouldTick)
-			notifyAll();
-	}
-
-	public synchronized void shutDown() {
-		complete = true;
-		notifyAll();
-	}
-
-	public synchronized void tickOnce() {
-		ticksPending++;
-		notifyAll();
-	}
-
 	@Override
 	public void run() {
 		long lastTick = System.currentTimeMillis();
@@ -102,5 +81,26 @@ class SimulatorTicker extends Thread {
 			} catch (InterruptedException e) {
 			}
 		}
+	}
+
+	synchronized void setAwake(boolean value) {
+		shouldTick = value;
+		if (shouldTick)
+			notifyAll();
+	}
+
+	public synchronized void setTickFrequency(int millis, int ticks) {
+		millisPerTickPhase = millis;
+		ticksPerTickPhase = ticks;
+	}
+
+	public synchronized void shutDown() {
+		complete = true;
+		notifyAll();
+	}
+
+	public synchronized void tickOnce() {
+		ticksPending++;
+		notifyAll();
 	}
 }

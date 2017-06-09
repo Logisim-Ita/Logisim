@@ -42,74 +42,6 @@ public class TransmissionGate extends InstanceFactory {
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
 
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		updatePorts(instance);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING || attr == Wiring.ATTR_GATE) {
-			instance.recomputeBounds();
-			updatePorts(instance);
-		} else if (attr == StdAttr.WIDTH) {
-			instance.fireInvalidated();
-		}
-	}
-
-	private void updatePorts(Instance instance) {
-		int dx = 0;
-		int dy = 0;
-		Direction facing = instance.getAttributeValue(StdAttr.FACING);
-		if (facing == Direction.NORTH) {
-			dy = 1;
-		} else if (facing == Direction.EAST) {
-			dx = -1;
-		} else if (facing == Direction.SOUTH) {
-			dy = -1;
-		} else if (facing == Direction.WEST) {
-			dx = 1;
-		}
-
-		Object powerLoc = instance.getAttributeValue(Wiring.ATTR_GATE);
-		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST) == (powerLoc == Wiring.GATE_TOP_LEFT);
-
-		Port[] ports = new Port[4];
-		ports[OUTPUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ports[INPUT] = new Port(40 * dx, 40 * dy, Port.INPUT, StdAttr.WIDTH);
-		if (flip) {
-			ports[GATE1] = new Port(20 * (dx - dy), 20 * (dx + dy), Port.INPUT, 1);
-			ports[GATE0] = new Port(20 * (dx + dy), 20 * (-dx + dy), Port.INPUT, 1);
-		} else {
-			ports[GATE0] = new Port(20 * (dx - dy), 20 * (dx + dy), Port.INPUT, 1);
-			ports[GATE1] = new Port(20 * (dx + dy), 20 * (-dx + dy), Port.INPUT, 1);
-		}
-		instance.setPorts(ports);
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Direction facing = attrs.getValue(StdAttr.FACING);
-		return Bounds.create(0, -20, 40, 40).rotate(Direction.WEST, facing, 0, 0);
-	}
-
-	@Override
-	public boolean contains(Location loc, AttributeSet attrs) {
-		if (super.contains(loc, attrs)) {
-			Direction facing = attrs.getValue(StdAttr.FACING);
-			Location center = Location.create(0, 0).translate(facing, -20);
-			return center.manhattanDistanceTo(loc) < 24;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		state.setPort(OUTPUT, computeOutput(state), 1);
-	}
-
 	private Value computeOutput(InstanceState state) {
 		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
 		Value input = state.getPort(INPUT);
@@ -138,14 +70,20 @@ public class TransmissionGate extends InstanceFactory {
 	}
 
 	@Override
-	public void paintInstance(InstancePainter painter) {
-		drawInstance(painter, false);
-		painter.drawPorts();
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updatePorts(instance);
 	}
 
 	@Override
-	public void paintGhost(InstancePainter painter) {
-		drawInstance(painter, true);
+	public boolean contains(Location loc, AttributeSet attrs) {
+		if (super.contains(loc, attrs)) {
+			Direction facing = attrs.getValue(StdAttr.FACING);
+			Location center = Location.create(0, 0).translate(facing, -20);
+			return center.manhattanDistanceTo(loc) < 24;
+		} else {
+			return false;
+		}
 	}
 
 	private void drawInstance(InstancePainter painter, boolean isGhost) {
@@ -209,5 +147,67 @@ public class TransmissionGate extends InstanceFactory {
 		}
 
 		g.dispose();
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction facing = attrs.getValue(StdAttr.FACING);
+		return Bounds.create(0, -20, 40, 40).rotate(Direction.WEST, facing, 0, 0);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING || attr == Wiring.ATTR_GATE) {
+			instance.recomputeBounds();
+			updatePorts(instance);
+		} else if (attr == StdAttr.WIDTH) {
+			instance.fireInvalidated();
+		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		drawInstance(painter, true);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		drawInstance(painter, false);
+		painter.drawPorts();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		state.setPort(OUTPUT, computeOutput(state), 1);
+	}
+
+	private void updatePorts(Instance instance) {
+		int dx = 0;
+		int dy = 0;
+		Direction facing = instance.getAttributeValue(StdAttr.FACING);
+		if (facing == Direction.NORTH) {
+			dy = 1;
+		} else if (facing == Direction.EAST) {
+			dx = -1;
+		} else if (facing == Direction.SOUTH) {
+			dy = -1;
+		} else if (facing == Direction.WEST) {
+			dx = 1;
+		}
+
+		Object powerLoc = instance.getAttributeValue(Wiring.ATTR_GATE);
+		boolean flip = (facing == Direction.SOUTH || facing == Direction.WEST) == (powerLoc == Wiring.GATE_TOP_LEFT);
+
+		Port[] ports = new Port[4];
+		ports[OUTPUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ports[INPUT] = new Port(40 * dx, 40 * dy, Port.INPUT, StdAttr.WIDTH);
+		if (flip) {
+			ports[GATE1] = new Port(20 * (dx - dy), 20 * (dx + dy), Port.INPUT, 1);
+			ports[GATE0] = new Port(20 * (dx + dy), 20 * (-dx + dy), Port.INPUT, 1);
+		} else {
+			ports[GATE0] = new Port(20 * (dx - dy), 20 * (dx + dy), Port.INPUT, 1);
+			ports[GATE1] = new Port(20 * (dx + dy), 20 * (-dx + dy), Port.INPUT, 1);
+		}
+		instance.setPorts(ports);
 	}
 }

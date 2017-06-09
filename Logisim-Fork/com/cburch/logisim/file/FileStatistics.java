@@ -35,12 +35,16 @@ public class FileStatistics {
 			this.recursiveCount = 0;
 		}
 
+		public ComponentFactory getFactory() {
+			return factory;
+		}
+
 		public Library getLibrary() {
 			return library;
 		}
 
-		public ComponentFactory getFactory() {
-			return factory;
+		public int getRecursiveCount() {
+			return recursiveCount;
 		}
 
 		public int getSimpleCount() {
@@ -49,10 +53,6 @@ public class FileStatistics {
 
 		public int getUniqueCount() {
 			return uniqueCount;
-		}
-
-		public int getRecursiveCount() {
-			return recursiveCount;
 		}
 	}
 
@@ -129,6 +129,23 @@ public class FileStatistics {
 		}
 	}
 
+	private static Count getTotal(List<Count> counts, Set<Circuit> exclude) {
+		Count ret = new Count(null);
+		for (Count count : counts) {
+			ComponentFactory factory = count.getFactory();
+			Circuit factoryCirc = null;
+			if (factory instanceof SubcircuitFactory) {
+				factoryCirc = ((SubcircuitFactory) factory).getSubcircuit();
+			}
+			if (exclude == null || !exclude.contains(factoryCirc)) {
+				ret.simpleCount += count.simpleCount;
+				ret.uniqueCount += count.uniqueCount;
+				ret.recursiveCount += count.recursiveCount;
+			}
+		}
+		return ret;
+	}
+
 	private static List<Count> sortCounts(Map<ComponentFactory, Count> counts, LogisimFile file) {
 		List<Count> ret = new ArrayList<Count>();
 		for (AddTool tool : file.getTools()) {
@@ -149,23 +166,6 @@ public class FileStatistics {
 						ret.add(count);
 					}
 				}
-			}
-		}
-		return ret;
-	}
-
-	private static Count getTotal(List<Count> counts, Set<Circuit> exclude) {
-		Count ret = new Count(null);
-		for (Count count : counts) {
-			ComponentFactory factory = count.getFactory();
-			Circuit factoryCirc = null;
-			if (factory instanceof SubcircuitFactory) {
-				factoryCirc = ((SubcircuitFactory) factory).getSubcircuit();
-			}
-			if (exclude == null || !exclude.contains(factoryCirc)) {
-				ret.simpleCount += count.simpleCount;
-				ret.uniqueCount += count.uniqueCount;
-				ret.recursiveCount += count.recursiveCount;
 			}
 		}
 		return ret;

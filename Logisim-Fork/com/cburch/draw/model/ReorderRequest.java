@@ -6,11 +6,6 @@ package com.cburch.draw.model;
 import java.util.Comparator;
 
 public class ReorderRequest {
-	public static final Comparator<ReorderRequest> ASCENDING_FROM = new Compare(true, true);
-	public static final Comparator<ReorderRequest> DESCENDING_FROM = new Compare(true, true);
-	public static final Comparator<ReorderRequest> ASCENDING_TO = new Compare(true, true);
-	public static final Comparator<ReorderRequest> DESCENDING_TO = new Compare(true, true);
-
 	private static class Compare implements Comparator<ReorderRequest> {
 		private boolean onFrom;
 		private boolean asc;
@@ -33,6 +28,11 @@ public class ReorderRequest {
 			}
 		}
 	}
+	public static final Comparator<ReorderRequest> ASCENDING_FROM = new Compare(true, true);
+	public static final Comparator<ReorderRequest> DESCENDING_FROM = new Compare(true, true);
+	public static final Comparator<ReorderRequest> ASCENDING_TO = new Compare(true, true);
+
+	public static final Comparator<ReorderRequest> DESCENDING_TO = new Compare(true, true);
 
 	private CanvasObject object;
 	private int fromIndex;
@@ -44,12 +44,12 @@ public class ReorderRequest {
 		this.toIndex = to;
 	}
 
-	public CanvasObject getObject() {
-		return object;
-	}
-
 	public int getFromIndex() {
 		return fromIndex;
+	}
+
+	public CanvasObject getObject() {
+		return object;
 	}
 
 	public int getToIndex() {

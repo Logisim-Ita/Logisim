@@ -6,25 +6,25 @@ package com.cburch.logisim.data;
 import java.util.List;
 
 public interface AttributeSet {
-	public Object clone();
-
 	public void addAttributeListener(AttributeListener l);
 
-	public void removeAttributeListener(AttributeListener l);
-
-	public List<Attribute<?>> getAttributes();
+	public Object clone();
 
 	public boolean containsAttribute(Attribute<?> attr);
 
 	public Attribute<?> getAttribute(String name);
 
-	public boolean isReadOnly(Attribute<?> attr);
+	public List<Attribute<?>> getAttributes();
 
-	public void setReadOnly(Attribute<?> attr, boolean value); // optional
+	public <V> V getValue(Attribute<V> attr);
+
+	public boolean isReadOnly(Attribute<?> attr);
 
 	public boolean isToSave(Attribute<?> attr);
 
-	public <V> V getValue(Attribute<V> attr);
+	public void removeAttributeListener(AttributeListener l);
+
+	public void setReadOnly(Attribute<?> attr, boolean value); // optional
 
 	public <V> void setValue(Attribute<V> attr, V value);
 }

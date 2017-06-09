@@ -25,48 +25,6 @@ class SelectionSave {
 		return save;
 	}
 
-	private Component[] floating;
-	private Component[] anchored;
-
-	private SelectionSave() {
-	}
-
-	public Component[] getFloatingComponents() {
-		return floating;
-	}
-
-	public Component[] getAnchoredComponents() {
-		return anchored;
-	}
-
-	public boolean isSame(Selection sel) {
-		return isSame(floating, sel.getFloatingComponents()) && isSame(anchored, sel.getAnchoredComponents());
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof SelectionSave) {
-			SelectionSave o = (SelectionSave) other;
-			return isSame(this.floating, o.floating) && isSame(this.anchored, o.anchored);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		int ret = 0;
-		if (floating != null) {
-			for (Component c : floating)
-				ret += c.hashCode();
-		}
-		if (anchored != null) {
-			for (Component c : anchored)
-				ret += c.hashCode();
-		}
-		return ret;
-	}
-
 	private static boolean isSame(Component[] save, Collection<Component> sel) {
 		if (save == null) {
 			return sel.isEmpty();
@@ -74,7 +32,6 @@ class SelectionSave {
 			return toSet(save).equals(sel);
 		}
 	}
-
 	private static boolean isSame(Component[] a, Component[] b) {
 		if (a == null || a.length == 0) {
 			return b == null || b.length == 0;
@@ -92,5 +49,48 @@ class SelectionSave {
 		for (Component c : comps)
 			ret.add(c);
 		return ret;
+	}
+
+	private Component[] floating;
+
+	private Component[] anchored;
+
+	private SelectionSave() {
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof SelectionSave) {
+			SelectionSave o = (SelectionSave) other;
+			return isSame(this.floating, o.floating) && isSame(this.anchored, o.anchored);
+		} else {
+			return false;
+		}
+	}
+
+	public Component[] getAnchoredComponents() {
+		return anchored;
+	}
+
+	public Component[] getFloatingComponents() {
+		return floating;
+	}
+
+	@Override
+	public int hashCode() {
+		int ret = 0;
+		if (floating != null) {
+			for (Component c : floating)
+				ret += c.hashCode();
+		}
+		if (anchored != null) {
+			for (Component c : anchored)
+				ret += c.hashCode();
+		}
+		return ret;
+	}
+
+	public boolean isSame(Selection sel) {
+		return isSame(floating, sel.getFloatingComponents()) && isSame(anchored, sel.getAnchoredComponents());
 	}
 }

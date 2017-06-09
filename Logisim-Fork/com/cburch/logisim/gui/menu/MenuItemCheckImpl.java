@@ -22,13 +22,18 @@ class MenuItemCheckImpl extends JCheckBoxMenuItem implements MenuItem {
 	}
 
 	@Override
-	public boolean hasListeners() {
-		return helper.hasListeners();
+	public void actionPerformed(ActionEvent event) {
+		helper.actionPerformed(event);
 	}
 
 	@Override
 	public void addActionListener(ActionListener l) {
 		helper.addActionListener(l);
+	}
+
+	@Override
+	public boolean hasListeners() {
+		return helper.hasListeners();
 	}
 
 	@Override
@@ -40,10 +45,5 @@ class MenuItemCheckImpl extends JCheckBoxMenuItem implements MenuItem {
 	public void setEnabled(boolean value) {
 		helper.setEnabled(value);
 		super.setEnabled(value && helper.hasListeners());
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		helper.actionPerformed(event);
 	}
 }

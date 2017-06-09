@@ -8,183 +8,6 @@ import java.util.ArrayList;
 import com.cburch.logisim.util.StringGetter;
 
 public class Parser {
-	private Parser() {
-	}
-
-	public static Expression parse(String in, AnalyzerModel model) throws ParserException {
-		ArrayList<Token> tokens = toTokens(in, false);
-
-		if (tokens.size() == 0)
-			return null;
-
-		for (Token token : tokens) {
-			if (token.type == TOKEN_ERROR) {
-				throw token.error(Strings.getter("invalidCharacterError", token.text));
-			} else if (token.type == TOKEN_IDENT) {
-				int index = model.getInputs().indexOf(token.text);
-				if (index < 0) {
-					// ok; but maybe this is an operator
-					String opText = token.text.toUpperCase();
-					if (opText.equals("NOT")) {
-						token.type = TOKEN_NOT;
-					} else if (opText.equals("AND")) {
-						token.type = TOKEN_AND;
-					} else if (opText.equals("XOR")) {
-						token.type = TOKEN_XOR;
-					} else if (opText.equals("OR")) {
-						token.type = TOKEN_OR;
-					} else {
-						throw token.error(Strings.getter("badVariableName", token.text));
-					}
-				}
-			}
-		}
-
-		return parse(tokens);
-	}
-
-	/**
-	 * I wrote this without thinking, and then realized that this is quite
-	 * complicated because of removing operators. I haven't bothered to do it
-	 * correctly; instead, it just regenerates a string from the raw expression.
-	 * static String removeVariable(String in, String variable) { StringBuilder
-	 * ret = new StringBuilder(); ArrayList tokens = toTokens(in, true); Token
-	 * lastWhite = null; for (int i = 0, n = tokens.size(); i < n; i++) { Token
-	 * token = (Token) tokens.get(i); if (token.type == TOKEN_IDENT &&
-	 * token.text.equals(variable)) { ; // just ignore it } else if (token.type
-	 * == TOKEN_WHITE) { if (lastWhite != null) { if (lastWhite.text.length() >=
-	 * token.text.length()) { ; // don't repeat shorter whitespace } else {
-	 * ret.replace(ret.length() - lastWhite.text.length(), ret.length(),
-	 * token.text); lastWhite = token; } } else { lastWhite = token;
-	 * ret.append(token.text); } } else { lastWhite = null;
-	 * ret.append(token.text); } } return ret.toString(); }
-	 */
-
-	static String replaceVariable(String in, String oldName, String newName) {
-		StringBuilder ret = new StringBuilder();
-		ArrayList<Token> tokens = toTokens(in, true);
-		for (Token token : tokens) {
-			if (token.type == TOKEN_IDENT && token.text.equals(oldName)) {
-				ret.append(newName);
-			} else {
-				ret.append(token.text);
-			}
-		}
-		return ret.toString();
-	}
-
-	//
-	// tokenizing code
-	//
-	private static final int TOKEN_AND = 0;
-	private static final int TOKEN_OR = 1;
-	private static final int TOKEN_XOR = 2;
-	private static final int TOKEN_NOT = 3;
-	private static final int TOKEN_NOT_POSTFIX = 4;
-	private static final int TOKEN_LPAREN = 5;
-	private static final int TOKEN_RPAREN = 6;
-	private static final int TOKEN_IDENT = 7;
-	private static final int TOKEN_CONST = 8;
-	private static final int TOKEN_WHITE = 9;
-	private static final int TOKEN_ERROR = 10;
-
-	private static class Token {
-		int type;
-		int offset;
-		int length;
-		String text;
-
-		Token(int type, int offset, String text) {
-			this(type, offset, text.length(), text);
-		}
-
-		Token(int type, int offset, int length, String text) {
-			this.type = type;
-			this.offset = offset;
-			this.length = length;
-			this.text = text;
-		}
-
-		ParserException error(StringGetter message) {
-			return new ParserException(message, offset, length);
-		}
-	}
-
-	private static ArrayList<Token> toTokens(String in, boolean includeWhite) {
-		ArrayList<Token> tokens = new ArrayList<Token>();
-
-		// Guarantee that we will stop just after reading whitespace,
-		// not in the middle of a token.
-		in = in + " ";
-		int pos = 0;
-		while (true) {
-			int whiteStart = pos;
-			while (pos < in.length() && Character.isWhitespace(in.charAt(pos)))
-				pos++;
-			if (includeWhite && pos != whiteStart) {
-				tokens.add(new Token(TOKEN_WHITE, whiteStart, in.substring(whiteStart, pos)));
-			}
-			if (pos == in.length())
-				return tokens;
-
-			int start = pos;
-			char startChar = in.charAt(pos);
-			pos++;
-			if (Character.isJavaIdentifierStart(startChar)) {
-				while (Character.isJavaIdentifierPart(in.charAt(pos)))
-					pos++;
-				tokens.add(new Token(TOKEN_IDENT, start, in.substring(start, pos)));
-			} else {
-				switch (startChar) {
-				case '(':
-					tokens.add(new Token(TOKEN_LPAREN, start, "("));
-					break;
-				case ')':
-					tokens.add(new Token(TOKEN_RPAREN, start, ")"));
-					break;
-				case '0':
-				case '1':
-					tokens.add(new Token(TOKEN_CONST, start, "" + startChar));
-					break;
-				case '~':
-					tokens.add(new Token(TOKEN_NOT, start, "~"));
-					break;
-				case '\'':
-					tokens.add(new Token(TOKEN_NOT_POSTFIX, start, "'"));
-					break;
-				case '^':
-					tokens.add(new Token(TOKEN_XOR, start, "^"));
-					break;
-				case '+':
-					tokens.add(new Token(TOKEN_OR, start, "+"));
-					break;
-				case '!':
-					tokens.add(new Token(TOKEN_NOT, start, "!"));
-					break;
-				case '&':
-					if (in.charAt(pos) == '&')
-						pos++;
-					tokens.add(new Token(TOKEN_AND, start, in.substring(start, pos)));
-					break;
-				case '|':
-					if (in.charAt(pos) == '|')
-						pos++;
-					tokens.add(new Token(TOKEN_OR, start, in.substring(start, pos)));
-					break;
-				default:
-					while (!okCharacter(in.charAt(pos)))
-						pos++;
-					String errorText = in.substring(start, pos);
-					tokens.add(new Token(TOKEN_ERROR, start, errorText));
-				}
-			}
-		}
-	}
-
-	private static boolean okCharacter(char c) {
-		return Character.isWhitespace(c) || Character.isJavaIdentifierStart(c) || "()01~^+!&|".indexOf(c) >= 0;
-	}
-
 	//
 	// parsing code
 	//
@@ -198,6 +21,47 @@ public class Parser {
 			this.current = current;
 			this.cause = cause;
 		}
+	}
+
+	private static class Token {
+		int type;
+		int offset;
+		int length;
+		String text;
+
+		Token(int type, int offset, int length, String text) {
+			this.type = type;
+			this.offset = offset;
+			this.length = length;
+			this.text = text;
+		}
+
+		Token(int type, int offset, String text) {
+			this(type, offset, text.length(), text);
+		}
+
+		ParserException error(StringGetter message) {
+			return new ParserException(message, offset, length);
+		}
+	}
+
+	//
+	// tokenizing code
+	//
+	private static final int TOKEN_AND = 0;
+
+	private static final int TOKEN_OR = 1;
+	private static final int TOKEN_XOR = 2;
+	private static final int TOKEN_NOT = 3;
+	private static final int TOKEN_NOT_POSTFIX = 4;
+	private static final int TOKEN_LPAREN = 5;
+	private static final int TOKEN_RPAREN = 6;
+	private static final int TOKEN_IDENT = 7;
+	private static final int TOKEN_CONST = 8;
+	private static final int TOKEN_WHITE = 9;
+	private static final int TOKEN_ERROR = 10;
+	private static boolean okCharacter(char c) {
+		return Character.isWhitespace(c) || Character.isJavaIdentifierStart(c) || "()01~^+!&|".indexOf(c) >= 0;
 	}
 
 	private static Expression parse(ArrayList<Token> tokens) throws ParserException {
@@ -281,8 +145,36 @@ public class Parser {
 		return current;
 	}
 
-	private static void push(ArrayList<Context> stack, Expression expr, int level, Token cause) {
-		stack.add(new Context(expr, level, cause));
+	public static Expression parse(String in, AnalyzerModel model) throws ParserException {
+		ArrayList<Token> tokens = toTokens(in, false);
+
+		if (tokens.size() == 0)
+			return null;
+
+		for (Token token : tokens) {
+			if (token.type == TOKEN_ERROR) {
+				throw token.error(Strings.getter("invalidCharacterError", token.text));
+			} else if (token.type == TOKEN_IDENT) {
+				int index = model.getInputs().indexOf(token.text);
+				if (index < 0) {
+					// ok; but maybe this is an operator
+					String opText = token.text.toUpperCase();
+					if (opText.equals("NOT")) {
+						token.type = TOKEN_NOT;
+					} else if (opText.equals("AND")) {
+						token.type = TOKEN_AND;
+					} else if (opText.equals("XOR")) {
+						token.type = TOKEN_XOR;
+					} else if (opText.equals("OR")) {
+						token.type = TOKEN_OR;
+					} else {
+						throw token.error(Strings.getter("badVariableName", token.text));
+					}
+				}
+			}
+		}
+
+		return parse(tokens);
 	}
 
 	private static int peekLevel(ArrayList<Context> stack) {
@@ -317,5 +209,113 @@ public class Parser {
 			}
 		}
 		return current;
+	}
+
+	private static void push(ArrayList<Context> stack, Expression expr, int level, Token cause) {
+		stack.add(new Context(expr, level, cause));
+	}
+
+	/**
+	 * I wrote this without thinking, and then realized that this is quite
+	 * complicated because of removing operators. I haven't bothered to do it
+	 * correctly; instead, it just regenerates a string from the raw expression.
+	 * static String removeVariable(String in, String variable) { StringBuilder
+	 * ret = new StringBuilder(); ArrayList tokens = toTokens(in, true); Token
+	 * lastWhite = null; for (int i = 0, n = tokens.size(); i < n; i++) { Token
+	 * token = (Token) tokens.get(i); if (token.type == TOKEN_IDENT &&
+	 * token.text.equals(variable)) { ; // just ignore it } else if (token.type
+	 * == TOKEN_WHITE) { if (lastWhite != null) { if (lastWhite.text.length() >=
+	 * token.text.length()) { ; // don't repeat shorter whitespace } else {
+	 * ret.replace(ret.length() - lastWhite.text.length(), ret.length(),
+	 * token.text); lastWhite = token; } } else { lastWhite = token;
+	 * ret.append(token.text); } } else { lastWhite = null;
+	 * ret.append(token.text); } } return ret.toString(); }
+	 */
+
+	static String replaceVariable(String in, String oldName, String newName) {
+		StringBuilder ret = new StringBuilder();
+		ArrayList<Token> tokens = toTokens(in, true);
+		for (Token token : tokens) {
+			if (token.type == TOKEN_IDENT && token.text.equals(oldName)) {
+				ret.append(newName);
+			} else {
+				ret.append(token.text);
+			}
+		}
+		return ret.toString();
+	}
+
+	private static ArrayList<Token> toTokens(String in, boolean includeWhite) {
+		ArrayList<Token> tokens = new ArrayList<Token>();
+
+		// Guarantee that we will stop just after reading whitespace,
+		// not in the middle of a token.
+		in = in + " ";
+		int pos = 0;
+		while (true) {
+			int whiteStart = pos;
+			while (pos < in.length() && Character.isWhitespace(in.charAt(pos)))
+				pos++;
+			if (includeWhite && pos != whiteStart) {
+				tokens.add(new Token(TOKEN_WHITE, whiteStart, in.substring(whiteStart, pos)));
+			}
+			if (pos == in.length())
+				return tokens;
+
+			int start = pos;
+			char startChar = in.charAt(pos);
+			pos++;
+			if (Character.isJavaIdentifierStart(startChar)) {
+				while (Character.isJavaIdentifierPart(in.charAt(pos)))
+					pos++;
+				tokens.add(new Token(TOKEN_IDENT, start, in.substring(start, pos)));
+			} else {
+				switch (startChar) {
+				case '(':
+					tokens.add(new Token(TOKEN_LPAREN, start, "("));
+					break;
+				case ')':
+					tokens.add(new Token(TOKEN_RPAREN, start, ")"));
+					break;
+				case '0':
+				case '1':
+					tokens.add(new Token(TOKEN_CONST, start, "" + startChar));
+					break;
+				case '~':
+					tokens.add(new Token(TOKEN_NOT, start, "~"));
+					break;
+				case '\'':
+					tokens.add(new Token(TOKEN_NOT_POSTFIX, start, "'"));
+					break;
+				case '^':
+					tokens.add(new Token(TOKEN_XOR, start, "^"));
+					break;
+				case '+':
+					tokens.add(new Token(TOKEN_OR, start, "+"));
+					break;
+				case '!':
+					tokens.add(new Token(TOKEN_NOT, start, "!"));
+					break;
+				case '&':
+					if (in.charAt(pos) == '&')
+						pos++;
+					tokens.add(new Token(TOKEN_AND, start, in.substring(start, pos)));
+					break;
+				case '|':
+					if (in.charAt(pos) == '|')
+						pos++;
+					tokens.add(new Token(TOKEN_OR, start, in.substring(start, pos)));
+					break;
+				default:
+					while (!okCharacter(in.charAt(pos)))
+						pos++;
+					String errorText = in.substring(start, pos);
+					tokens.add(new Token(TOKEN_ERROR, start, errorText));
+				}
+			}
+		}
+	}
+
+	private Parser() {
 	}
 }

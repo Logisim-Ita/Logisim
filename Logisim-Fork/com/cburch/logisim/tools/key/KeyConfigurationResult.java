@@ -24,11 +24,11 @@ public class KeyConfigurationResult {
 		this.attrValueMap = values;
 	}
 
-	public KeyConfigurationEvent getEvent() {
-		return event;
-	}
-
 	public Map<Attribute<?>, Object> getAttributeValues() {
 		return attrValueMap;
+	}
+
+	public KeyConfigurationEvent getEvent() {
+		return event;
 	}
 }

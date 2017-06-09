@@ -38,6 +38,19 @@ class MemMenu implements ActionListener, MenuExtender {
 	}
 
 	@Override
+	public void actionPerformed(ActionEvent evt) {
+		Object src = evt.getSource();
+		if (src == edit)
+			doEdit();
+		else if (src == clear)
+			doClear();
+		else if (src == load)
+			doLoad();
+		else if (src == save)
+			doSave();
+	}
+
+	@Override
 	public void configureMenu(JPopupMenu menu, Project proj) {
 		this.proj = proj;
 		this.frame = proj.getFrame();
@@ -68,28 +81,6 @@ class MemMenu implements ActionListener, MenuExtender {
 		return ret;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		Object src = evt.getSource();
-		if (src == edit)
-			doEdit();
-		else if (src == clear)
-			doClear();
-		else if (src == load)
-			doLoad();
-		else if (src == save)
-			doSave();
-	}
-
-	private void doEdit() {
-		MemState s = factory.getState(instance, circState);
-		if (s == null)
-			return;
-		HexFrame frame = factory.getHexFrame(proj, instance, circState);
-		frame.setVisible(true);
-		frame.toFront();
-	}
-
 	private void doClear() {
 		MemState s = factory.getState(instance, circState);
 		boolean isAllZero = s.getContents().isClear();
@@ -101,6 +92,15 @@ class MemMenu implements ActionListener, MenuExtender {
 		if (choice == JOptionPane.YES_OPTION) {
 			s.getContents().clear();
 		}
+	}
+
+	private void doEdit() {
+		MemState s = factory.getState(instance, circState);
+		if (s == null)
+			return;
+		HexFrame frame = factory.getHexFrame(proj, instance, circState);
+		frame.setVisible(true);
+		frame.toFront();
 	}
 
 	private void doLoad() {

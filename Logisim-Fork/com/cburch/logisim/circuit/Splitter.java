@@ -26,6 +26,16 @@ import com.cburch.logisim.tools.WireRepairData;
 import com.cburch.logisim.util.StringUtil;
 
 public class Splitter extends ManagedComponent implements WireRepair, ToolTipMaker, MenuExtender, AttributeListener {
+	private static void appendBuf(StringBuilder buf, int start, int end) {
+		if (buf.length() > 0)
+			buf.append(",");
+		if (start == end) {
+			buf.append(start);
+		} else {
+			buf.append(start + "-" + end);
+		}
+	}
+
 	// basic data
 	byte[] bit_thread; // how each bit maps to thread within end
 
@@ -39,31 +49,15 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 	}
 
 	//
-	// abstract ManagedComponent methods
+	// AttributeListener methods
 	//
 	@Override
-	public ComponentFactory getFactory() {
-		return SplitterFactory.instance;
+	public void attributeListChanged(AttributeEvent e) {
 	}
 
 	@Override
-	public void propagate(CircuitState state) {
-		; // handled by CircuitWires, nothing to do
-	}
-
-	@Override
-	public boolean contains(Location loc) {
-		if (super.contains(loc)) {
-			Location myLoc = getLocation();
-			Direction facing = getAttributeSet().getValue(StdAttr.FACING);
-			if (facing == Direction.EAST || facing == Direction.WEST) {
-				return Math.abs(loc.getX() - myLoc.getX()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
-			} else {
-				return Math.abs(loc.getY() - myLoc.getY()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
-			}
-		} else {
-			return false;
-		}
+	public void attributeValueChanged(AttributeEvent e) {
+		configureComponent();
 	}
 
 	private synchronized void configureComponent() {
@@ -106,6 +100,28 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 		fireComponentInvalidated(new ComponentEvent(this));
 	}
 
+	@Override
+	public void configureMenu(JPopupMenu menu, Project proj) {
+		menu.addSeparator();
+		menu.add(new SplitterDistributeItem(proj, this, 1));
+		menu.add(new SplitterDistributeItem(proj, this, -1));
+	}
+
+	@Override
+	public boolean contains(Location loc) {
+		if (super.contains(loc)) {
+			Location myLoc = getLocation();
+			Direction facing = getAttributeSet().getValue(StdAttr.FACING);
+			if (facing == Direction.EAST || facing == Direction.WEST) {
+				return Math.abs(loc.getX() - myLoc.getX()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
+			} else {
+				return Math.abs(loc.getY() - myLoc.getY()) > 5 || loc.manhattanDistanceTo(myLoc) <= 5;
+			}
+		} else {
+			return false;
+		}
+	}
+
 	//
 	// user interface methods
 	//
@@ -122,6 +138,14 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 		}
 	}
 
+	//
+	// abstract ManagedComponent methods
+	//
+	@Override
+	public ComponentFactory getFactory() {
+		return SplitterFactory.instance;
+	}
+
 	@Override
 	public Object getFeature(Object key) {
 		if (key == WireRepair.class)
@@ -132,11 +156,6 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 			return this;
 		else
 			return super.getFeature(key);
-	}
-
-	@Override
-	public boolean shouldRepairWire(WireRepairData data) {
-		return true;
 	}
 
 	@Override
@@ -192,32 +211,13 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 		}
 	}
 
-	private static void appendBuf(StringBuilder buf, int start, int end) {
-		if (buf.length() > 0)
-			buf.append(",");
-		if (start == end) {
-			buf.append(start);
-		} else {
-			buf.append(start + "-" + end);
-		}
+	@Override
+	public void propagate(CircuitState state) {
+		; // handled by CircuitWires, nothing to do
 	}
 
 	@Override
-	public void configureMenu(JPopupMenu menu, Project proj) {
-		menu.addSeparator();
-		menu.add(new SplitterDistributeItem(proj, this, 1));
-		menu.add(new SplitterDistributeItem(proj, this, -1));
-	}
-
-	//
-	// AttributeListener methods
-	//
-	@Override
-	public void attributeListChanged(AttributeEvent e) {
-	}
-
-	@Override
-	public void attributeValueChanged(AttributeEvent e) {
-		configureComponent();
+	public boolean shouldRepairWire(WireRepairData data) {
+		return true;
 	}
 }

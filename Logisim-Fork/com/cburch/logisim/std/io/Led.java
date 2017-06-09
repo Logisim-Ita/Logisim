@@ -22,6 +22,21 @@ import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Led extends InstanceFactory {
+	public static class Logger extends InstanceLogger {
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			return state.getAttributeValue(StdAttr.LABEL);
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+			if (data == null)
+				return Value.FALSE;
+			return data.getValue() == Value.TRUE ? Value.TRUE : Value.FALSE;
+		}
+	}
+
 	public Led() {
 		super("LED", Strings.getter("ledComponent"));
 		setAttributes(
@@ -33,28 +48,6 @@ public class Led extends InstanceFactory {
 		setIconName("led.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.INPUT, 1) });
 		setInstanceLogger(Logger.class);
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Direction facing = attrs.getValue(StdAttr.FACING);
-		return Bounds.create(0, -10, 20, 20).rotate(Direction.WEST, facing, 0, 0);
-	}
-
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		computeTextField(instance);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-			computeTextField(instance);
-		} else if (attr == Io.ATTR_LABEL_LOC) {
-			computeTextField(instance);
-		}
 	}
 
 	private void computeTextField(Instance instance) {
@@ -93,13 +86,24 @@ public class Led extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		Value val = state.getPort(0);
-		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-		if (data == null) {
-			state.setData(new InstanceDataSingleton(val));
-		} else {
-			data.setValue(val);
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		computeTextField(instance);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction facing = attrs.getValue(StdAttr.FACING);
+		return Bounds.create(0, -10, 20, 20).rotate(Direction.WEST, facing, 0, 0);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			computeTextField(instance);
+		} else if (attr == Io.ATTR_LABEL_LOC) {
+			computeTextField(instance);
 		}
 	}
 
@@ -135,18 +139,14 @@ public class Led extends InstanceFactory {
 		painter.drawPorts();
 	}
 
-	public static class Logger extends InstanceLogger {
-		@Override
-		public String getLogName(InstanceState state, Object option) {
-			return state.getAttributeValue(StdAttr.LABEL);
-		}
-
-		@Override
-		public Value getLogValue(InstanceState state, Object option) {
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			if (data == null)
-				return Value.FALSE;
-			return data.getValue() == Value.TRUE ? Value.TRUE : Value.FALSE;
+	@Override
+	public void propagate(InstanceState state) {
+		Value val = state.getPort(0);
+		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+		if (data == null) {
+			state.setData(new InstanceDataSingleton(val));
+		} else {
+			data.setValue(val);
 		}
 	}
 }

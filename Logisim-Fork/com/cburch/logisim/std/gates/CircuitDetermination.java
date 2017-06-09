@@ -16,32 +16,83 @@ import com.cburch.logisim.comp.ComponentFactory;
  * expression's translation.
  */
 abstract class CircuitDetermination {
-	/** Ensures that all gates have only two inputs. */
-	void convertToTwoInputs() {
-	}
+	private static class Determine implements ExpressionVisitor<CircuitDetermination> {
+		private Gate binary(CircuitDetermination aret, CircuitDetermination bret, ComponentFactory factory) {
+			if (aret instanceof Gate) {
+				Gate a = (Gate) aret;
+				if (a.factory == factory) {
+					if (bret instanceof Gate) {
+						Gate b = (Gate) bret;
+						if (b.factory == factory) {
+							a.inputs.addAll(b.inputs);
+							return a;
+						}
+					}
+					a.inputs.add(bret);
+					return a;
+				}
+			}
 
-	/**
-	 * Converts all gates to NANDs. Note that this will fail with an exception
-	 * if any XOR/XNOR gates are used.
-	 */
-	void convertToNands() {
-	}
+			if (bret instanceof Gate) {
+				Gate b = (Gate) bret;
+				if (b.factory == factory) {
+					b.inputs.add(aret);
+					return b;
+				}
+			}
 
-	/**
-	 * Repairs two errors that may have cropped up in creating the circuit.
-	 * First, if there are gates with more inputs than their capacity, we repair
-	 * them. Second, any XOR/XNOR gates with more than 2 inputs should really be
-	 * Odd/Even Parity gates.
-	 */
-	void repair() {
-	}
+			Gate ret = new Gate(factory);
+			ret.inputs.add(aret);
+			ret.inputs.add(bret);
+			return ret;
+		}
 
-	/**
-	 * A utility method for determining whether this fits the pattern of a NAND
-	 * representing a NOT.
-	 */
-	boolean isNandNot() {
-		return false;
+		@Override
+		public CircuitDetermination visitAnd(Expression a, Expression b) {
+			return binary(a.visit(this), b.visit(this), AndGate.FACTORY);
+		}
+
+		@Override
+		public CircuitDetermination visitConstant(int value) {
+			return new Value(value);
+		}
+
+		@Override
+		public CircuitDetermination visitNot(Expression aBase) {
+			CircuitDetermination aret = aBase.visit(this);
+			if (aret instanceof Gate) {
+				Gate a = (Gate) aret;
+				if (a.factory == AndGate.FACTORY) {
+					a.factory = NandGate.FACTORY;
+					return a;
+				} else if (a.factory == OrGate.FACTORY) {
+					a.factory = NorGate.FACTORY;
+					return a;
+				} else if (a.factory == XorGate.FACTORY) {
+					a.factory = XnorGate.FACTORY;
+					return a;
+				}
+			}
+
+			Gate ret = new Gate(NotGate.FACTORY);
+			ret.inputs.add(aret);
+			return ret;
+		}
+
+		@Override
+		public CircuitDetermination visitOr(Expression a, Expression b) {
+			return binary(a.visit(this), b.visit(this), OrGate.FACTORY);
+		}
+
+		@Override
+		public CircuitDetermination visitVariable(String name) {
+			return new Input(name);
+		}
+
+		@Override
+		public CircuitDetermination visitXor(Expression a, Expression b) {
+			return binary(a.visit(this), b.visit(this), XorGate.FACTORY);
+		}
 	}
 
 	//
@@ -55,12 +106,29 @@ abstract class CircuitDetermination {
 			this.factory = factory;
 		}
 
-		ComponentFactory getFactory() {
-			return factory;
-		}
+		@Override
+		void convertToNands() {
+			// first recurse to clean up any children
+			for (CircuitDetermination sub : inputs) {
+				sub.convertToNands();
+			}
 
-		ArrayList<CircuitDetermination> getInputs() {
-			return inputs;
+			// repair large XOR/XNORs to odd/even parity gates
+			if (factory == NotGate.FACTORY) {
+				inputs.add(inputs.get(0));
+			} else if (factory == AndGate.FACTORY) {
+				notOutput();
+			} else if (factory == OrGate.FACTORY) {
+				notAllInputs();
+			} else if (factory == NorGate.FACTORY) {
+				notAllInputs(); // the order of these two lines is significant
+				notOutput();
+			} else if (factory == NandGate.FACTORY) {
+				;
+			} else {
+				throw new IllegalArgumentException("Cannot handle " + factory.getDisplayName());
+			}
+			factory = NandGate.FACTORY;
 		}
 
 		@Override
@@ -103,37 +171,17 @@ abstract class CircuitDetermination {
 			}
 		}
 
-		@Override
-		void convertToNands() {
-			// first recurse to clean up any children
-			for (CircuitDetermination sub : inputs) {
-				sub.convertToNands();
-			}
-
-			// repair large XOR/XNORs to odd/even parity gates
-			if (factory == NotGate.FACTORY) {
-				inputs.add(inputs.get(0));
-			} else if (factory == AndGate.FACTORY) {
-				notOutput();
-			} else if (factory == OrGate.FACTORY) {
-				notAllInputs();
-			} else if (factory == NorGate.FACTORY) {
-				notAllInputs(); // the order of these two lines is significant
-				notOutput();
-			} else if (factory == NandGate.FACTORY) {
-				;
-			} else {
-				throw new IllegalArgumentException("Cannot handle " + factory.getDisplayName());
-			}
-			factory = NandGate.FACTORY;
+		ComponentFactory getFactory() {
+			return factory;
 		}
 
-		private void notOutput() {
-			Gate sub = new Gate(NandGate.FACTORY);
-			sub.inputs = this.inputs;
-			this.inputs = new ArrayList<CircuitDetermination>();
-			inputs.add(sub);
-			inputs.add(sub);
+		ArrayList<CircuitDetermination> getInputs() {
+			return inputs;
+		}
+
+		@Override
+		boolean isNandNot() {
+			return factory == NandGate.FACTORY && inputs.size() == 2 && inputs.get(0) == inputs.get(1);
 		}
 
 		private void notAllInputs() {
@@ -150,9 +198,12 @@ abstract class CircuitDetermination {
 			}
 		}
 
-		@Override
-		boolean isNandNot() {
-			return factory == NandGate.FACTORY && inputs.size() == 2 && inputs.get(0) == inputs.get(1);
+		private void notOutput() {
+			Gate sub = new Gate(NandGate.FACTORY);
+			sub.inputs = this.inputs;
+			this.inputs = new ArrayList<CircuitDetermination>();
+			inputs.add(sub);
+			inputs.add(sub);
 		}
 
 		@Override
@@ -230,82 +281,31 @@ abstract class CircuitDetermination {
 		return expr.visit(new Determine());
 	}
 
-	private static class Determine implements ExpressionVisitor<CircuitDetermination> {
-		@Override
-		public CircuitDetermination visitAnd(Expression a, Expression b) {
-			return binary(a.visit(this), b.visit(this), AndGate.FACTORY);
-		}
+	/**
+	 * Converts all gates to NANDs. Note that this will fail with an exception
+	 * if any XOR/XNOR gates are used.
+	 */
+	void convertToNands() {
+	}
 
-		@Override
-		public CircuitDetermination visitOr(Expression a, Expression b) {
-			return binary(a.visit(this), b.visit(this), OrGate.FACTORY);
-		}
+	/** Ensures that all gates have only two inputs. */
+	void convertToTwoInputs() {
+	}
 
-		@Override
-		public CircuitDetermination visitXor(Expression a, Expression b) {
-			return binary(a.visit(this), b.visit(this), XorGate.FACTORY);
-		}
+	/**
+	 * A utility method for determining whether this fits the pattern of a NAND
+	 * representing a NOT.
+	 */
+	boolean isNandNot() {
+		return false;
+	}
 
-		private Gate binary(CircuitDetermination aret, CircuitDetermination bret, ComponentFactory factory) {
-			if (aret instanceof Gate) {
-				Gate a = (Gate) aret;
-				if (a.factory == factory) {
-					if (bret instanceof Gate) {
-						Gate b = (Gate) bret;
-						if (b.factory == factory) {
-							a.inputs.addAll(b.inputs);
-							return a;
-						}
-					}
-					a.inputs.add(bret);
-					return a;
-				}
-			}
-
-			if (bret instanceof Gate) {
-				Gate b = (Gate) bret;
-				if (b.factory == factory) {
-					b.inputs.add(aret);
-					return b;
-				}
-			}
-
-			Gate ret = new Gate(factory);
-			ret.inputs.add(aret);
-			ret.inputs.add(bret);
-			return ret;
-		}
-
-		@Override
-		public CircuitDetermination visitNot(Expression aBase) {
-			CircuitDetermination aret = aBase.visit(this);
-			if (aret instanceof Gate) {
-				Gate a = (Gate) aret;
-				if (a.factory == AndGate.FACTORY) {
-					a.factory = NandGate.FACTORY;
-					return a;
-				} else if (a.factory == OrGate.FACTORY) {
-					a.factory = NorGate.FACTORY;
-					return a;
-				} else if (a.factory == XorGate.FACTORY) {
-					a.factory = XnorGate.FACTORY;
-					return a;
-				}
-			}
-
-			Gate ret = new Gate(NotGate.FACTORY);
-			ret.inputs.add(aret);
-			return ret;
-		}
-
-		@Override
-		public CircuitDetermination visitVariable(String name) {
-			return new Input(name);
-		}
-
-		@Override
-		public CircuitDetermination visitConstant(int value) {
-			return new Value(value);
-		}
+	/**
+	 * Repairs two errors that may have cropped up in creating the circuit.
+	 * First, if there are gates with more inputs than their capacity, we repair
+	 * them. Second, any XOR/XNOR gates with more than 2 inputs should really be
+	 * Odd/Even Parity gates.
+	 */
+	void repair() {
 	}
 }

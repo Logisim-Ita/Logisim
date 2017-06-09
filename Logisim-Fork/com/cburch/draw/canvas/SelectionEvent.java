@@ -26,15 +26,15 @@ public class SelectionEvent extends EventObject {
 		this.affected = affected;
 	}
 
-	public Selection getSelection() {
-		return (Selection) getSource();
-	}
-
 	public int getAction() {
 		return action;
 	}
 
 	public Collection<CanvasObject> getAffected() {
 		return affected;
+	}
+
+	public Selection getSelection() {
+		return (Selection) getSource();
 	}
 }

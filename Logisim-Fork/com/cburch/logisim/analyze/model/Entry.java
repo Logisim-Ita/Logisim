@@ -41,12 +41,12 @@ public class Entry {
 		return description;
 	}
 
-	public boolean isError() {
-		return errorMessage != null;
-	}
-
 	public String getErrorMessage() {
 		return errorMessage == null ? null : errorMessage.get();
+	}
+
+	public boolean isError() {
+		return errorMessage != null;
 	}
 
 	@Override

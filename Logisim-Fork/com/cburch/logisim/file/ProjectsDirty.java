@@ -12,9 +12,6 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.Projects;
 
 class ProjectsDirty {
-	private ProjectsDirty() {
-	}
-
 	private static class DirtyListener implements LibraryListener {
 		Project proj;
 
@@ -51,9 +48,12 @@ class ProjectsDirty {
 	}
 
 	private static ProjectListListener projectListListener = new ProjectListListener();
-	private static ArrayList<DirtyListener> listeners = new ArrayList<DirtyListener>();
 
+	private static ArrayList<DirtyListener> listeners = new ArrayList<DirtyListener>();
 	public static void initialize() {
 		Projects.addPropertyChangeListener(Projects.projectListProperty, projectListListener);
+	}
+
+	private ProjectsDirty() {
 	}
 }

@@ -31,13 +31,13 @@ class PrefBoolean extends JCheckBox implements ActionListener, PropertyChangeLis
 		setSelected(pref.getBoolean());
 	}
 
-	void localeChanged() {
-		setText(title.get());
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		pref.setBoolean(this.isSelected());
+	}
+
+	void localeChanged() {
+		setText(title.get());
 	}
 
 	@Override

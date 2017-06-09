@@ -24,23 +24,6 @@ import com.cburch.logisim.proj.Projects;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class WindowManagers {
-	private WindowManagers() {
-	}
-
-	public static void initialize() {
-		if (!initialized) {
-			initialized = true;
-			AnalyzerManager.initialize();
-			PreferencesFrame.initializeManager();
-			Projects.addPropertyChangeListener(Projects.projectListProperty, myListener);
-			computeListeners();
-		}
-	}
-
-	private static boolean initialized = false;
-	private static MyListener myListener = new MyListener();
-	private static HashMap<Project, ProjectManager> projectMap = new LinkedHashMap<Project, ProjectManager>();
-
 	private static class MyListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
@@ -65,19 +48,23 @@ public class WindowManagers {
 		}
 
 		@Override
-		public void projectChanged(ProjectEvent event) {
-			if (event.getAction() == ProjectEvent.ACTION_SET_FILE) {
-				setText(proj.getLogisimFile().getName());
-			}
-		}
-
-		@Override
 		public void libraryChanged(LibraryEvent event) {
 			if (event.getAction() == LibraryEvent.SET_NAME) {
 				setText((String) event.getData());
 			}
 		}
+
+		@Override
+		public void projectChanged(ProjectEvent event) {
+			if (event.getAction() == ProjectEvent.ACTION_SET_FILE) {
+				setText(proj.getLogisimFile().getName());
+			}
+		}
 	}
+
+	private static boolean initialized = false;
+	private static MyListener myListener = new MyListener();
+	private static HashMap<Project, ProjectManager> projectMap = new LinkedHashMap<Project, ProjectManager>();
 
 	private static void computeListeners() {
 		List<Project> nowOpen = Projects.getOpenProjects();
@@ -96,5 +83,18 @@ public class WindowManagers {
 			ProjectManager manager = new ProjectManager(proj);
 			projectMap.put(proj, manager);
 		}
+	}
+
+	public static void initialize() {
+		if (!initialized) {
+			initialized = true;
+			AnalyzerManager.initialize();
+			PreferencesFrame.initializeManager();
+			Projects.addPropertyChangeListener(Projects.projectListProperty, myListener);
+			computeListeners();
+		}
+	}
+
+	private WindowManagers() {
 	}
 }

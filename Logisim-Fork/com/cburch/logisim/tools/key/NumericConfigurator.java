@@ -47,15 +47,15 @@ public abstract class NumericConfigurator<V> implements KeyConfigurator, Cloneab
 		}
 	}
 
-	protected int getMinimumValue(AttributeSet attrs) {
-		return minValue;
-	}
+	protected abstract V createValue(int value);
 
 	protected int getMaximumValue(AttributeSet attrs) {
 		return maxValue;
 	}
 
-	protected abstract V createValue(int value);
+	protected int getMinimumValue(AttributeSet attrs) {
+		return minValue;
+	}
 
 	@Override
 	public KeyConfigurationResult keyEventReceived(KeyConfigurationEvent event) {

@@ -16,12 +16,6 @@ import java.util.StringTokenizer;
 import com.cburch.hex.HexModel;
 
 public class HexFile {
-	private HexFile() {
-	}
-
-	private static final String RAW_IMAGE_HEADER = "v2.0 raw";
-	private static final String COMMENT_MARKER = "#";
-
 	private static class HexReader {
 		private BufferedReader in;
 		private int[] data;
@@ -49,15 +43,6 @@ public class HexFile {
 				line = this.in.readLine();
 			}
 			return null;
-		}
-
-		private String nextToken() throws IOException {
-			if (curLine != null && curLine.hasMoreTokens()) {
-				return curLine.nextToken();
-			} else {
-				curLine = findNonemptyLine();
-				return curLine == null ? null : curLine.nextToken();
-			}
 		}
 
 		public boolean hasNext() throws IOException {
@@ -124,39 +109,47 @@ public class HexFile {
 				return ret;
 			}
 		}
+
+		private String nextToken() throws IOException {
+			if (curLine != null && curLine.hasMoreTokens()) {
+				return curLine.nextToken();
+			} else {
+				curLine = findNonemptyLine();
+				return curLine == null ? null : curLine.nextToken();
+			}
+		}
 	}
 
-	public static void save(Writer out, HexModel src) throws IOException {
-		long first = src.getFirstOffset();
-		long last = src.getLastOffset();
-		while (last > first && src.get(last) == 0)
-			last--;
-		int tokens = 0;
-		long cur = 0;
-		while (cur <= last) {
-			int val = src.get(cur);
-			long start = cur;
-			cur++;
-			while (cur <= last && src.get(cur) == val)
-				cur++;
-			long len = cur - start;
-			if (len < 4) {
-				cur = start + 1;
-				len = 1;
-			}
-			try {
-				if (tokens > 0)
-					out.write(tokens % 8 == 0 ? '\n' : ' ');
-				if (cur != start + 1)
-					out.write((cur - start) + "*");
-				out.write(Integer.toHexString(val));
-			} catch (IOException e) {
-				throw new IOException(Strings.get("hexFileWriteError"));
-			}
-			tokens++;
+	private static final String RAW_IMAGE_HEADER = "v2.0 raw";
+	private static final String COMMENT_MARKER = "#";
+
+	public static void open(HexModel dst, File src) throws IOException {
+		BufferedReader in;
+		try {
+			in = new BufferedReader(new FileReader(src));
+		} catch (IOException e) {
+			throw new IOException(Strings.get("hexFileOpenError"));
 		}
-		if (tokens > 0)
-			out.write('\n');
+		try {
+			String header = in.readLine();
+			if (!header.equals(RAW_IMAGE_HEADER)) {
+				throw new IOException(Strings.get("hexHeaderFormatError"));
+			}
+			open(dst, in);
+			try {
+				BufferedReader oldIn = in;
+				in = null;
+				oldIn.close();
+			} catch (IOException e) {
+				throw new IOException(Strings.get("hexFileReadError"));
+			}
+		} finally {
+			try {
+				if (in != null)
+					in.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 
 	public static void open(HexModel dst, Reader in) throws IOException {
@@ -195,35 +188,6 @@ public class HexFile {
 		return data;
 	}
 
-	public static void open(HexModel dst, File src) throws IOException {
-		BufferedReader in;
-		try {
-			in = new BufferedReader(new FileReader(src));
-		} catch (IOException e) {
-			throw new IOException(Strings.get("hexFileOpenError"));
-		}
-		try {
-			String header = in.readLine();
-			if (!header.equals(RAW_IMAGE_HEADER)) {
-				throw new IOException(Strings.get("hexHeaderFormatError"));
-			}
-			open(dst, in);
-			try {
-				BufferedReader oldIn = in;
-				in = null;
-				oldIn.close();
-			} catch (IOException e) {
-				throw new IOException(Strings.get("hexFileReadError"));
-			}
-		} finally {
-			try {
-				if (in != null)
-					in.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
 	public static void save(File dst, HexModel src) throws IOException {
 		FileWriter out;
 		try {
@@ -245,5 +209,41 @@ public class HexFile {
 				throw new IOException(Strings.get("hexFileWriteError"));
 			}
 		}
+	}
+
+	public static void save(Writer out, HexModel src) throws IOException {
+		long first = src.getFirstOffset();
+		long last = src.getLastOffset();
+		while (last > first && src.get(last) == 0)
+			last--;
+		int tokens = 0;
+		long cur = 0;
+		while (cur <= last) {
+			int val = src.get(cur);
+			long start = cur;
+			cur++;
+			while (cur <= last && src.get(cur) == val)
+				cur++;
+			long len = cur - start;
+			if (len < 4) {
+				cur = start + 1;
+				len = 1;
+			}
+			try {
+				if (tokens > 0)
+					out.write(tokens % 8 == 0 ? '\n' : ' ');
+				if (cur != start + 1)
+					out.write((cur - start) + "*");
+				out.write(Integer.toHexString(val));
+			} catch (IOException e) {
+				throw new IOException(Strings.get("hexFileWriteError"));
+			}
+			tokens++;
+		}
+		if (tokens > 0)
+			out.write('\n');
+	}
+
+	private HexFile() {
 	}
 }

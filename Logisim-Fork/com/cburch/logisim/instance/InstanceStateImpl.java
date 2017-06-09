@@ -22,36 +22,10 @@ class InstanceStateImpl implements InstanceState {
 		this.component = component;
 	}
 
-	public void repurpose(CircuitState circuitState, Component component) {
-		this.circuitState = circuitState;
-		this.component = component;
-	}
-
-	CircuitState getCircuitState() {
-		return circuitState;
-	}
-
 	@Override
-	public Project getProject() {
-		return circuitState.getProject();
-	}
-
-	@Override
-	public Instance getInstance() {
+	public void fireInvalidated() {
 		if (component instanceof InstanceComponent) {
-			return ((InstanceComponent) component).getInstance();
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public InstanceFactory getFactory() {
-		if (component instanceof InstanceComponent) {
-			InstanceComponent comp = (InstanceComponent) component;
-			return (InstanceFactory) comp.getFactory();
-		} else {
-			return null;
+			((InstanceComponent) component).fireInvalidated();
 		}
 	}
 
@@ -65,10 +39,53 @@ class InstanceStateImpl implements InstanceState {
 		return component.getAttributeSet().getValue(attr);
 	}
 
+	CircuitState getCircuitState() {
+		return circuitState;
+	}
+
+	@Override
+	public InstanceData getData() {
+		return (InstanceData) circuitState.getData(component);
+	}
+
+	@Override
+	public InstanceFactory getFactory() {
+		if (component instanceof InstanceComponent) {
+			InstanceComponent comp = (InstanceComponent) component;
+			return (InstanceFactory) comp.getFactory();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Instance getInstance() {
+		if (component instanceof InstanceComponent) {
+			return ((InstanceComponent) component).getInstance();
+		} else {
+			return null;
+		}
+	}
+
 	@Override
 	public Value getPort(int portIndex) {
 		EndData data = component.getEnd(portIndex);
 		return circuitState.getValue(data.getLocation());
+	}
+
+	@Override
+	public Project getProject() {
+		return circuitState.getProject();
+	}
+
+	@Override
+	public long getTickCount() {
+		return circuitState.getPropagator().getTickCount();
+	}
+
+	@Override
+	public boolean isCircuitRoot() {
+		return !circuitState.isSubstate();
 	}
 
 	@Override
@@ -78,15 +95,9 @@ class InstanceStateImpl implements InstanceState {
 		return circ.isConnected(loc, component);
 	}
 
-	@Override
-	public void setPort(int portIndex, Value value, int delay) {
-		EndData end = component.getEnd(portIndex);
-		circuitState.setValue(end.getLocation(), value, component, delay);
-	}
-
-	@Override
-	public InstanceData getData() {
-		return (InstanceData) circuitState.getData(component);
+	public void repurpose(CircuitState circuitState, Component component) {
+		this.circuitState = circuitState;
+		this.component = component;
 	}
 
 	@Override
@@ -95,19 +106,8 @@ class InstanceStateImpl implements InstanceState {
 	}
 
 	@Override
-	public void fireInvalidated() {
-		if (component instanceof InstanceComponent) {
-			((InstanceComponent) component).fireInvalidated();
-		}
-	}
-
-	@Override
-	public boolean isCircuitRoot() {
-		return !circuitState.isSubstate();
-	}
-
-	@Override
-	public long getTickCount() {
-		return circuitState.getPropagator().getTickCount();
+	public void setPort(int portIndex, Value value, int delay) {
+		EndData end = component.getEnd(portIndex);
+		circuitState.setValue(end.getLocation(), value, component, delay);
 	}
 }

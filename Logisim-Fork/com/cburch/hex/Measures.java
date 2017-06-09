@@ -32,119 +32,6 @@ class Measures {
 		computeCellSize(null);
 	}
 
-	public int getColumnCount() {
-		return cols;
-	}
-
-	public int getBaseX() {
-		return baseX;
-	}
-
-	public int getCellHeight() {
-		return cellHeight;
-	}
-
-	public int getCellWidth() {
-		return cellWidth;
-	}
-
-	public int getLabelWidth() {
-		return headerWidth;
-	}
-
-	public int getLabelChars() {
-		return headerChars;
-	}
-
-	public int getCellChars() {
-		return cellChars;
-	}
-
-	public int getValuesX() {
-		return baseX + spacerWidth;
-	}
-
-	public int getValuesWidth() {
-		return ((cols - 1) / 4) * spacerWidth + cols * cellWidth;
-	}
-
-	public long getBaseAddress(HexModel model) {
-		if (model == null) {
-			return 0;
-		} else {
-			long addr0 = model.getFirstOffset();
-			return addr0 - addr0 % cols;
-		}
-	}
-
-	public int toY(long addr) {
-		long row = (addr - getBaseAddress(hex.getModel())) / cols;
-		long ret = row * cellHeight;
-		return ret < Integer.MAX_VALUE ? (int) ret : Integer.MAX_VALUE;
-	}
-
-	public int toX(long addr) {
-		int col = (int) (addr % cols);
-		return baseX + (1 + (col / 4)) * spacerWidth + col * cellWidth;
-	}
-
-	public long toAddress(int x, int y) {
-		HexModel model = hex.getModel();
-		if (model == null)
-			return Integer.MIN_VALUE;
-		long addr0 = model.getFirstOffset();
-		long addr1 = model.getLastOffset();
-
-		long base = getBaseAddress(model) + ((long) y / cellHeight) * cols;
-		int offs = (x - baseX) / (cellWidth + (spacerWidth + 2) / 4);
-		if (offs < 0)
-			offs = 0;
-		if (offs >= cols)
-			offs = cols - 1;
-
-		long ret = base + offs;
-		if (ret > addr1)
-			ret = addr1;
-		if (ret < addr0)
-			ret = addr0;
-		return ret;
-	}
-
-	void ensureComputed(Graphics g) {
-		if (guessed || cellWidth < 0)
-			computeCellSize(g);
-	}
-
-	void recompute() {
-		computeCellSize(hex.getGraphics());
-	}
-
-	void widthChanged() {
-		int oldCols = cols;
-		int width;
-		if (guessed || cellWidth < 0) {
-			cols = 16;
-			width = hex.getPreferredSize().width;
-		} else {
-			width = hex.getWidth();
-			int ret = (width - headerWidth) / (cellWidth + (spacerWidth + 3) / 4);
-			if (ret >= 16)
-				cols = 16;
-			else if (ret >= 8)
-				cols = 8;
-			else
-				cols = 4;
-		}
-		int lineWidth = headerWidth + cols * cellWidth + ((cols / 4) - 1) * spacerWidth;
-		int newBase = headerWidth + Math.max(0, (width - lineWidth) / 2);
-		if (baseX != newBase) {
-			baseX = newBase;
-			hex.repaint();
-		}
-		if (cols != oldCols)
-			recompute();
-	}
-
 	private void computeCellSize(Graphics g) {
 		HexModel model = hex.getModel();
 
@@ -218,5 +105,118 @@ class Measures {
 		}
 
 		widthChanged();
+	}
+
+	void ensureComputed(Graphics g) {
+		if (guessed || cellWidth < 0)
+			computeCellSize(g);
+	}
+
+	public long getBaseAddress(HexModel model) {
+		if (model == null) {
+			return 0;
+		} else {
+			long addr0 = model.getFirstOffset();
+			return addr0 - addr0 % cols;
+		}
+	}
+
+	public int getBaseX() {
+		return baseX;
+	}
+
+	public int getCellChars() {
+		return cellChars;
+	}
+
+	public int getCellHeight() {
+		return cellHeight;
+	}
+
+	public int getCellWidth() {
+		return cellWidth;
+	}
+
+	public int getColumnCount() {
+		return cols;
+	}
+
+	public int getLabelChars() {
+		return headerChars;
+	}
+
+	public int getLabelWidth() {
+		return headerWidth;
+	}
+
+	public int getValuesWidth() {
+		return ((cols - 1) / 4) * spacerWidth + cols * cellWidth;
+	}
+
+	public int getValuesX() {
+		return baseX + spacerWidth;
+	}
+
+	void recompute() {
+		computeCellSize(hex.getGraphics());
+	}
+
+	public long toAddress(int x, int y) {
+		HexModel model = hex.getModel();
+		if (model == null)
+			return Integer.MIN_VALUE;
+		long addr0 = model.getFirstOffset();
+		long addr1 = model.getLastOffset();
+
+		long base = getBaseAddress(model) + ((long) y / cellHeight) * cols;
+		int offs = (x - baseX) / (cellWidth + (spacerWidth + 2) / 4);
+		if (offs < 0)
+			offs = 0;
+		if (offs >= cols)
+			offs = cols - 1;
+
+		long ret = base + offs;
+		if (ret > addr1)
+			ret = addr1;
+		if (ret < addr0)
+			ret = addr0;
+		return ret;
+	}
+
+	public int toX(long addr) {
+		int col = (int) (addr % cols);
+		return baseX + (1 + (col / 4)) * spacerWidth + col * cellWidth;
+	}
+
+	public int toY(long addr) {
+		long row = (addr - getBaseAddress(hex.getModel())) / cols;
+		long ret = row * cellHeight;
+		return ret < Integer.MAX_VALUE ? (int) ret : Integer.MAX_VALUE;
+	}
+
+	void widthChanged() {
+		int oldCols = cols;
+		int width;
+		if (guessed || cellWidth < 0) {
+			cols = 16;
+			width = hex.getPreferredSize().width;
+		} else {
+			width = hex.getWidth();
+			int ret = (width - headerWidth) / (cellWidth + (spacerWidth + 3) / 4);
+			if (ret >= 16)
+				cols = 16;
+			else if (ret >= 8)
+				cols = 8;
+			else
+				cols = 4;
+		}
+		int lineWidth = headerWidth + cols * cellWidth + ((cols / 4) - 1) * spacerWidth;
+		int newBase = headerWidth + Math.max(0, (width - lineWidth) / 2);
+		if (baseX != newBase) {
+			baseX = newBase;
+			hex.repaint();
+		}
+		if (cols != oldCols)
+			recompute();
 	}
 }

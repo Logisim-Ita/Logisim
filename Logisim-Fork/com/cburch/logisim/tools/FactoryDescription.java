@@ -40,13 +40,6 @@ public class FactoryDescription {
 	private ComponentFactory factory;
 	private StringGetter toolTip;
 
-	public FactoryDescription(String name, StringGetter displayName, String iconName, String factoryClassName) {
-		this(name, displayName, factoryClassName);
-		this.iconName = iconName;
-		this.iconLoadAttempted = false;
-		this.icon = null;
-	}
-
 	public FactoryDescription(String name, StringGetter displayName, Icon icon, String factoryClassName) {
 		this(name, displayName, factoryClassName);
 		this.iconName = "???";
@@ -66,28 +59,15 @@ public class FactoryDescription {
 		this.toolTip = null;
 	}
 
-	public String getName() {
-		return name;
+	public FactoryDescription(String name, StringGetter displayName, String iconName, String factoryClassName) {
+		this(name, displayName, factoryClassName);
+		this.iconName = iconName;
+		this.iconLoadAttempted = false;
+		this.icon = null;
 	}
 
 	public String getDisplayName() {
 		return displayName.get();
-	}
-
-	public boolean isFactoryLoaded() {
-		return factoryLoadAttempted;
-	}
-
-	public Icon getIcon() {
-		Icon ret = icon;
-		if (ret != null || iconLoadAttempted) {
-			return ret;
-		} else {
-			ret = Icons.getIcon(iconName);
-			icon = ret;
-			iconLoadAttempted = true;
-			return ret;
-		}
 	}
 
 	public ComponentFactory getFactory(Class<? extends Library> libraryClass) {
@@ -133,13 +113,33 @@ public class FactoryDescription {
 		}
 	}
 
-	public FactoryDescription setToolTip(StringGetter getter) {
-		toolTip = getter;
-		return this;
+	public Icon getIcon() {
+		Icon ret = icon;
+		if (ret != null || iconLoadAttempted) {
+			return ret;
+		} else {
+			ret = Icons.getIcon(iconName);
+			icon = ret;
+			iconLoadAttempted = true;
+			return ret;
+		}
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getToolTip() {
 		StringGetter getter = toolTip;
 		return getter == null ? null : getter.get();
+	}
+
+	public boolean isFactoryLoaded() {
+		return factoryLoadAttempted;
+	}
+
+	public FactoryDescription setToolTip(StringGetter getter) {
+		toolTip = getter;
+		return this;
 	}
 }

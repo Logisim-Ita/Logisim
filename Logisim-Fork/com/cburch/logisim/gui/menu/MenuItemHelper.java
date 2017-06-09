@@ -26,24 +26,20 @@ class MenuItemHelper implements ActionListener {
 		this.listeners = new ArrayList<ActionListener>();
 	}
 
-	public boolean hasListeners() {
-		return !listeners.isEmpty();
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		if (!listeners.isEmpty()) {
+			ActionEvent e = new ActionEvent(menuItem, event.getID(), event.getActionCommand(), event.getWhen(),
+					event.getModifiers());
+			for (ActionListener l : listeners) {
+				l.actionPerformed(e);
+			}
+		}
 	}
 
 	public void addActionListener(ActionListener l) {
 		listeners.add(l);
 		computeEnabled();
-	}
-
-	public void removeActionListener(ActionListener l) {
-		listeners.remove(l);
-		computeEnabled();
-	}
-
-	public void setEnabled(boolean value) {
-		if (!inActionListener) {
-			enabled = value;
-		}
 	}
 
 	private void computeEnabled() {
@@ -56,14 +52,18 @@ class MenuItemHelper implements ActionListener {
 		}
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		if (!listeners.isEmpty()) {
-			ActionEvent e = new ActionEvent(menuItem, event.getID(), event.getActionCommand(), event.getWhen(),
-					event.getModifiers());
-			for (ActionListener l : listeners) {
-				l.actionPerformed(e);
-			}
+	public boolean hasListeners() {
+		return !listeners.isEmpty();
+	}
+
+	public void removeActionListener(ActionListener l) {
+		listeners.remove(l);
+		computeEnabled();
+	}
+
+	public void setEnabled(boolean value) {
+		if (!inActionListener) {
+			enabled = value;
 		}
 	}
 }

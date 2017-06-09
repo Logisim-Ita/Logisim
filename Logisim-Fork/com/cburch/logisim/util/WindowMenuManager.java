@@ -7,12 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 class WindowMenuManager {
-	private WindowMenuManager() {
-	}
-
 	private static ArrayList<WindowMenu> menus = new ArrayList<WindowMenu>();
+
 	private static ArrayList<WindowMenuItemManager> managers = new ArrayList<WindowMenuItemManager>();
 	private static WindowMenuItemManager currentManager = null;
+	public static void addManager(WindowMenuItemManager manager) {
+		for (WindowMenu menu : menus) {
+			manager.createMenuItem(menu);
+		}
+		managers.add(manager);
+	}
 
 	public static void addMenu(WindowMenu menu) {
 		for (WindowMenuItemManager manager : managers) {
@@ -23,11 +27,18 @@ class WindowMenuManager {
 
 	// TODO frames should call removeMenu when they're destroyed
 
-	public static void addManager(WindowMenuItemManager manager) {
+	private static void enableAll() {
 		for (WindowMenu menu : menus) {
-			manager.createMenuItem(menu);
+			menu.computeEnabled();
 		}
-		managers.add(manager);
+	}
+
+	static WindowMenuItemManager getCurrentManager() {
+		return currentManager;
+	}
+
+	static List<WindowMenu> getMenus() {
+		return menus;
 	}
 
 	public static void removeManager(WindowMenuItemManager manager) {
@@ -35,14 +46,6 @@ class WindowMenuManager {
 			manager.removeMenuItem(menu);
 		}
 		managers.remove(manager);
-	}
-
-	static List<WindowMenu> getMenus() {
-		return menus;
-	}
-
-	static WindowMenuItemManager getCurrentManager() {
-		return currentManager;
 	}
 
 	static void setCurrentManager(WindowMenuItemManager value) {
@@ -63,21 +66,18 @@ class WindowMenuManager {
 			enableAll();
 	}
 
-	static void unsetCurrentManager(WindowMenuItemManager value) {
-		if (value != currentManager)
-			return;
-		setCurrentManager(null);
-	}
-
 	private static void setNullItems(boolean value) {
 		for (WindowMenu menu : menus) {
 			menu.setNullItemSelected(value);
 		}
 	}
 
-	private static void enableAll() {
-		for (WindowMenu menu : menus) {
-			menu.computeEnabled();
-		}
+	static void unsetCurrentManager(WindowMenuItemManager value) {
+		if (value != currentManager)
+			return;
+		setCurrentManager(null);
+	}
+
+	private WindowMenuManager() {
 	}
 }

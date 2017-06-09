@@ -18,12 +18,17 @@ import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.util.StringUtil;
 
 class MenuEdit extends Menu {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4037758443151508591L;
-
 	private class MyListener implements ProjectListener, ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+			Project proj = menubar.getProject();
+			if (src == undo) {
+				if (proj != null)
+					proj.undoAction();
+			}
+		}
+
 		@Override
 		public void projectChanged(ProjectEvent e) {
 			Project proj = menubar.getProject();
@@ -36,17 +41,12 @@ class MenuEdit extends Menu {
 				undo.setEnabled(true);
 			}
 		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Object src = e.getSource();
-			Project proj = menubar.getProject();
-			if (src == undo) {
-				if (proj != null)
-					proj.undoAction();
-			}
-		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4037758443151508591L;
 
 	private LogisimMenuBar menubar;
 	private JMenuItem undo = new JMenuItem();
@@ -120,6 +120,14 @@ class MenuEdit extends Menu {
 		computeEnabled();
 	}
 
+	@Override
+	void computeEnabled() {
+		setEnabled(menubar.getProject() != null || cut.hasListeners() || copy.hasListeners() || paste.hasListeners()
+				|| delete.hasListeners() || dup.hasListeners() || selall.hasListeners() || raise.hasListeners()
+				|| lower.hasListeners() || raiseTop.hasListeners() || lowerBottom.hasListeners()
+				|| addCtrl.hasListeners() || remCtrl.hasListeners());
+	}
+
 	public void localeChanged() {
 		this.setText(Strings.get("editMenu"));
 		myListener.projectChanged(null);
@@ -135,13 +143,5 @@ class MenuEdit extends Menu {
 		lowerBottom.setText(Strings.get("editLowerBottomItem"));
 		addCtrl.setText(Strings.get("editAddControlItem"));
 		remCtrl.setText(Strings.get("editRemoveControlItem"));
-	}
-
-	@Override
-	void computeEnabled() {
-		setEnabled(menubar.getProject() != null || cut.hasListeners() || copy.hasListeners() || paste.hasListeners()
-				|| delete.hasListeners() || dup.hasListeners() || selall.hasListeners() || raise.hasListeners()
-				|| lower.hasListeners() || raiseTop.hasListeners() || lowerBottom.hasListeners()
-				|| addCtrl.hasListeners() || remCtrl.hasListeners());
 	}
 }

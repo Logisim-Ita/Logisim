@@ -22,3 +22,5 @@
 /TtyState.class
 /RGBLed$Logger.class
 /RGBLed.class
+/PinAttributes.class
+/RGBLedAttributes.class

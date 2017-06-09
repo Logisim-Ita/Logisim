@@ -20,21 +20,7 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 public class WindowMenu extends JMenu {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 356839702149085338L;
-
 	private class MyListener implements LocaleListener, ActionListener {
-		@Override
-		public void localeChanged() {
-			WindowMenu.this.setText(Strings.get("windowMenu"));
-			minimize.setText(Strings.get("windowMinimizeItem"));
-			close.setText(Strings.get("windowCloseItem"));
-			zoom.setText(MacCompatibility.isQuitAutomaticallyPresent() ? Strings.get("windowZoomItemMac")
-					: Strings.get("windowZoomItem"));
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src = e.getSource();
@@ -67,7 +53,21 @@ public class WindowMenu extends JMenu {
 			}
 			return null;
 		}
+
+		@Override
+		public void localeChanged() {
+			WindowMenu.this.setText(Strings.get("windowMenu"));
+			minimize.setText(Strings.get("windowMinimizeItem"));
+			close.setText(Strings.get("windowCloseItem"));
+			zoom.setText(MacCompatibility.isQuitAutomaticallyPresent() ? Strings.get("windowZoomItemMac")
+					: Strings.get("windowZoomItem"));
+		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 356839702149085338L;
 
 	private JFrame owner;
 	private MyListener myListener = new MyListener();
@@ -112,24 +112,6 @@ public class WindowMenu extends JMenu {
 		computeContents();
 	}
 
-	void removeMenuItem(Object source, JRadioButtonMenuItem item) {
-		if (transientItems.remove(item)) {
-			item.removeActionListener(myListener);
-		}
-		computeContents();
-	}
-
-	void computeEnabled() {
-		WindowMenuItemManager currentManager = WindowMenuManager.getCurrentManager();
-		minimize.setEnabled(currentManager != null);
-		zoom.setEnabled(currentManager != null);
-		close.setEnabled(currentManager != null);
-	}
-
-	void setNullItemSelected(boolean value) {
-		nullItem.setSelected(value);
-	}
-
 	private void computeContents() {
 		ButtonGroup bgroup = new ButtonGroup();
 		bgroup.add(nullItem);
@@ -164,10 +146,11 @@ public class WindowMenu extends JMenu {
 		}
 	}
 
-	void doMinimize() {
-		if (owner != null) {
-			owner.setExtendedState(Frame.ICONIFIED);
-		}
+	void computeEnabled() {
+		WindowMenuItemManager currentManager = WindowMenuManager.getCurrentManager();
+		minimize.setEnabled(currentManager != null);
+		zoom.setEnabled(currentManager != null);
+		close.setEnabled(currentManager != null);
 	}
 
 	void doClose() {
@@ -182,6 +165,12 @@ public class WindowMenu extends JMenu {
 			} else if (action == WindowConstants.DISPOSE_ON_CLOSE) {
 				owner.dispose();
 			}
+		}
+	}
+
+	void doMinimize() {
+		if (owner != null) {
+			owner.setExtendedState(Frame.ICONIFIED);
 		}
 	}
 
@@ -217,5 +206,16 @@ public class WindowMenu extends JMenu {
 			owner.setLocation(windowLoc);
 		if (sizeChanged)
 			owner.setSize(windowSize);
+	}
+
+	void removeMenuItem(Object source, JRadioButtonMenuItem item) {
+		if (transientItems.remove(item)) {
+			item.removeActionListener(myListener);
+		}
+		computeContents();
+	}
+
+	void setNullItemSelected(boolean value) {
+		nullItem.setSelected(value);
 	}
 }

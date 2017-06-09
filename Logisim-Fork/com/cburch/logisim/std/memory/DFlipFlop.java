@@ -11,12 +11,12 @@ public class DFlipFlop extends AbstractFlipFlop {
 	}
 
 	@Override
-	protected String getInputName(int index) {
-		return "D";
+	protected Value computeValue(Value[] inputs, Value curValue) {
+		return inputs[0];
 	}
 
 	@Override
-	protected Value computeValue(Value[] inputs, Value curValue) {
-		return inputs[0];
+	protected String getInputName(int index) {
+		return "D";
 	}
 }

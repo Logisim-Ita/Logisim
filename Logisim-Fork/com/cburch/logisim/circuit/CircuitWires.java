@@ -32,21 +32,81 @@ import com.cburch.logisim.util.IteratorUtil;
 import com.cburch.logisim.util.SmallSet;
 
 class CircuitWires {
+	static class BundleMap {
+		boolean computed = false;
+		HashMap<Location, WireBundle> pointBundles = new HashMap<Location, WireBundle>();
+		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
+		boolean isValid = true;
+		// NOTE: It would make things more efficient if we also had
+		// a set of just the first bundle in each tree.
+		HashSet<WidthIncompatibilityData> incompatibilityData = null;
+
+		void addWidthIncompatibilityData(WidthIncompatibilityData e) {
+			if (incompatibilityData == null) {
+				incompatibilityData = new HashSet<WidthIncompatibilityData>();
+			}
+			incompatibilityData.add(e);
+		}
+
+		WireBundle createBundleAt(Location p) {
+			WireBundle ret = pointBundles.get(p);
+			if (ret == null) {
+				ret = new WireBundle();
+				pointBundles.put(p, ret);
+				ret.points.add(p);
+				bundles.add(ret);
+			}
+			return ret;
+		}
+
+		WireBundle getBundleAt(Location p) {
+			return pointBundles.get(p);
+		}
+
+		Set<Location> getBundlePoints() {
+			return pointBundles.keySet();
+		}
+
+		Set<WireBundle> getBundles() {
+			return bundles;
+		}
+
+		HashSet<WidthIncompatibilityData> getWidthIncompatibilityData() {
+			return incompatibilityData;
+		}
+
+		void invalidate() {
+			isValid = false;
+		}
+
+		boolean isValid() {
+			return isValid;
+		}
+
+		synchronized void markComputed() {
+			computed = true;
+			notifyAll();
+		}
+
+		void setBundleAt(Location p, WireBundle b) {
+			pointBundles.put(p, b);
+		}
+
+		synchronized void waitUntilComputed() {
+			while (!computed) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
+
 	static class SplitterData {
 		WireBundle[] end_bundle; // PointData associated with each end
 
 		SplitterData(int fan_out) {
 			end_bundle = new WireBundle[fan_out + 1];
-		}
-	}
-
-	static class ThreadBundle {
-		int loc;
-		WireBundle b;
-
-		ThreadBundle(int loc, WireBundle b) {
-			this.loc = loc;
-			this.b = b;
 		}
 	}
 
@@ -66,6 +126,16 @@ class CircuitWires {
 		}
 	}
 
+	static class ThreadBundle {
+		int loc;
+		WireBundle b;
+
+		ThreadBundle(int loc, WireBundle b) {
+			this.loc = loc;
+			this.b = b;
+		}
+	}
+
 	private class TunnelListener implements AttributeListener {
 		@Override
 		public void attributeListChanged(AttributeEvent e) {
@@ -80,171 +150,45 @@ class CircuitWires {
 		}
 	}
 
-	static class BundleMap {
-		boolean computed = false;
-		HashMap<Location, WireBundle> pointBundles = new HashMap<Location, WireBundle>();
-		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
-		boolean isValid = true;
-		// NOTE: It would make things more efficient if we also had
-		// a set of just the first bundle in each tree.
-		HashSet<WidthIncompatibilityData> incompatibilityData = null;
-
-		HashSet<WidthIncompatibilityData> getWidthIncompatibilityData() {
-			return incompatibilityData;
-		}
-
-		void addWidthIncompatibilityData(WidthIncompatibilityData e) {
-			if (incompatibilityData == null) {
-				incompatibilityData = new HashSet<WidthIncompatibilityData>();
+	private static Value pullValue(Value base, Value pullTo) {
+		if (base.isFullyDefined()) {
+			return base;
+		} else if (base.getWidth() == 1) {
+			if (base == Value.UNKNOWN)
+				return pullTo;
+			else
+				return base;
+		} else {
+			Value[] ret = base.getAll();
+			for (int i = 0; i < ret.length; i++) {
+				if (ret[i] == Value.UNKNOWN)
+					ret[i] = pullTo;
 			}
-			incompatibilityData.add(e);
-		}
-
-		WireBundle getBundleAt(Location p) {
-			return pointBundles.get(p);
-		}
-
-		WireBundle createBundleAt(Location p) {
-			WireBundle ret = pointBundles.get(p);
-			if (ret == null) {
-				ret = new WireBundle();
-				pointBundles.put(p, ret);
-				ret.points.add(p);
-				bundles.add(ret);
-			}
-			return ret;
-		}
-
-		boolean isValid() {
-			return isValid;
-		}
-
-		void invalidate() {
-			isValid = false;
-		}
-
-		void setBundleAt(Location p, WireBundle b) {
-			pointBundles.put(p, b);
-		}
-
-		Set<Location> getBundlePoints() {
-			return pointBundles.keySet();
-		}
-
-		Set<WireBundle> getBundles() {
-			return bundles;
-		}
-
-		synchronized void markComputed() {
-			computed = true;
-			notifyAll();
-		}
-
-		synchronized void waitUntilComputed() {
-			while (!computed) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-				}
-			}
+			return Value.create(ret);
 		}
 	}
-
 	// user-given data
 	private HashSet<Wire> wires = new HashSet<Wire>();
 	private HashSet<Splitter> splitters = new HashSet<Splitter>();
-	private HashSet<Component> tunnels = new HashSet<Component>(); // of
-																	// Components
+																	private HashSet<Component> tunnels = new HashSet<Component>(); // of
+	// Components
 																	// with
 																	// Tunnel
 																	// factory
 	private TunnelListener tunnelListener = new TunnelListener();
-	private HashSet<Component> pulls = new HashSet<Component>(); // of
-																	// Components
+																	private HashSet<Component> pulls = new HashSet<Component>(); // of
+
+	// Components
 																	// with
 																	// PullResistor
 																	// factory
 	final CircuitPoints points = new CircuitPoints();
-
 	// derived data
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;
+
 	private BundleMap bundleMap = null;
 
 	CircuitWires() {
-	}
-
-	//
-	// query methods
-	//
-	boolean isMapVoided() {
-		return bundleMap == null;
-	}
-
-	Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
-		return getBundleMap().getWidthIncompatibilityData();
-	}
-
-	void ensureComputed() {
-		getBundleMap();
-	}
-
-	BitWidth getWidth(Location q) {
-		BitWidth det = points.getWidth(q);
-		if (det != BitWidth.UNKNOWN)
-			return det;
-
-		BundleMap bmap = getBundleMap();
-		if (!bmap.isValid())
-			return BitWidth.UNKNOWN;
-		WireBundle qb = bmap.getBundleAt(q);
-		if (qb != null && qb.isValid())
-			return qb.getWidth();
-
-		return BitWidth.UNKNOWN;
-	}
-
-	Location getWidthDeterminant(Location q) {
-		BitWidth det = points.getWidth(q);
-		if (det != BitWidth.UNKNOWN)
-			return q;
-
-		WireBundle qb = getBundleMap().getBundleAt(q);
-		if (qb != null && qb.isValid())
-			return qb.getWidthDeterminant();
-
-		return q;
-	}
-
-	Iterator<? extends Component> getComponents() {
-		return IteratorUtil.createJoinedIterator(splitters.iterator(), wires.iterator());
-	}
-
-	Set<Wire> getWires() {
-		return wires;
-	}
-
-	Bounds getWireBounds() {
-		Bounds bds = bounds;
-		if (bds == Bounds.EMPTY_BOUNDS) {
-			bds = recomputeBounds();
-		}
-		return bds;
-	}
-
-	WireBundle getWireBundle(Location query) {
-		BundleMap bmap = getBundleMap();
-		return bmap.getBundleAt(query);
-	}
-
-	WireSet getWireSet(Wire start) {
-		WireBundle bundle = getWireBundle(start.e0);
-		if (bundle == null)
-			return WireSet.EMPTY;
-		HashSet<Wire> wires = new HashSet<Wire>();
-		for (Location loc : bundle.points) {
-			wires.addAll(points.getWires(loc));
-		}
-		return new WireSet(wires);
 	}
 
 	//
@@ -275,38 +219,8 @@ class CircuitWires {
 		return added;
 	}
 
-	void remove(Component comp) {
-		if (comp instanceof Wire) {
-			removeWire((Wire) comp);
-		} else if (comp instanceof Splitter) {
-			splitters.remove(comp);
-		} else {
-			Object factory = comp.getFactory();
-			if (factory instanceof Tunnel) {
-				tunnels.remove(comp);
-				comp.getAttributeSet().removeAttributeListener(tunnelListener);
-			} else if (factory instanceof PullResistor) {
-				pulls.remove(comp);
-				comp.getAttributeSet().removeAttributeListener(tunnelListener);
-			}
-		}
-		points.remove(comp);
-		voidBundleMap();
-	}
-
 	void add(Component comp, EndData end) {
 		points.add(comp, end);
-		voidBundleMap();
-	}
-
-	void remove(Component comp, EndData end) {
-		points.remove(comp, end);
-		voidBundleMap();
-	}
-
-	void replace(Component comp, EndData oldEnd, EndData newEnd) {
-		points.remove(comp, oldEnd);
-		points.add(comp, newEnd);
 		voidBundleMap();
 	}
 
@@ -321,107 +235,194 @@ class CircuitWires {
 		return true;
 	}
 
-	private void removeWire(Wire w) {
-		boolean removed = wires.remove(w);
-		if (!removed)
-			return;
+	// To be called by getBundleMap only
+	private void computeBundleMap(BundleMap ret) {
+		// create bundles corresponding to wires and tunnels
+		connectWires(ret);
+		connectTunnels(ret);
+		connectPullResistors(ret);
 
-		if (bounds != Bounds.EMPTY_BOUNDS) {
-			// bounds is valid - invalidate if endpoint on border
-			Bounds smaller = bounds.expand(-2);
-			if (!smaller.contains(w.e0) || !smaller.contains(w.e1)) {
-				bounds = Bounds.EMPTY_BOUNDS;
+		// merge any WireBundle objects united by previous steps
+		for (Iterator<WireBundle> it = ret.getBundles().iterator(); it.hasNext();) {
+			WireBundle b = it.next();
+			WireBundle bpar = b.find();
+			if (bpar != b) { // b isn't group's representative
+				for (Location pt : b.points) {
+					ret.setBundleAt(pt, bpar);
+					bpar.points.add(pt);
+				}
+				bpar.addPullValue(b.getPullValue());
+				it.remove();
+			}
+		}
+
+		// make a WireBundle object for each end of a splitter
+		for (Splitter spl : splitters) {
+			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
+			for (EndData end : ends) {
+				Location p = end.getLocation();
+				WireBundle pb = ret.createBundleAt(p);
+				pb.setWidth(end.getWidth(), p);
+			}
+		}
+
+		// set the width for each bundle whose size is known
+		// based on components
+		for (Location p : ret.getBundlePoints()) {
+			WireBundle pb = ret.getBundleAt(p);
+			BitWidth width = points.getWidth(p);
+			if (width != BitWidth.UNKNOWN) {
+				pb.setWidth(width, p);
+			}
+		}
+
+		// determine the bundles at the end of each splitter
+		for (Splitter spl : splitters) {
+			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
+			int index = -1;
+			for (EndData end : ends) {
+				index++;
+				Location p = end.getLocation();
+				WireBundle pb = ret.getBundleAt(p);
+				if (pb != null) {
+					pb.setWidth(end.getWidth(), p);
+					spl.wire_data.end_bundle[index] = pb;
+				}
+			}
+		}
+
+		// unite threads going through splitters
+		for (Splitter spl : splitters) {
+			synchronized (spl) {
+				SplitterAttributes spl_attrs = (SplitterAttributes) spl.getAttributeSet();
+				byte[] bit_end = spl_attrs.bit_end;
+				SplitterData spl_data = spl.wire_data;
+				WireBundle from_bundle = spl_data.end_bundle[0];
+				if (from_bundle == null || !from_bundle.isValid())
+					continue;
+
+				for (int i = 0; i < bit_end.length; i++) {
+					int j = bit_end[i];
+					if (j > 0) {
+						int thr = spl.bit_thread[i];
+						WireBundle to_bundle = spl_data.end_bundle[j];
+						WireThread[] to_threads = to_bundle.threads;
+						if (to_threads != null && to_bundle.isValid()) {
+							WireThread[] from_threads = from_bundle.threads;
+							if (i >= from_threads.length) {
+								throw new ArrayIndexOutOfBoundsException("from " + i + " of " + from_threads.length);
+							}
+							if (thr >= to_threads.length) {
+								throw new ArrayIndexOutOfBoundsException("to " + thr + " of " + to_threads.length);
+							}
+							from_threads[i].unite(to_threads[thr]);
+						}
+					}
+				}
+			}
+		}
+
+		// merge any threads united by previous step
+		for (WireBundle b : ret.getBundles()) {
+			if (b.isValid() && b.threads != null) {
+				for (int i = 0; i < b.threads.length; i++) {
+					WireThread thr = b.threads[i].find();
+					b.threads[i] = thr;
+					thr.getBundles().add(new ThreadBundle(i, b));
+				}
+			}
+		}
+
+		// All threads are sewn together! Compute the exception set before
+		// leaving
+		Collection<WidthIncompatibilityData> exceptions = points.getWidthIncompatibilityData();
+		if (exceptions != null && exceptions.size() > 0) {
+			for (WidthIncompatibilityData wid : exceptions) {
+				ret.addWidthIncompatibilityData(wid);
+			}
+		}
+		for (WireBundle b : ret.getBundles()) {
+			WidthIncompatibilityData e = b.getWidthIncompatibilityData();
+			if (e != null)
+				ret.addWidthIncompatibilityData(e);
+		}
+	}
+
+	private void connectPullResistors(BundleMap ret) {
+		for (Component comp : pulls) {
+			Location loc = comp.getEnd(0).getLocation();
+			WireBundle b = ret.getBundleAt(loc);
+			if (b == null) {
+				b = ret.createBundleAt(loc);
+				b.points.add(loc);
+				ret.setBundleAt(loc, b);
+			}
+			Instance instance = Instance.getInstanceFor(comp);
+			b.addPullValue(PullResistor.getPullValue(instance));
+		}
+	}
+
+	private void connectTunnels(BundleMap ret) {
+		// determine the sets of tunnels
+		HashMap<String, ArrayList<Location>> tunnelSets = new HashMap<String, ArrayList<Location>>();
+		for (Component comp : tunnels) {
+			String label = comp.getAttributeSet().getValue(StdAttr.LABEL);
+			label = label.trim();
+			if (!label.equals("")) {
+				ArrayList<Location> tunnelSet = tunnelSets.get(label);
+				if (tunnelSet == null) {
+					tunnelSet = new ArrayList<Location>(3);
+					tunnelSets.put(label, tunnelSet);
+				}
+				tunnelSet.add(comp.getLocation());
+			}
+		}
+
+		// now connect the bundles that are tunnelled together
+		for (ArrayList<Location> tunnelSet : tunnelSets.values()) {
+			WireBundle foundBundle = null;
+			Location foundLocation = null;
+			for (Location loc : tunnelSet) {
+				WireBundle b = ret.getBundleAt(loc);
+				if (b != null) {
+					foundBundle = b;
+					foundLocation = loc;
+					break;
+				}
+			}
+			if (foundBundle == null) {
+				foundLocation = tunnelSet.get(0);
+				foundBundle = ret.createBundleAt(foundLocation);
+			}
+			for (Location loc : tunnelSet) {
+				if (loc != foundLocation) {
+					WireBundle b = ret.getBundleAt(loc);
+					if (b == null) {
+						foundBundle.points.add(loc);
+						ret.setBundleAt(loc, foundBundle);
+					} else {
+						b.unite(foundBundle);
+					}
+				}
 			}
 		}
 	}
 
-	//
-	// utility methods
-	//
-	void propagate(CircuitState circState, Set<Location> points) {
-		BundleMap map = getBundleMap();
-		SmallSet<WireThread> dirtyThreads = new SmallSet<WireThread>(); // affected
-																		// threads
-
-		// get state, or create a new one if current state is outdated
-		State s = circState.getWireData();
-		if (s == null || s.bundleMap != map) {
-			// if it is outdated, we need to compute for all threads
-			s = new State(map);
-			for (WireBundle b : map.getBundles()) {
-				WireThread[] th = b.threads;
-				if (b.isValid() && th != null) {
-					for (WireThread t : th) {
-						dirtyThreads.add(t);
-					}
-				}
-			}
-			circState.setWireData(s);
-		}
-
-		// determine affected threads, and set values for unwired points
-		for (Location p : points) {
-			WireBundle pb = map.getBundleAt(p);
-			if (pb == null) { // point is not wired
-				circState.setValueByWire(p, circState.getComponentOutputAt(p));
+	private void connectWires(BundleMap ret) {
+		// make a WireBundle object for each tree of connected wires
+		for (Wire w : wires) {
+			WireBundle b0 = ret.getBundleAt(w.e0);
+			if (b0 == null) {
+				WireBundle b1 = ret.createBundleAt(w.e1);
+				b1.points.add(w.e0);
+				ret.setBundleAt(w.e0, b1);
 			} else {
-				WireThread[] th = pb.threads;
-				if (!pb.isValid() || th == null) {
-					// immediately propagate NILs across invalid bundles
-					SmallSet<Location> pbPoints = pb.points;
-					if (pbPoints == null) {
-						circState.setValueByWire(p, Value.NIL);
-					} else {
-						for (Location loc2 : pbPoints) {
-							circState.setValueByWire(loc2, Value.NIL);
-						}
-					}
+				WireBundle b1 = ret.getBundleAt(w.e1);
+				if (b1 == null) { // t1 doesn't exist
+					b0.points.add(w.e1);
+					ret.setBundleAt(w.e1, b0);
 				} else {
-					for (WireThread t : th) {
-						dirtyThreads.add(t);
-					}
-				}
-			}
-		}
-
-		if (dirtyThreads.isEmpty())
-			return;
-
-		// determine values of affected threads
-		HashSet<ThreadBundle> bundles = new HashSet<ThreadBundle>();
-		for (WireThread t : dirtyThreads) {
-			Value v = getThreadValue(circState, t);
-			s.thr_values.put(t, v);
-			bundles.addAll(t.getBundles());
-		}
-
-		// now propagate values through circuit
-		for (ThreadBundle tb : bundles) {
-			WireBundle b = tb.b;
-
-			Value bv = null;
-			if (!b.isValid() || b.threads == null) {
-				; // do nothing
-			} else if (b.threads.length == 1) {
-				bv = s.thr_values.get(b.threads[0]);
-			} else {
-				Value[] tvs = new Value[b.threads.length];
-				boolean tvs_valid = true;
-				for (int i = 0; i < tvs.length; i++) {
-					Value tv = s.thr_values.get(b.threads[i]);
-					if (tv == null) {
-						tvs_valid = false;
-						break;
-					}
-					tvs[i] = tv;
-				}
-				if (tvs_valid)
-					bv = Value.create(tvs);
-			}
-
-			if (bv != null) {
-				for (Location p : b.points) {
-					circState.setValueByWire(p, bv);
+					b1.unite(b0); // unite b0 and b1
 				}
 			}
 		}
@@ -544,11 +545,8 @@ class CircuitWires {
 		}
 	}
 
-	//
-	// helper methods
-	//
-	private void voidBundleMap() {
-		bundleMap = null;
+	void ensureComputed() {
+		getBundleMap();
 	}
 
 	private BundleMap getBundleMap() {
@@ -586,197 +584,8 @@ class CircuitWires {
 		return ret;
 	}
 
-	// To be called by getBundleMap only
-	private void computeBundleMap(BundleMap ret) {
-		// create bundles corresponding to wires and tunnels
-		connectWires(ret);
-		connectTunnels(ret);
-		connectPullResistors(ret);
-
-		// merge any WireBundle objects united by previous steps
-		for (Iterator<WireBundle> it = ret.getBundles().iterator(); it.hasNext();) {
-			WireBundle b = it.next();
-			WireBundle bpar = b.find();
-			if (bpar != b) { // b isn't group's representative
-				for (Location pt : b.points) {
-					ret.setBundleAt(pt, bpar);
-					bpar.points.add(pt);
-				}
-				bpar.addPullValue(b.getPullValue());
-				it.remove();
-			}
-		}
-
-		// make a WireBundle object for each end of a splitter
-		for (Splitter spl : splitters) {
-			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
-			for (EndData end : ends) {
-				Location p = end.getLocation();
-				WireBundle pb = ret.createBundleAt(p);
-				pb.setWidth(end.getWidth(), p);
-			}
-		}
-
-		// set the width for each bundle whose size is known
-		// based on components
-		for (Location p : ret.getBundlePoints()) {
-			WireBundle pb = ret.getBundleAt(p);
-			BitWidth width = points.getWidth(p);
-			if (width != BitWidth.UNKNOWN) {
-				pb.setWidth(width, p);
-			}
-		}
-
-		// determine the bundles at the end of each splitter
-		for (Splitter spl : splitters) {
-			List<EndData> ends = new ArrayList<EndData>(spl.getEnds());
-			int index = -1;
-			for (EndData end : ends) {
-				index++;
-				Location p = end.getLocation();
-				WireBundle pb = ret.getBundleAt(p);
-				if (pb != null) {
-					pb.setWidth(end.getWidth(), p);
-					spl.wire_data.end_bundle[index] = pb;
-				}
-			}
-		}
-
-		// unite threads going through splitters
-		for (Splitter spl : splitters) {
-			synchronized (spl) {
-				SplitterAttributes spl_attrs = (SplitterAttributes) spl.getAttributeSet();
-				byte[] bit_end = spl_attrs.bit_end;
-				SplitterData spl_data = spl.wire_data;
-				WireBundle from_bundle = spl_data.end_bundle[0];
-				if (from_bundle == null || !from_bundle.isValid())
-					continue;
-
-				for (int i = 0; i < bit_end.length; i++) {
-					int j = bit_end[i];
-					if (j > 0) {
-						int thr = spl.bit_thread[i];
-						WireBundle to_bundle = spl_data.end_bundle[j];
-						WireThread[] to_threads = to_bundle.threads;
-						if (to_threads != null && to_bundle.isValid()) {
-							WireThread[] from_threads = from_bundle.threads;
-							if (i >= from_threads.length) {
-								throw new ArrayIndexOutOfBoundsException("from " + i + " of " + from_threads.length);
-							}
-							if (thr >= to_threads.length) {
-								throw new ArrayIndexOutOfBoundsException("to " + thr + " of " + to_threads.length);
-							}
-							from_threads[i].unite(to_threads[thr]);
-						}
-					}
-				}
-			}
-		}
-
-		// merge any threads united by previous step
-		for (WireBundle b : ret.getBundles()) {
-			if (b.isValid() && b.threads != null) {
-				for (int i = 0; i < b.threads.length; i++) {
-					WireThread thr = b.threads[i].find();
-					b.threads[i] = thr;
-					thr.getBundles().add(new ThreadBundle(i, b));
-				}
-			}
-		}
-
-		// All threads are sewn together! Compute the exception set before
-		// leaving
-		Collection<WidthIncompatibilityData> exceptions = points.getWidthIncompatibilityData();
-		if (exceptions != null && exceptions.size() > 0) {
-			for (WidthIncompatibilityData wid : exceptions) {
-				ret.addWidthIncompatibilityData(wid);
-			}
-		}
-		for (WireBundle b : ret.getBundles()) {
-			WidthIncompatibilityData e = b.getWidthIncompatibilityData();
-			if (e != null)
-				ret.addWidthIncompatibilityData(e);
-		}
-	}
-
-	private void connectWires(BundleMap ret) {
-		// make a WireBundle object for each tree of connected wires
-		for (Wire w : wires) {
-			WireBundle b0 = ret.getBundleAt(w.e0);
-			if (b0 == null) {
-				WireBundle b1 = ret.createBundleAt(w.e1);
-				b1.points.add(w.e0);
-				ret.setBundleAt(w.e0, b1);
-			} else {
-				WireBundle b1 = ret.getBundleAt(w.e1);
-				if (b1 == null) { // t1 doesn't exist
-					b0.points.add(w.e1);
-					ret.setBundleAt(w.e1, b0);
-				} else {
-					b1.unite(b0); // unite b0 and b1
-				}
-			}
-		}
-	}
-
-	private void connectTunnels(BundleMap ret) {
-		// determine the sets of tunnels
-		HashMap<String, ArrayList<Location>> tunnelSets = new HashMap<String, ArrayList<Location>>();
-		for (Component comp : tunnels) {
-			String label = comp.getAttributeSet().getValue(StdAttr.LABEL);
-			label = label.trim();
-			if (!label.equals("")) {
-				ArrayList<Location> tunnelSet = tunnelSets.get(label);
-				if (tunnelSet == null) {
-					tunnelSet = new ArrayList<Location>(3);
-					tunnelSets.put(label, tunnelSet);
-				}
-				tunnelSet.add(comp.getLocation());
-			}
-		}
-
-		// now connect the bundles that are tunnelled together
-		for (ArrayList<Location> tunnelSet : tunnelSets.values()) {
-			WireBundle foundBundle = null;
-			Location foundLocation = null;
-			for (Location loc : tunnelSet) {
-				WireBundle b = ret.getBundleAt(loc);
-				if (b != null) {
-					foundBundle = b;
-					foundLocation = loc;
-					break;
-				}
-			}
-			if (foundBundle == null) {
-				foundLocation = tunnelSet.get(0);
-				foundBundle = ret.createBundleAt(foundLocation);
-			}
-			for (Location loc : tunnelSet) {
-				if (loc != foundLocation) {
-					WireBundle b = ret.getBundleAt(loc);
-					if (b == null) {
-						foundBundle.points.add(loc);
-						ret.setBundleAt(loc, foundBundle);
-					} else {
-						b.unite(foundBundle);
-					}
-				}
-			}
-		}
-	}
-
-	private void connectPullResistors(BundleMap ret) {
-		for (Component comp : pulls) {
-			Location loc = comp.getEnd(0).getLocation();
-			WireBundle b = ret.getBundleAt(loc);
-			if (b == null) {
-				b = ret.createBundleAt(loc);
-				b.points.add(loc);
-				ret.setBundleAt(loc, b);
-			}
-			Instance instance = Instance.getInstanceFor(comp);
-			b.addPullValue(PullResistor.getPullValue(instance));
-		}
+	Iterator<? extends Component> getComponents() {
+		return IteratorUtil.createJoinedIterator(splitters.iterator(), wires.iterator());
 	}
 
 	private Value getThreadValue(CircuitState state, WireThread t) {
@@ -799,21 +608,161 @@ class CircuitWires {
 		return ret;
 	}
 
-	private static Value pullValue(Value base, Value pullTo) {
-		if (base.isFullyDefined()) {
-			return base;
-		} else if (base.getWidth() == 1) {
-			if (base == Value.UNKNOWN)
-				return pullTo;
-			else
-				return base;
-		} else {
-			Value[] ret = base.getAll();
-			for (int i = 0; i < ret.length; i++) {
-				if (ret[i] == Value.UNKNOWN)
-					ret[i] = pullTo;
+	BitWidth getWidth(Location q) {
+		BitWidth det = points.getWidth(q);
+		if (det != BitWidth.UNKNOWN)
+			return det;
+
+		BundleMap bmap = getBundleMap();
+		if (!bmap.isValid())
+			return BitWidth.UNKNOWN;
+		WireBundle qb = bmap.getBundleAt(q);
+		if (qb != null && qb.isValid())
+			return qb.getWidth();
+
+		return BitWidth.UNKNOWN;
+	}
+
+	Location getWidthDeterminant(Location q) {
+		BitWidth det = points.getWidth(q);
+		if (det != BitWidth.UNKNOWN)
+			return q;
+
+		WireBundle qb = getBundleMap().getBundleAt(q);
+		if (qb != null && qb.isValid())
+			return qb.getWidthDeterminant();
+
+		return q;
+	}
+
+	Set<WidthIncompatibilityData> getWidthIncompatibilityData() {
+		return getBundleMap().getWidthIncompatibilityData();
+	}
+
+	Bounds getWireBounds() {
+		Bounds bds = bounds;
+		if (bds == Bounds.EMPTY_BOUNDS) {
+			bds = recomputeBounds();
+		}
+		return bds;
+	}
+
+	WireBundle getWireBundle(Location query) {
+		BundleMap bmap = getBundleMap();
+		return bmap.getBundleAt(query);
+	}
+
+	Set<Wire> getWires() {
+		return wires;
+	}
+
+	WireSet getWireSet(Wire start) {
+		WireBundle bundle = getWireBundle(start.e0);
+		if (bundle == null)
+			return WireSet.EMPTY;
+		HashSet<Wire> wires = new HashSet<Wire>();
+		for (Location loc : bundle.points) {
+			wires.addAll(points.getWires(loc));
+		}
+		return new WireSet(wires);
+	}
+
+	//
+	// query methods
+	//
+	boolean isMapVoided() {
+		return bundleMap == null;
+	}
+
+	//
+	// utility methods
+	//
+	void propagate(CircuitState circState, Set<Location> points) {
+		BundleMap map = getBundleMap();
+		SmallSet<WireThread> dirtyThreads = new SmallSet<WireThread>(); // affected
+																		// threads
+
+		// get state, or create a new one if current state is outdated
+		State s = circState.getWireData();
+		if (s == null || s.bundleMap != map) {
+			// if it is outdated, we need to compute for all threads
+			s = new State(map);
+			for (WireBundle b : map.getBundles()) {
+				WireThread[] th = b.threads;
+				if (b.isValid() && th != null) {
+					for (WireThread t : th) {
+						dirtyThreads.add(t);
+					}
+				}
 			}
-			return Value.create(ret);
+			circState.setWireData(s);
+		}
+
+		// determine affected threads, and set values for unwired points
+		for (Location p : points) {
+			WireBundle pb = map.getBundleAt(p);
+			if (pb == null) { // point is not wired
+				circState.setValueByWire(p, circState.getComponentOutputAt(p));
+			} else {
+				WireThread[] th = pb.threads;
+				if (!pb.isValid() || th == null) {
+					// immediately propagate NILs across invalid bundles
+					SmallSet<Location> pbPoints = pb.points;
+					if (pbPoints == null) {
+						circState.setValueByWire(p, Value.NIL);
+					} else {
+						for (Location loc2 : pbPoints) {
+							circState.setValueByWire(loc2, Value.NIL);
+						}
+					}
+				} else {
+					for (WireThread t : th) {
+						dirtyThreads.add(t);
+					}
+				}
+			}
+		}
+
+		if (dirtyThreads.isEmpty())
+			return;
+
+		// determine values of affected threads
+		HashSet<ThreadBundle> bundles = new HashSet<ThreadBundle>();
+		for (WireThread t : dirtyThreads) {
+			Value v = getThreadValue(circState, t);
+			s.thr_values.put(t, v);
+			bundles.addAll(t.getBundles());
+		}
+
+		// now propagate values through circuit
+		for (ThreadBundle tb : bundles) {
+			WireBundle b = tb.b;
+
+			Value bv = null;
+			if (!b.isValid() || b.threads == null) {
+				; // do nothing
+			} else if (b.threads.length == 1) {
+				bv = s.thr_values.get(b.threads[0]);
+			} else {
+				Value[] tvs = new Value[b.threads.length];
+				boolean tvs_valid = true;
+				for (int i = 0; i < tvs.length; i++) {
+					Value tv = s.thr_values.get(b.threads[i]);
+					if (tv == null) {
+						tvs_valid = false;
+						break;
+					}
+					tvs[i] = tv;
+				}
+				if (tvs_valid)
+					bv = Value.create(tvs);
+			}
+
+			if (bv != null) {
+				for (Location p : b.points) {
+					circState.setValueByWire(p, bv);
+				}
+			}
 		}
 	}
 
@@ -847,5 +796,56 @@ class CircuitWires {
 		Bounds bds = Bounds.create(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 		bounds = bds;
 		return bds;
+	}
+
+	void remove(Component comp) {
+		if (comp instanceof Wire) {
+			removeWire((Wire) comp);
+		} else if (comp instanceof Splitter) {
+			splitters.remove(comp);
+		} else {
+			Object factory = comp.getFactory();
+			if (factory instanceof Tunnel) {
+				tunnels.remove(comp);
+				comp.getAttributeSet().removeAttributeListener(tunnelListener);
+			} else if (factory instanceof PullResistor) {
+				pulls.remove(comp);
+				comp.getAttributeSet().removeAttributeListener(tunnelListener);
+			}
+		}
+		points.remove(comp);
+		voidBundleMap();
+	}
+
+	void remove(Component comp, EndData end) {
+		points.remove(comp, end);
+		voidBundleMap();
+	}
+
+	private void removeWire(Wire w) {
+		boolean removed = wires.remove(w);
+		if (!removed)
+			return;
+
+		if (bounds != Bounds.EMPTY_BOUNDS) {
+			// bounds is valid - invalidate if endpoint on border
+			Bounds smaller = bounds.expand(-2);
+			if (!smaller.contains(w.e0) || !smaller.contains(w.e1)) {
+				bounds = Bounds.EMPTY_BOUNDS;
+			}
+		}
+	}
+
+	void replace(Component comp, EndData oldEnd, EndData newEnd) {
+		points.remove(comp, oldEnd);
+		points.add(comp, newEnd);
+		voidBundleMap();
+	}
+
+	//
+	// helper methods
+	//
+	private void voidBundleMap() {
+		bundleMap = null;
 	}
 }

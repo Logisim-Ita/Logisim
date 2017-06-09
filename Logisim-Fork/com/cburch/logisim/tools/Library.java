@@ -10,31 +10,42 @@ import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.util.ListUtil;
 
 public abstract class Library {
-	public String getName() {
-		return getClass().getName();
+	public boolean contains(ComponentFactory query) {
+		return indexOf(query) >= 0;
 	}
 
-	public abstract List<? extends Tool> getTools();
-
-	@Override
-	public String toString() {
-		return getName();
+	public boolean containsFromSource(Tool query) {
+		for (Tool tool : getTools()) {
+			if (tool.sharesSource(query)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public String getDisplayName() {
 		return getName();
 	}
 
-	public boolean isDirty() {
-		return false;
+	public List<?> getElements() {
+		return ListUtil.joinImmutableLists(getTools(), getLibraries());
 	}
 
 	public List<Library> getLibraries() {
 		return Collections.emptyList();
 	}
 
-	public List<?> getElements() {
-		return ListUtil.joinImmutableLists(getTools(), getLibraries());
+	public Library getLibrary(String name) {
+		for (Library lib : getLibraries()) {
+			if (lib.getName().equals(name)) {
+				return lib;
+			}
+		}
+		return null;
+	}
+
+	public String getName() {
+		return getClass().getName();
 	}
 
 	public Tool getTool(String name) {
@@ -46,14 +57,7 @@ public abstract class Library {
 		return null;
 	}
 
-	public boolean containsFromSource(Tool query) {
-		for (Tool tool : getTools()) {
-			if (tool.sharesSource(query)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	public abstract List<? extends Tool> getTools();
 
 	public int indexOf(ComponentFactory query) {
 		int index = -1;
@@ -68,17 +72,13 @@ public abstract class Library {
 		return -1;
 	}
 
-	public boolean contains(ComponentFactory query) {
-		return indexOf(query) >= 0;
+	public boolean isDirty() {
+		return false;
 	}
 
-	public Library getLibrary(String name) {
-		for (Library lib : getLibraries()) {
-			if (lib.getName().equals(name)) {
-				return lib;
-			}
-		}
-		return null;
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

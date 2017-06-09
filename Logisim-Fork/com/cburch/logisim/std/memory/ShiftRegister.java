@@ -52,28 +52,9 @@ public class ShiftRegister extends InstanceFactory {
 	}
 
 	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Object parallel = attrs.getValue(ATTR_LOAD);
-		if (parallel == null || ((Boolean) parallel).booleanValue()) {
-			int len = attrs.getValue(ATTR_LENGTH).intValue();
-			return Bounds.create(0, -20, 20 + 10 * len, 40);
-		} else {
-			return Bounds.create(0, -20, 30, 40);
-		}
-	}
-
-	@Override
 	protected void configureNewInstance(Instance instance) {
 		configurePorts(instance);
 		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH) {
-			instance.recomputeBounds();
-			configurePorts(instance);
-		}
 	}
 
 	private void configurePorts(Instance instance) {
@@ -126,31 +107,21 @@ public class ShiftRegister extends InstanceFactory {
 	}
 
 	@Override
-	public void propagate(InstanceState state) {
-		Object triggerType = state.getAttributeValue(StdAttr.EDGE_TRIGGER);
-		boolean parallel = state.getAttributeValue(ATTR_LOAD).booleanValue();
-		ShiftRegisterData data = getData(state);
-		int len = data.getLength();
-
-		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
-		if (state.getPort(CLR) == Value.TRUE) {
-			data.clear();
-		} else if (triggered) {
-			if (parallel && state.getPort(LD) == Value.TRUE) {
-				data.clear();
-				for (int i = len - 1; i >= 0; i--) {
-					data.push(state.getPort(6 + 2 * i));
-				}
-			} else if (state.getPort(SH) != Value.FALSE) {
-				data.push(state.getPort(IN));
-			}
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Object parallel = attrs.getValue(ATTR_LOAD);
+		if (parallel == null || ((Boolean) parallel).booleanValue()) {
+			int len = attrs.getValue(ATTR_LENGTH).intValue();
+			return Bounds.create(0, -20, 20 + 10 * len, 40);
+		} else {
+			return Bounds.create(0, -20, 30, 40);
 		}
+	}
 
-		state.setPort(OUT, data.get(0), 4);
-		if (parallel) {
-			for (int i = 0; i < len; i++) {
-				state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
-			}
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH) {
+			instance.recomputeBounds();
+			configurePorts(instance);
 		}
 	}
 
@@ -209,5 +180,34 @@ public class ShiftRegister extends InstanceFactory {
 				painter.drawPort(i);
 		}
 		painter.drawClock(CK, Direction.EAST);
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		Object triggerType = state.getAttributeValue(StdAttr.EDGE_TRIGGER);
+		boolean parallel = state.getAttributeValue(ATTR_LOAD).booleanValue();
+		ShiftRegisterData data = getData(state);
+		int len = data.getLength();
+
+		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
+		if (state.getPort(CLR) == Value.TRUE) {
+			data.clear();
+		} else if (triggered) {
+			if (parallel && state.getPort(LD) == Value.TRUE) {
+				data.clear();
+				for (int i = len - 1; i >= 0; i--) {
+					data.push(state.getPort(6 + 2 * i));
+				}
+			} else if (state.getPort(SH) != Value.FALSE) {
+				data.push(state.getPort(IN));
+			}
+		}
+
+		state.setPort(OUT, data.get(0), 4);
+		if (parallel) {
+			for (int i = 0; i < len; i++) {
+				state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
+			}
+		}
 	}
 }

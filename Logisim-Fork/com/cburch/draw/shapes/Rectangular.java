@@ -21,35 +21,46 @@ abstract class Rectangular extends FillableCanvasObject {
 	}
 
 	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof Rectangular) {
-			Rectangular that = (Rectangular) other;
-			return this.bounds.equals(that.bounds) && super.matches(that);
+	public boolean canMoveHandle(Handle handle) {
+		return true;
+	}
+
+	protected abstract boolean contains(int x, int y, int w, int h, Location q);
+
+	@Override
+	public boolean contains(Location loc, boolean assumeFilled) {
+		Object type = getPaintType();
+		if (assumeFilled && type == DrawAttr.PAINT_STROKE) {
+			type = DrawAttr.PAINT_STROKE_FILL;
+		}
+		Bounds b = bounds;
+		int x = b.getX();
+		int y = b.getY();
+		int w = b.getWidth();
+		int h = b.getHeight();
+		int qx = loc.getX();
+		int qy = loc.getY();
+		if (type == DrawAttr.PAINT_FILL) {
+			return isInRect(qx, qy, x, y, w, h) && contains(x, y, w, h, loc);
+		} else if (type == DrawAttr.PAINT_STROKE) {
+			int stroke = getStrokeWidth();
+			int tol2 = Math.max(2 * Line.ON_LINE_THRESH, stroke);
+			int tol = tol2 / 2;
+			return isInRect(qx, qy, x - tol, y - tol, w + tol2, h + tol2)
+					&& contains(x - tol, y - tol, w + tol2, h + tol2, loc)
+					&& !contains(x + tol, y + tol, w - tol2, h - tol2, loc);
+		} else if (type == DrawAttr.PAINT_STROKE_FILL) {
+			int stroke = getStrokeWidth();
+			int tol2 = stroke;
+			int tol = tol2 / 2;
+			return isInRect(qx, qy, x - tol, y - tol, w + tol2, h + tol2)
+					&& contains(x - tol, y - tol, w + tol2, h + tol2, loc);
 		} else {
 			return false;
 		}
 	}
 
-	@Override
-	public int matchesHashCode() {
-		return bounds.hashCode() * 31 + super.matchesHashCode();
-	}
-
-	public int getX() {
-		return bounds.getX();
-	}
-
-	public int getY() {
-		return bounds.getY();
-	}
-
-	public int getWidth() {
-		return bounds.getWidth();
-	}
-
-	public int getHeight() {
-		return bounds.getHeight();
-	}
+	protected abstract void draw(Graphics g, int x, int y, int w, int h);
 
 	@Override
 	public Bounds getBounds() {
@@ -60,16 +71,6 @@ abstract class Rectangular extends FillableCanvasObject {
 		} else {
 			return bounds.expand(wid / 2);
 		}
-	}
-
-	@Override
-	public void translate(int dx, int dy) {
-		bounds = bounds.translate(dx, dy);
-	}
-
-	@Override
-	public List<Handle> getHandles(HandleGesture gesture) {
-		return UnmodifiableList.create(getHandleArray(gesture));
 	}
 
 	private Handle[] getHandleArray(HandleGesture gesture) {
@@ -151,8 +152,43 @@ abstract class Rectangular extends FillableCanvasObject {
 	}
 
 	@Override
-	public boolean canMoveHandle(Handle handle) {
-		return true;
+	public List<Handle> getHandles(HandleGesture gesture) {
+		return UnmodifiableList.create(getHandleArray(gesture));
+	}
+
+	public int getHeight() {
+		return bounds.getHeight();
+	}
+
+	public int getWidth() {
+		return bounds.getWidth();
+	}
+
+	public int getX() {
+		return bounds.getX();
+	}
+
+	public int getY() {
+		return bounds.getY();
+	}
+
+	boolean isInRect(int qx, int qy, int x0, int y0, int w, int h) {
+		return qx >= x0 && qx < x0 + w && qy >= y0 && qy < y0 + h;
+	}
+
+	@Override
+	public boolean matches(CanvasObject other) {
+		if (other instanceof Rectangular) {
+			Rectangular that = (Rectangular) other;
+			return this.bounds.equals(that.bounds) && super.matches(that);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		return bounds.hashCode() * 31 + super.matchesHashCode();
 	}
 
 	@Override
@@ -215,43 +251,7 @@ abstract class Rectangular extends FillableCanvasObject {
 	}
 
 	@Override
-	public boolean contains(Location loc, boolean assumeFilled) {
-		Object type = getPaintType();
-		if (assumeFilled && type == DrawAttr.PAINT_STROKE) {
-			type = DrawAttr.PAINT_STROKE_FILL;
-		}
-		Bounds b = bounds;
-		int x = b.getX();
-		int y = b.getY();
-		int w = b.getWidth();
-		int h = b.getHeight();
-		int qx = loc.getX();
-		int qy = loc.getY();
-		if (type == DrawAttr.PAINT_FILL) {
-			return isInRect(qx, qy, x, y, w, h) && contains(x, y, w, h, loc);
-		} else if (type == DrawAttr.PAINT_STROKE) {
-			int stroke = getStrokeWidth();
-			int tol2 = Math.max(2 * Line.ON_LINE_THRESH, stroke);
-			int tol = tol2 / 2;
-			return isInRect(qx, qy, x - tol, y - tol, w + tol2, h + tol2)
-					&& contains(x - tol, y - tol, w + tol2, h + tol2, loc)
-					&& !contains(x + tol, y + tol, w - tol2, h - tol2, loc);
-		} else if (type == DrawAttr.PAINT_STROKE_FILL) {
-			int stroke = getStrokeWidth();
-			int tol2 = stroke;
-			int tol = tol2 / 2;
-			return isInRect(qx, qy, x - tol, y - tol, w + tol2, h + tol2)
-					&& contains(x - tol, y - tol, w + tol2, h + tol2, loc);
-		} else {
-			return false;
-		}
+	public void translate(int dx, int dy) {
+		bounds = bounds.translate(dx, dy);
 	}
-
-	boolean isInRect(int qx, int qy, int x0, int y0, int w, int h) {
-		return qx >= x0 && qx < x0 + w && qy >= y0 && qy < y0 + h;
-	}
-
-	protected abstract boolean contains(int x, int y, int w, int h, Location q);
-
-	protected abstract void draw(Graphics g, int x, int y, int w, int h);
 }

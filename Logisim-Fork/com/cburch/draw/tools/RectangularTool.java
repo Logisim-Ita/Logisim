@@ -29,80 +29,6 @@ abstract class RectangularTool extends AbstractTool {
 		currentBounds = Bounds.EMPTY_BOUNDS;
 	}
 
-	public abstract CanvasObject createShape(int x, int y, int w, int h);
-
-	public abstract void drawShape(Graphics g, int x, int y, int w, int h);
-
-	public abstract void fillShape(Graphics g, int x, int y, int w, int h);
-
-	@Override
-	public Cursor getCursor(Canvas canvas) {
-		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-	}
-
-	@Override
-	public void toolDeselected(Canvas canvas) {
-		Bounds bds = currentBounds;
-		active = false;
-		repaintArea(canvas, bds);
-	}
-
-	@Override
-	public void mousePressed(Canvas canvas, MouseEvent e) {
-		Location loc = Location.create(e.getX(), e.getY());
-		Bounds bds = Bounds.create(loc);
-		dragStart = loc;
-		lastMouseX = loc.getX();
-		lastMouseY = loc.getY();
-		active = canvas.getModel() != null;
-		repaintArea(canvas, bds);
-	}
-
-	@Override
-	public void mouseDragged(Canvas canvas, MouseEvent e) {
-		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
-	}
-
-	@Override
-	public void mouseReleased(Canvas canvas, MouseEvent e) {
-		if (active) {
-			Bounds oldBounds = currentBounds;
-			Bounds bds = computeBounds(canvas, e.getX(), e.getY(), e.getModifiersEx());
-			currentBounds = Bounds.EMPTY_BOUNDS;
-			active = false;
-			CanvasObject add = null;
-			if (bds.getWidth() != 0 && bds.getHeight() != 0) {
-				CanvasModel model = canvas.getModel();
-				add = createShape(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
-				canvas.doAction(new ModelAddAction(model, add));
-				repaintArea(canvas, oldBounds.add(bds));
-			}
-			canvas.toolGestureComplete(this, add);
-		}
-	}
-
-	@Override
-	public void keyPressed(Canvas canvas, KeyEvent e) {
-		int code = e.getKeyCode();
-		if (active && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_ALT || code == KeyEvent.VK_CONTROL)) {
-			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
-		}
-	}
-
-	@Override
-	public void keyReleased(Canvas canvas, KeyEvent e) {
-		keyPressed(canvas, e);
-	}
-
-	private void updateMouse(Canvas canvas, int mx, int my, int mods) {
-		Bounds oldBounds = currentBounds;
-		Bounds bds = computeBounds(canvas, mx, my, mods);
-		if (!bds.equals(oldBounds)) {
-			currentBounds = bds;
-			repaintArea(canvas, oldBounds.add(bds));
-		}
-	}
-
 	private Bounds computeBounds(Canvas canvas, int mx, int my, int mods) {
 		lastMouseX = mx;
 		lastMouseY = my;
@@ -163,6 +89,73 @@ abstract class RectangularTool extends AbstractTool {
 		}
 	}
 
+	public abstract CanvasObject createShape(int x, int y, int w, int h);
+
+	@Override
+	public void draw(Canvas canvas, Graphics g) {
+		Bounds bds = currentBounds;
+		if (active && bds != null && bds != Bounds.EMPTY_BOUNDS) {
+			g.setColor(Color.GRAY);
+			drawShape(g, bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
+		}
+	}
+
+	public abstract void drawShape(Graphics g, int x, int y, int w, int h);
+
+	public abstract void fillShape(Graphics g, int x, int y, int w, int h);
+
+	@Override
+	public Cursor getCursor(Canvas canvas) {
+		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+	}
+
+	@Override
+	public void keyPressed(Canvas canvas, KeyEvent e) {
+		int code = e.getKeyCode();
+		if (active && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_ALT || code == KeyEvent.VK_CONTROL)) {
+			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
+		}
+	}
+
+	@Override
+	public void keyReleased(Canvas canvas, KeyEvent e) {
+		keyPressed(canvas, e);
+	}
+
+	@Override
+	public void mouseDragged(Canvas canvas, MouseEvent e) {
+		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
+	}
+
+	@Override
+	public void mousePressed(Canvas canvas, MouseEvent e) {
+		Location loc = Location.create(e.getX(), e.getY());
+		Bounds bds = Bounds.create(loc);
+		dragStart = loc;
+		lastMouseX = loc.getX();
+		lastMouseY = loc.getY();
+		active = canvas.getModel() != null;
+		repaintArea(canvas, bds);
+	}
+
+	@Override
+	public void mouseReleased(Canvas canvas, MouseEvent e) {
+		if (active) {
+			Bounds oldBounds = currentBounds;
+			Bounds bds = computeBounds(canvas, e.getX(), e.getY(), e.getModifiersEx());
+			currentBounds = Bounds.EMPTY_BOUNDS;
+			active = false;
+			CanvasObject add = null;
+			if (bds.getWidth() != 0 && bds.getHeight() != 0) {
+				CanvasModel model = canvas.getModel();
+				add = createShape(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
+				canvas.doAction(new ModelAddAction(model, add));
+				repaintArea(canvas, oldBounds.add(bds));
+			}
+			canvas.toolGestureComplete(this, add);
+		}
+	}
+
 	private void repaintArea(Canvas canvas, Bounds bds) {
 		canvas.repaint();
 		/*
@@ -174,11 +167,18 @@ abstract class RectangularTool extends AbstractTool {
 	}
 
 	@Override
-	public void draw(Canvas canvas, Graphics g) {
+	public void toolDeselected(Canvas canvas) {
 		Bounds bds = currentBounds;
-		if (active && bds != null && bds != Bounds.EMPTY_BOUNDS) {
-			g.setColor(Color.GRAY);
-			drawShape(g, bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
+		active = false;
+		repaintArea(canvas, bds);
+	}
+
+	private void updateMouse(Canvas canvas, int mx, int my, int mods) {
+		Bounds oldBounds = currentBounds;
+		Bounds bds = computeBounds(canvas, mx, my, mods);
+		if (!bds.equals(oldBounds)) {
+			currentBounds = bds;
+			repaintArea(canvas, oldBounds.add(bds));
 		}
 	}
 

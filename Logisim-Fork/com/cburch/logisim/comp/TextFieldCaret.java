@@ -47,13 +47,14 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	}
 
 	@Override
-	public void removeCaretListener(CaretListener l) {
-		listeners.remove(l);
-	}
-
-	@Override
-	public String getText() {
-		return curText;
+	public void cancelEditing() {
+		CaretEvent e = new CaretEvent(this, oldText, oldText);
+		curText = oldText;
+		pos = curText.length();
+		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
+			l.editingCanceled(e);
+		}
+		field.removeTextFieldListener(this);
 	}
 
 	@Override
@@ -154,41 +155,8 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	}
 
 	@Override
-	public void cancelEditing() {
-		CaretEvent e = new CaretEvent(this, oldText, oldText);
-		curText = oldText;
-		pos = curText.length();
-		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
-			l.editingCanceled(e);
-		}
-		field.removeTextFieldListener(this);
-	}
-
-	@Override
-	public void stopEditing() {
-		CaretEvent e = new CaretEvent(this, oldText, curText);
-		field.setText(curText);
-		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
-			l.editingStopped(e);
-		}
-		field.removeTextFieldListener(this);
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO: enhance label editing
-		moveCaret(e.getX(), e.getY());
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// TODO: enhance label editing
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO: enhance label editing
-		moveCaret(e.getX(), e.getY());
+	public String getText() {
+		return curText;
 	}
 
 	@Override
@@ -269,6 +237,23 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		}
 	}
 
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO: enhance label editing
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO: enhance label editing
+		moveCaret(e.getX(), e.getY());
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO: enhance label editing
+		moveCaret(e.getX(), e.getY());
+	}
+
 	private void moveCaret(int x, int y) {
 		Bounds bds = getBounds(g);
 		FontMetrics fm = g.getFontMetrics();
@@ -283,6 +268,21 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			last = cur;
 		}
 		pos = curText.length();
+	}
+
+	@Override
+	public void removeCaretListener(CaretListener l) {
+		listeners.remove(l);
+	}
+
+	@Override
+	public void stopEditing() {
+		CaretEvent e = new CaretEvent(this, oldText, curText);
+		field.setText(curText);
+		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
+			l.editingStopped(e);
+		}
+		field.removeTextFieldListener(this);
 	}
 
 	@Override

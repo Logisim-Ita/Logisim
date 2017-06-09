@@ -1,6 +1,8 @@
 package com.cburch.logisim;
 
 public class LogisimVersion {
+	public static final int FINAL_REVISION = Integer.MAX_VALUE / 4;
+
 	/**
 	 * Create a new version object for the current Logisim instance (the
 	 * constructor is private) where the revision number is set to its default
@@ -70,8 +72,6 @@ public class LogisimVersion {
 		}
 		return (new LogisimVersion(major, minor, release, revision, variant));
 	}
-
-	public static final int FINAL_REVISION = Integer.MAX_VALUE / 4;
 	private int major;
 
 	private int minor;

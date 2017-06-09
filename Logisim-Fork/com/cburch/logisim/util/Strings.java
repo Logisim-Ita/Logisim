@@ -6,12 +6,12 @@ package com.cburch.logisim.util;
 class Strings {
 	static LocaleManager source = new LocaleManager("resources/logisim", "util");
 
-	public static LocaleManager getLocaleManager() {
-		return source;
-	}
-
 	public static String get(String key) {
 		return source.get(key);
+	}
+
+	public static LocaleManager getLocaleManager() {
+		return source;
 	}
 
 	public static StringGetter getter(String key) {

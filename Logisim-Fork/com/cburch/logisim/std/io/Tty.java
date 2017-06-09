@@ -40,6 +40,20 @@ public class Tty extends InstanceFactory {
 	private static final Attribute<Integer> ATTR_ROWS = Attributes.forIntegerRange("rows",
 			Strings.getter("ttyRowsAttr"), 1, 48);
 
+	private static int getColumnCount(Object val) {
+		if (val instanceof Integer)
+			return ((Integer) val).intValue();
+		else
+			return 16;
+	}
+
+	private static int getRowCount(Object val) {
+		if (val instanceof Integer)
+			return ((Integer) val).intValue();
+		else
+			return 4;
+	}
+
 	public Tty() {
 		super("TTY", Strings.getter("ttyComponent"));
 		setAttributes(
@@ -61,6 +75,11 @@ public class Tty extends InstanceFactory {
 	}
 
 	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+	}
+
+	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		int rows = getRowCount(attrs.getValue(ATTR_ROWS));
 		int cols = getColumnCount(attrs.getValue(ATTR_COLUMNS));
@@ -73,41 +92,23 @@ public class Tty extends InstanceFactory {
 		return Bounds.create(0, 10 - height, width, height);
 	}
 
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
+	private TtyState getTtyState(InstanceState state) {
+		int rows = getRowCount(state.getAttributeValue(ATTR_ROWS));
+		int cols = getColumnCount(state.getAttributeValue(ATTR_COLUMNS));
+		TtyState ret = (TtyState) state.getData();
+		if (ret == null) {
+			ret = new TtyState(rows, cols);
+			state.setData(ret);
+		} else {
+			ret.updateSize(rows, cols);
+		}
+		return ret;
 	}
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == ATTR_ROWS || attr == ATTR_COLUMNS) {
 			instance.recomputeBounds();
-		}
-	}
-
-	@Override
-	public void propagate(InstanceState circState) {
-		Object trigger = circState.getAttributeValue(StdAttr.EDGE_TRIGGER);
-		TtyState state = getTtyState(circState);
-		Value clear = circState.getPort(CLR);
-		Value clock = circState.getPort(CK);
-		Value enable = circState.getPort(WE);
-		Value in = circState.getPort(IN);
-
-		synchronized (state) {
-			Value lastClock = state.setLastClock(clock);
-			if (clear == Value.TRUE) {
-				state.clear();
-			} else if (enable != Value.FALSE) {
-				boolean go;
-				if (trigger == StdAttr.TRIG_FALLING) {
-					go = lastClock == Value.TRUE && clock == Value.FALSE;
-				} else {
-					go = lastClock == Value.FALSE && clock == Value.TRUE;
-				}
-				if (go)
-					state.add(in.isFullyDefined() ? (char) in.toIntValue() : '?');
-			}
 		}
 	}
 
@@ -180,35 +181,34 @@ public class Tty extends InstanceFactory {
 		}
 	}
 
-	private TtyState getTtyState(InstanceState state) {
-		int rows = getRowCount(state.getAttributeValue(ATTR_ROWS));
-		int cols = getColumnCount(state.getAttributeValue(ATTR_COLUMNS));
-		TtyState ret = (TtyState) state.getData();
-		if (ret == null) {
-			ret = new TtyState(rows, cols);
-			state.setData(ret);
-		} else {
-			ret.updateSize(rows, cols);
+	@Override
+	public void propagate(InstanceState circState) {
+		Object trigger = circState.getAttributeValue(StdAttr.EDGE_TRIGGER);
+		TtyState state = getTtyState(circState);
+		Value clear = circState.getPort(CLR);
+		Value clock = circState.getPort(CK);
+		Value enable = circState.getPort(WE);
+		Value in = circState.getPort(IN);
+
+		synchronized (state) {
+			Value lastClock = state.setLastClock(clock);
+			if (clear == Value.TRUE) {
+				state.clear();
+			} else if (enable != Value.FALSE) {
+				boolean go;
+				if (trigger == StdAttr.TRIG_FALLING) {
+					go = lastClock == Value.TRUE && clock == Value.FALSE;
+				} else {
+					go = lastClock == Value.FALSE && clock == Value.TRUE;
+				}
+				if (go)
+					state.add(in.isFullyDefined() ? (char) in.toIntValue() : '?');
+			}
 		}
-		return ret;
 	}
 
 	public void sendToStdout(InstanceState state) {
 		TtyState tty = getTtyState(state);
 		tty.setSendStdout(true);
-	}
-
-	private static int getRowCount(Object val) {
-		if (val instanceof Integer)
-			return ((Integer) val).intValue();
-		else
-			return 4;
-	}
-
-	private static int getColumnCount(Object val) {
-		if (val instanceof Integer)
-			return ((Integer) val).intValue();
-		else
-			return 16;
 	}
 }

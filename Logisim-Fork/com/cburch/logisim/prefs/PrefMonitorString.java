@@ -7,7 +7,11 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.Preferences;
 
 class PrefMonitorString extends AbstractPrefMonitor<String> {
+	private static boolean isSame(String a, String b) {
+		return a == null ? b == null : a.equals(b);
+	}
 	private String dflt;
+
 	private String value;
 
 	PrefMonitorString(String name, String dflt) {
@@ -21,15 +25,6 @@ class PrefMonitorString extends AbstractPrefMonitor<String> {
 	@Override
 	public String get() {
 		return value;
-	}
-
-	@Override
-	public void set(String newValue) {
-		String oldValue = value;
-		if (!isSame(oldValue, newValue)) {
-			value = newValue;
-			AppPreferences.getPrefs().put(getIdentifier(), newValue);
-		}
 	}
 
 	@Override
@@ -47,7 +42,12 @@ class PrefMonitorString extends AbstractPrefMonitor<String> {
 		}
 	}
 
-	private static boolean isSame(String a, String b) {
-		return a == null ? b == null : a.equals(b);
+	@Override
+	public void set(String newValue) {
+		String oldValue = value;
+		if (!isSame(oldValue, newValue)) {
+			value = newValue;
+			AppPreferences.getPrefs().put(getIdentifier(), newValue);
+		}
 	}
 }

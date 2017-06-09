@@ -46,8 +46,21 @@ public class CurveTool extends AbstractTool {
 	}
 
 	@Override
-	public Icon getIcon() {
-		return Icons.getIcon("drawcurv.gif");
+	public void draw(Canvas canvas, Graphics g) {
+		g.setColor(Color.GRAY);
+		switch (state) {
+		case ENDPOINT_DRAG:
+			g.drawLine(end0.getX(), end0.getY(), end1.getX(), end1.getY());
+			break;
+		case CONTROL_DRAG:
+			((Graphics2D) g).draw(curCurve.getCurve2D());
+			break;
+		}
+	}
+
+	@Override
+	public List<Attribute<?>> getAttributes() {
+		return DrawAttr.getFillAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
 	}
 
 	@Override
@@ -56,8 +69,37 @@ public class CurveTool extends AbstractTool {
 	}
 
 	@Override
-	public void toolDeselected(Canvas canvas) {
-		state = BEFORE_CREATION;
+	public Icon getIcon() {
+		return Icons.getIcon("drawcurv.gif");
+	}
+
+	@Override
+	public void keyPressed(Canvas canvas, KeyEvent e) {
+		int code = e.getKeyCode();
+		if (mouseDown && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_ALT)) {
+			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
+			repaintArea(canvas);
+		}
+	}
+
+	@Override
+	public void keyReleased(Canvas canvas, KeyEvent e) {
+		keyPressed(canvas, e);
+	}
+
+	@Override
+	public void keyTyped(Canvas canvas, KeyEvent e) {
+		char ch = e.getKeyChar();
+		if (ch == '\u001b') { // escape key
+			state = BEFORE_CREATION;
+			repaintArea(canvas);
+			canvas.toolGestureComplete(this, null);
+		}
+	}
+
+	@Override
+	public void mouseDragged(Canvas canvas, MouseEvent e) {
+		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
 		repaintArea(canvas);
 	}
 
@@ -90,12 +132,6 @@ public class CurveTool extends AbstractTool {
 	}
 
 	@Override
-	public void mouseDragged(Canvas canvas, MouseEvent e) {
-		updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
-		repaintArea(canvas);
-	}
-
-	@Override
 	public void mouseReleased(Canvas canvas, MouseEvent e) {
 		Curve c = updateMouse(canvas, e.getX(), e.getY(), e.getModifiersEx());
 		mouseDown = false;
@@ -111,28 +147,14 @@ public class CurveTool extends AbstractTool {
 		repaintArea(canvas);
 	}
 
-	@Override
-	public void keyPressed(Canvas canvas, KeyEvent e) {
-		int code = e.getKeyCode();
-		if (mouseDown && (code == KeyEvent.VK_SHIFT || code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_ALT)) {
-			updateMouse(canvas, lastMouseX, lastMouseY, e.getModifiersEx());
-			repaintArea(canvas);
-		}
+	private void repaintArea(Canvas canvas) {
+		canvas.repaint();
 	}
 
 	@Override
-	public void keyReleased(Canvas canvas, KeyEvent e) {
-		keyPressed(canvas, e);
-	}
-
-	@Override
-	public void keyTyped(Canvas canvas, KeyEvent e) {
-		char ch = e.getKeyChar();
-		if (ch == '\u001b') { // escape key
-			state = BEFORE_CREATION;
-			repaintArea(canvas);
-			canvas.toolGestureComplete(this, null);
-		}
+	public void toolDeselected(Canvas canvas) {
+		state = BEFORE_CREATION;
+		repaintArea(canvas);
 	}
 
 	private Curve updateMouse(Canvas canvas, int mx, int my, int mods) {
@@ -193,27 +215,5 @@ public class CurveTool extends AbstractTool {
 			break;
 		}
 		return ret;
-	}
-
-	private void repaintArea(Canvas canvas) {
-		canvas.repaint();
-	}
-
-	@Override
-	public List<Attribute<?>> getAttributes() {
-		return DrawAttr.getFillAttributes(attrs.getValue(DrawAttr.PAINT_TYPE));
-	}
-
-	@Override
-	public void draw(Canvas canvas, Graphics g) {
-		g.setColor(Color.GRAY);
-		switch (state) {
-		case ENDPOINT_DRAG:
-			g.drawLine(end0.getX(), end0.getY(), end1.getX(), end1.getY());
-			break;
-		case CONTROL_DRAG:
-			((Graphics2D) g).draw(curCurve.getCurve2D());
-			break;
-		}
 	}
 }

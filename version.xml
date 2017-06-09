@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.7.1.11</jar_version>
+  <jar_version>2.7.1.12</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.7.1.11</exe_version>
+  <exe_version>2.7.1.12</exe_version>
   <changelog>
-*I/O->RGB LED
+*Major fixes to RGB LED(copy and paste, paint ghost bug, all leds with the same value etc...)
+*RGB LED with 1bit/color or 8bits/color
   </changelog>
 </logisim>

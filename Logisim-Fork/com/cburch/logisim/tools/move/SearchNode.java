@@ -35,6 +35,44 @@ class SearchNode implements Comparable<SearchNode> {
 		this.prev = prev;
 	}
 
+	@Override
+	public int compareTo(SearchNode o) {
+		int ret = this.heur - o.heur;
+
+		if (ret == 0) {
+			return this.hashCode() - o.hashCode();
+		} else {
+			return ret;
+		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof SearchNode) {
+			SearchNode o = (SearchNode) other;
+			return this.loc.equals(o.loc) && (this.dir == null ? o.dir == null : this.dir.equals(o.dir))
+					&& this.dest.equals(o.dest);
+		} else {
+			return false;
+		}
+	}
+
+	public ConnectionData getConnection() {
+		return conn;
+	}
+
+	public Location getDestination() {
+		return dest;
+	}
+
+	public Direction getDirection() {
+		return dir;
+	}
+
+	public int getDistance() {
+		return dist;
+	}
+
 	private int getHeuristic() {
 		Location cur = loc;
 		Location dst = dest;
@@ -82,6 +120,36 @@ class SearchNode implements Comparable<SearchNode> {
 		return ret;
 	}
 
+	public int getHeuristicValue() {
+		return heur;
+	}
+
+	public Location getLocation() {
+		return loc;
+	}
+
+	public SearchNode getPrevious() {
+		return prev;
+	}
+
+	@Override
+	public int hashCode() {
+		int dirHash = dir == null ? 0 : dir.hashCode();
+		return ((loc.hashCode() * 31) + dirHash) * 31 + dest.hashCode();
+	}
+
+	public boolean isDestination() {
+		return dest.equals(loc);
+	}
+
+	public boolean isExtendingWire() {
+		return extendsWire;
+	}
+
+	public boolean isStart() {
+		return prev == null;
+	}
+
 	public SearchNode next(Direction moveDir, boolean crossing) {
 		int newDist = dist;
 		Direction connDir = conn.getDirection();
@@ -100,74 +168,6 @@ class SearchNode implements Comparable<SearchNode> {
 			return null;
 		} else {
 			return new SearchNode(nextLoc, moveDir, conn, dest, newDist, exWire, this);
-		}
-	}
-
-	public boolean isStart() {
-		return prev == null;
-	}
-
-	public boolean isDestination() {
-		return dest.equals(loc);
-	}
-
-	public SearchNode getPrevious() {
-		return prev;
-	}
-
-	public int getDistance() {
-		return dist;
-	}
-
-	public Location getLocation() {
-		return loc;
-	}
-
-	public Direction getDirection() {
-		return dir;
-	}
-
-	public int getHeuristicValue() {
-		return heur;
-	}
-
-	public Location getDestination() {
-		return dest;
-	}
-
-	public boolean isExtendingWire() {
-		return extendsWire;
-	}
-
-	public ConnectionData getConnection() {
-		return conn;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof SearchNode) {
-			SearchNode o = (SearchNode) other;
-			return this.loc.equals(o.loc) && (this.dir == null ? o.dir == null : this.dir.equals(o.dir))
-					&& this.dest.equals(o.dest);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		int dirHash = dir == null ? 0 : dir.hashCode();
-		return ((loc.hashCode() * 31) + dirHash) * 31 + dest.hashCode();
-	}
-
-	@Override
-	public int compareTo(SearchNode o) {
-		int ret = this.heur - o.heur;
-
-		if (ret == 0) {
-			return this.hashCode() - o.hashCode();
-		} else {
-			return ret;
 		}
 	}
 

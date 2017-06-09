@@ -20,6 +20,10 @@ public class OutputExpressionsEvent {
 		this.data = data;
 	}
 
+	public Object getData() {
+		return data;
+	}
+
 	public AnalyzerModel getModel() {
 		return model;
 	}
@@ -30,9 +34,5 @@ public class OutputExpressionsEvent {
 
 	public String getVariable() {
 		return variable;
-	}
-
-	public Object getData() {
-		return data;
 	}
 }

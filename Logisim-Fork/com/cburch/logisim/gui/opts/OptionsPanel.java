@@ -28,11 +28,15 @@ abstract class OptionsPanel extends JPanel {
 		this.optionsFrame = frame;
 	}
 
-	public abstract String getTitle();
-
 	public abstract String getHelpText();
 
-	public abstract void localeChanged();
+	LogisimFile getLogisimFile() {
+		return optionsFrame.getLogisimFile();
+	}
+
+	Options getOptions() {
+		return optionsFrame.getOptions();
+	}
 
 	OptionsFrame getOptionsFrame() {
 		return optionsFrame;
@@ -42,11 +46,7 @@ abstract class OptionsPanel extends JPanel {
 		return optionsFrame.getProject();
 	}
 
-	LogisimFile getLogisimFile() {
-		return optionsFrame.getLogisimFile();
-	}
+	public abstract String getTitle();
 
-	Options getOptions() {
-		return optionsFrame.getOptions();
-	}
+	public abstract void localeChanged();
 }

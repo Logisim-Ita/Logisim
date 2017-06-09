@@ -54,6 +54,29 @@ public class Comparator extends InstanceFactory {
 		setPorts(ps);
 	}
 
+	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		instance.fireInvalidated();
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		painter.drawBounds();
+		painter.drawPort(IN0);
+		painter.drawPort(IN1);
+		painter.drawPort(GT, ">", Direction.WEST);
+		painter.drawPort(EQ, "=", Direction.WEST);
+		painter.drawPort(LT, "<", Direction.WEST);
+	}
+
 	@Override
 	public void propagate(InstanceState state) {
 		// get attributes
@@ -106,28 +129,5 @@ public class Comparator extends InstanceFactory {
 		state.setPort(GT, gt, delay);
 		state.setPort(EQ, eq, delay);
 		state.setPort(LT, lt, delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		painter.drawBounds();
-		painter.drawPort(IN0);
-		painter.drawPort(IN1);
-		painter.drawPort(GT, ">", Direction.WEST);
-		painter.drawPort(EQ, "=", Direction.WEST);
-		painter.drawPort(LT, "<", Direction.WEST);
-	}
-
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		instance.fireInvalidated();
 	}
 }

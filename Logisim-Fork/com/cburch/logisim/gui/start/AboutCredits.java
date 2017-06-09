@@ -19,17 +19,6 @@ import javax.swing.JComponent;
 import com.cburch.logisim.data.Value;
 
 class AboutCredits extends JComponent {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9079743833961968776L;
-
-	/** Time to spend freezing the credits before after after scrolling */
-	private static final int MILLIS_FREEZE = 2000;
-
-	/** Speed of how quickly the scrolling occurs */
-	private static final int MILLIS_PER_PIXEL = 20;
-
 	private static class CreditsLine {
 		private int y;
 		private int type;
@@ -49,6 +38,17 @@ class AboutCredits extends JComponent {
 			this.imgWidth = imgWidth;
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9079743833961968776L;
+
+	/** Time to spend freezing the credits before after after scrolling */
+	private static final int MILLIS_FREEZE = 2000;
+
+	/** Speed of how quickly the scrolling occurs */
+	private static final int MILLIS_PER_PIXEL = 20;
 
 	private Color[] colorBase;
 	private Paint[] paintSteady;
@@ -128,11 +128,6 @@ class AboutCredits extends JComponent {
 		lines.add(new CreditsLine(1, "Carl Burch"));
 		lines.add(new CreditsLine(2, "Hendrix College"));
 		lines.add(new CreditsLine(1, "www.cburch.com/logisim/"));
-	}
-
-	public void setScroll(int value) {
-		scroll = value;
-		repaint();
 	}
 
 	private Color derive(Color base, int alpha) {
@@ -224,5 +219,10 @@ class AboutCredits extends JComponent {
 				g.drawImage(img, x, top, this);
 			}
 		}
+	}
+
+	public void setScroll(int value) {
+		scroll = value;
+		repaint();
 	}
 }

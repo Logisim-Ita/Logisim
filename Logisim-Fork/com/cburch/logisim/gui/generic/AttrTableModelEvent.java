@@ -16,15 +16,15 @@ public class AttrTableModelEvent {
 		this.index = index;
 	}
 
-	public Object getSource() {
-		return model;
-	}
-
 	public AttrTableModel getModel() {
 		return model;
 	}
 
 	public int getRowIndex() {
 		return index;
+	}
+
+	public Object getSource() {
+		return model;
 	}
 }

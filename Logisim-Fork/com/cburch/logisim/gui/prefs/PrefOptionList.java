@@ -39,6 +39,12 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 		selectOption(pref.get());
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		PrefOption x = (PrefOption) combo.getSelectedItem();
+		pref.set((String) x.getValue());
+	}
+
 	JPanel createJPanel() {
 		JPanel ret = new JPanel();
 		ret.add(label);
@@ -46,23 +52,17 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 		return ret;
 	}
 
-	JLabel getJLabel() {
-		return label;
-	}
-
 	@SuppressWarnings("rawtypes")
 	JComboBox getJComboBox() {
 		return combo;
 	}
 
-	void localeChanged() {
-		label.setText(labelStr.get() + " ");
+	JLabel getJLabel() {
+		return label;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		PrefOption x = (PrefOption) combo.getSelectedItem();
-		pref.set((String) x.getValue());
+	void localeChanged() {
+		label.setText(labelStr.get() + " ");
 	}
 
 	@Override

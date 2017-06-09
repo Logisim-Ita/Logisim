@@ -22,6 +22,30 @@ class AndGate extends AbstractGate {
 	}
 
 	@Override
+	protected Expression computeExpression(Expression[] inputs, int numInputs) {
+		Expression ret = inputs[0];
+		for (int i = 1; i < numInputs; i++) {
+			ret = Expressions.and(ret, inputs[i]);
+		}
+		return ret;
+	}
+
+	@Override
+	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
+		return GateFunctions.computeAnd(inputs, numInputs);
+	}
+
+	@Override
+	protected Value getIdentity() {
+		return Value.TRUE;
+	}
+
+	@Override
+	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
+		PainterDin.paintAnd(painter, width, height, false);
+	}
+
+	@Override
 	protected void paintIconShaped(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		int[] xp = new int[] { 10, 2, 2, 10 };
@@ -33,29 +57,5 @@ class AndGate extends AbstractGate {
 	@Override
 	protected void paintShape(InstancePainter painter, int width, int height) {
 		PainterShaped.paintAnd(painter, width, height);
-	}
-
-	@Override
-	protected void paintDinShape(InstancePainter painter, int width, int height, int inputs) {
-		PainterDin.paintAnd(painter, width, height, false);
-	}
-
-	@Override
-	protected Value computeOutput(Value[] inputs, int numInputs, InstanceState state) {
-		return GateFunctions.computeAnd(inputs, numInputs);
-	}
-
-	@Override
-	protected Expression computeExpression(Expression[] inputs, int numInputs) {
-		Expression ret = inputs[0];
-		for (int i = 1; i < numInputs; i++) {
-			ret = Expressions.and(ret, inputs[i]);
-		}
-		return ret;
-	}
-
-	@Override
-	protected Value getIdentity() {
-		return Value.TRUE;
 	}
 }

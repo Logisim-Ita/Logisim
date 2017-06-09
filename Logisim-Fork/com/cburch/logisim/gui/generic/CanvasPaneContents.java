@@ -9,10 +9,6 @@ import java.awt.Rectangle;
 import javax.swing.Scrollable;
 
 public interface CanvasPaneContents extends Scrollable {
-	public void setCanvasPane(CanvasPane pane);
-
-	public void recomputeSize();
-
 	// from Scrollable
 	@Override
 	public Dimension getPreferredScrollableViewportSize();
@@ -28,4 +24,8 @@ public interface CanvasPaneContents extends Scrollable {
 
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction);
+
+	public void recomputeSize();
+
+	public void setCanvasPane(CanvasPane pane);
 }

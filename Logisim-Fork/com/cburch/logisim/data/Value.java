@@ -27,46 +27,6 @@ public class Value {
 
 	private static final Cache cache = new Cache();
 
-	public static Value create(Value[] values) {
-		if (values.length == 0)
-			return NIL;
-		if (values.length == 1)
-			return values[0];
-		if (values.length > MAX_WIDTH)
-			throw new RuntimeException("Cannot have more than " + MAX_WIDTH + " bits in a value");
-
-		int width = values.length;
-		int value = 0;
-		int unknown = 0;
-		int error = 0;
-		for (int i = 0; i < values.length; i++) {
-			int mask = 1 << i;
-			if (values[i] == TRUE)
-				value |= mask;
-			else if (values[i] == FALSE) /* do nothing */;
-			else if (values[i] == UNKNOWN)
-				unknown |= mask;
-			else if (values[i] == ERROR)
-				error |= mask;
-			else {
-				throw new RuntimeException("unrecognized value " + values[i]);
-			}
-		}
-		return Value.create(width, error, unknown, value);
-	}
-
-	public static Value createKnown(BitWidth bits, int value) {
-		return Value.create(bits.getWidth(), 0, 0, value);
-	}
-
-	public static Value createUnknown(BitWidth bits) {
-		return Value.create(bits.getWidth(), 0, -1, 0);
-	}
-
-	public static Value createError(BitWidth bits) {
-		return Value.create(bits.getWidth(), -1, 0, 0);
-	}
-
 	private static Value create(int width, int error, int unknown, int value) {
 		if (width == 0) {
 			return Value.NIL;
@@ -98,6 +58,46 @@ public class Value {
 		}
 	}
 
+	public static Value create(Value[] values) {
+		if (values.length == 0)
+			return NIL;
+		if (values.length == 1)
+			return values[0];
+		if (values.length > MAX_WIDTH)
+			throw new RuntimeException("Cannot have more than " + MAX_WIDTH + " bits in a value");
+
+		int width = values.length;
+		int value = 0;
+		int unknown = 0;
+		int error = 0;
+		for (int i = 0; i < values.length; i++) {
+			int mask = 1 << i;
+			if (values[i] == TRUE)
+				value |= mask;
+			else if (values[i] == FALSE) /* do nothing */;
+			else if (values[i] == UNKNOWN)
+				unknown |= mask;
+			else if (values[i] == ERROR)
+				error |= mask;
+			else {
+				throw new RuntimeException("unrecognized value " + values[i]);
+			}
+		}
+		return Value.create(width, error, unknown, value);
+	}
+
+	public static Value createError(BitWidth bits) {
+		return Value.create(bits.getWidth(), -1, 0, 0);
+	}
+
+	public static Value createKnown(BitWidth bits, int value) {
+		return Value.create(bits.getWidth(), 0, 0, value);
+	}
+
+	public static Value createUnknown(BitWidth bits) {
+		return Value.create(bits.getWidth(), 0, -1, 0);
+	}
+
 	public static Value repeat(Value base, int bits) {
 		if (base.getWidth() != 1) {
 			throw new IllegalArgumentException("first parameter must be one bit");
@@ -126,8 +126,54 @@ public class Value {
 		this.value = value;
 	}
 
-	public boolean isErrorValue() {
-		return error != 0;
+	public Value and(Value other) {
+		if (other == null)
+			return this;
+		if (this.width == 1 && other.width == 1) {
+			if (this == FALSE || other == FALSE)
+				return FALSE;
+			if (this == TRUE && other == TRUE)
+				return TRUE;
+			return ERROR;
+		} else {
+			int false0 = ~this.value & ~this.error & ~this.unknown;
+			int false1 = ~other.value & ~other.error & ~other.unknown;
+			int falses = false0 | false1;
+			return Value.create(Math.max(this.width, other.width),
+					(this.error | other.error | this.unknown | other.unknown) & ~falses, 0, this.value & other.value);
+		}
+	}
+
+	public Value combine(Value other) {
+		if (other == null)
+			return this;
+		if (this == NIL)
+			return other;
+		if (other == NIL)
+			return this;
+		if (this.width == 1 && other.width == 1) {
+			if (this == other)
+				return this;
+			if (this == UNKNOWN)
+				return other;
+			if (other == UNKNOWN)
+				return this;
+			return ERROR;
+		} else {
+			int disagree = (this.value ^ other.value) & ~(this.unknown | other.unknown);
+			return Value.create(Math.max(this.width, other.width), this.error | other.error | disagree,
+					this.unknown & other.unknown, (this.value & ~this.unknown) | (other.value & ~other.unknown));
+		}
+	}
+
+	@Override
+	public boolean equals(Object other_obj) {
+		if (!(other_obj instanceof Value))
+			return false;
+		Value other = (Value) other_obj;
+		boolean ret = this.width == other.width && this.error == other.error && this.unknown == other.unknown
+				&& this.value == other.value;
+		return ret;
 	}
 
 	public Value extendWidth(int newWidth, Value others) {
@@ -145,6 +191,70 @@ public class Value {
 		}
 	}
 
+	public Value get(int which) {
+		if (which < 0 || which >= width)
+			return ERROR;
+		int mask = 1 << which;
+		if ((error & mask) != 0)
+			return ERROR;
+		else if ((unknown & mask) != 0)
+			return UNKNOWN;
+		else if ((value & mask) != 0)
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	public Value[] getAll() {
+		Value[] ret = new Value[width];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = get(i);
+		}
+		return ret;
+	}
+
+	public BitWidth getBitWidth() {
+		return BitWidth.create(width);
+	}
+
+	public Color getColor() {
+		if (error != 0) {
+			return ERROR_COLOR;
+		} else if (width == 0) {
+			return NIL_COLOR;
+		} else if (width == 1) {
+			if (this == UNKNOWN)
+				return UNKNOWN_COLOR;
+			else if (this == TRUE)
+				return TRUE_COLOR;
+			else
+				return FALSE_COLOR;
+		} else {
+			return MULTI_COLOR;
+		}
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int hashCode() {
+		int ret = width;
+		ret = 31 * ret + error;
+		ret = 31 * ret + unknown;
+		ret = 31 * ret + value;
+		return ret;
+	}
+
+	public boolean isErrorValue() {
+		return error != 0;
+	}
+
+	public boolean isFullyDefined() {
+		return width > 0 && error == 0 && unknown == 0;
+	}
+
 	public boolean isUnknown() {
 		if (width == 32) {
 			return error == 0 && unknown == -1;
@@ -153,8 +263,34 @@ public class Value {
 		}
 	}
 
-	public boolean isFullyDefined() {
-		return width > 0 && error == 0 && unknown == 0;
+	public Value not() {
+		if (width <= 1) {
+			if (this == TRUE)
+				return FALSE;
+			if (this == FALSE)
+				return TRUE;
+			return ERROR;
+		} else {
+			return Value.create(this.width, this.error | this.unknown, 0, ~this.value);
+		}
+	}
+
+	public Value or(Value other) {
+		if (other == null)
+			return this;
+		if (this.width == 1 && other.width == 1) {
+			if (this == TRUE || other == TRUE)
+				return TRUE;
+			if (this == FALSE && other == FALSE)
+				return FALSE;
+			return ERROR;
+		} else {
+			int true0 = this.value & ~this.error & ~this.unknown;
+			int true1 = other.value & ~other.error & ~other.unknown;
+			int trues = true0 | true1;
+			return Value.create(Math.max(this.width, other.width),
+					(this.error | other.error | this.unknown | other.unknown) & ~trues, 0, this.value | other.value);
+		}
 	}
 
 	public Value set(int which, Value val) {
@@ -171,73 +307,34 @@ public class Value {
 		}
 	}
 
-	public Value[] getAll() {
-		Value[] ret = new Value[width];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = get(i);
+	public String toDecimalString(boolean signed) {
+		if (width == 0)
+			return "-";
+		if (isErrorValue())
+			return Strings.get("valueError");
+		if (!isFullyDefined())
+			return Strings.get("valueUnknown");
+
+		int value = toIntValue();
+		if (signed) {
+			if (width < 32 && (value >> (width - 1)) != 0) {
+				value |= (-1) << width;
+			}
+			return "" + value;
+		} else {
+			return "" + (value & 0xFFFFFFFFL);
 		}
-		return ret;
 	}
 
-	public Value get(int which) {
-		if (which < 0 || which >= width)
-			return ERROR;
-		int mask = 1 << which;
-		if ((error & mask) != 0)
-			return ERROR;
-		else if ((unknown & mask) != 0)
-			return UNKNOWN;
-		else if ((value & mask) != 0)
-			return TRUE;
-		else
-			return FALSE;
-	}
-
-	public BitWidth getBitWidth() {
-		return BitWidth.create(width);
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public boolean equals(Object other_obj) {
-		if (!(other_obj instanceof Value))
-			return false;
-		Value other = (Value) other_obj;
-		boolean ret = this.width == other.width && this.error == other.error && this.unknown == other.unknown
-				&& this.value == other.value;
-		return ret;
-	}
-
-	@Override
-	public int hashCode() {
-		int ret = width;
-		ret = 31 * ret + error;
-		ret = 31 * ret + unknown;
-		ret = 31 * ret + value;
-		return ret;
-	}
-
-	public int toIntValue() {
-		if (error != 0)
-			return -1;
-		if (unknown != 0)
-			return -1;
-		return value;
-	}
-
-	@Override
-	public String toString() {
+	public String toDisplayString() {
 		switch (width) {
 		case 0:
 			return "-";
 		case 1:
 			if (error != 0)
-				return "E";
+				return Strings.get("valueErrorSymbol");
 			else if (unknown != 0)
-				return "x";
+				return Strings.get("valueUnknownSymbol");
 			else if (value != 0)
 				return "1";
 			else
@@ -253,35 +350,22 @@ public class Value {
 		}
 	}
 
-	public String toOctalString() {
-		if (width <= 1) {
-			return toString();
-		} else {
-			Value[] vals = getAll();
-			char[] c = new char[(vals.length + 2) / 3];
-			for (int i = 0; i < c.length; i++) {
-				int k = c.length - 1 - i;
-				int frst = 3 * k;
-				int last = Math.min(vals.length, 3 * (k + 1));
-				int v = 0;
-				c[i] = '?';
-				for (int j = last - 1; j >= frst; j--) {
-					if (vals[j] == Value.ERROR) {
-						c[i] = 'E';
-						break;
-					}
-					if (vals[j] == Value.UNKNOWN) {
-						c[i] = 'x';
-						break;
-					}
-					v = 2 * v;
-					if (vals[j] == Value.TRUE)
-						v++;
-				}
-				if (c[i] == '?')
-					c[i] = Character.forDigit(v, 8);
-			}
-			return new String(c);
+	public String toDisplayString(int radix) {
+		switch (radix) {
+		case 2:
+			return toDisplayString();
+		case 8:
+			return toOctalString();
+		case 16:
+			return toHexString();
+		default:
+			if (width == 0)
+				return "-";
+			if (isErrorValue())
+				return Strings.get("valueError");
+			if (!isFullyDefined())
+				return Strings.get("valueUnknown");
+			return Integer.toString(toIntValue(), radix);
 		}
 	}
 
@@ -317,53 +401,56 @@ public class Value {
 		}
 	}
 
-	public String toDecimalString(boolean signed) {
-		if (width == 0)
-			return "-";
-		if (isErrorValue())
-			return Strings.get("valueError");
-		if (!isFullyDefined())
-			return Strings.get("valueUnknown");
+	public int toIntValue() {
+		if (error != 0)
+			return -1;
+		if (unknown != 0)
+			return -1;
+		return value;
+	}
 
-		int value = toIntValue();
-		if (signed) {
-			if (width < 32 && (value >> (width - 1)) != 0) {
-				value |= (-1) << width;
-			}
-			return "" + value;
+	public String toOctalString() {
+		if (width <= 1) {
+			return toString();
 		} else {
-			return "" + (value & 0xFFFFFFFFL);
+			Value[] vals = getAll();
+			char[] c = new char[(vals.length + 2) / 3];
+			for (int i = 0; i < c.length; i++) {
+				int k = c.length - 1 - i;
+				int frst = 3 * k;
+				int last = Math.min(vals.length, 3 * (k + 1));
+				int v = 0;
+				c[i] = '?';
+				for (int j = last - 1; j >= frst; j--) {
+					if (vals[j] == Value.ERROR) {
+						c[i] = 'E';
+						break;
+					}
+					if (vals[j] == Value.UNKNOWN) {
+						c[i] = 'x';
+						break;
+					}
+					v = 2 * v;
+					if (vals[j] == Value.TRUE)
+						v++;
+				}
+				if (c[i] == '?')
+					c[i] = Character.forDigit(v, 8);
+			}
+			return new String(c);
 		}
 	}
 
-	public String toDisplayString(int radix) {
-		switch (radix) {
-		case 2:
-			return toDisplayString();
-		case 8:
-			return toOctalString();
-		case 16:
-			return toHexString();
-		default:
-			if (width == 0)
-				return "-";
-			if (isErrorValue())
-				return Strings.get("valueError");
-			if (!isFullyDefined())
-				return Strings.get("valueUnknown");
-			return Integer.toString(toIntValue(), radix);
-		}
-	}
-
-	public String toDisplayString() {
+	@Override
+	public String toString() {
 		switch (width) {
 		case 0:
 			return "-";
 		case 1:
 			if (error != 0)
-				return Strings.get("valueErrorSymbol");
+				return "E";
 			else if (unknown != 0)
-				return Strings.get("valueUnknownSymbol");
+				return "x";
 			else if (value != 0)
 				return "1";
 			else
@@ -376,64 +463,6 @@ public class Value {
 					ret.append(" ");
 			}
 			return ret.toString();
-		}
-	}
-
-	public Value combine(Value other) {
-		if (other == null)
-			return this;
-		if (this == NIL)
-			return other;
-		if (other == NIL)
-			return this;
-		if (this.width == 1 && other.width == 1) {
-			if (this == other)
-				return this;
-			if (this == UNKNOWN)
-				return other;
-			if (other == UNKNOWN)
-				return this;
-			return ERROR;
-		} else {
-			int disagree = (this.value ^ other.value) & ~(this.unknown | other.unknown);
-			return Value.create(Math.max(this.width, other.width), this.error | other.error | disagree,
-					this.unknown & other.unknown, (this.value & ~this.unknown) | (other.value & ~other.unknown));
-		}
-	}
-
-	public Value and(Value other) {
-		if (other == null)
-			return this;
-		if (this.width == 1 && other.width == 1) {
-			if (this == FALSE || other == FALSE)
-				return FALSE;
-			if (this == TRUE && other == TRUE)
-				return TRUE;
-			return ERROR;
-		} else {
-			int false0 = ~this.value & ~this.error & ~this.unknown;
-			int false1 = ~other.value & ~other.error & ~other.unknown;
-			int falses = false0 | false1;
-			return Value.create(Math.max(this.width, other.width),
-					(this.error | other.error | this.unknown | other.unknown) & ~falses, 0, this.value & other.value);
-		}
-	}
-
-	public Value or(Value other) {
-		if (other == null)
-			return this;
-		if (this.width == 1 && other.width == 1) {
-			if (this == TRUE || other == TRUE)
-				return TRUE;
-			if (this == FALSE && other == FALSE)
-				return FALSE;
-			return ERROR;
-		} else {
-			int true0 = this.value & ~this.error & ~this.unknown;
-			int true1 = other.value & ~other.error & ~other.unknown;
-			int trues = true0 | true1;
-			return Value.create(Math.max(this.width, other.width),
-					(this.error | other.error | this.unknown | other.unknown) & ~trues, 0, this.value | other.value);
 		}
 	}
 
@@ -453,35 +482,6 @@ public class Value {
 		} else {
 			return Value.create(Math.max(this.width, other.width),
 					this.error | other.error | this.unknown | other.unknown, 0, this.value ^ other.value);
-		}
-	}
-
-	public Value not() {
-		if (width <= 1) {
-			if (this == TRUE)
-				return FALSE;
-			if (this == FALSE)
-				return TRUE;
-			return ERROR;
-		} else {
-			return Value.create(this.width, this.error | this.unknown, 0, ~this.value);
-		}
-	}
-
-	public Color getColor() {
-		if (error != 0) {
-			return ERROR_COLOR;
-		} else if (width == 0) {
-			return NIL_COLOR;
-		} else if (width == 1) {
-			if (this == UNKNOWN)
-				return UNKNOWN_COLOR;
-			else if (this == TRUE)
-				return TRUE_COLOR;
-			else
-				return FALSE_COLOR;
-		} else {
-			return MULTI_COLOR;
 		}
 	}
 }

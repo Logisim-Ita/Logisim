@@ -13,9 +13,6 @@ import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 class RecentProjects implements PreferenceChangeListener {
-	private static final String BASE_PROPERTY = "recent";
-	private static final int NUM_RECENT = 10;
-
 	private static class FileTime {
 		private long time;
 		private File file;
@@ -35,8 +32,15 @@ class RecentProjects implements PreferenceChangeListener {
 			}
 		}
 	}
+	private static final String BASE_PROPERTY = "recent";
 
+	private static final int NUM_RECENT = 10;
+
+	private static boolean isSame(Object a, Object b) {
+		return a == null ? b == null : a.equals(b);
+	}
 	private File[] recentFiles;
+
 	private long[] recentTimes;
 
 	RecentProjects() {
@@ -49,6 +53,21 @@ class RecentProjects implements PreferenceChangeListener {
 
 		for (int index = 0; index < NUM_RECENT; index++) {
 			getAndDecode(prefs, index);
+		}
+	}
+
+	private void getAndDecode(Preferences prefs, int index) {
+		String encoding = prefs.get(BASE_PROPERTY + index, null);
+		if (encoding == null)
+			return;
+		int semi = encoding.indexOf(';');
+		if (semi < 0)
+			return;
+		try {
+			long time = Long.parseLong(encoding.substring(0, semi));
+			File file = new File(encoding.substring(semi + 1));
+			updateInto(index, time, file);
+		} catch (NumberFormatException e) {
 		}
 	}
 
@@ -83,17 +102,6 @@ class RecentProjects implements PreferenceChangeListener {
 			}
 		}
 		return ret;
-	}
-
-	public void updateRecent(File file) {
-		File fileToSave = file;
-		try {
-			fileToSave = file.getCanonicalFile();
-		} catch (IOException e) {
-		}
-		long now = System.currentTimeMillis();
-		int index = getReplacementIndex(now, fileToSave);
-		updateInto(index, now, fileToSave);
 	}
 
 	private int getReplacementIndex(long now, File f) {
@@ -164,22 +172,14 @@ class RecentProjects implements PreferenceChangeListener {
 		}
 	}
 
-	private void getAndDecode(Preferences prefs, int index) {
-		String encoding = prefs.get(BASE_PROPERTY + index, null);
-		if (encoding == null)
-			return;
-		int semi = encoding.indexOf(';');
-		if (semi < 0)
-			return;
+	public void updateRecent(File file) {
+		File fileToSave = file;
 		try {
-			long time = Long.parseLong(encoding.substring(0, semi));
-			File file = new File(encoding.substring(semi + 1));
-			updateInto(index, time, file);
-		} catch (NumberFormatException e) {
+			fileToSave = file.getCanonicalFile();
+		} catch (IOException e) {
 		}
-	}
-
-	private static boolean isSame(Object a, Object b) {
-		return a == null ? b == null : a.equals(b);
+		long now = System.currentTimeMillis();
+		int index = getReplacementIndex(now, fileToSave);
+		updateInto(index, now, fileToSave);
 	}
 }

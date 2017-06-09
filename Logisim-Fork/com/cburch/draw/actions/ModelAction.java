@@ -11,37 +11,6 @@ import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.undo.Action;
 
 public abstract class ModelAction extends Action {
-	private CanvasModel model;
-
-	public ModelAction(CanvasModel model) {
-		this.model = model;
-	}
-
-	public Collection<CanvasObject> getObjects() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public abstract String getName();
-
-	abstract void doSub(CanvasModel model);
-
-	abstract void undoSub(CanvasModel model);
-
-	@Override
-	public final void doIt() {
-		doSub(model);
-	}
-
-	@Override
-	public final void undo() {
-		undoSub(model);
-	}
-
-	public CanvasModel getModel() {
-		return model;
-	}
-
 	static String getShapesName(Collection<CanvasObject> coll) {
 		if (coll.size() != 1) {
 			return Strings.get("shapeMultiple");
@@ -50,4 +19,35 @@ public abstract class ModelAction extends Action {
 			return shape.getDisplayName();
 		}
 	}
+
+	private CanvasModel model;
+
+	public ModelAction(CanvasModel model) {
+		this.model = model;
+	}
+
+	@Override
+	public final void doIt() {
+		doSub(model);
+	}
+
+	abstract void doSub(CanvasModel model);
+
+	public CanvasModel getModel() {
+		return model;
+	}
+
+	@Override
+	public abstract String getName();
+
+	public Collection<CanvasObject> getObjects() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public final void undo() {
+		undoSub(model);
+	}
+
+	abstract void undoSub(CanvasModel model);
 }

@@ -29,66 +29,6 @@ public class Adder extends InstanceFactory {
 	private static final int C_IN = 3;
 	private static final int C_OUT = 4;
 
-	public Adder() {
-		super("Adder", Strings.getter("adderComponent"));
-		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
-		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
-		setIconName("adder.gif");
-
-		Port[] ps = new Port[5];
-		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
-		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
-		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[C_IN] = new Port(-20, -20, Port.INPUT, 1);
-		ps[C_OUT] = new Port(-20, 20, Port.INPUT, 1);
-		ps[IN0].setToolTip(Strings.getter("adderInputTip"));
-		ps[IN1].setToolTip(Strings.getter("adderInputTip"));
-		ps[OUT].setToolTip(Strings.getter("adderOutputTip"));
-		ps[C_IN].setToolTip(Strings.getter("adderCarryInTip"));
-		ps[C_OUT].setToolTip(Strings.getter("adderCarryOutTip"));
-		setPorts(ps);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		// get attributes
-		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
-
-		// compute outputs
-		Value a = state.getPort(IN0);
-		Value b = state.getPort(IN1);
-		Value c_in = state.getPort(C_IN);
-		Value[] outs = Adder.computeSum(dataWidth, a, b, c_in);
-
-		// propagate them
-		int delay = (dataWidth.getWidth() + 2) * PER_DELAY;
-		state.setPort(OUT, outs[0], delay);
-		state.setPort(C_OUT, outs[1], delay);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
-
-		g.setColor(Color.GRAY);
-		painter.drawPort(IN0);
-		painter.drawPort(IN1);
-		painter.drawPort(OUT);
-		painter.drawPort(C_IN, "c in", Direction.NORTH);
-		painter.drawPort(C_OUT, "c out", Direction.SOUTH);
-
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.BLACK);
-		g.drawLine(x - 15, y, x - 5, y);
-		g.drawLine(x - 10, y - 5, x - 10, y + 5);
-		GraphicsUtil.switchToWidth(g, 1);
-	}
-
 	static Value[] computeSum(BitWidth width, Value a, Value b, Value c_in) {
 		int w = width.getWidth();
 		if (c_in == Value.UNKNOWN || c_in == Value.NIL)
@@ -133,5 +73,65 @@ public class Adder extends InstanceFactory {
 			}
 			return new Value[] { Value.create(bits), carry };
 		}
+	}
+
+	public Adder() {
+		super("Adder", Strings.getter("adderComponent"));
+		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(8) });
+		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
+		setOffsetBounds(Bounds.create(-40, -20, 40, 40));
+		setIconName("adder.gif");
+
+		Port[] ps = new Port[5];
+		ps[IN0] = new Port(-40, -10, Port.INPUT, StdAttr.WIDTH);
+		ps[IN1] = new Port(-40, 10, Port.INPUT, StdAttr.WIDTH);
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[C_IN] = new Port(-20, -20, Port.INPUT, 1);
+		ps[C_OUT] = new Port(-20, 20, Port.INPUT, 1);
+		ps[IN0].setToolTip(Strings.getter("adderInputTip"));
+		ps[IN1].setToolTip(Strings.getter("adderInputTip"));
+		ps[OUT].setToolTip(Strings.getter("adderOutputTip"));
+		ps[C_IN].setToolTip(Strings.getter("adderCarryInTip"));
+		ps[C_OUT].setToolTip(Strings.getter("adderCarryOutTip"));
+		setPorts(ps);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		painter.drawBounds();
+
+		g.setColor(Color.GRAY);
+		painter.drawPort(IN0);
+		painter.drawPort(IN1);
+		painter.drawPort(OUT);
+		painter.drawPort(C_IN, "c in", Direction.NORTH);
+		painter.drawPort(C_OUT, "c out", Direction.SOUTH);
+
+		Location loc = painter.getLocation();
+		int x = loc.getX();
+		int y = loc.getY();
+		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(Color.BLACK);
+		g.drawLine(x - 15, y, x - 5, y);
+		g.drawLine(x - 10, y - 5, x - 10, y + 5);
+		GraphicsUtil.switchToWidth(g, 1);
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		// get attributes
+		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
+
+		// compute outputs
+		Value a = state.getPort(IN0);
+		Value b = state.getPort(IN1);
+		Value c_in = state.getPort(C_IN);
+		Value[] outs = Adder.computeSum(dataWidth, a, b, c_in);
+
+		// propagate them
+		int delay = (dataWidth.getWidth() + 2) * PER_DELAY;
+		state.setPort(OUT, outs[0], delay);
+		state.setPort(C_OUT, outs[1], delay);
 	}
 }

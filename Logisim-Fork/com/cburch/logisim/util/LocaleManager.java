@@ -14,10 +14,6 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 public class LocaleManager {
-	// static members
-	private static final String SETTINGS_NAME = "settings";
-	private static ArrayList<LocaleManager> managers = new ArrayList<LocaleManager>();
-
 	private static class LocaleGetter implements StringGetter {
 		private LocaleManager source;
 		private String key;
@@ -37,11 +33,58 @@ public class LocaleManager {
 			return get();
 		}
 	}
+	// static members
+	private static final String SETTINGS_NAME = "settings";
+
+	private static ArrayList<LocaleManager> managers = new ArrayList<LocaleManager>();
 
 	private static ArrayList<LocaleListener> listeners = new ArrayList<LocaleListener>();
 	private static boolean replaceAccents = false;
 	private static HashMap<Character, String> repl = null;
 	private static Locale curLocale = null;
+
+	public static void addLocaleListener(LocaleListener l) {
+		listeners.add(l);
+	}
+
+	public static boolean canReplaceAccents() {
+		return fetchReplaceAccents() != null;
+	}
+
+	private static HashMap<Character, String> fetchReplaceAccents() {
+		HashMap<Character, String> ret = null;
+		String val;
+		try {
+			val = Strings.source.locale.getString("accentReplacements");
+		} catch (MissingResourceException e) {
+			return null;
+		}
+		StringTokenizer toks = new StringTokenizer(val, "/");
+		while (toks.hasMoreTokens()) {
+			String tok = toks.nextToken().trim();
+			char c = '\0';
+			String s = null;
+			if (tok.length() == 1) {
+				c = tok.charAt(0);
+				s = "";
+			} else if (tok.length() >= 2 && tok.charAt(1) == ' ') {
+				c = tok.charAt(0);
+				s = tok.substring(2).trim();
+			}
+			if (s != null) {
+				if (ret == null)
+					ret = new HashMap<Character, String>();
+				ret.put(new Character(c), s);
+			}
+		}
+		return ret;
+	}
+
+	private static void fireLocaleChanged() {
+		for (LocaleListener l : listeners) {
+			l.localeChanged();
+		}
+	}
 
 	public static Locale getLocale() {
 		Locale ret = curLocale;
@@ -50,6 +93,42 @@ public class LocaleManager {
 			curLocale = ret;
 		}
 		return ret;
+	}
+
+	public static void removeLocaleListener(LocaleListener l) {
+		listeners.remove(l);
+	}
+
+	private static String replaceAccents(String src, HashMap<Character, String> repl) {
+		// find first non-standard character - so we can avoid the
+		// replacement process if possible
+		int i = 0;
+		int n = src.length();
+		for (; i < n; i++) {
+			char ci = src.charAt(i);
+			if (ci < 32 || ci >= 127)
+				break;
+		}
+		if (i == n)
+			return src;
+
+		// ok, we'll have to consider replacing accents
+		char[] cs = src.toCharArray();
+		StringBuilder ret = new StringBuilder(src.substring(0, i));
+		for (int j = i; j < cs.length; j++) {
+			char cj = cs[j];
+			if (cj < 32 || cj >= 127) {
+				String out = repl.get(Character.valueOf(cj));
+				if (out != null) {
+					ret.append(out);
+				} else {
+					ret.append(cj);
+				}
+			} else {
+				ret.append(cj);
+			}
+		}
+		return ret.toString();
 	}
 
 	public static void setLocale(Locale loc) {
@@ -85,65 +164,18 @@ public class LocaleManager {
 		}
 	}
 
-	public static boolean canReplaceAccents() {
-		return fetchReplaceAccents() != null;
-	}
-
 	public static void setReplaceAccents(boolean value) {
 		HashMap<Character, String> newRepl = value ? fetchReplaceAccents() : null;
 		replaceAccents = value;
 		repl = newRepl;
 		fireLocaleChanged();
 	}
-
-	private static HashMap<Character, String> fetchReplaceAccents() {
-		HashMap<Character, String> ret = null;
-		String val;
-		try {
-			val = Strings.source.locale.getString("accentReplacements");
-		} catch (MissingResourceException e) {
-			return null;
-		}
-		StringTokenizer toks = new StringTokenizer(val, "/");
-		while (toks.hasMoreTokens()) {
-			String tok = toks.nextToken().trim();
-			char c = '\0';
-			String s = null;
-			if (tok.length() == 1) {
-				c = tok.charAt(0);
-				s = "";
-			} else if (tok.length() >= 2 && tok.charAt(1) == ' ') {
-				c = tok.charAt(0);
-				s = tok.substring(2).trim();
-			}
-			if (s != null) {
-				if (ret == null)
-					ret = new HashMap<Character, String>();
-				ret.put(new Character(c), s);
-			}
-		}
-		return ret;
-	}
-
-	public static void addLocaleListener(LocaleListener l) {
-		listeners.add(l);
-	}
-
-	public static void removeLocaleListener(LocaleListener l) {
-		listeners.remove(l);
-	}
-
-	private static void fireLocaleChanged() {
-		for (LocaleListener l : listeners) {
-			l.localeChanged();
-		}
-	}
-
 	// instance members
 	private String dir_name;
 	private String file_start;
 	private ResourceBundle settings = null;
 	private ResourceBundle locale = null;
+
 	private ResourceBundle dflt_locale = null;
 
 	public LocaleManager(String dir_name, String file_start) {
@@ -153,37 +185,15 @@ public class LocaleManager {
 		managers.add(this);
 	}
 
-	private void loadDefault() {
-		if (settings == null) {
-			try {
-				settings = ResourceBundle.getBundle(dir_name + "/" + SETTINGS_NAME);
-			} catch (java.util.MissingResourceException e) {
-			}
+	public JComponent createLocaleSelector() {
+		Locale[] locales = getLocaleOptions();
+		if (locales == null || locales.length == 0) {
+			Locale cur = getLocale();
+			if (cur == null)
+				cur = new Locale("en");
+			locales = new Locale[] { cur };
 		}
-
-		try {
-			loadLocale(Locale.getDefault());
-			if (locale != null)
-				return;
-		} catch (java.util.MissingResourceException e) {
-		}
-		try {
-			loadLocale(Locale.ENGLISH);
-			if (locale != null)
-				return;
-		} catch (java.util.MissingResourceException e) {
-		}
-		Locale[] choices = getLocaleOptions();
-		if (choices != null && choices.length > 0)
-			loadLocale(choices[0]);
-		if (locale != null)
-			return;
-		throw new RuntimeException("No locale bundles are available");
-	}
-
-	private void loadLocale(Locale loc) {
-		String bundleName = dir_name + "/" + loc.getLanguage() + "/" + file_start;
-		locale = ResourceBundle.getBundle(bundleName, loc);
+		return new JScrollPane(new LocaleSelector(locales));
 	}
 
 	public String get(String key) {
@@ -207,18 +217,6 @@ public class LocaleManager {
 		if (repl != null)
 			ret = replaceAccents(ret, repl);
 		return ret;
-	}
-
-	public StringGetter getter(String key) {
-		return new LocaleGetter(this, key);
-	}
-
-	public StringGetter getter(String key, String arg) {
-		return StringUtil.formatter(getter(key), arg);
-	}
-
-	public StringGetter getter(String key, StringGetter arg) {
-		return StringUtil.formatter(getter(key), arg);
 	}
 
 	public Locale[] getLocaleOptions() {
@@ -253,46 +251,48 @@ public class LocaleManager {
 		return retl.toArray(new Locale[retl.size()]);
 	}
 
-	public JComponent createLocaleSelector() {
-		Locale[] locales = getLocaleOptions();
-		if (locales == null || locales.length == 0) {
-			Locale cur = getLocale();
-			if (cur == null)
-				cur = new Locale("en");
-			locales = new Locale[] { cur };
-		}
-		return new JScrollPane(new LocaleSelector(locales));
+	public StringGetter getter(String key) {
+		return new LocaleGetter(this, key);
 	}
 
-	private static String replaceAccents(String src, HashMap<Character, String> repl) {
-		// find first non-standard character - so we can avoid the
-		// replacement process if possible
-		int i = 0;
-		int n = src.length();
-		for (; i < n; i++) {
-			char ci = src.charAt(i);
-			if (ci < 32 || ci >= 127)
-				break;
-		}
-		if (i == n)
-			return src;
+	public StringGetter getter(String key, String arg) {
+		return StringUtil.formatter(getter(key), arg);
+	}
 
-		// ok, we'll have to consider replacing accents
-		char[] cs = src.toCharArray();
-		StringBuilder ret = new StringBuilder(src.substring(0, i));
-		for (int j = i; j < cs.length; j++) {
-			char cj = cs[j];
-			if (cj < 32 || cj >= 127) {
-				String out = repl.get(Character.valueOf(cj));
-				if (out != null) {
-					ret.append(out);
-				} else {
-					ret.append(cj);
-				}
-			} else {
-				ret.append(cj);
+	public StringGetter getter(String key, StringGetter arg) {
+		return StringUtil.formatter(getter(key), arg);
+	}
+
+	private void loadDefault() {
+		if (settings == null) {
+			try {
+				settings = ResourceBundle.getBundle(dir_name + "/" + SETTINGS_NAME);
+			} catch (java.util.MissingResourceException e) {
 			}
 		}
-		return ret.toString();
+
+		try {
+			loadLocale(Locale.getDefault());
+			if (locale != null)
+				return;
+		} catch (java.util.MissingResourceException e) {
+		}
+		try {
+			loadLocale(Locale.ENGLISH);
+			if (locale != null)
+				return;
+		} catch (java.util.MissingResourceException e) {
+		}
+		Locale[] choices = getLocaleOptions();
+		if (choices != null && choices.length > 0)
+			loadLocale(choices[0]);
+		if (locale != null)
+			return;
+		throw new RuntimeException("No locale bundles are available");
+	}
+
+	private void loadLocale(Locale loc) {
+		String bundleName = dir_name + "/" + loc.getLanguage() + "/" + file_start;
+		locale = ResourceBundle.getBundle(bundleName, loc);
 	}
 }

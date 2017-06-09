@@ -21,15 +21,19 @@ class DrawingOverlaps {
 		untested = new HashSet<CanvasObject>();
 	}
 
-	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject o) {
-		ensureUpdated();
-
-		List<CanvasObject> ret = map.get(o);
-		if (ret == null || ret.isEmpty()) {
-			return Collections.emptyList();
-		} else {
-			return Collections.unmodifiableList(ret);
+	private void addOverlap(CanvasObject a, CanvasObject b) {
+		List<CanvasObject> alist = map.get(a);
+		if (alist == null) {
+			alist = new ArrayList<CanvasObject>();
+			map.put(a, alist);
 		}
+		if (!alist.contains(b)) {
+			alist.add(b);
+		}
+	}
+
+	public void addShape(CanvasObject shape) {
+		untested.add(shape);
 	}
 
 	private void ensureUpdated() {
@@ -46,19 +50,26 @@ class DrawingOverlaps {
 		untested.clear();
 	}
 
-	private void addOverlap(CanvasObject a, CanvasObject b) {
-		List<CanvasObject> alist = map.get(a);
-		if (alist == null) {
-			alist = new ArrayList<CanvasObject>();
-			map.put(a, alist);
-		}
-		if (!alist.contains(b)) {
-			alist.add(b);
+	public Collection<CanvasObject> getObjectsOverlapping(CanvasObject o) {
+		ensureUpdated();
+
+		List<CanvasObject> ret = map.get(o);
+		if (ret == null || ret.isEmpty()) {
+			return Collections.emptyList();
+		} else {
+			return Collections.unmodifiableList(ret);
 		}
 	}
 
-	public void addShape(CanvasObject shape) {
+	public void invalidateShape(CanvasObject shape) {
+		removeShape(shape);
 		untested.add(shape);
+	}
+
+	public void invalidateShapes(Collection<? extends CanvasObject> shapes) {
+		for (CanvasObject o : shapes) {
+			invalidateShape(o);
+		}
 	}
 
 	public void removeShape(CanvasObject shape) {
@@ -71,17 +82,6 @@ class DrawingOverlaps {
 					reverse.remove(shape);
 				}
 			}
-		}
-	}
-
-	public void invalidateShape(CanvasObject shape) {
-		removeShape(shape);
-		untested.add(shape);
-	}
-
-	public void invalidateShapes(Collection<? extends CanvasObject> shapes) {
-		for (CanvasObject o : shapes) {
-			invalidateShape(o);
 		}
 	}
 }

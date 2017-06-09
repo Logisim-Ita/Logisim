@@ -10,9 +10,9 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.WindowMenuItemManager;
 
 public class AnalyzerManager extends WindowMenuItemManager implements LocaleListener {
-	public static void initialize() {
-		analysisManager = new AnalyzerManager();
-	}
+	private static Analyzer analysisWindow = null;
+
+	private static AnalyzerManager analysisManager = null;
 
 	public static Analyzer getAnalyzer() {
 		if (analysisWindow == null) {
@@ -23,9 +23,9 @@ public class AnalyzerManager extends WindowMenuItemManager implements LocaleList
 		}
 		return analysisWindow;
 	}
-
-	private static Analyzer analysisWindow = null;
-	private static AnalyzerManager analysisManager = null;
+	public static void initialize() {
+		analysisManager = new AnalyzerManager();
+	}
 
 	private AnalyzerManager() {
 		super(Strings.get("analyzerWindowTitle"), true);

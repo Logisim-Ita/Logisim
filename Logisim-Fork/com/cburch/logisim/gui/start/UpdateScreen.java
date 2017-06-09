@@ -54,6 +54,23 @@ public class UpdateScreen extends JWindow {
 			f.setIconImage(icon.getImage());
 	}
 
+	public void addActionListener(ActionListener listener) {
+		cancel.addActionListener(listener);
+	}
+
+	public void Clear() {
+		f.invalidate();
+		f.getContentPane().removeAll();
+	}
+
+	public void close() {
+		if (inClose)
+			return;
+		inClose = true;
+		f.setVisible(false);
+		inClose = false;
+	}
+
 	public void Downloading(int n) {
 		MAX = n;
 
@@ -82,20 +99,14 @@ public class UpdateScreen extends JWindow {
 
 		f.getContentPane().add(updatePanel, BorderLayout.CENTER);
 	}
-	
-	
+
 	public void Message(String s) {
 		label = new JLabel(s);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 13));
 		JPanel j = new JPanel(new GridBagLayout());
 		j.add(label);
-		j.setPreferredSize(new Dimension(305,105));
+		j.setPreferredSize(new Dimension(305, 105));
 		f.getContentPane().add(j, BorderLayout.CENTER);
-	}
-
-	public void Clear() {
-		f.invalidate();
-		f.getContentPane().removeAll();
 	}
 
 	public void Repaint() {
@@ -120,17 +131,5 @@ public class UpdateScreen extends JWindow {
 			f.setLocation(x, y);
 		}
 		f.setVisible(value);
-	}
-
-	public void close() {
-		if (inClose)
-			return;
-		inClose = true;
-		f.setVisible(false);
-		inClose = false;
-	}
-
-	public void addActionListener(ActionListener listener) {
-		cancel.addActionListener(listener);
 	}
 }

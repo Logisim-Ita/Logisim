@@ -38,33 +38,53 @@ public class Canvas extends JComponent {
 		setPreferredSize(new Dimension(200, 200));
 	}
 
+	public void doAction(Action action) {
+		dispatcher.doAction(action);
+	}
+
 	public CanvasModel getModel() {
 		return model;
-	}
-
-	public CanvasTool getTool() {
-		return listener.getTool();
-	}
-
-	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
-		; // nothing to do - subclass may override
-	}
-
-	protected JPopupMenu showPopupMenu(MouseEvent e, CanvasObject clicked) {
-		return null; // subclass will override if it supports popup menus
 	}
 
 	public Selection getSelection() {
 		return selection;
 	}
 
-	protected void setSelection(Selection value) {
-		selection = value;
-		repaint();
+	public CanvasTool getTool() {
+		return listener.getTool();
 	}
 
-	public void doAction(Action action) {
-		dispatcher.doAction(action);
+	public double getZoomFactor() {
+		return 1.0; // subclass will have to override this
+	}
+
+	protected void paintBackground(Graphics g) {
+		g.clearRect(0, 0, getWidth(), getHeight());
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		paintBackground(g);
+		paintForeground(g);
+	}
+
+	protected void paintForeground(Graphics g) {
+		CanvasModel model = this.model;
+		CanvasTool tool = listener.getTool();
+		if (model != null) {
+			Graphics dup = g.create();
+			model.paint(g, selection);
+			dup.dispose();
+		}
+		if (tool != null) {
+			Graphics dup = g.create();
+			tool.draw(this, dup);
+			dup.dispose();
+		}
+	}
+
+	public void repaintCanvasCoords(int x, int y, int width, int height) {
+		repaint(x, y, width, height);
 	}
 
 	public void setModel(CanvasModel value, ActionDispatcher dispatcher) {
@@ -82,6 +102,11 @@ public class Canvas extends JComponent {
 		}
 	}
 
+	protected void setSelection(Selection value) {
+		selection = value;
+		repaint();
+	}
+
 	public void setTool(CanvasTool value) {
 		CanvasTool oldValue = listener.getTool();
 		if (value != oldValue) {
@@ -90,12 +115,8 @@ public class Canvas extends JComponent {
 		}
 	}
 
-	public void repaintCanvasCoords(int x, int y, int width, int height) {
-		repaint(x, y, width, height);
-	}
-
-	public double getZoomFactor() {
-		return 1.0; // subclass will have to override this
+	protected JPopupMenu showPopupMenu(MouseEvent e, CanvasObject clicked) {
+		return null; // subclass will override if it supports popup menus
 	}
 
 	public int snapX(int x) {
@@ -106,28 +127,7 @@ public class Canvas extends JComponent {
 		return y; // subclass will have to override this
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		paintBackground(g);
-		paintForeground(g);
-	}
-
-	protected void paintBackground(Graphics g) {
-		g.clearRect(0, 0, getWidth(), getHeight());
-	}
-
-	protected void paintForeground(Graphics g) {
-		CanvasModel model = this.model;
-		CanvasTool tool = listener.getTool();
-		if (model != null) {
-			Graphics dup = g.create();
-			model.paint(g, selection);
-			dup.dispose();
-		}
-		if (tool != null) {
-			Graphics dup = g.create();
-			tool.draw(this, dup);
-			dup.dispose();
-		}
+	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
+		; // nothing to do - subclass may override
 	}
 }

@@ -15,30 +15,6 @@ import com.cburch.draw.model.ReorderRequest;
 import com.cburch.draw.util.ZOrder;
 
 public class ModelReorderAction extends ModelAction {
-	public static ModelReorderAction createRaise(CanvasModel model, Collection<? extends CanvasObject> objects) {
-		List<ReorderRequest> reqs = new ArrayList<ReorderRequest>();
-		Map<CanvasObject, Integer> zmap = ZOrder.getZIndex(objects, model);
-		for (Map.Entry<CanvasObject, Integer> entry : zmap.entrySet()) {
-			CanvasObject obj = entry.getKey();
-			int from = entry.getValue().intValue();
-			CanvasObject above = ZOrder.getObjectAbove(obj, model, objects);
-			if (above != null) {
-				int to = ZOrder.getZIndex(above, model);
-				if (objects.contains(above)) {
-					to--;
-				}
-				reqs.add(new ReorderRequest(obj, from, to));
-			}
-		}
-		if (reqs.isEmpty()) {
-			return null;
-		} else {
-			Collections.sort(reqs, ReorderRequest.DESCENDING_FROM);
-			repairRequests(reqs);
-			return new ModelReorderAction(model, reqs);
-		}
-	}
-
 	public static ModelReorderAction createLower(CanvasModel model, Collection<? extends CanvasObject> objects) {
 		List<ReorderRequest> reqs = new ArrayList<ReorderRequest>();
 		Map<CanvasObject, Integer> zmap = ZOrder.getZIndex(objects, model);
@@ -63,10 +39,10 @@ public class ModelReorderAction extends ModelAction {
 		}
 	}
 
-	public static ModelReorderAction createRaiseTop(CanvasModel model, Collection<? extends CanvasObject> objects) {
+	public static ModelReorderAction createLowerBottom(CanvasModel model, Collection<? extends CanvasObject> objects) {
 		List<ReorderRequest> reqs = new ArrayList<ReorderRequest>();
 		Map<CanvasObject, Integer> zmap = ZOrder.getZIndex(objects, model);
-		int to = model.getObjectsFromBottom().size() - 1;
+		int to = 0;
 		for (Map.Entry<CanvasObject, Integer> entry : zmap.entrySet()) {
 			CanvasObject obj = entry.getKey();
 			int from = entry.getValue().intValue();
@@ -81,10 +57,34 @@ public class ModelReorderAction extends ModelAction {
 		}
 	}
 
-	public static ModelReorderAction createLowerBottom(CanvasModel model, Collection<? extends CanvasObject> objects) {
+	public static ModelReorderAction createRaise(CanvasModel model, Collection<? extends CanvasObject> objects) {
 		List<ReorderRequest> reqs = new ArrayList<ReorderRequest>();
 		Map<CanvasObject, Integer> zmap = ZOrder.getZIndex(objects, model);
-		int to = 0;
+		for (Map.Entry<CanvasObject, Integer> entry : zmap.entrySet()) {
+			CanvasObject obj = entry.getKey();
+			int from = entry.getValue().intValue();
+			CanvasObject above = ZOrder.getObjectAbove(obj, model, objects);
+			if (above != null) {
+				int to = ZOrder.getZIndex(above, model);
+				if (objects.contains(above)) {
+					to--;
+				}
+				reqs.add(new ReorderRequest(obj, from, to));
+			}
+		}
+		if (reqs.isEmpty()) {
+			return null;
+		} else {
+			Collections.sort(reqs, ReorderRequest.DESCENDING_FROM);
+			repairRequests(reqs);
+			return new ModelReorderAction(model, reqs);
+		}
+	}
+
+	public static ModelReorderAction createRaiseTop(CanvasModel model, Collection<? extends CanvasObject> objects) {
+		List<ReorderRequest> reqs = new ArrayList<ReorderRequest>();
+		Map<CanvasObject, Integer> zmap = ZOrder.getZIndex(objects, model);
+		int to = model.getObjectsFromBottom().size() - 1;
 		for (Map.Entry<CanvasObject, Integer> entry : zmap.entrySet()) {
 			CanvasObject obj = entry.getKey();
 			int from = entry.getValue().intValue();
@@ -165,13 +165,9 @@ public class ModelReorderAction extends ModelAction {
 		this.type = type;
 	}
 
-	public List<ReorderRequest> getReorderRequests() {
-		return Collections.unmodifiableList(requests);
-	}
-
 	@Override
-	public Collection<CanvasObject> getObjects() {
-		return objects;
+	void doSub(CanvasModel model) {
+		model.reorderObjects(requests);
 	}
 
 	@Override
@@ -186,8 +182,12 @@ public class ModelReorderAction extends ModelAction {
 	}
 
 	@Override
-	void doSub(CanvasModel model) {
-		model.reorderObjects(requests);
+	public Collection<CanvasObject> getObjects() {
+		return objects;
+	}
+
+	public List<ReorderRequest> getReorderRequests() {
+		return Collections.unmodifiableList(requests);
 	}
 
 	@Override

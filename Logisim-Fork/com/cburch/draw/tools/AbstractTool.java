@@ -22,13 +22,18 @@ public abstract class AbstractTool extends CanvasTool {
 				new OvalTool(attrs), new PolyTool(true, attrs), };
 	}
 
-	public abstract Icon getIcon();
+	/**
+	 * This is because a popup menu may result from the subsequent mouse release
+	 */
+	@Override
+	public void cancelMousePress(Canvas canvas) {
+	}
+
+	@Override
+	public void draw(Canvas canvas, Graphics g) {
+	}
 
 	public abstract List<Attribute<?>> getAttributes();
-
-	public String getDescription() {
-		return null;
-	}
 
 	//
 	// CanvasTool methods
@@ -36,44 +41,11 @@ public abstract class AbstractTool extends CanvasTool {
 	@Override
 	public abstract Cursor getCursor(Canvas canvas);
 
-	@Override
-	public void toolSelected(Canvas canvas) {
+	public String getDescription() {
+		return null;
 	}
 
-	@Override
-	public void toolDeselected(Canvas canvas) {
-	}
-
-	@Override
-	public void mouseMoved(Canvas canvas, MouseEvent e) {
-	}
-
-	@Override
-	public void mousePressed(Canvas canvas, MouseEvent e) {
-	}
-
-	@Override
-	public void mouseDragged(Canvas canvas, MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(Canvas canvas, MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(Canvas canvas, MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(Canvas canvas, MouseEvent e) {
-	}
-
-	/**
-	 * This is because a popup menu may result from the subsequent mouse release
-	 */
-	@Override
-	public void cancelMousePress(Canvas canvas) {
-	}
+	public abstract Icon getIcon();
 
 	@Override
 	public void keyPressed(Canvas canvas, KeyEvent e) {
@@ -88,6 +60,34 @@ public abstract class AbstractTool extends CanvasTool {
 	}
 
 	@Override
-	public void draw(Canvas canvas, Graphics g) {
+	public void mouseDragged(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void mouseMoved(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void mousePressed(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(Canvas canvas, MouseEvent e) {
+	}
+
+	@Override
+	public void toolDeselected(Canvas canvas) {
+	}
+
+	@Override
+	public void toolSelected(Canvas canvas) {
 	}
 }

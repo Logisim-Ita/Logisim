@@ -15,9 +15,6 @@ import com.cburch.logisim.data.Direction;
 public class Icons {
 	private static final String path = "resources/logisim/icons";
 
-	private Icons() {
-	}
-
 	public static Icon getIcon(String name) {
 		java.net.URL url = Icons.class.getClassLoader().getResource(path + "/" + name);
 		if (url == null)
@@ -45,5 +42,8 @@ public class Icons {
 		}
 		icon.paintIcon(dest, g2, x, y);
 		g2.dispose();
+	}
+
+	private Icons() {
 	}
 }

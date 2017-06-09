@@ -26,27 +26,27 @@ public class KeyConfigurationEvent {
 		this.consumed = false;
 	}
 
-	public int getType() {
-		return type;
-	}
-
-	public KeyEvent getKeyEvent() {
-		return event;
+	public void consume() {
+		consumed = true;
 	}
 
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
 
-	public void consume() {
-		consumed = true;
+	public Object getData() {
+		return data;
+	}
+
+	public KeyEvent getKeyEvent() {
+		return event;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 	public boolean isConsumed() {
 		return consumed;
-	}
-
-	public Object getData() {
-		return data;
 	}
 }

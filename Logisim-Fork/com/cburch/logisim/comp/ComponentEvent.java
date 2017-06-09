@@ -18,15 +18,15 @@ public class ComponentEvent {
 		this.newData = newData;
 	}
 
-	public Component getSource() {
-		return source;
-	}
-
 	public Object getData() {
 		return newData;
 	}
 
 	public Object getOldData() {
 		return oldData;
+	}
+
+	public Component getSource() {
+		return source;
 	}
 }

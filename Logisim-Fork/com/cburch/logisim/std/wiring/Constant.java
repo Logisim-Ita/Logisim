@@ -32,16 +32,6 @@ import com.cburch.logisim.tools.key.JoinedConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Constant extends InstanceFactory {
-	public static final Attribute<Integer> ATTR_VALUE = Attributes.forHexInteger("value",
-			Strings.getter("constantValueAttr"));
-
-	public static InstanceFactory FACTORY = new Constant();
-
-	private static final Color BACKGROUND_COLOR = new Color(230, 230, 230);
-
-	private static final List<Attribute<?>> ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_VALUE });
-
 	private static class ConstantAttributes extends AbstractAttributeSet {
 		private Direction facing = Direction.EAST;;
 		private BitWidth width = BitWidth.ONE;
@@ -105,6 +95,16 @@ public class Constant extends InstanceFactory {
 		}
 	}
 
+	public static final Attribute<Integer> ATTR_VALUE = Attributes.forHexInteger("value",
+			Strings.getter("constantValueAttr"));
+
+	public static InstanceFactory FACTORY = new Constant();
+
+	private static final Color BACKGROUND_COLOR = new Color(230, 230, 230);
+
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays
+			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_VALUE });
+
 	public Constant() {
 		super("Constant", Strings.getter("constantComponent"));
 		setFacingAttribute(StdAttr.FACING);
@@ -113,31 +113,14 @@ public class Constant extends InstanceFactory {
 	}
 
 	@Override
-	public AttributeSet createAttributeSet() {
-		return new ConstantAttributes();
-	}
-
-	@Override
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
 		updatePorts(instance);
 	}
 
-	private void updatePorts(Instance instance) {
-		Port[] ps = { new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH) };
-		instance.setPorts(ps);
-	}
-
 	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.WIDTH) {
-			instance.recomputeBounds();
-			updatePorts(instance);
-		} else if (attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-		} else if (attr == ATTR_VALUE) {
-			instance.fireInvalidated();
-		}
+	public AttributeSet createAttributeSet() {
+		return new ConstantAttributes();
 	}
 
 	@Override
@@ -145,13 +128,6 @@ public class Constant extends InstanceFactory {
 		if (key == ExpressionComputer.class)
 			return new ConstantExpression(instance);
 		return super.getInstanceFeature(instance, key);
-	}
-
-	@Override
-	public void propagate(InstanceState state) {
-		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
-		int value = state.getAttributeValue(ATTR_VALUE).intValue();
-		state.setPort(0, Value.createKnown(width, value), 1);
 	}
 
 	@Override
@@ -276,6 +252,30 @@ public class Constant extends InstanceFactory {
 		return ret;
 	}
 
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.WIDTH) {
+			instance.recomputeBounds();
+			updatePorts(instance);
+		} else if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+		} else if (attr == ATTR_VALUE) {
+			instance.fireInvalidated();
+		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		int v = painter.getAttributeValue(ATTR_VALUE).intValue();
+		String vStr = Integer.toHexString(v);
+		Bounds bds = getOffsetBounds(painter.getAttributeSet());
+
+		Graphics g = painter.getGraphics();
+		GraphicsUtil.switchToWidth(g, 2);
+		g.fillOval(-2, -2, 5, 5);
+		GraphicsUtil.drawCenteredText(g, vStr, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
+	}
+
 	//
 	// painting methods
 	//
@@ -311,18 +311,6 @@ public class Constant extends InstanceFactory {
 	}
 
 	@Override
-	public void paintGhost(InstancePainter painter) {
-		int v = painter.getAttributeValue(ATTR_VALUE).intValue();
-		String vStr = Integer.toHexString(v);
-		Bounds bds = getOffsetBounds(painter.getAttributeSet());
-
-		Graphics g = painter.getGraphics();
-		GraphicsUtil.switchToWidth(g, 2);
-		g.fillOval(-2, -2, 5, 5);
-		GraphicsUtil.drawCenteredText(g, vStr, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
-	}
-
-	@Override
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getOffsetBounds();
 		BitWidth width = painter.getAttributeValue(StdAttr.WIDTH);
@@ -348,6 +336,18 @@ public class Constant extends InstanceFactory {
 					y + bds.getY() + bds.getHeight() / 2 - 2);
 		}
 		painter.drawPorts();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
+		int value = state.getAttributeValue(ATTR_VALUE).intValue();
+		state.setPort(0, Value.createKnown(width, value), 1);
+	}
+
+	private void updatePorts(Instance instance) {
+		Port[] ps = { new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH) };
+		instance.setPorts(ps);
 	}
 
 	// TODO: Allow editing of value via text tool/attribute table

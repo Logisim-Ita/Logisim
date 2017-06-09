@@ -46,23 +46,23 @@ class SimulationExplorer extends JPanel implements ProjectListener, MouseListene
 		proj.addProjectListener(this);
 	}
 
-	//
-	// ProjectListener methods
-	//
+	private void checkForPopup(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+			; // do nothing
+		}
+	}
+
 	@Override
-	public void projectChanged(ProjectEvent event) {
-		int action = event.getAction();
-		if (action == ProjectEvent.ACTION_SET_STATE) {
-			Simulator sim = project.getSimulator();
-			CircuitState root = sim.getCircuitState();
-			if (model.getRootState() != root) {
-				model = new SimulationTreeModel(root);
-				tree.setModel(model);
-			}
-			model.setCurrentView(project.getCircuitState());
-			TreePath path = model.mapToPath(project.getCircuitState());
+	public void mouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 			if (path != null) {
-				tree.scrollPathToVisible(path);
+				Object last = path.getLastPathComponent();
+				if (last instanceof SimulationTreeCircuitNode) {
+					SimulationTreeCircuitNode node;
+					node = (SimulationTreeCircuitNode) last;
+					project.setCircuitState(node.getCircuitState());
+				}
 			}
 		}
 	}
@@ -92,23 +92,23 @@ class SimulationExplorer extends JPanel implements ProjectListener, MouseListene
 		checkForPopup(e);
 	}
 
-	private void checkForPopup(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			; // do nothing
-		}
-	}
-
+	//
+	// ProjectListener methods
+	//
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-			TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+	public void projectChanged(ProjectEvent event) {
+		int action = event.getAction();
+		if (action == ProjectEvent.ACTION_SET_STATE) {
+			Simulator sim = project.getSimulator();
+			CircuitState root = sim.getCircuitState();
+			if (model.getRootState() != root) {
+				model = new SimulationTreeModel(root);
+				tree.setModel(model);
+			}
+			model.setCurrentView(project.getCircuitState());
+			TreePath path = model.mapToPath(project.getCircuitState());
 			if (path != null) {
-				Object last = path.getLastPathComponent();
-				if (last instanceof SimulationTreeCircuitNode) {
-					SimulationTreeCircuitNode node;
-					node = (SimulationTreeCircuitNode) last;
-					project.setCircuitState(node.getCircuitState());
-				}
+				tree.scrollPathToVisible(path);
 			}
 		}
 	}

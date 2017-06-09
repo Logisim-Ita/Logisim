@@ -21,27 +21,21 @@ public class Oval extends Rectangular {
 	}
 
 	@Override
-	public boolean matches(CanvasObject other) {
-		if (other instanceof Oval) {
-			return super.matches(other);
-		} else {
-			return false;
-		}
+	protected boolean contains(int x, int y, int w, int h, Location q) {
+		int qx = q.getX();
+		int qy = q.getY();
+		double dx = qx - (x + 0.5 * w);
+		double dy = qy - (y + 0.5 * h);
+		double sum = (dx * dx) / (w * w) + (dy * dy) / (h * h);
+		return sum <= 0.25;
 	}
 
 	@Override
-	public int matchesHashCode() {
-		return super.matchesHashCode();
-	}
-
-	@Override
-	public Element toSvgElement(Document doc) {
-		return SvgCreator.createOval(doc, this);
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Strings.get("shapeOval");
+	public void draw(Graphics g, int x, int y, int w, int h) {
+		if (setForFill(g))
+			g.fillOval(x, y, w, h);
+		if (setForStroke(g))
+			g.drawOval(x, y, w, h);
 	}
 
 	@Override
@@ -50,13 +44,8 @@ public class Oval extends Rectangular {
 	}
 
 	@Override
-	protected boolean contains(int x, int y, int w, int h, Location q) {
-		int qx = q.getX();
-		int qy = q.getY();
-		double dx = qx - (x + 0.5 * w);
-		double dy = qy - (y + 0.5 * h);
-		double sum = (dx * dx) / (w * w) + (dy * dy) / (h * h);
-		return sum <= 0.25;
+	public String getDisplayName() {
+		return Strings.get("shapeOval");
 	}
 
 	@Override
@@ -79,10 +68,21 @@ public class Oval extends Rectangular {
 	}
 
 	@Override
-	public void draw(Graphics g, int x, int y, int w, int h) {
-		if (setForFill(g))
-			g.fillOval(x, y, w, h);
-		if (setForStroke(g))
-			g.drawOval(x, y, w, h);
+	public boolean matches(CanvasObject other) {
+		if (other instanceof Oval) {
+			return super.matches(other);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int matchesHashCode() {
+		return super.matchesHashCode();
+	}
+
+	@Override
+	public Element toSvgElement(Document doc) {
+		return SvgCreator.createOval(doc, this);
 	}
 }

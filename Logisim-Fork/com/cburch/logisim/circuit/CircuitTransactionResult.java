@@ -12,8 +12,8 @@ public class CircuitTransactionResult {
 		this.mutator = mutator;
 	}
 
-	public CircuitTransaction getReverseTransaction() {
-		return mutator.getReverseTransaction();
+	public Collection<Circuit> getModifiedCircuits() {
+		return mutator.getModifiedCircuits();
 	}
 
 	public ReplacementMap getReplacementMap(Circuit circuit) {
@@ -21,7 +21,7 @@ public class CircuitTransactionResult {
 		return ret == null ? new ReplacementMap() : ret;
 	}
 
-	public Collection<Circuit> getModifiedCircuits() {
-		return mutator.getModifiedCircuits();
+	public CircuitTransaction getReverseTransaction() {
+		return mutator.getReverseTransaction();
 	}
 }

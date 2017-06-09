@@ -17,24 +17,6 @@ class Clipboard {
 	private static Clipboard current = null;
 	private static PropertyChangeWeakSupport propertySupport = new PropertyChangeWeakSupport(Clipboard.class);
 
-	public static boolean isEmpty() {
-		return current == null || current.components.isEmpty();
-	}
-
-	public static Clipboard get() {
-		return current;
-	}
-
-	public static void set(Selection value, AttributeSet oldAttrs) {
-		set(new Clipboard(value, oldAttrs));
-	}
-
-	public static void set(Clipboard value) {
-		Clipboard old = current;
-		current = value;
-		propertySupport.firePropertyChange(contentsProperty, old, current);
-	}
-
 	//
 	// PropertyChangeSource methods
 	//
@@ -46,12 +28,30 @@ class Clipboard {
 		propertySupport.addPropertyChangeListener(propertyName, listener);
 	}
 
+	public static Clipboard get() {
+		return current;
+	}
+
+	public static boolean isEmpty() {
+		return current == null || current.components.isEmpty();
+	}
+
 	public static void removePropertyChangeListener(PropertyChangeListener listener) {
 		propertySupport.removePropertyChangeListener(listener);
 	}
 
 	public static void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		propertySupport.removePropertyChangeListener(propertyName, listener);
+	}
+
+	public static void set(Clipboard value) {
+		Clipboard old = current;
+		current = value;
+		propertySupport.firePropertyChange(contentsProperty, old, current);
+	}
+
+	public static void set(Selection value, AttributeSet oldAttrs) {
+		set(new Clipboard(value, oldAttrs));
 	}
 
 	//
@@ -81,12 +81,12 @@ class Clipboard {
 		return components;
 	}
 
-	public AttributeSet getOldAttributeSet() {
-		return oldAttrs;
-	}
-
 	public AttributeSet getNewAttributeSet() {
 		return newAttrs;
+	}
+
+	public AttributeSet getOldAttributeSet() {
+		return oldAttrs;
 	}
 
 	void setOldAttributeSet(AttributeSet value) {

@@ -31,17 +31,29 @@ class LogisimToolbarItem implements ToolbarItem {
 		this.toolTip = toolTip;
 	}
 
-	public void setIcon(String iconName) {
-		this.icon = Icons.getIcon(iconName);
-	}
-
-	public void setToolTip(StringGetter toolTip) {
-		this.toolTip = toolTip;
-	}
-
 	public void doAction() {
 		if (menu != null && menu.isEnabled(action)) {
 			menu.doAction(action);
+		}
+	}
+
+	@Override
+	public Dimension getDimension(Object orientation) {
+		if (icon == null) {
+			return new Dimension(16, 16);
+		} else {
+			int w = icon.getIconWidth();
+			int h = icon.getIconHeight();
+			return new Dimension(w, h + 2);
+		}
+	}
+
+	@Override
+	public String getToolTip() {
+		if (toolTip != null) {
+			return toolTip.get();
+		} else {
+			return null;
 		}
 	}
 
@@ -69,23 +81,11 @@ class LogisimToolbarItem implements ToolbarItem {
 		}
 	}
 
-	@Override
-	public String getToolTip() {
-		if (toolTip != null) {
-			return toolTip.get();
-		} else {
-			return null;
-		}
+	public void setIcon(String iconName) {
+		this.icon = Icons.getIcon(iconName);
 	}
 
-	@Override
-	public Dimension getDimension(Object orientation) {
-		if (icon == null) {
-			return new Dimension(16, 16);
-		} else {
-			int w = icon.getIconWidth();
-			int h = icon.getIconHeight();
-			return new Dimension(w, h + 2);
-		}
+	public void setToolTip(StringGetter toolTip) {
+		this.toolTip = toolTip;
 	}
 }

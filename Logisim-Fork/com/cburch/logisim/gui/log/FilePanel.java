@@ -25,42 +25,7 @@ import com.cburch.logisim.util.JFileChoosers;
 import com.cburch.logisim.util.StringUtil;
 
 class FilePanel extends LogPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7780727837324383844L;
-
 	private class Listener implements ActionListener, ModelListener {
-		@Override
-		public void selectionChanged(ModelEvent event) {
-		}
-
-		@Override
-		public void entryAdded(ModelEvent event, Value[] values) {
-		}
-
-		@Override
-		public void filePropertyChanged(ModelEvent event) {
-			Model model = getModel();
-			computeEnableItems(model);
-
-			File file = model.getFile();
-			fileField.setText(file == null ? "" : file.getPath());
-			enableButton.setEnabled(file != null);
-
-			headerCheckBox.setSelected(model.getFileHeader());
-		}
-
-		private void computeEnableItems(Model model) {
-			if (model.isFileEnabled()) {
-				enableLabel.setText(Strings.get("fileEnabled"));
-				enableButton.setText(Strings.get("fileDisableButton"));
-			} else {
-				enableLabel.setText(Strings.get("fileDisabled"));
-				enableButton.setText(Strings.get("fileEnableButton"));
-			}
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
@@ -100,7 +65,42 @@ class FilePanel extends LogPanel {
 				getModel().setFileHeader(headerCheckBox.isSelected());
 			}
 		}
+
+		private void computeEnableItems(Model model) {
+			if (model.isFileEnabled()) {
+				enableLabel.setText(Strings.get("fileEnabled"));
+				enableButton.setText(Strings.get("fileDisableButton"));
+			} else {
+				enableLabel.setText(Strings.get("fileDisabled"));
+				enableButton.setText(Strings.get("fileEnableButton"));
+			}
+		}
+
+		@Override
+		public void entryAdded(ModelEvent event, Value[] values) {
+		}
+
+		@Override
+		public void filePropertyChanged(ModelEvent event) {
+			Model model = getModel();
+			computeEnableItems(model);
+
+			File file = model.getFile();
+			fileField.setText(file == null ? "" : file.getPath());
+			enableButton.setEnabled(file != null);
+
+			headerCheckBox.setSelected(model.getFileHeader());
+		}
+
+		@Override
+		public void selectionChanged(ModelEvent event) {
+		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7780727837324383844L;
 
 	private Listener listener = new Listener();
 	private JLabel enableLabel = new JLabel();
@@ -175,13 +175,13 @@ class FilePanel extends LogPanel {
 	}
 
 	@Override
-	public String getTitle() {
-		return Strings.get("fileTab");
+	public String getHelpText() {
+		return Strings.get("fileHelp");
 	}
 
 	@Override
-	public String getHelpText() {
-		return Strings.get("fileHelp");
+	public String getTitle() {
+		return Strings.get("fileTab");
 	}
 
 	@Override

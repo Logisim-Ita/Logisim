@@ -33,6 +33,18 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.Icons;
 
 public class TextTool extends AbstractTool {
+	private class CancelListener extends AbstractAction {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4185682496263546969L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			cancelText(curCanvas);
+		}
+	}
+
 	private class FieldListener extends AbstractAction implements AttributeListener {
 		/**
 		 * 
@@ -60,18 +72,6 @@ public class TextTool extends AbstractTool {
 		}
 	}
 
-	private class CancelListener extends AbstractAction {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -4185682496263546969L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			cancelText(curCanvas);
-		}
-	}
-
 	private DrawingAttributeSet attrs;
 	private EditableLabelField field;
 	private FieldListener fieldListener;
@@ -95,14 +95,44 @@ public class TextTool extends AbstractTool {
 		fieldAction.put("cancel", new CancelListener());
 	}
 
-	@Override
-	public Icon getIcon() {
-		return Icons.getIcon("text.gif");
+	private void cancelText(Canvas canvas) {
+		Text cur = curText;
+		if (cur != null) {
+			curText = null;
+			cur.removeAttributeListener(fieldListener);
+			canvas.remove(field);
+			canvas.getSelection().clearSelected();
+			canvas.repaint();
+		}
+	}
+
+	private void commitText(Canvas canvas) {
+		Text cur = curText;
+		boolean isNew = isTextNew;
+		String newText = field.getText();
+		if (cur == null) {
+			return;
+		}
+		cancelText(canvas);
+
+		if (isNew) {
+			if (!newText.equals("")) {
+				cur.setText(newText);
+				canvas.doAction(new ModelAddAction(canvas.getModel(), cur));
+			}
+		} else {
+			String oldText = cur.getText();
+			if (newText.equals("")) {
+				canvas.doAction(new ModelRemoveAction(canvas.getModel(), cur));
+			} else if (!oldText.equals(newText)) {
+				canvas.doAction(new ModelEditTextAction(canvas.getModel(), cur, newText));
+			}
+		}
 	}
 
 	@Override
-	public Cursor getCursor(Canvas canvas) {
-		return Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+	public void draw(Canvas canvas, Graphics g) {
+		; // actually, there's nothing to do here - it's handled by the field
 	}
 
 	@Override
@@ -111,13 +141,13 @@ public class TextTool extends AbstractTool {
 	}
 
 	@Override
-	public void toolSelected(Canvas canvas) {
-		cancelText(canvas);
+	public Cursor getCursor(Canvas canvas) {
+		return Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
 	}
 
 	@Override
-	public void toolDeselected(Canvas canvas) {
-		commitText(canvas);
+	public Icon getIcon() {
+		return Icons.getIcon("text.gif");
 	}
 
 	@Override
@@ -166,50 +196,20 @@ public class TextTool extends AbstractTool {
 	}
 
 	@Override
+	public void toolDeselected(Canvas canvas) {
+		commitText(canvas);
+	}
+
+	@Override
+	public void toolSelected(Canvas canvas) {
+		cancelText(canvas);
+	}
+
+	@Override
 	public void zoomFactorChanged(Canvas canvas) {
 		Text t = curText;
 		if (t != null) {
 			t.getLabel().configureTextField(field, canvas.getZoomFactor());
-		}
-	}
-
-	@Override
-	public void draw(Canvas canvas, Graphics g) {
-		; // actually, there's nothing to do here - it's handled by the field
-	}
-
-	private void cancelText(Canvas canvas) {
-		Text cur = curText;
-		if (cur != null) {
-			curText = null;
-			cur.removeAttributeListener(fieldListener);
-			canvas.remove(field);
-			canvas.getSelection().clearSelected();
-			canvas.repaint();
-		}
-	}
-
-	private void commitText(Canvas canvas) {
-		Text cur = curText;
-		boolean isNew = isTextNew;
-		String newText = field.getText();
-		if (cur == null) {
-			return;
-		}
-		cancelText(canvas);
-
-		if (isNew) {
-			if (!newText.equals("")) {
-				cur.setText(newText);
-				canvas.doAction(new ModelAddAction(canvas.getModel(), cur));
-			}
-		} else {
-			String oldText = cur.getText();
-			if (newText.equals("")) {
-				canvas.doAction(new ModelRemoveAction(canvas.getModel(), cur));
-			} else if (!oldText.equals(newText)) {
-				canvas.doAction(new ModelEditTextAction(canvas.getModel(), cur, newText));
-			}
 		}
 	}
 }

@@ -42,216 +42,17 @@ import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 
 public class AttrTable extends JPanel implements LocaleListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -529960152633563125L;
-	private static final AttrTableModel NULL_ATTR_MODEL = new NullAttrModel();
-
-	private static class NullAttrModel implements AttrTableModel {
-		@Override
-		public void addAttrTableModelListener(AttrTableModelListener listener) {
-		}
-
-		@Override
-		public void removeAttrTableModelListener(AttrTableModelListener listener) {
-		}
-
-		@Override
-		public String getTitle() {
-			return null;
-		}
-
-		@Override
-		public int getRowCount() {
-			return 0;
-		}
-
-		@Override
-		public AttrTableModelRow getRow(int rowIndex) {
-			return null;
-		}
-	}
-
-	private static class TitleLabel extends JLabel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 8599788843622700019L;
-
-		@Override
-		public Dimension getMinimumSize() {
-			Dimension ret = super.getMinimumSize();
-			return new Dimension(1, ret.height);
-		}
-	}
-
-	private static class MyDialog extends JDialogOk {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -7689633170900231085L;
-		JInputComponent input;
-		Object value;
-
-		public MyDialog(Dialog parent, JInputComponent input) {
-			super(parent, Strings.get("attributeDialogTitle"), true);
-			configure(input);
-		}
-
-		public MyDialog(Frame parent, JInputComponent input) {
-			super(parent, Strings.get("attributeDialogTitle"), true);
-			configure(input);
-		}
-
-		private void configure(JInputComponent input) {
-			this.input = input;
-			this.value = input.getValue();
-
-			// Thanks to Christophe Jacquet, who contributed a fix to this
-			// so that when the dialog is resized, the component within it
-			// is resized as well. (Tracker #2024479)
-			JPanel p = new JPanel(new BorderLayout());
-			p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-			p.add((JComponent) input, BorderLayout.CENTER);
-			getContentPane().add(p, BorderLayout.CENTER);
-
-			pack();
-		}
-
-		@Override
-		public void okClicked() {
-			value = input.getValue();
-		}
-
-		public Object getValue() {
-			return value;
-		}
-	}
-
-	private class TableModelAdapter implements TableModel, AttrTableModelListener {
-		Window parent;
-		LinkedList<TableModelListener> listeners;
-		AttrTableModel attrModel;
-
-		TableModelAdapter(Window parent, AttrTableModel attrModel) {
-			this.parent = parent;
-			this.listeners = new LinkedList<TableModelListener>();
-			this.attrModel = attrModel;
-		}
-
-		void setAttrTableModel(AttrTableModel value) {
-			if (attrModel != value) {
-				TableCellEditor editor = table.getCellEditor();
-				if (editor != null)
-					editor.cancelCellEditing();
-				attrModel.removeAttrTableModelListener(this);
-				attrModel = value;
-				attrModel.addAttrTableModelListener(this);
-				fireTableChanged();
-			}
-		}
-
-		@Override
-		public void addTableModelListener(TableModelListener l) {
-			listeners.add(l);
-		}
-
-		@Override
-		public void removeTableModelListener(TableModelListener l) {
-			listeners.remove(l);
-		}
-
-		void fireTableChanged() {
-			TableModelEvent e = new TableModelEvent(this);
-			for (TableModelListener l : new ArrayList<TableModelListener>(listeners)) {
-				l.tableChanged(e);
-			}
-		}
-
-		@Override
-		public int getColumnCount() {
-			return 2;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			if (columnIndex == 0)
-				return "Attribute";
-			else
-				return "Value";
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			return String.class;
-		}
-
-		@Override
-		public int getRowCount() {
-			return attrModel.getRowCount();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			if (columnIndex == 0) {
-				return attrModel.getRow(rowIndex).getLabel();
-			} else {
-				return attrModel.getRow(rowIndex).getValue();
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex > 0 && attrModel.getRow(rowIndex).isValueEditable();
-		}
-
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			if (columnIndex > 0) {
-				try {
-					attrModel.getRow(rowIndex).setValue(value);
-				} catch (AttrTableSetException e) {
-					JOptionPane.showMessageDialog(parent, e.getMessage(), Strings.get("attributeChangeInvalidTitle"),
-							JOptionPane.WARNING_MESSAGE);
-				}
-			}
-		}
-
-		//
-		// AttrTableModelListener methods
-		//
-		@Override
-		public void attrTitleChanged(AttrTableModelEvent e) {
-			if (e.getSource() != attrModel) {
-				attrModel.removeAttrTableModelListener(this);
-				return;
-			}
-			updateTitle();
-		}
-
-		@Override
-		public void attrStructureChanged(AttrTableModelEvent e) {
-			if (e.getSource() != attrModel) {
-				attrModel.removeAttrTableModelListener(this);
-				return;
-			}
-			fireTableChanged();
-		}
-
-		@Override
-		public void attrValueChanged(AttrTableModelEvent e) {
-			if (e.getSource() != attrModel) {
-				attrModel.removeAttrTableModelListener(this);
-				return;
-			}
-			fireTableChanged();
-		}
-	}
-
 	private class CellEditor implements TableCellEditor, FocusListener, ActionListener {
 		LinkedList<CellEditorListener> listeners = new LinkedList<CellEditorListener>();
 		Component currentEditor;
+
+		//
+		// ActionListener methods
+		//
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			stopCellEditing();
+		}
 
 		//
 		// TableCellListener management
@@ -263,10 +64,14 @@ public class AttrTable extends JPanel implements LocaleListener {
 			listeners.add(l);
 		}
 
+		//
+		// other TableCellEditor methods
+		//
 		@Override
-		public void removeCellEditorListener(CellEditorListener l) {
-			// Removes a listener from the list that's notified
-			listeners.remove(l);
+		public void cancelCellEditing() {
+			// Tells the editor to cancel editing and not accept any
+			// partially edited value.
+			fireEditingCanceled();
 		}
 
 		public void fireEditingCanceled() {
@@ -283,22 +88,29 @@ public class AttrTable extends JPanel implements LocaleListener {
 			}
 		}
 
-		//
-		// other TableCellEditor methods
-		//
 		@Override
-		public void cancelCellEditing() {
-			// Tells the editor to cancel editing and not accept any
-			// partially edited value.
-			fireEditingCanceled();
+		public void focusGained(FocusEvent e) {
 		}
 
+		//
+		// FocusListener methods
+		//
 		@Override
-		public boolean stopCellEditing() {
-			// Tells the editor to stop editing and accept any partially
-			// edited value as the value of the editor.
-			fireEditingStopped();
-			return true;
+		public void focusLost(FocusEvent e) {
+			Object dst = e.getOppositeComponent();
+			if (dst instanceof Component) {
+				Component p = (Component) dst;
+				while (p != null && !(p instanceof Window)) {
+					if (p == AttrTable.this) {
+						// switch to another place in this table,
+						// no problem
+						return;
+					}
+					p = p.getParent();
+				}
+				// focus transferred outside table; stop editing
+				editor.stopCellEditing();
+			}
 		}
 
 		@SuppressWarnings("rawtypes")
@@ -313,19 +125,6 @@ public class AttrTable extends JPanel implements LocaleListener {
 			} else {
 				return null;
 			}
-		}
-
-		@Override
-		public boolean isCellEditable(EventObject anEvent) {
-			// Asks the editor if it can start editing using anEvent.
-			return true;
-		}
-
-		@Override
-		public boolean shouldSelectCell(EventObject anEvent) {
-			// Returns true if the editing cell should be selected,
-			// false otherwise.
-			return true;
 		}
 
 		@SuppressWarnings("rawtypes")
@@ -371,40 +170,241 @@ public class AttrTable extends JPanel implements LocaleListener {
 			}
 		}
 
+		@Override
+		public boolean isCellEditable(EventObject anEvent) {
+			// Asks the editor if it can start editing using anEvent.
+			return true;
+		}
+
+		@Override
+		public void removeCellEditorListener(CellEditorListener l) {
+			// Removes a listener from the list that's notified
+			listeners.remove(l);
+		}
+
+		@Override
+		public boolean shouldSelectCell(EventObject anEvent) {
+			// Returns true if the editing cell should be selected,
+			// false otherwise.
+			return true;
+		}
+
+		@Override
+		public boolean stopCellEditing() {
+			// Tells the editor to stop editing and accept any partially
+			// edited value as the value of the editor.
+			fireEditingStopped();
+			return true;
+		}
+
+	}
+	private static class MyDialog extends JDialogOk {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7689633170900231085L;
+		JInputComponent input;
+		Object value;
+
+		public MyDialog(Dialog parent, JInputComponent input) {
+			super(parent, Strings.get("attributeDialogTitle"), true);
+			configure(input);
+		}
+
+		public MyDialog(Frame parent, JInputComponent input) {
+			super(parent, Strings.get("attributeDialogTitle"), true);
+			configure(input);
+		}
+
+		private void configure(JInputComponent input) {
+			this.input = input;
+			this.value = input.getValue();
+
+			// Thanks to Christophe Jacquet, who contributed a fix to this
+			// so that when the dialog is resized, the component within it
+			// is resized as well. (Tracker #2024479)
+			JPanel p = new JPanel(new BorderLayout());
+			p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			p.add((JComponent) input, BorderLayout.CENTER);
+			getContentPane().add(p, BorderLayout.CENTER);
+
+			pack();
+		}
+
+		public Object getValue() {
+			return value;
+		}
+
+		@Override
+		public void okClicked() {
+			value = input.getValue();
+		}
+	}
+
+	private static class NullAttrModel implements AttrTableModel {
+		@Override
+		public void addAttrTableModelListener(AttrTableModelListener listener) {
+		}
+
+		@Override
+		public AttrTableModelRow getRow(int rowIndex) {
+			return null;
+		}
+
+		@Override
+		public int getRowCount() {
+			return 0;
+		}
+
+		@Override
+		public String getTitle() {
+			return null;
+		}
+
+		@Override
+		public void removeAttrTableModelListener(AttrTableModelListener listener) {
+		}
+	}
+
+	private class TableModelAdapter implements TableModel, AttrTableModelListener {
+		Window parent;
+		LinkedList<TableModelListener> listeners;
+		AttrTableModel attrModel;
+
+		TableModelAdapter(Window parent, AttrTableModel attrModel) {
+			this.parent = parent;
+			this.listeners = new LinkedList<TableModelListener>();
+			this.attrModel = attrModel;
+		}
+
+		@Override
+		public void addTableModelListener(TableModelListener l) {
+			listeners.add(l);
+		}
+
+		@Override
+		public void attrStructureChanged(AttrTableModelEvent e) {
+			if (e.getSource() != attrModel) {
+				attrModel.removeAttrTableModelListener(this);
+				return;
+			}
+			fireTableChanged();
+		}
+
 		//
-		// FocusListener methods
+		// AttrTableModelListener methods
 		//
 		@Override
-		public void focusLost(FocusEvent e) {
-			Object dst = e.getOppositeComponent();
-			if (dst instanceof Component) {
-				Component p = (Component) dst;
-				while (p != null && !(p instanceof Window)) {
-					if (p == AttrTable.this) {
-						// switch to another place in this table,
-						// no problem
-						return;
-					}
-					p = p.getParent();
-				}
-				// focus transferred outside table; stop editing
-				editor.stopCellEditing();
+		public void attrTitleChanged(AttrTableModelEvent e) {
+			if (e.getSource() != attrModel) {
+				attrModel.removeAttrTableModelListener(this);
+				return;
+			}
+			updateTitle();
+		}
+
+		@Override
+		public void attrValueChanged(AttrTableModelEvent e) {
+			if (e.getSource() != attrModel) {
+				attrModel.removeAttrTableModelListener(this);
+				return;
+			}
+			fireTableChanged();
+		}
+
+		void fireTableChanged() {
+			TableModelEvent e = new TableModelEvent(this);
+			for (TableModelListener l : new ArrayList<TableModelListener>(listeners)) {
+				l.tableChanged(e);
 			}
 		}
 
 		@Override
-		public void focusGained(FocusEvent e) {
+		public Class<?> getColumnClass(int columnIndex) {
+			return String.class;
 		}
 
-		//
-		// ActionListener methods
-		//
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			stopCellEditing();
+		public int getColumnCount() {
+			return 2;
 		}
 
+		@Override
+		public String getColumnName(int columnIndex) {
+			if (columnIndex == 0)
+				return "Attribute";
+			else
+				return "Value";
+		}
+
+		@Override
+		public int getRowCount() {
+			return attrModel.getRowCount();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			if (columnIndex == 0) {
+				return attrModel.getRow(rowIndex).getLabel();
+			} else {
+				return attrModel.getRow(rowIndex).getValue();
+			}
+		}
+
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return columnIndex > 0 && attrModel.getRow(rowIndex).isValueEditable();
+		}
+
+		@Override
+		public void removeTableModelListener(TableModelListener l) {
+			listeners.remove(l);
+		}
+
+		void setAttrTableModel(AttrTableModel value) {
+			if (attrModel != value) {
+				TableCellEditor editor = table.getCellEditor();
+				if (editor != null)
+					editor.cancelCellEditing();
+				attrModel.removeAttrTableModelListener(this);
+				attrModel = value;
+				attrModel.addAttrTableModelListener(this);
+				fireTableChanged();
+			}
+		}
+
+		@Override
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			if (columnIndex > 0) {
+				try {
+					attrModel.getRow(rowIndex).setValue(value);
+				} catch (AttrTableSetException e) {
+					JOptionPane.showMessageDialog(parent, e.getMessage(), Strings.get("attributeChangeInvalidTitle"),
+							JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		}
 	}
+
+	private static class TitleLabel extends JLabel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8599788843622700019L;
+
+		@Override
+		public Dimension getMinimumSize() {
+			Dimension ret = super.getMinimumSize();
+			return new Dimension(1, ret.height);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -529960152633563125L;
+
+	private static final AttrTableModel NULL_ATTR_MODEL = new NullAttrModel();
 
 	private Window parent;
 	private boolean titleEnabled;
@@ -447,13 +447,18 @@ public class AttrTable extends JPanel implements LocaleListener {
 		localeChanged();
 	}
 
-	public void setTitleEnabled(boolean value) {
-		titleEnabled = value;
-		updateTitle();
+	public AttrTableModel getAttrTableModel() {
+		return tableModel.attrModel;
 	}
 
 	public boolean getTitleEnabled() {
 		return titleEnabled;
+	}
+
+	@Override
+	public void localeChanged() {
+		updateTitle();
+		tableModel.fireTableChanged();
 	}
 
 	public void setAttrTableModel(AttrTableModel value) {
@@ -461,14 +466,9 @@ public class AttrTable extends JPanel implements LocaleListener {
 		updateTitle();
 	}
 
-	public AttrTableModel getAttrTableModel() {
-		return tableModel.attrModel;
-	}
-
-	@Override
-	public void localeChanged() {
+	public void setTitleEnabled(boolean value) {
+		titleEnabled = value;
 		updateTitle();
-		tableModel.fireTableChanged();
 	}
 
 	private void updateTitle() {

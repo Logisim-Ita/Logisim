@@ -39,12 +39,32 @@ import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.StringGetter;
 
 abstract class AbstractGate extends InstanceFactory {
+	static Value pullOutput(Value value, Object outType) {
+		if (outType == GateAttributes.OUTPUT_01) {
+			return value;
+		} else {
+			Value[] v = value.getAll();
+			if (outType == GateAttributes.OUTPUT_0Z) {
+				for (int i = 0; i < v.length; i++) {
+					if (v[i] == Value.TRUE)
+						v[i] = Value.UNKNOWN;
+				}
+			} else if (outType == GateAttributes.OUTPUT_Z1) {
+				for (int i = 0; i < v.length; i++) {
+					if (v[i] == Value.FALSE)
+						v[i] = Value.UNKNOWN;
+				}
+			}
+			return Value.create(v);
+		}
+	}
 	private String[] iconNames = new String[3];
 	private Icon[] icons = new Icon[3];
 	private int bonusWidth = 0;
 	private boolean negateOutput = false;
 	private boolean isXor = false;
 	private String rectLabel = "";
+
 	private boolean paintInputLines;
 
 	protected AbstractGate(String name, StringGetter desc) {
@@ -60,45 +80,60 @@ abstract class AbstractGate extends InstanceFactory {
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 	}
 
-	@Override
-	public AttributeSet createAttributeSet() {
-		return new GateAttributes(isXor);
-	}
+	protected abstract Expression computeExpression(Expression[] inputs, int numInputs);
 
-	@Override
-	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
-		if (attr instanceof NegateAttribute) {
-			return Boolean.FALSE;
-		} else {
-			return super.getDefaultAttributeValue(attr, ver);
-		}
-	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrsBase) {
-		GateAttributes attrs = (GateAttributes) attrsBase;
+	private void computeLabel(Instance instance) {
+		GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
 		Direction facing = attrs.facing;
-		int size = ((Integer) attrs.size.getValue()).intValue();
-		int inputs = attrs.inputs;
-		if (inputs % 2 == 0) {
-			inputs++;
-		}
-		int negated = attrs.negated;
+		int baseWidth = ((Integer) attrs.size.getValue()).intValue();
 
-		int width = size + bonusWidth + (negateOutput ? 10 : 0);
-		if (negated != 0) {
-			width += 10;
+		int axis = baseWidth / 2 + (negateOutput ? 10 : 0);
+		int perp = 0;
+		if (AppPreferences.GATE_SHAPE.get().equals(AppPreferences.SHAPE_RECTANGULAR)) {
+			perp += 6;
 		}
-		int height = Math.max(10 * inputs, size);
-		if (facing == Direction.SOUTH) {
-			return Bounds.create(-height / 2, -width, height, width);
-		} else if (facing == Direction.NORTH) {
-			return Bounds.create(-height / 2, 0, height, width);
+		Location loc = instance.getLocation();
+		int cx;
+		int cy;
+		if (facing == Direction.NORTH) {
+			cx = loc.getX() + perp;
+			cy = loc.getY() + axis;
+		} else if (facing == Direction.SOUTH) {
+			cx = loc.getX() - perp;
+			cy = loc.getY() - axis;
 		} else if (facing == Direction.WEST) {
-			return Bounds.create(0, -height / 2, width, height);
+			cx = loc.getX() + axis;
+			cy = loc.getY() - perp;
 		} else {
-			return Bounds.create(-width, -height / 2, width, height);
+			cx = loc.getX() - axis;
+			cy = loc.getY() + perp;
 		}
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, cx, cy, TextField.H_CENTER, TextField.V_CENTER);
+	}
+
+	protected abstract Value computeOutput(Value[] inputs, int numInputs, InstanceState state);
+
+	void computePorts(Instance instance) {
+		GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
+		int inputs = attrs.inputs;
+
+		Port[] ports = new Port[inputs + 1];
+		ports[0] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		for (int i = 0; i < inputs; i++) {
+			Location offs = getInputOffset(attrs, i);
+			ports[i + 1] = new Port(offs.getX(), offs.getY(), Port.INPUT, StdAttr.WIDTH);
+		}
+		instance.setPorts(ports);
+	}
+
+	//
+	// methods for instances
+	//
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		computePorts(instance);
+		computeLabel(instance);
 	}
 
 	@Override
@@ -137,19 +172,200 @@ abstract class AbstractGate extends InstanceFactory {
 		}
 	}
 
-	//
-	// painting methods
-	//
 	@Override
-	public void paintGhost(InstancePainter painter) {
-		paintBase(painter);
+	public AttributeSet createAttributeSet() {
+		return new GateAttributes(isXor);
 	}
 
 	@Override
-	public void paintInstance(InstancePainter painter) {
-		paintBase(painter);
-		if (!painter.isPrintView() || painter.getGateShape() == AppPreferences.SHAPE_RECTANGULAR) {
-			painter.drawPorts();
+	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
+		if (attr instanceof NegateAttribute) {
+			return Boolean.FALSE;
+		} else {
+			return super.getDefaultAttributeValue(attr, ver);
+		}
+	}
+
+	private Icon getIcon(int type) {
+		Icon ret = icons[type];
+		if (ret != null) {
+			return ret;
+		} else {
+			String iconName = iconNames[type];
+			if (iconName == null) {
+				return null;
+			} else {
+				ret = Icons.getIcon(iconName);
+				if (ret == null) {
+					iconNames[type] = null;
+				} else {
+					icons[type] = ret;
+				}
+				return ret;
+			}
+		}
+	}
+
+	private Icon getIconDin40700() {
+		return getIcon(2);
+	}
+
+	private Icon getIconRectangular() {
+		return getIcon(1);
+	}
+
+	private Icon getIconShaped() {
+		return getIcon(0);
+	}
+
+	//
+	// protected methods intended to be overridden
+	//
+	protected abstract Value getIdentity();
+
+	Location getInputOffset(GateAttributes attrs, int index) {
+		int inputs = attrs.inputs;
+		Direction facing = attrs.facing;
+		int size = ((Integer) attrs.size.getValue()).intValue();
+		int axisLength = size + bonusWidth + (negateOutput ? 10 : 0);
+		int negated = attrs.negated;
+
+		int skipStart;
+		int skipDist;
+		int skipLowerEven = 10;
+		if (inputs <= 3) {
+			if (size < 40) {
+				skipStart = -5;
+				skipDist = 10;
+				skipLowerEven = 10;
+			} else if (size < 60 || inputs <= 2) {
+				skipStart = -10;
+				skipDist = 20;
+				skipLowerEven = 20;
+			} else {
+				skipStart = -15;
+				skipDist = 30;
+				skipLowerEven = 30;
+			}
+		} else if (inputs == 4 && size >= 60) {
+			skipStart = -5;
+			skipDist = 20;
+			skipLowerEven = 0;
+		} else {
+			skipStart = -5;
+			skipDist = 10;
+			skipLowerEven = 10;
+		}
+
+		int dy;
+		if ((inputs & 1) == 1) {
+			dy = skipStart * (inputs - 1) + skipDist * index;
+		} else {
+			dy = skipStart * inputs + skipDist * index;
+			if (index >= inputs / 2)
+				dy += skipLowerEven;
+		}
+
+		int dx = axisLength;
+		int negatedBit = (negated >> index) & 1;
+		if (negatedBit == 1) {
+			dx += 10;
+		}
+
+		if (facing == Direction.NORTH) {
+			return Location.create(dy, dx);
+		} else if (facing == Direction.SOUTH) {
+			return Location.create(dy, -dx);
+		} else if (facing == Direction.WEST) {
+			return Location.create(dx, dy);
+		} else {
+			return Location.create(-dx, dy);
+		}
+	}
+
+	@Override
+	protected Object getInstanceFeature(final Instance instance, Object key) {
+		if (key == WireRepair.class) {
+			return new WireRepair() {
+				@Override
+				public boolean shouldRepairWire(WireRepairData data) {
+					return AbstractGate.this.shouldRepairWire(instance, data);
+				}
+			};
+		}
+		if (key == ExpressionComputer.class) {
+			return new ExpressionComputer() {
+				@Override
+				public void computeExpression(Map<Location, Expression> expressionMap) {
+					GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
+					int inputCount = attrs.inputs;
+					int negated = attrs.negated;
+
+					Expression[] inputs = new Expression[inputCount];
+					int numInputs = 0;
+					for (int i = 1; i <= inputCount; i++) {
+						Expression e = expressionMap.get(instance.getPortLocation(i));
+						if (e != null) {
+							int negatedBit = (negated >> (i - 1)) & 1;
+							if (negatedBit == 1) {
+								e = Expressions.not(e);
+							}
+							inputs[numInputs] = e;
+							++numInputs;
+						}
+					}
+					if (numInputs > 0) {
+						Expression out = AbstractGate.this.computeExpression(inputs, numInputs);
+						expressionMap.put(instance.getPortLocation(0), out);
+					}
+				}
+			};
+		}
+		return super.getInstanceFeature(instance, key);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrsBase) {
+		GateAttributes attrs = (GateAttributes) attrsBase;
+		Direction facing = attrs.facing;
+		int size = ((Integer) attrs.size.getValue()).intValue();
+		int inputs = attrs.inputs;
+		if (inputs % 2 == 0) {
+			inputs++;
+		}
+		int negated = attrs.negated;
+
+		int width = size + bonusWidth + (negateOutput ? 10 : 0);
+		if (negated != 0) {
+			width += 10;
+		}
+		int height = Math.max(10 * inputs, size);
+		if (facing == Direction.SOUTH) {
+			return Bounds.create(-height / 2, -width, height, width);
+		} else if (facing == Direction.NORTH) {
+			return Bounds.create(-height / 2, 0, height, width);
+		} else if (facing == Direction.WEST) {
+			return Bounds.create(0, -height / 2, width, height);
+		} else {
+			return Bounds.create(-width, -height / 2, width, height);
+		}
+	}
+
+	protected String getRectangularLabel(AttributeSet attrs) {
+		return rectLabel;
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == GateAttributes.ATTR_SIZE || attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			computePorts(instance);
+			computeLabel(instance);
+		} else if (attr == GateAttributes.ATTR_INPUTS || attr instanceof NegateAttribute) {
+			instance.recomputeBounds();
+			computePorts(instance);
+		} else if (attr == GateAttributes.ATTR_XOR) {
+			instance.fireInvalidated();
 		}
 	}
 
@@ -220,61 +436,14 @@ abstract class AbstractGate extends InstanceFactory {
 		painter.drawLabel();
 	}
 
-	protected void setIconNames(String all) {
-		setIconNames(all, all, all);
-	}
+	protected abstract void paintDinShape(InstancePainter painter, int width, int height, int inputs);
 
-	protected void setIconNames(String shaped, String rect, String din) {
-		iconNames[0] = shaped;
-		iconNames[1] = rect;
-		iconNames[2] = din;
-	}
-
-	private Icon getIcon(int type) {
-		Icon ret = icons[type];
-		if (ret != null) {
-			return ret;
-		} else {
-			String iconName = iconNames[type];
-			if (iconName == null) {
-				return null;
-			} else {
-				ret = Icons.getIcon(iconName);
-				if (ret == null) {
-					iconNames[type] = null;
-				} else {
-					icons[type] = ret;
-				}
-				return ret;
-			}
-		}
-	}
-
-	private Icon getIconShaped() {
-		return getIcon(0);
-	}
-
-	private Icon getIconRectangular() {
-		return getIcon(1);
-	}
-
-	private Icon getIconDin40700() {
-		return getIcon(2);
-	}
-
-	protected void setPaintInputLines(boolean value) {
-		paintInputLines = value;
-	}
-
-	protected abstract void paintIconShaped(InstancePainter painter);
-
-	protected void paintIconRectangular(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		g.drawRect(1, 2, 16, 16);
-		if (negateOutput)
-			g.drawOval(16, 8, 4, 4);
-		String label = getRectangularLabel(painter.getAttributeSet());
-		GraphicsUtil.drawCenteredText(g, label, 9, 8);
+	//
+	// painting methods
+	//
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter);
 	}
 
 	@Override
@@ -305,28 +474,24 @@ abstract class AbstractGate extends InstanceFactory {
 		}
 	}
 
-	protected void setAdditionalWidth(int value) {
-		bonusWidth = value;
+	protected void paintIconRectangular(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
+		g.drawRect(1, 2, 16, 16);
+		if (negateOutput)
+			g.drawOval(16, 8, 4, 4);
+		String label = getRectangularLabel(painter.getAttributeSet());
+		GraphicsUtil.drawCenteredText(g, label, 9, 8);
 	}
 
-	protected void setNegateOutput(boolean value) {
-		negateOutput = value;
+	protected abstract void paintIconShaped(InstancePainter painter);
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		paintBase(painter);
+		if (!painter.isPrintView() || painter.getGateShape() == AppPreferences.SHAPE_RECTANGULAR) {
+			painter.drawPorts();
+		}
 	}
-
-	protected void setRectangularLabel(String value) {
-		rectLabel = value;
-	}
-
-	protected String getRectangularLabel(AttributeSet attrs) {
-		return rectLabel;
-	}
-
-	//
-	// protected methods intended to be overridden
-	//
-	protected abstract Value getIdentity();
-
-	protected abstract void paintShape(InstancePainter painter, int width, int height);
 
 	protected void paintRectangular(InstancePainter painter, int width, int height) {
 		int don = negateOutput ? 10 : 0;
@@ -337,81 +502,7 @@ abstract class AbstractGate extends InstanceFactory {
 		}
 	}
 
-	protected abstract void paintDinShape(InstancePainter painter, int width, int height, int inputs);
-
-	protected abstract Value computeOutput(Value[] inputs, int numInputs, InstanceState state);
-
-	protected abstract Expression computeExpression(Expression[] inputs, int numInputs);
-
-	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
-		return false;
-	}
-
-	//
-	// methods for instances
-	//
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		computePorts(instance);
-		computeLabel(instance);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == GateAttributes.ATTR_SIZE || attr == StdAttr.FACING) {
-			instance.recomputeBounds();
-			computePorts(instance);
-			computeLabel(instance);
-		} else if (attr == GateAttributes.ATTR_INPUTS || attr instanceof NegateAttribute) {
-			instance.recomputeBounds();
-			computePorts(instance);
-		} else if (attr == GateAttributes.ATTR_XOR) {
-			instance.fireInvalidated();
-		}
-	}
-
-	private void computeLabel(Instance instance) {
-		GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
-		Direction facing = attrs.facing;
-		int baseWidth = ((Integer) attrs.size.getValue()).intValue();
-
-		int axis = baseWidth / 2 + (negateOutput ? 10 : 0);
-		int perp = 0;
-		if (AppPreferences.GATE_SHAPE.get().equals(AppPreferences.SHAPE_RECTANGULAR)) {
-			perp += 6;
-		}
-		Location loc = instance.getLocation();
-		int cx;
-		int cy;
-		if (facing == Direction.NORTH) {
-			cx = loc.getX() + perp;
-			cy = loc.getY() + axis;
-		} else if (facing == Direction.SOUTH) {
-			cx = loc.getX() - perp;
-			cy = loc.getY() - axis;
-		} else if (facing == Direction.WEST) {
-			cx = loc.getX() + axis;
-			cy = loc.getY() - perp;
-		} else {
-			cx = loc.getX() - axis;
-			cy = loc.getY() + perp;
-		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, cx, cy, TextField.H_CENTER, TextField.V_CENTER);
-	}
-
-	void computePorts(Instance instance) {
-		GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
-		int inputs = attrs.inputs;
-
-		Port[] ports = new Port[inputs + 1];
-		ports[0] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		for (int i = 0; i < inputs; i++) {
-			Location offs = getInputOffset(attrs, i);
-			ports[i + 1] = new Port(offs.getX(), offs.getY(), Port.INPUT, StdAttr.WIDTH);
-		}
-		instance.setPorts(ports);
-	}
+	protected abstract void paintShape(InstancePainter painter, int width, int height);
 
 	@Override
 	public void propagate(InstanceState state) {
@@ -449,124 +540,33 @@ abstract class AbstractGate extends InstanceFactory {
 		state.setPort(0, out, GateAttributes.DELAY);
 	}
 
-	static Value pullOutput(Value value, Object outType) {
-		if (outType == GateAttributes.OUTPUT_01) {
-			return value;
-		} else {
-			Value[] v = value.getAll();
-			if (outType == GateAttributes.OUTPUT_0Z) {
-				for (int i = 0; i < v.length; i++) {
-					if (v[i] == Value.TRUE)
-						v[i] = Value.UNKNOWN;
-				}
-			} else if (outType == GateAttributes.OUTPUT_Z1) {
-				for (int i = 0; i < v.length; i++) {
-					if (v[i] == Value.FALSE)
-						v[i] = Value.UNKNOWN;
-				}
-			}
-			return Value.create(v);
-		}
+	protected void setAdditionalWidth(int value) {
+		bonusWidth = value;
 	}
 
-	@Override
-	protected Object getInstanceFeature(final Instance instance, Object key) {
-		if (key == WireRepair.class) {
-			return new WireRepair() {
-				@Override
-				public boolean shouldRepairWire(WireRepairData data) {
-					return AbstractGate.this.shouldRepairWire(instance, data);
-				}
-			};
-		}
-		if (key == ExpressionComputer.class) {
-			return new ExpressionComputer() {
-				@Override
-				public void computeExpression(Map<Location, Expression> expressionMap) {
-					GateAttributes attrs = (GateAttributes) instance.getAttributeSet();
-					int inputCount = attrs.inputs;
-					int negated = attrs.negated;
-
-					Expression[] inputs = new Expression[inputCount];
-					int numInputs = 0;
-					for (int i = 1; i <= inputCount; i++) {
-						Expression e = expressionMap.get(instance.getPortLocation(i));
-						if (e != null) {
-							int negatedBit = (negated >> (i - 1)) & 1;
-							if (negatedBit == 1) {
-								e = Expressions.not(e);
-							}
-							inputs[numInputs] = e;
-							++numInputs;
-						}
-					}
-					if (numInputs > 0) {
-						Expression out = AbstractGate.this.computeExpression(inputs, numInputs);
-						expressionMap.put(instance.getPortLocation(0), out);
-					}
-				}
-			};
-		}
-		return super.getInstanceFeature(instance, key);
+	protected void setIconNames(String all) {
+		setIconNames(all, all, all);
 	}
 
-	Location getInputOffset(GateAttributes attrs, int index) {
-		int inputs = attrs.inputs;
-		Direction facing = attrs.facing;
-		int size = ((Integer) attrs.size.getValue()).intValue();
-		int axisLength = size + bonusWidth + (negateOutput ? 10 : 0);
-		int negated = attrs.negated;
+	protected void setIconNames(String shaped, String rect, String din) {
+		iconNames[0] = shaped;
+		iconNames[1] = rect;
+		iconNames[2] = din;
+	}
 
-		int skipStart;
-		int skipDist;
-		int skipLowerEven = 10;
-		if (inputs <= 3) {
-			if (size < 40) {
-				skipStart = -5;
-				skipDist = 10;
-				skipLowerEven = 10;
-			} else if (size < 60 || inputs <= 2) {
-				skipStart = -10;
-				skipDist = 20;
-				skipLowerEven = 20;
-			} else {
-				skipStart = -15;
-				skipDist = 30;
-				skipLowerEven = 30;
-			}
-		} else if (inputs == 4 && size >= 60) {
-			skipStart = -5;
-			skipDist = 20;
-			skipLowerEven = 0;
-		} else {
-			skipStart = -5;
-			skipDist = 10;
-			skipLowerEven = 10;
-		}
+	protected void setNegateOutput(boolean value) {
+		negateOutput = value;
+	}
 
-		int dy;
-		if ((inputs & 1) == 1) {
-			dy = skipStart * (inputs - 1) + skipDist * index;
-		} else {
-			dy = skipStart * inputs + skipDist * index;
-			if (index >= inputs / 2)
-				dy += skipLowerEven;
-		}
+	protected void setPaintInputLines(boolean value) {
+		paintInputLines = value;
+	}
 
-		int dx = axisLength;
-		int negatedBit = (negated >> index) & 1;
-		if (negatedBit == 1) {
-			dx += 10;
-		}
+	protected void setRectangularLabel(String value) {
+		rectLabel = value;
+	}
 
-		if (facing == Direction.NORTH) {
-			return Location.create(dy, dx);
-		} else if (facing == Direction.SOUTH) {
-			return Location.create(dy, -dx);
-		} else if (facing == Direction.WEST) {
-			return Location.create(dx, dy);
-		} else {
-			return Location.create(-dx, dy);
-		}
+	protected boolean shouldRepairWire(Instance instance, WireRepairData data) {
+		return false;
 	}
 }

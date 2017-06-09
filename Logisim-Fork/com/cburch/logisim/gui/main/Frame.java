@@ -61,21 +61,33 @@ import com.cburch.logisim.util.StringUtil;
 import com.cburch.logisim.util.VerticalSplitPane;
 
 public class Frame extends LFrame implements LocaleListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4910555080088957933L;
-	public static final String EDITOR_VIEW = "editorView";
-	public static final String EXPLORER_VIEW = "explorerView";
-	public static final String EDIT_LAYOUT = "layout";
-	public static final String EDIT_APPEARANCE = "appearance";
-	public static final String VIEW_TOOLBOX = "toolbox";
-	public static final String VIEW_SIMULATION = "simulation";
-
-	private static final double[] ZOOM_OPTIONS = { 20, 50, 75, 100, 133, 150, 200, 250, 300, 400 };
-
 	class MyProjectListener
 			implements ProjectListener, LibraryListener, CircuitListener, PropertyChangeListener, ChangeListener {
+		public void attributeListChanged(AttributeEvent e) {
+		}
+
+		@Override
+		public void circuitChanged(CircuitEvent event) {
+			if (event.getAction() == CircuitEvent.ACTION_SET_NAME) {
+				computeTitle();
+			}
+		}
+
+		private void enableSave() {
+			Project proj = getProject();
+			boolean ok = proj.isFileDirty();
+			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
+		}
+
+		@Override
+		public void libraryChanged(LibraryEvent e) {
+			if (e.getAction() == LibraryEvent.SET_NAME) {
+				computeTitle();
+			} else if (e.getAction() == LibraryEvent.DIRTY_STATE) {
+				enableSave();
+			}
+		}
+
 		@Override
 		public void projectChanged(ProjectEvent event) {
 			int action = event.getAction();
@@ -101,31 +113,6 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 
 		@Override
-		public void libraryChanged(LibraryEvent e) {
-			if (e.getAction() == LibraryEvent.SET_NAME) {
-				computeTitle();
-			} else if (e.getAction() == LibraryEvent.DIRTY_STATE) {
-				enableSave();
-			}
-		}
-
-		@Override
-		public void circuitChanged(CircuitEvent event) {
-			if (event.getAction() == CircuitEvent.ACTION_SET_NAME) {
-				computeTitle();
-			}
-		}
-
-		private void enableSave() {
-			Project proj = getProject();
-			boolean ok = proj.isFileDirty();
-			getRootPane().putClientProperty("windowModified", Boolean.valueOf(ok));
-		}
-
-		public void attributeListChanged(AttributeEvent e) {
-		}
-
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
 				placeToolbar();
@@ -142,7 +129,6 @@ public class Frame extends LFrame implements LocaleListener {
 			}
 		}
 	}
-
 	class MyWindowListener extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent e) {
@@ -157,10 +143,81 @@ public class Frame extends LFrame implements LocaleListener {
 			layoutCanvas.computeSize(true);
 		}
 	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4910555080088957933L;
+	public static final String EDITOR_VIEW = "editorView";
+	public static final String EXPLORER_VIEW = "explorerView";
+	public static final String EDIT_LAYOUT = "layout";
+	public static final String EDIT_APPEARANCE = "appearance";
+
+	public static final String VIEW_TOOLBOX = "toolbox";
+
+	public static final String VIEW_SIMULATION = "simulation";
+
+	private static final double[] ZOOM_OPTIONS = { 20, 50, 75, 100, 133, 150, 200, 250, 300, 400 };
+
+	private static Point getInitialLocation() {
+		String s = AppPreferences.WINDOW_LOCATION.get();
+		if (s == null)
+			return null;
+		int comma = s.indexOf(',');
+		if (comma < 0)
+			return null;
+		try {
+			int x = Integer.parseInt(s.substring(0, comma));
+			int y = Integer.parseInt(s.substring(comma + 1));
+			while (isProjectFrameAt(x, y)) {
+				x += 20;
+				y += 20;
+			}
+			Rectangle desired = new Rectangle(x, y, 50, 50);
+
+			int gcBestSize = 0;
+			Point gcBestPoint = null;
+			GraphicsEnvironment ge;
+			ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			for (GraphicsDevice gd : ge.getScreenDevices()) {
+				for (GraphicsConfiguration gc : gd.getConfigurations()) {
+					Rectangle gcBounds = gc.getBounds();
+					if (gcBounds.intersects(desired)) {
+						Rectangle inter = gcBounds.intersection(desired);
+						int size = inter.width * inter.height;
+						if (size > gcBestSize) {
+							gcBestSize = size;
+							int x2 = Math.max(gcBounds.x, Math.min(inter.x, inter.x + inter.width - 50));
+							int y2 = Math.max(gcBounds.y, Math.min(inter.y, inter.y + inter.height - 50));
+							gcBestPoint = new Point(x2, y2);
+						}
+					}
+				}
+			}
+			if (gcBestPoint != null) {
+				if (isProjectFrameAt(gcBestPoint.x, gcBestPoint.y)) {
+					gcBestPoint = null;
+				}
+			}
+			return gcBestPoint;
+		} catch (Throwable t) {
+			return null;
+		}
+	}
+	private static boolean isProjectFrameAt(int x, int y) {
+		for (Project current : Projects.getOpenProjects()) {
+			Frame frame = current.getFrame();
+			if (frame != null) {
+				Point loc = frame.getLocationOnScreen();
+				int d = Math.abs(loc.x - x) + Math.abs(loc.y - y);
+				if (d <= 3)
+					return true;
+			}
+		}
+		return false;
+	}
 
 	private Project proj;
 	private MyProjectListener myProjectListener = new MyProjectListener();
-
 	// GUI elements shared between views
 	private LogisimMenuBar menubar;
 	private MenuListener menuListener;
@@ -174,14 +231,16 @@ public class Frame extends LFrame implements LocaleListener {
 	private CardPanel explorerPane;
 	private Toolbox toolbox;
 	private SimulationExplorer simExplorer;
+
 	private AttrTable attrTable;
 	private ZoomControl zoom;
-
 	// for the Layout view
 	private LayoutToolbarModel layoutToolbarModel;
 	private Canvas layoutCanvas;
 	private ZoomModel layoutZoomModel;
+
 	private LayoutEditHandler layoutEditHandler;
+
 	private AttrTableSelectionModel attrTableSelectionModel;
 
 	// for the Appearance view
@@ -278,6 +337,68 @@ public class Frame extends LFrame implements LocaleListener {
 		LocaleManager.addLocaleListener(this);
 	}
 
+	private void computeTitle() {
+		String s;
+		Circuit circuit = proj.getCurrentCircuit();
+		String name = proj.getLogisimFile().getName();
+		if (circuit != null) {
+			s = StringUtil.format(Strings.get("titleCircFileKnown"), Main.VERSION_NAME, circuit.getName(), name);
+		} else {
+			s = StringUtil.format(Strings.get("titleFileKnown"), Main.VERSION_NAME, name);
+		}
+		this.setTitle(s);
+		myProjectListener.enableSave();
+	}
+
+	public boolean confirmClose() {
+		return confirmClose(Strings.get("confirmCloseTitle"));
+	}
+
+	// returns true if user is OK with proceeding
+	public boolean confirmClose(String title) {
+		String message = StringUtil.format(Strings.get("confirmDiscardMessage"), proj.getLogisimFile().getName());
+
+		if (!proj.isFileDirty())
+			return true;
+		toFront();
+		String[] options = { Strings.get("saveOption"), Strings.get("discardOption"), Strings.get("cancelOption") };
+		int result = JOptionPane.showOptionDialog(this, message, title, 0, JOptionPane.QUESTION_MESSAGE, null, options,
+				options[0]);
+		boolean ret;
+		if (result == 0) {
+			ret = ProjectActions.doSave(proj);
+		} else if (result == 1) {
+			ret = true;
+		} else {
+			ret = false;
+		}
+		if (ret) {
+			dispose();
+		}
+		return ret;
+	}
+
+	public Canvas getCanvas() {
+		return layoutCanvas;
+	}
+
+	public String getEditorView() {
+		return mainPanel.getView();
+	}
+
+	public String getExplorerView() {
+		return explorerPane.getView();
+	}
+
+	public Project getProject() {
+		return proj;
+	}
+
+	@Override
+	public void localeChanged() {
+		computeTitle();
+	}
+
 	private void placeToolbar() {
 		String loc = AppPreferences.TOOLBAR_PLACEMENT.get();
 		Container contents = getContentPane();
@@ -310,16 +431,32 @@ public class Frame extends LFrame implements LocaleListener {
 		contents.validate();
 	}
 
-	public Project getProject() {
-		return proj;
-	}
-
-	public void viewComponentAttributes(Circuit circ, Component comp) {
-		if (comp == null) {
-			setAttrTableModel(null);
-		} else {
-			setAttrTableModel(new AttrTableComponentModel(proj, circ, comp));
+	public void savePreferences() {
+		AppPreferences.TICK_FREQUENCY.set(Double.valueOf(proj.getSimulator().getTickFrequency()));
+		AppPreferences.LAYOUT_SHOW_GRID.setBoolean(layoutZoomModel.getShowGrid());
+		AppPreferences.LAYOUT_ZOOM.set(Double.valueOf(layoutZoomModel.getZoomFactor()));
+		if (appearance != null) {
+			ZoomModel aZoom = appearance.getZoomModel();
+			AppPreferences.APPEARANCE_SHOW_GRID.setBoolean(aZoom.getShowGrid());
+			AppPreferences.APPEARANCE_ZOOM.set(Double.valueOf(aZoom.getZoomFactor()));
 		}
+		int state = getExtendedState() & ~java.awt.Frame.ICONIFIED;
+		AppPreferences.WINDOW_STATE.set(Integer.valueOf(state));
+		Dimension dim = getSize();
+		AppPreferences.WINDOW_WIDTH.set(Integer.valueOf(dim.width));
+		AppPreferences.WINDOW_HEIGHT.set(Integer.valueOf(dim.height));
+		Point loc;
+		try {
+			loc = getLocationOnScreen();
+		} catch (IllegalComponentStateException e) {
+			loc = Projects.getLocation(this);
+		}
+		if (loc != null) {
+			AppPreferences.WINDOW_LOCATION.set(loc.x + "," + loc.y);
+		}
+		AppPreferences.WINDOW_LEFT_SPLIT.set(Double.valueOf(leftRegion.getFraction()));
+		AppPreferences.WINDOW_MAIN_SPLIT.set(Double.valueOf(mainRegion.getFraction()));
+		AppPreferences.DIALOG_DIRECTORY.set(JFileChoosers.getCurrentDirectory());
 	}
 
 	void setAttrTableModel(AttrTableModel value) {
@@ -339,14 +476,6 @@ public class Frame extends LFrame implements LocaleListener {
 		} else {
 			layoutCanvas.setHaloedComponent(null, null);
 		}
-	}
-
-	public void setExplorerView(String view) {
-		explorerPane.setView(view);
-	}
-
-	public String getExplorerView() {
-		return explorerPane.getView();
 	}
 
 	public void setEditorView(String view) {
@@ -378,25 +507,8 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 	}
 
-	public String getEditorView() {
-		return mainPanel.getView();
-	}
-
-	public Canvas getCanvas() {
-		return layoutCanvas;
-	}
-
-	private void computeTitle() {
-		String s;
-		Circuit circuit = proj.getCurrentCircuit();
-		String name = proj.getLogisimFile().getName();
-		if (circuit != null) {
-			s = StringUtil.format(Strings.get("titleCircFileKnown"), Main.VERSION_NAME, circuit.getName(), name);
-		} else {
-			s = StringUtil.format(Strings.get("titleFileKnown"), Main.VERSION_NAME, name);
-		}
-		this.setTitle(s);
-		myProjectListener.enableSave();
+	public void setExplorerView(String view) {
+		explorerPane.setView(view);
 	}
 
 	void viewAttributes(Tool newTool) {
@@ -438,123 +550,11 @@ public class Frame extends LFrame implements LocaleListener {
 		}
 	}
 
-	@Override
-	public void localeChanged() {
-		computeTitle();
-	}
-
-	public void savePreferences() {
-		AppPreferences.TICK_FREQUENCY.set(Double.valueOf(proj.getSimulator().getTickFrequency()));
-		AppPreferences.LAYOUT_SHOW_GRID.setBoolean(layoutZoomModel.getShowGrid());
-		AppPreferences.LAYOUT_ZOOM.set(Double.valueOf(layoutZoomModel.getZoomFactor()));
-		if (appearance != null) {
-			ZoomModel aZoom = appearance.getZoomModel();
-			AppPreferences.APPEARANCE_SHOW_GRID.setBoolean(aZoom.getShowGrid());
-			AppPreferences.APPEARANCE_ZOOM.set(Double.valueOf(aZoom.getZoomFactor()));
-		}
-		int state = getExtendedState() & ~java.awt.Frame.ICONIFIED;
-		AppPreferences.WINDOW_STATE.set(Integer.valueOf(state));
-		Dimension dim = getSize();
-		AppPreferences.WINDOW_WIDTH.set(Integer.valueOf(dim.width));
-		AppPreferences.WINDOW_HEIGHT.set(Integer.valueOf(dim.height));
-		Point loc;
-		try {
-			loc = getLocationOnScreen();
-		} catch (IllegalComponentStateException e) {
-			loc = Projects.getLocation(this);
-		}
-		if (loc != null) {
-			AppPreferences.WINDOW_LOCATION.set(loc.x + "," + loc.y);
-		}
-		AppPreferences.WINDOW_LEFT_SPLIT.set(Double.valueOf(leftRegion.getFraction()));
-		AppPreferences.WINDOW_MAIN_SPLIT.set(Double.valueOf(mainRegion.getFraction()));
-		AppPreferences.DIALOG_DIRECTORY.set(JFileChoosers.getCurrentDirectory());
-	}
-
-	public boolean confirmClose() {
-		return confirmClose(Strings.get("confirmCloseTitle"));
-	}
-
-	// returns true if user is OK with proceeding
-	public boolean confirmClose(String title) {
-		String message = StringUtil.format(Strings.get("confirmDiscardMessage"), proj.getLogisimFile().getName());
-
-		if (!proj.isFileDirty())
-			return true;
-		toFront();
-		String[] options = { Strings.get("saveOption"), Strings.get("discardOption"), Strings.get("cancelOption") };
-		int result = JOptionPane.showOptionDialog(this, message, title, 0, JOptionPane.QUESTION_MESSAGE, null, options,
-				options[0]);
-		boolean ret;
-		if (result == 0) {
-			ret = ProjectActions.doSave(proj);
-		} else if (result == 1) {
-			ret = true;
+	public void viewComponentAttributes(Circuit circ, Component comp) {
+		if (comp == null) {
+			setAttrTableModel(null);
 		} else {
-			ret = false;
+			setAttrTableModel(new AttrTableComponentModel(proj, circ, comp));
 		}
-		if (ret) {
-			dispose();
-		}
-		return ret;
-	}
-
-	private static Point getInitialLocation() {
-		String s = AppPreferences.WINDOW_LOCATION.get();
-		if (s == null)
-			return null;
-		int comma = s.indexOf(',');
-		if (comma < 0)
-			return null;
-		try {
-			int x = Integer.parseInt(s.substring(0, comma));
-			int y = Integer.parseInt(s.substring(comma + 1));
-			while (isProjectFrameAt(x, y)) {
-				x += 20;
-				y += 20;
-			}
-			Rectangle desired = new Rectangle(x, y, 50, 50);
-
-			int gcBestSize = 0;
-			Point gcBestPoint = null;
-			GraphicsEnvironment ge;
-			ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			for (GraphicsDevice gd : ge.getScreenDevices()) {
-				for (GraphicsConfiguration gc : gd.getConfigurations()) {
-					Rectangle gcBounds = gc.getBounds();
-					if (gcBounds.intersects(desired)) {
-						Rectangle inter = gcBounds.intersection(desired);
-						int size = inter.width * inter.height;
-						if (size > gcBestSize) {
-							gcBestSize = size;
-							int x2 = Math.max(gcBounds.x, Math.min(inter.x, inter.x + inter.width - 50));
-							int y2 = Math.max(gcBounds.y, Math.min(inter.y, inter.y + inter.height - 50));
-							gcBestPoint = new Point(x2, y2);
-						}
-					}
-				}
-			}
-			if (gcBestPoint != null) {
-				if (isProjectFrameAt(gcBestPoint.x, gcBestPoint.y)) {
-					gcBestPoint = null;
-				}
-			}
-			return gcBestPoint;
-		} catch (Throwable t) {
-			return null;
-		}
-	}
-
-	private static boolean isProjectFrameAt(int x, int y) {
-		for (Project current : Projects.getOpenProjects()) {
-			Frame frame = current.getFrame();
-			if (frame != null) {
-				Point loc = frame.getLocationOnScreen();
-				int d = Math.abs(loc.x - x) + Math.abs(loc.y - y);
-				if (d <= 3)
-					return true;
-			}
-		}
-		return false;
 	}
 }

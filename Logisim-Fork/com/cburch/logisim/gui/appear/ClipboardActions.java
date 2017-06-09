@@ -17,12 +17,12 @@ import com.cburch.logisim.proj.Project;
 
 public class ClipboardActions extends Action {
 
-	public static Action cut(AppearanceCanvas canvas) {
-		return new ClipboardActions(true, canvas);
-	}
-
 	public static Action copy(AppearanceCanvas canvas) {
 		return new ClipboardActions(false, canvas);
+	}
+
+	public static Action cut(AppearanceCanvas canvas) {
+		return new ClipboardActions(true, canvas);
 	}
 
 	private boolean remove;
@@ -57,20 +57,20 @@ public class ClipboardActions extends Action {
 	}
 
 	@Override
-	public String getName() {
-		if (remove) {
-			return Strings.get("cutSelectionAction");
-		} else {
-			return Strings.get("copySelectionAction");
-		}
-	}
-
-	@Override
 	public void doIt(Project proj) {
 		oldClipboard = Clipboard.get();
 		Clipboard.set(newClipboard);
 		if (remove) {
 			canvasModel.removeObjects(affected.keySet());
+		}
+	}
+
+	@Override
+	public String getName() {
+		if (remove) {
+			return Strings.get("cutSelectionAction");
+		} else {
+			return Strings.get("copySelectionAction");
 		}
 	}
 

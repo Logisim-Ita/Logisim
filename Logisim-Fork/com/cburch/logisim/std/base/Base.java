@@ -28,13 +28,13 @@ public class Base extends Library {
 	}
 
 	@Override
-	public String getName() {
-		return "Base";
+	public String getDisplayName() {
+		return Strings.get("baseLibrary");
 	}
 
 	@Override
-	public String getDisplayName() {
-		return Strings.get("baseLibrary");
+	public String getName() {
+		return "Base";
 	}
 
 	@Override

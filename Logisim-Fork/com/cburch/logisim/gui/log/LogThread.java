@@ -28,30 +28,41 @@ class LogThread extends Thread implements ModelListener {
 		model.addModelListener(this);
 	}
 
-	@Override
-	public void run() {
-		while (!canceled) {
-			synchronized (lock) {
-				if (writer != null) {
-					if (System.currentTimeMillis() - lastWrite > IDLE_UNTIL_CLOSE) {
-						writer.close();
-						writer = null;
-					} else {
-						writer.flush();
-					}
-				}
-			}
+	// Should hold lock and have verified that isFileEnabled() before
+	// entering this method.
+	private void addEntry(Value[] values) {
+		if (writer == null) {
 			try {
-				Thread.sleep(FLUSH_FREQUENCY);
-			} catch (InterruptedException e) {
+				writer = new PrintWriter(new FileWriter(model.getFile(), true));
+			} catch (IOException e) {
+				model.setFile(null);
+				return;
 			}
 		}
-		synchronized (lock) {
-			if (writer != null) {
-				writer.close();
-				writer = null;
+		Selection sel = model.getSelection();
+		if (headerDirty) {
+			if (model.getFileHeader()) {
+				StringBuilder buf = new StringBuilder();
+				for (int i = 0; i < sel.size(); i++) {
+					if (i > 0)
+						buf.append("\t");
+					buf.append(sel.get(i).toString());
+				}
+				writer.println(buf.toString());
+			}
+			headerDirty = false;
+		}
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < values.length; i++) {
+			if (i > 0)
+				buf.append("\t");
+			if (values[i] != null) {
+				int radix = sel.get(i).getRadix();
+				buf.append(values[i].toDisplayString(radix));
 			}
 		}
+		writer.println(buf.toString());
+		lastWrite = System.currentTimeMillis();
 	}
 
 	public void cancel() {
@@ -62,11 +73,6 @@ class LogThread extends Thread implements ModelListener {
 				writer = null;
 			}
 		}
-	}
-
-	@Override
-	public void selectionChanged(ModelEvent event) {
-		headerDirty = true;
 	}
 
 	@Override
@@ -106,40 +112,34 @@ class LogThread extends Thread implements ModelListener {
 		return !canceled && model.isSelected() && model.isFileEnabled() && model.getFile() != null;
 	}
 
-	// Should hold lock and have verified that isFileEnabled() before
-	// entering this method.
-	private void addEntry(Value[] values) {
-		if (writer == null) {
-			try {
-				writer = new PrintWriter(new FileWriter(model.getFile(), true));
-			} catch (IOException e) {
-				model.setFile(null);
-				return;
-			}
-		}
-		Selection sel = model.getSelection();
-		if (headerDirty) {
-			if (model.getFileHeader()) {
-				StringBuilder buf = new StringBuilder();
-				for (int i = 0; i < sel.size(); i++) {
-					if (i > 0)
-						buf.append("\t");
-					buf.append(sel.get(i).toString());
+	@Override
+	public void run() {
+		while (!canceled) {
+			synchronized (lock) {
+				if (writer != null) {
+					if (System.currentTimeMillis() - lastWrite > IDLE_UNTIL_CLOSE) {
+						writer.close();
+						writer = null;
+					} else {
+						writer.flush();
+					}
 				}
-				writer.println(buf.toString());
 			}
-			headerDirty = false;
-		}
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < values.length; i++) {
-			if (i > 0)
-				buf.append("\t");
-			if (values[i] != null) {
-				int radix = sel.get(i).getRadix();
-				buf.append(values[i].toDisplayString(radix));
+			try {
+				Thread.sleep(FLUSH_FREQUENCY);
+			} catch (InterruptedException e) {
 			}
 		}
-		writer.println(buf.toString());
-		lastWrite = System.currentTimeMillis();
+		synchronized (lock) {
+			if (writer != null) {
+				writer.close();
+				writer = null;
+			}
+		}
+	}
+
+	@Override
+	public void selectionChanged(ModelEvent event) {
+		headerDirty = true;
 	}
 }

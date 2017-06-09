@@ -20,104 +20,6 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
 
 class PortManager {
-	private CircuitAppearance appearance;
-	private boolean doingUpdate;
-
-	PortManager(CircuitAppearance appearance) {
-		this.appearance = appearance;
-		this.doingUpdate = false;
-	}
-
-	void updatePorts() {
-		appearance.recomputePorts();
-	}
-
-	void updatePorts(Set<Instance> adds, Set<Instance> removes, Map<Instance, Instance> replaces,
-			Collection<Instance> allPins) {
-		if (appearance.isDefaultAppearance()) {
-			appearance.recomputePorts();
-		} else if (!doingUpdate) {
-			// "doingUpdate" ensures infinite recursion doesn't happen
-			try {
-				doingUpdate = true;
-				performUpdate(adds, removes, replaces, allPins);
-				appearance.recomputePorts();
-			} finally {
-				doingUpdate = false;
-			}
-		}
-	}
-
-	private void performUpdate(Set<Instance> adds, Set<Instance> removes, Map<Instance, Instance> replaces,
-			Collection<Instance> allPins) {
-		// Find the current objects corresponding to pins
-		Map<Instance, AppearancePort> oldObjects;
-		oldObjects = new HashMap<Instance, AppearancePort>();
-		AppearanceAnchor anchor = null;
-		for (CanvasObject o : appearance.getObjectsFromBottom()) {
-			if (o instanceof AppearancePort) {
-				AppearancePort port = (AppearancePort) o;
-				oldObjects.put(port.getPin(), port);
-			} else if (o instanceof AppearanceAnchor) {
-				anchor = (AppearanceAnchor) o;
-			}
-		}
-
-		// ensure we have the anchor in the circuit
-		if (anchor == null) {
-			for (CanvasObject o : DefaultAppearance.build(allPins)) {
-				if (o instanceof AppearanceAnchor) {
-					anchor = (AppearanceAnchor) o;
-				}
-			}
-			if (anchor == null) {
-				anchor = new AppearanceAnchor(Location.create(100, 100));
-			}
-			int dest = appearance.getObjectsFromBottom().size();
-			appearance.addObjects(dest, Collections.singleton(anchor));
-		}
-
-		// Compute how the ports should change
-		ArrayList<AppearancePort> portRemoves;
-		portRemoves = new ArrayList<AppearancePort>(removes.size());
-		ArrayList<AppearancePort> portAdds;
-		portAdds = new ArrayList<AppearancePort>(adds.size());
-
-		// handle removals
-		for (Instance pin : removes) {
-			AppearancePort port = oldObjects.remove(pin);
-			if (port != null) {
-				portRemoves.add(port);
-			}
-		}
-		// handle replacements
-		ArrayList<Instance> addsCopy = new ArrayList<Instance>(adds);
-		for (Map.Entry<Instance, Instance> entry : replaces.entrySet()) {
-			AppearancePort port = oldObjects.remove(entry.getKey());
-			if (port != null) {
-				port.setPin(entry.getValue());
-				oldObjects.put(entry.getValue(), port);
-			} else { // this really shouldn't happen, but just to make sure...
-				addsCopy.add(entry.getValue());
-			}
-		}
-		// handle additions
-		DefaultAppearance.sortPinList(addsCopy, Direction.EAST);
-		// They're probably not really all facing east.
-		// I'm just sorting them so it works predictably.
-		for (Instance pin : addsCopy) {
-			if (!oldObjects.containsKey(pin)) {
-				Location loc = computeDefaultLocation(appearance, pin, oldObjects);
-				AppearancePort o = new AppearancePort(loc, pin);
-				portAdds.add(o);
-				oldObjects.put(pin, o);
-			}
-		}
-
-		// Now update the appearance
-		appearance.replaceAutomatically(portRemoves, portAdds);
-	}
-
 	private static Location computeDefaultLocation(CircuitAppearance appear, Instance pin,
 			Map<Instance, AppearancePort> others) {
 		// Determine which locations are being used in canvas, and look for
@@ -202,5 +104,103 @@ class PortManager {
 			loc = loc.translate(dx, dy);
 		}
 		return loc;
+	}
+	private CircuitAppearance appearance;
+
+	private boolean doingUpdate;
+
+	PortManager(CircuitAppearance appearance) {
+		this.appearance = appearance;
+		this.doingUpdate = false;
+	}
+
+	private void performUpdate(Set<Instance> adds, Set<Instance> removes, Map<Instance, Instance> replaces,
+			Collection<Instance> allPins) {
+		// Find the current objects corresponding to pins
+		Map<Instance, AppearancePort> oldObjects;
+		oldObjects = new HashMap<Instance, AppearancePort>();
+		AppearanceAnchor anchor = null;
+		for (CanvasObject o : appearance.getObjectsFromBottom()) {
+			if (o instanceof AppearancePort) {
+				AppearancePort port = (AppearancePort) o;
+				oldObjects.put(port.getPin(), port);
+			} else if (o instanceof AppearanceAnchor) {
+				anchor = (AppearanceAnchor) o;
+			}
+		}
+
+		// ensure we have the anchor in the circuit
+		if (anchor == null) {
+			for (CanvasObject o : DefaultAppearance.build(allPins)) {
+				if (o instanceof AppearanceAnchor) {
+					anchor = (AppearanceAnchor) o;
+				}
+			}
+			if (anchor == null) {
+				anchor = new AppearanceAnchor(Location.create(100, 100));
+			}
+			int dest = appearance.getObjectsFromBottom().size();
+			appearance.addObjects(dest, Collections.singleton(anchor));
+		}
+
+		// Compute how the ports should change
+		ArrayList<AppearancePort> portRemoves;
+		portRemoves = new ArrayList<AppearancePort>(removes.size());
+		ArrayList<AppearancePort> portAdds;
+		portAdds = new ArrayList<AppearancePort>(adds.size());
+
+		// handle removals
+		for (Instance pin : removes) {
+			AppearancePort port = oldObjects.remove(pin);
+			if (port != null) {
+				portRemoves.add(port);
+			}
+		}
+		// handle replacements
+		ArrayList<Instance> addsCopy = new ArrayList<Instance>(adds);
+		for (Map.Entry<Instance, Instance> entry : replaces.entrySet()) {
+			AppearancePort port = oldObjects.remove(entry.getKey());
+			if (port != null) {
+				port.setPin(entry.getValue());
+				oldObjects.put(entry.getValue(), port);
+			} else { // this really shouldn't happen, but just to make sure...
+				addsCopy.add(entry.getValue());
+			}
+		}
+		// handle additions
+		DefaultAppearance.sortPinList(addsCopy, Direction.EAST);
+		// They're probably not really all facing east.
+		// I'm just sorting them so it works predictably.
+		for (Instance pin : addsCopy) {
+			if (!oldObjects.containsKey(pin)) {
+				Location loc = computeDefaultLocation(appearance, pin, oldObjects);
+				AppearancePort o = new AppearancePort(loc, pin);
+				portAdds.add(o);
+				oldObjects.put(pin, o);
+			}
+		}
+
+		// Now update the appearance
+		appearance.replaceAutomatically(portRemoves, portAdds);
+	}
+
+	void updatePorts() {
+		appearance.recomputePorts();
+	}
+
+	void updatePorts(Set<Instance> adds, Set<Instance> removes, Map<Instance, Instance> replaces,
+			Collection<Instance> allPins) {
+		if (appearance.isDefaultAppearance()) {
+			appearance.recomputePorts();
+		} else if (!doingUpdate) {
+			// "doingUpdate" ensures infinite recursion doesn't happen
+			try {
+				doingUpdate = true;
+				performUpdate(adds, removes, replaces, allPins);
+				appearance.recomputePorts();
+			} finally {
+				doingUpdate = false;
+			}
+		}
 	}
 }

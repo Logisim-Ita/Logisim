@@ -30,6 +30,23 @@ import javax.swing.JOptionPane;
 import com.cburch.logisim.gui.start.Startup;
 
 public class Main {
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 12, "jar");
+
+	public static final String VERSION_NAME = VERSION.toString();
+
+	public static final int COPYRIGHT_YEAR = 2017;
+	/**
+	 * This flag enables auto-updates. It is true by default, so that users
+	 * normally check for updates at startup. On the other hand, this might be
+	 * annoying for developers, therefore we let them disable it from the
+	 * command line with the '-noupdates' option.
+	 */
+	public static boolean UPDATE = true;
+
+	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
+
+	/* URL for the automatic updater */
+
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
 		if (startup == null) {
@@ -47,24 +64,8 @@ public class Main {
 					JOptionPane.showMessageDialog(null, result.toString());
 					System.exit(-1);
 				}
-			} else System.exit(0);
+			} else
+				System.exit(0);
 		}
 	}
-
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 7, 1, 11, "jar");
-
-	public static final String VERSION_NAME = VERSION.toString();
-	public static final int COPYRIGHT_YEAR = 2017;
-
-	/**
-	 * This flag enables auto-updates. It is true by default, so that users
-	 * normally check for updates at startup. On the other hand, this might be
-	 * annoying for developers, therefore we let them disable it from the
-	 * command line with the '-noupdates' option.
-	 */
-	public static boolean UPDATE = true;
-
-	/* URL for the automatic updater*/
-	
-	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 }

@@ -36,21 +36,6 @@ public class AppearanceEditPopup extends EditPopup implements EditHandler.Listen
 	}
 
 	@Override
-	protected boolean shouldShow(LogisimMenuItem item) {
-		if (item == LogisimMenuBar.ADD_CONTROL || item == LogisimMenuBar.REMOVE_CONTROL) {
-			return canvas.getSelection().getSelectedHandle() != null;
-		} else {
-			return true;
-		}
-	}
-
-	@Override
-	protected boolean isEnabled(LogisimMenuItem item) {
-		Boolean value = enabled.get(item);
-		return value != null && value.booleanValue();
-	}
-
-	@Override
 	protected void fire(LogisimMenuItem item) {
 		if (item == LogisimMenuBar.CUT) {
 			handler.cut();
@@ -72,6 +57,21 @@ public class AppearanceEditPopup extends EditPopup implements EditHandler.Listen
 			handler.addControlPoint();
 		} else if (item == LogisimMenuBar.REMOVE_CONTROL) {
 			handler.removeControlPoint();
+		}
+	}
+
+	@Override
+	protected boolean isEnabled(LogisimMenuItem item) {
+		Boolean value = enabled.get(item);
+		return value != null && value.booleanValue();
+	}
+
+	@Override
+	protected boolean shouldShow(LogisimMenuItem item) {
+		if (item == LogisimMenuBar.ADD_CONTROL || item == LogisimMenuBar.REMOVE_CONTROL) {
+			return canvas.getSelection().getSelectedHandle() != null;
+		} else {
+			return true;
 		}
 	}
 }
