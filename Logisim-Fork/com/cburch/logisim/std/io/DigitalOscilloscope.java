@@ -156,8 +156,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 					new int[] { x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7,
 							x + border + 10 * -length * (reverse - 1) + 13 - reverse * 11,
 							x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7 },
-					new int[] { y + border + i * 30 - 3 + 30, y + border + i * 30 + 30,
-							y + border + i * 30 + 3 + 30},
+					new int[] { y + border + i * 30 - 3 + 30, y + border + i * 30 + 30, y + border + i * 30 + 3 + 30 },
 					3);
 			g.drawLine(x + border + 10 * -length * (reverse - 1) + 11 * reverse, y + border + i * 30 + 30,
 					x + border + 10 * -length * (reverse - 1) + 4 + 11 * reverse, y + border + i * 30 + 30);
@@ -204,7 +203,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		Value lastclock = diagramstate.setLastClock(clock);
 		// for each front
 		if (lastclock != clock && lastclock != Value.UNKNOWN && clock != Value.UNKNOWN
-				&& state.getPort(inputs) != Value.TRUE && state.getPort(inputs) != Value.FALSE) {
+				&& state.getPort(inputs + 1) != Value.TRUE && state.getPort(inputs) != Value.FALSE) {
 			// inputs values
 			for (int i = 0; i < inputs; i++) {
 				for (int j = 0; j < length - 1; j++) {
@@ -214,7 +213,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			}
 		}
 		// clear
-		else if (state.getPort(inputs+1) == Value.TRUE)
+		else if (state.getPort(inputs + 1) == Value.TRUE)
 			diagramstate.clear();
 	}
 

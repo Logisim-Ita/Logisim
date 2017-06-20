@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.8.0.0</jar_version>
+  <jar_version>2.8.0.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.8.0.0</exe_version>
+  <exe_version>2.8.0.1</exe_version>
   <changelog>
-*I/O->Digital Oscilloscope!!! You can finally trace the signal diagrams
-*Not gate, narrow size by default
-*Better code for RGB LED drawing
-*Fixed italian translations
+*Fixed Digital Oscilloscope enable input
   </changelog>
 </logisim>
