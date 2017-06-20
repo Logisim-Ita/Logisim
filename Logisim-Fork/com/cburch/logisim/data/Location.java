@@ -25,6 +25,7 @@ public class Location implements Comparable<Location> {
 		cache.put(hashCode, loc);
 		return loc;
 	}
+
 	public static Location parse(String value) {
 		String base = value;
 
@@ -48,6 +49,7 @@ public class Location implements Comparable<Location> {
 		int y = Integer.parseInt(value.substring(comma + 1).trim());
 		return Location.create(x, y);
 	}
+
 	private final int hashCode;
 
 	private final int x;

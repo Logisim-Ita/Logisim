@@ -58,6 +58,7 @@ abstract class AbstractGate extends InstanceFactory {
 			return Value.create(v);
 		}
 	}
+
 	private String[] iconNames = new String[3];
 	private Icon[] icons = new Icon[3];
 	private int bonusWidth = 0;

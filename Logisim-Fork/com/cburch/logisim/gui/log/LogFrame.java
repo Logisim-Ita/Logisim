@@ -134,6 +134,7 @@ public class LogFrame extends LFrame {
 		String name = data == null ? "???" : data.getCircuitState().getCircuit().getName();
 		return StringUtil.format(Strings.get("logFrameTitle"), name, proj.getLogisimFile().getDisplayName());
 	}
+
 	private Project project;
 	private Simulator curSimulator = null;
 	private Model curModel;

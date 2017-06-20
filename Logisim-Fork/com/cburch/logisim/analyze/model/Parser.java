@@ -60,6 +60,7 @@ public class Parser {
 	private static final int TOKEN_CONST = 8;
 	private static final int TOKEN_WHITE = 9;
 	private static final int TOKEN_ERROR = 10;
+
 	private static boolean okCharacter(char c) {
 		return Character.isWhitespace(c) || Character.isJavaIdentifierStart(c) || "()01~^+!&|".indexOf(c) >= 0;
 	}

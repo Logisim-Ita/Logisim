@@ -20,6 +20,7 @@ class ComboOption {
 		}
 		combo.setSelectedItem(combo.getItemAt(0));
 	}
+
 	private Object value;
 
 	private StringGetter getter;

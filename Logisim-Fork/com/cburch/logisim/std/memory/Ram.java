@@ -71,6 +71,7 @@ public class Ram extends Mem {
 			}
 		}
 	}
+
 	private static class RamState extends MemState implements InstanceData, AttributeListener {
 		private Instance parent;
 		private MemListener listener;
@@ -139,6 +140,7 @@ public class Ram extends Mem {
 				value.getAttributeSet().addAttributeListener(this);
 		}
 	}
+
 	static final AttributeOption BUS_COMBINED = new AttributeOption("combined", Strings.getter("ramBusSynchCombined"));
 
 	static final AttributeOption BUS_ASYNCH = new AttributeOption("asynch", Strings.getter("ramBusAsynchCombined"));

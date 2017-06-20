@@ -53,6 +53,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			}
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -72,6 +73,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		}
 		return -1;
 	}
+
 	private CanvasTool selectTool;
 	private Project proj;
 	private CircuitState circuitState;

@@ -23,6 +23,7 @@ public class AnalyzerManager extends WindowMenuItemManager implements LocaleList
 		}
 		return analysisWindow;
 	}
+
 	public static void initialize() {
 		analysisManager = new AnalyzerManager();
 	}

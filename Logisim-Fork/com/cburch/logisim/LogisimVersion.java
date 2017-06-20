@@ -72,6 +72,7 @@ public class LogisimVersion {
 		}
 		return (new LogisimVersion(major, minor, release, revision, variant));
 	}
+
 	private int major;
 
 	private int minor;

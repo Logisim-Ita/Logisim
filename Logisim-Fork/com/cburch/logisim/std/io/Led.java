@@ -42,7 +42,7 @@ public class Led extends InstanceFactory {
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_ACTIVE, StdAttr.LABEL,
 						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.WEST, new Color(240, 0, 0), Color.DARK_GRAY, Boolean.TRUE, "", Io.LABEL_CENTER,
+				new Object[] { Direction.WEST, new Color(240, 0, 0), Color.DARK_GRAY, Boolean.TRUE, "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("led.gif");

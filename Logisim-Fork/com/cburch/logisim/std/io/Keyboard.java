@@ -104,6 +104,7 @@ public class Keyboard extends InstanceFactory {
 				state.getInstance().fireInvalidated();
 		}
 	}
+
 	private static final int CLR = 0;
 	private static final int CK = 1;
 	private static final int RE = 2;

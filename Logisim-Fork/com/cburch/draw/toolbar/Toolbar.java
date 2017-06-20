@@ -21,6 +21,7 @@ public class Toolbar extends JPanel {
 			computeContents();
 		}
 	}
+
 	/**
 	 * 
 	 */

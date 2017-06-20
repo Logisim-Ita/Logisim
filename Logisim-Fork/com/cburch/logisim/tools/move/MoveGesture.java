@@ -75,6 +75,7 @@ public class MoveGesture {
 		}
 		return conns;
 	}
+
 	private static Wire findWire(Circuit circ, Location loc, Set<Component> ignore, Wire ignoreW) {
 		Wire ret = null;
 		for (Component comp : circ.getComponents(loc)) {
@@ -88,6 +89,7 @@ public class MoveGesture {
 		}
 		return ret;
 	}
+
 	private MoveRequestListener listener;
 
 	private Circuit circuit;

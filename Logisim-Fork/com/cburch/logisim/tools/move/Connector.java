@@ -27,6 +27,7 @@ class Connector {
 
 	static final String ALLOW_VERTICAL = "vert";
 	static final String ALLOW_HORIZONTAL = "horz";
+
 	static MoveResult computeWires(MoveRequest req) {
 		MoveGesture gesture = req.getMoveGesture();
 		int dx = req.getDeltaX();

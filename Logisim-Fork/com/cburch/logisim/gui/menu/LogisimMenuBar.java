@@ -31,6 +31,7 @@ public class LogisimMenuBar extends JMenuBar {
 			help.localeChanged();
 		}
 	}
+
 	/**
 	 * 
 	 */

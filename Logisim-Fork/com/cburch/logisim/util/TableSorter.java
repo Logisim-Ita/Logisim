@@ -167,6 +167,7 @@ public class TableSorter extends AbstractTableModel {
 			}
 		}
 	}
+
 	private class Row implements Comparable<Row> {
 		private int modelIndex;
 
@@ -204,6 +205,7 @@ public class TableSorter extends AbstractTableModel {
 			return 0;
 		}
 	}
+
 	private class SortableHeaderRenderer implements TableCellRenderer {
 		private TableCellRenderer tableCellRenderer;
 

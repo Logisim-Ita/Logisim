@@ -39,6 +39,7 @@ public class Loader implements LibraryLoader {
 			return Strings.get("jarFileFilter");
 		}
 	}
+
 	private static class LogisimFileFilter extends FileFilter {
 		@Override
 		public boolean accept(File f) {
@@ -50,6 +51,7 @@ public class Loader implements LibraryLoader {
 			return Strings.get("logisimFileFilter");
 		}
 	}
+
 	public static final String LOGISIM_EXTENSION = ".circ";
 
 	public static final FileFilter LOGISIM_FILTER = new LogisimFileFilter();
@@ -70,6 +72,7 @@ public class Loader implements LibraryLoader {
 		}
 		return null;
 	}
+
 	private static void recoverBackup(File backup, File dest) {
 		if (backup != null && backup.exists()) {
 			if (dest.exists())

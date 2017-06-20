@@ -61,12 +61,14 @@ public class SelectTool extends Tool {
 			return Strings.get("moveWorkingMsg");
 		}
 	}
+
 	private class Listener implements Selection.Listener {
 		@Override
 		public void selectionChanged(Event event) {
 			keyHandlers = null;
 		}
 	}
+
 	private static class MoveRequestHandler implements MoveRequestListener {
 		private Canvas canvas;
 
@@ -95,6 +97,7 @@ public class SelectTool extends Tool {
 	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
 
 	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
+
 	private static void clearCanvasMessage(Canvas canvas, int dx, int dy) {
 		Object getter = canvas.getErrorMessage();
 		if (getter instanceof ComputingMessage) {
@@ -105,6 +108,7 @@ public class SelectTool extends Tool {
 			}
 		}
 	}
+
 	private Location start;
 	private int state;
 	private int curDx;

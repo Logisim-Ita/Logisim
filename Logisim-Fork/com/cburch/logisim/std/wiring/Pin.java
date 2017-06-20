@@ -62,6 +62,7 @@ public class Pin extends InstanceFactory {
 			return s.sending;
 		}
 	}
+
 	public static class PinPoker extends InstancePoker {
 		int bitPressed = -1;
 
@@ -136,6 +137,7 @@ public class Pin extends InstanceFactory {
 			bitPressed = -1;
 		}
 	}
+
 	private static class PinState implements InstanceData, Cloneable {
 		Value sending;
 		Value receiving;

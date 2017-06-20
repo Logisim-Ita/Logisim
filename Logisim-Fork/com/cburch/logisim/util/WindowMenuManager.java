@@ -11,6 +11,7 @@ class WindowMenuManager {
 
 	private static ArrayList<WindowMenuItemManager> managers = new ArrayList<WindowMenuItemManager>();
 	private static WindowMenuItemManager currentManager = null;
+
 	public static void addManager(WindowMenuItemManager manager) {
 		for (WindowMenu menu : menus) {
 			manager.createMenuItem(menu);

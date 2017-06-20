@@ -105,6 +105,7 @@ class PortManager {
 		}
 		return loc;
 	}
+
 	private CircuitAppearance appearance;
 
 	private boolean doingUpdate;

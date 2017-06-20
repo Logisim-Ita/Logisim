@@ -70,6 +70,7 @@ public abstract class RadixOption extends AttributeOption {
 			return value.toDecimalString(true);
 		}
 	}
+
 	private static class Radix10Unsigned extends RadixOption {
 		private Radix10Unsigned() {
 			super("10unsigned", Strings.getter("radix10Unsigned"));
@@ -126,6 +127,7 @@ public abstract class RadixOption extends AttributeOption {
 			return value.toDecimalString(false);
 		}
 	}
+
 	private static class Radix16 extends RadixOption {
 		private Radix16() {
 			super("16", Strings.getter("radix16"));
@@ -141,6 +143,7 @@ public abstract class RadixOption extends AttributeOption {
 			return value.toDisplayString(16);
 		}
 	}
+
 	private static class Radix2 extends RadixOption {
 		private Radix2() {
 			super("2", Strings.getter("radix2"));
@@ -164,6 +167,7 @@ public abstract class RadixOption extends AttributeOption {
 			return value.toDisplayString(2);
 		}
 	}
+
 	private static class Radix8 extends RadixOption {
 		private Radix8() {
 			super("8", Strings.getter("radix8"));

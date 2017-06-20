@@ -23,6 +23,7 @@ public class Curve extends FillableCanvasObject {
 	private static double[] toArray(Location loc) {
 		return new double[] { loc.getX(), loc.getY() };
 	}
+
 	private Location p0;
 	private Location p1;
 	private Location p2;

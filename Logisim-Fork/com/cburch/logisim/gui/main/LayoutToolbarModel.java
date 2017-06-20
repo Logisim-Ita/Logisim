@@ -150,6 +150,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 		}
 		return null;
 	}
+
 	private Frame frame;
 	private Project proj;
 	private MyListener myListener;

@@ -45,6 +45,7 @@ class KarnaughMapPanel extends JPanel implements TruthTablePanel {
 		}
 
 	}
+
 	/**
 	 * 
 	 */

@@ -28,6 +28,7 @@ public class ReorderRequest {
 			}
 		}
 	}
+
 	public static final Comparator<ReorderRequest> ASCENDING_FROM = new Compare(true, true);
 	public static final Comparator<ReorderRequest> DESCENDING_FROM = new Compare(true, true);
 	public static final Comparator<ReorderRequest> ASCENDING_TO = new Compare(true, true);

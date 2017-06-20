@@ -42,6 +42,7 @@ public class CanvasActionAdapter extends com.cburch.logisim.proj.Action {
 		}
 
 	}
+
 	private Circuit circuit;
 	private Action canvasAction;
 

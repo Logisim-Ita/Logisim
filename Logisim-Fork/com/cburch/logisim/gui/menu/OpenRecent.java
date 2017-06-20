@@ -42,6 +42,7 @@ class OpenRecent extends JMenu implements PropertyChangeListener {
 			ProjectActions.doOpen(par, proj, file);
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -71,6 +72,7 @@ class OpenRecent extends JMenu implements PropertyChangeListener {
 			}
 		}
 	}
+
 	private LogisimMenuBar menubar;
 
 	private List<RecentItem> recentItems;

@@ -23,6 +23,7 @@ class CircuitLocker {
 	}
 
 	private static AtomicInteger NEXT_SERIAL_NUMBER = new AtomicInteger(0);
+
 	static Map<Circuit, Lock> acquireLocks(CircuitTransaction xn, CircuitMutatorImpl mutator) {
 		Map<Circuit, Integer> requests = xn.getAccessedCircuits();
 		Map<Circuit, Lock> circuitLocks = new HashMap<Circuit, Lock>();
@@ -59,6 +60,7 @@ class CircuitLocker {
 		}
 		return circuitLocks;
 	}
+
 	static void releaseLocks(Map<Circuit, Lock> locks) {
 		Thread curThread = Thread.currentThread();
 		for (Map.Entry<Circuit, Lock> entry : locks.entrySet()) {
@@ -72,6 +74,7 @@ class CircuitLocker {
 			lock.unlock();
 		}
 	}
+
 	private int serialNumber;
 
 	private ReadWriteLock circuitLock;

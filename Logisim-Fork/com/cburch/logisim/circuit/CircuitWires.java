@@ -167,21 +167,22 @@ class CircuitWires {
 			return Value.create(ret);
 		}
 	}
+
 	// user-given data
 	private HashSet<Wire> wires = new HashSet<Wire>();
 	private HashSet<Splitter> splitters = new HashSet<Splitter>();
-																	private HashSet<Component> tunnels = new HashSet<Component>(); // of
+	private HashSet<Component> tunnels = new HashSet<Component>(); // of
 	// Components
-																	// with
-																	// Tunnel
-																	// factory
+	// with
+	// Tunnel
+	// factory
 	private TunnelListener tunnelListener = new TunnelListener();
-																	private HashSet<Component> pulls = new HashSet<Component>(); // of
+	private HashSet<Component> pulls = new HashSet<Component>(); // of
 
 	// Components
-																	// with
-																	// PullResistor
-																	// factory
+	// with
+	// PullResistor
+	// factory
 	final CircuitPoints points = new CircuitPoints();
 	// derived data
 	private Bounds bounds = Bounds.EMPTY_BOUNDS;

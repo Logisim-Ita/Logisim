@@ -132,6 +132,7 @@ public class DotMatrix extends InstanceFactory {
 			}
 		}
 	}
+
 	static final AttributeOption INPUT_SELECT = new AttributeOption("select", Strings.getter("ioInputSelect"));
 	static final AttributeOption INPUT_COLUMN = new AttributeOption("column", Strings.getter("ioInputColumn"));
 

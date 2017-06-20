@@ -29,6 +29,7 @@ public class GridPainter {
 			}
 		}
 	}
+
 	public static final String ZOOM_PROPERTY = "zoom";
 
 	public static final String SHOW_GRID_PROPERTY = "showgrid";

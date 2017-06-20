@@ -53,6 +53,7 @@ public class EditTool extends Tool {
 			updateLocation(lastCanvas, lastRawX, lastRawY, lastMods);
 		}
 	}
+
 	private static final int CACHE_MAX_SIZE = 32;
 
 	private static final Location NULL_LOCATION = Location.create(Integer.MIN_VALUE, Integer.MIN_VALUE);

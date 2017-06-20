@@ -42,6 +42,7 @@ class SelectionBase {
 			return ret;
 		}
 	}
+
 	private static boolean shouldSnapComponent(Component comp) {
 		Boolean shouldSnapValue = (Boolean) comp.getFactory().getFeature(ComponentFactory.SHOULD_SNAP,
 				comp.getAttributeSet());
@@ -49,15 +50,15 @@ class SelectionBase {
 	}
 
 	Project proj;
-																	private ArrayList<Selection.Listener> listeners = new ArrayList<Selection.Listener>();
-																final HashSet<Component> selected = new HashSet<Component>(); // of selected
-																			// Components
-																	// in
-																	// circuit
+	private ArrayList<Selection.Listener> listeners = new ArrayList<Selection.Listener>();
+	final HashSet<Component> selected = new HashSet<Component>(); // of selected
+	// Components
+	// in
+	// circuit
 	final HashSet<Component> lifted = new HashSet<Component>(); // of selected
 
 	// Components
-																// removed
+	// removed
 	final HashSet<Component> suppressHandles = new HashSet<Component>(); // of
 	// Components
 	final Set<Component> unionSet = CollectionUtil.createUnmodifiableSetUnion(selected, lifted);

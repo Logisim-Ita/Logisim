@@ -119,6 +119,7 @@ public class TruthTable {
 	public static boolean isInputSet(int row, int column, int inputs) {
 		return ((row >> (inputs - 1 - column)) & 0x1) == 1;
 	}
+
 	private MyListener myListener = new MyListener();
 	private List<TruthTableListener> listeners = new ArrayList<TruthTableListener>();
 	private AnalyzerModel model;

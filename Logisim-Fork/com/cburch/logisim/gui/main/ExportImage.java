@@ -156,6 +156,7 @@ class ExportImage {
 			return desc.get();
 		}
 	}
+
 	private static class OptionsPanel extends JPanel implements ChangeListener {
 		/**
 		 * 
@@ -259,6 +260,7 @@ class ExportImage {
 				curScale.setPreferredSize(curScaleDim);
 		}
 	}
+
 	private static final int SLIDER_DIVISIONS = 6;
 
 	private static final int FORMAT_GIF = 0;

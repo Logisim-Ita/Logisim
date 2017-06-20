@@ -48,6 +48,7 @@ public class Implicant implements Comparable<Implicant> {
 		public void remove() {
 		}
 	}
+
 	static Implicant MINIMAL_IMPLICANT = new Implicant(0, -1);
 
 	static List<Implicant> MINIMAL_LIST = Arrays.asList(new Implicant[] { MINIMAL_IMPLICANT });
@@ -207,6 +208,7 @@ public class Implicant implements Comparable<Implicant> {
 		Collections.sort(ret);
 		return ret;
 	}
+
 	static Expression toExpression(int format, AnalyzerModel model, List<Implicant> implicants) {
 		if (implicants == null)
 			return null;

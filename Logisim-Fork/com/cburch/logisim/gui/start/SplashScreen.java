@@ -26,6 +26,7 @@ public class SplashScreen extends JWindow implements ActionListener {
 			this.message = message;
 		}
 	}
+
 	/**
 	 * 
 	 */

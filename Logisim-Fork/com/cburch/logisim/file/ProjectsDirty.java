@@ -50,6 +50,7 @@ class ProjectsDirty {
 	private static ProjectListListener projectListListener = new ProjectListListener();
 
 	private static ArrayList<DirtyListener> listeners = new ArrayList<DirtyListener>();
+
 	public static void initialize() {
 		Projects.addPropertyChangeListener(Projects.projectListProperty, projectListListener);
 	}

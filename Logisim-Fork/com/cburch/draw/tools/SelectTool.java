@@ -52,6 +52,7 @@ public class SelectTool extends AbstractTool {
 		}
 		return null;
 	}
+
 	private int curAction;
 	private List<CanvasObject> beforePressSelection;
 	private Handle beforePressHandle;

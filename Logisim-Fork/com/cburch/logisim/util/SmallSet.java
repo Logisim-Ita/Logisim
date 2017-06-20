@@ -112,6 +112,7 @@ public class SmallSet<E> extends AbstractSet<E> {
 			}
 		}
 	}
+
 	private int size = 0;
 	private int version = 0;
 

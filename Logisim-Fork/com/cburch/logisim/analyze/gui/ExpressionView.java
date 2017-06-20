@@ -150,6 +150,7 @@ class ExpressionView extends JPanel {
 			this.text = text.toString();
 		}
 	}
+
 	private class MyListener implements ComponentListener {
 		@Override
 		public void componentHidden(ComponentEvent arg0) {
@@ -176,11 +177,13 @@ class ExpressionView extends JPanel {
 		public void componentShown(ComponentEvent arg0) {
 		}
 	}
+
 	private static class NotData {
 		int startIndex;
 		int stopIndex;
 		int depth;
 	}
+
 	private static class RenderData {
 		ExpressionData exprData;
 		int prefWidth;
@@ -341,6 +344,7 @@ class ExpressionView extends JPanel {
 			}
 		}
 	}
+
 	/**
 	 * 
 	 */

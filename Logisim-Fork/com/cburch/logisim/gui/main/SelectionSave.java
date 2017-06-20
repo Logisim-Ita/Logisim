@@ -32,6 +32,7 @@ class SelectionSave {
 			return toSet(save).equals(sel);
 		}
 	}
+
 	private static boolean isSame(Component[] a, Component[] b) {
 		if (a == null || a.length == 0) {
 			return b == null || b.length == 0;

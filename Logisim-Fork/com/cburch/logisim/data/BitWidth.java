@@ -44,6 +44,7 @@ public class BitWidth implements Comparable<BitWidth> {
 			return BitWidth.parse(value);
 		}
 	}
+
 	public static final BitWidth UNKNOWN = new BitWidth(0);
 
 	public static final BitWidth ONE = new BitWidth(1);

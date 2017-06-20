@@ -89,6 +89,7 @@ public class HorizontalSplitPane extends JPanel {
 
 		abstract void setDragValue(int value);
 	}
+
 	private class MyDragbar extends Dragbar {
 		/**
 		 * 
@@ -111,6 +112,7 @@ public class HorizontalSplitPane extends JPanel {
 			revalidate();
 		}
 	}
+
 	private class MyLayout implements LayoutManager {
 		@Override
 		public void addLayoutComponent(String name, Component comp) {

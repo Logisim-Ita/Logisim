@@ -89,6 +89,7 @@ public class Analyzer extends LFrame {
 			}
 		}
 	}
+
 	private class MyListener implements LocaleListener {
 		@Override
 		public void localeChanged() {
@@ -112,6 +113,7 @@ public class Analyzer extends LFrame {
 			buildCircuit.localeChanged();
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -131,6 +133,7 @@ public class Analyzer extends LFrame {
 		frame.pack();
 		frame.setVisible(true);
 	}
+
 	private MyListener myListener = new MyListener();
 	private EditListener editListener = new EditListener();
 	private AnalyzerModel model = new AnalyzerModel();

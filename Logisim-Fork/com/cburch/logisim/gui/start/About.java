@@ -92,6 +92,7 @@ public class About {
 			}
 		}
 	}
+
 	private static class PanelThread extends Thread {
 		private MyPanel panel;
 		private boolean running = true;

@@ -106,14 +106,15 @@ public class Circuit {
 	public static boolean isInput(Component comp) {
 		return comp.getEnd(0).getType() != EndData.INPUT_ONLY;
 	}
+
 	private MyComponentListener myComponentListener = new MyComponentListener();
 	private CircuitAppearance appearance;
 	private AttributeSet staticAttrs;
 	private SubcircuitFactory subcircuitFactory;
 	private EventSourceWeakSupport<CircuitListener> listeners = new EventSourceWeakSupport<CircuitListener>();
-																	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
+	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
 	// include
-																	// wires
+	// wires
 	CircuitWires wires = new CircuitWires();
 	// wires is package-protected for CircuitState and Analyze only.
 	private ArrayList<Component> clocks = new ArrayList<Component>();

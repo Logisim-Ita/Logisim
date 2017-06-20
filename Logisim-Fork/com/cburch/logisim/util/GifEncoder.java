@@ -244,6 +244,7 @@ public class GifEncoder {
 		static int Hash(short index, byte lastbyte) {
 			return (((short) (lastbyte << 8) ^ index) & 0xFFFF) % HASHSIZE;
 		}
+
 		byte strChr_[];
 		short strNxt_[];
 		short strHsh_[];
@@ -374,11 +375,13 @@ public class GifEncoder {
 	public static void toFile(Image img, File file) throws IOException, AWTException {
 		toFile(img, file, null);
 	}
+
 	public static void toFile(Image img, File file, ProgressMonitor monitor) throws IOException, AWTException {
 		FileOutputStream out = new FileOutputStream(file);
 		new GifEncoder(img, monitor).write(out);
 		out.close();
 	}
+
 	public static void toFile(Image img, String filename) throws IOException, AWTException {
 		toFile(img, filename, null);
 	}

@@ -89,6 +89,7 @@ public class OptionsFrame extends LFrame {
 		String name = file == null ? "???" : file.getName();
 		return StringUtil.format(Strings.get("optionsFrameTitle"), name);
 	}
+
 	private Project project;
 	private LogisimFile file;
 	private MyListener myListener = new MyListener();

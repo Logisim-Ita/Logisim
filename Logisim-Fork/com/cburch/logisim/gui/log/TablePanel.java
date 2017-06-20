@@ -58,6 +58,7 @@ class TablePanel extends LogPanel {
 			computeRowCount();
 		}
 	}
+
 	private class VerticalScrollBar extends JScrollBar implements ChangeListener {
 		/**
 		 * 
@@ -107,6 +108,7 @@ class TablePanel extends LogPanel {
 			}
 		}
 	}
+
 	/**
 	 * 
 	 */

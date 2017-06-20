@@ -78,6 +78,7 @@ public class JTreeUtil {
 			return Arrays.asList(flavors).contains(flavor);
 		}
 	}
+
 	/*
 	 * This class is the most important. It manages all the DnD behavior. It is
 	 * abstract because it contains two abstract methods: public abstract

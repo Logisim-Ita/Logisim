@@ -91,6 +91,7 @@ class Toolbar extends JComponent {
 		}
 
 	}
+
 	/**
 	 * 
 	 */

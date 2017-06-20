@@ -65,6 +65,7 @@ public class AppPreferences {
 			}
 		}
 	}
+
 	//
 	// methods for accessing preferences
 	//
@@ -107,6 +108,7 @@ public class AppPreferences {
 			}
 		}
 	}
+
 	// class variables for maintaining consistency between properties,
 	// internal variables, and other classes
 	private static Preferences prefs = null;
@@ -166,6 +168,7 @@ public class AppPreferences {
 	public static PrefMonitor<String> POKE_WIRE_RADIX1;
 
 	public static PrefMonitor<String> POKE_WIRE_RADIX2;
+
 	static {
 		RadixOption[] radixOptions = RadixOption.OPTIONS;
 		String[] radixStrings = new String[radixOptions.length];
@@ -177,6 +180,7 @@ public class AppPreferences {
 		POKE_WIRE_RADIX2 = create(
 				new PrefMonitorStringOpts("pokeRadix2", radixStrings, RadixOption.RADIX_10_SIGNED.getSaveString()));
 	}
+
 	// Experimental preferences
 	public static final String ACCEL_DEFAULT = "default";
 	public static final String ACCEL_NONE = "none";

@@ -198,6 +198,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 		}
 
 	}
+
 	private static class MyDialog extends JDialogOk {
 		/**
 		 * 

@@ -44,6 +44,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 			updateList(true);
 		}
 	}
+
 	private static final Attribute<?>[] EMPTY_ATTRIBUTES = new Attribute<?>[0];
 
 	private static final Object[] EMPTY_VALUES = new Object[0];
@@ -77,6 +78,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 		}
 		return attrMap;
 	}
+
 	private static boolean computeReadOnly(Collection<Component> sel, Attribute<?> attr) {
 		for (Component comp : sel) {
 			AttributeSet attrs = comp.getAttributeSet();
@@ -85,6 +87,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 		}
 		return false;
 	}
+
 	private static Set<Component> createSet(Collection<Component> comps) {
 		boolean includeWires = true;
 		for (Component comp : comps) {
@@ -105,6 +108,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 			return ret;
 		}
 	}
+
 	private static boolean haveSameElements(Collection<Component> a, Collection<Component> b) {
 		if (a == null) {
 			return b == null ? true : b.size() == 0;
@@ -120,6 +124,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 			return true;
 		}
 	}
+
 	private static boolean isSame(LinkedHashMap<Attribute<Object>, Object> attrMap, Attribute<?>[] oldAttrs,
 			Object[] oldValues) {
 		if (oldAttrs.length != attrMap.size()) {
@@ -140,6 +145,7 @@ class SelectionAttributes extends AbstractAttributeSet {
 			return true;
 		}
 	}
+
 	private Canvas canvas;
 	private Selection selection;
 	private Listener listener;

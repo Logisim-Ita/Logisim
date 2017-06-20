@@ -50,6 +50,7 @@ abstract class Mem extends InstanceFactory {
 		public void metainfoChanged(HexModel source) {
 		}
 	}
+
 	// Note: The code is meant to be able to handle up to 32-bit addresses, but
 	// it
 	// hasn't been debugged thoroughly. There are two definite changes I would

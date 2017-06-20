@@ -94,6 +94,7 @@ public class ArraySet<E> extends AbstractSet<E> {
 			}
 		}
 	}
+
 	private int version = 0;
 
 	private Object[] values = EMPTY_ARRAY;

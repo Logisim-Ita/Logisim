@@ -41,11 +41,13 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 			}
 		}
 	}
+
 	private static AttributeSet createAttributes(ComponentFactory factory, AttributeSet src) {
 		AttributeSet dest = factory.createAttributeSet();
 		copyAttributes(dest, src);
 		return dest;
 	}
+
 	private static void replaceAll(Circuit circuit, Map<ComponentFactory, ComponentFactory> compMap) {
 		ArrayList<Component> toReplace = null;
 		for (Component comp : circuit.getNonWires()) {
@@ -68,6 +70,7 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 			xn.execute();
 		}
 	}
+
 	private static void replaceAll(LogisimFile file, Map<ComponentFactory, ComponentFactory> compMap,
 			Map<Tool, Tool> toolMap) {
 		file.getOptions().getToolbarData().replaceAll(toolMap);

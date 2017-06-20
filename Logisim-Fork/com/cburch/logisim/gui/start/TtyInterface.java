@@ -71,6 +71,7 @@ public class TtyInterface {
 			}
 		}
 	}
+
 	public static final int FORMAT_TABLE = 1;
 	public static final int FORMAT_SPEED = 2;
 	public static final int FORMAT_TTY = 4;

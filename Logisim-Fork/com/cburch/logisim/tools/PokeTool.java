@@ -40,6 +40,7 @@ public class PokeTool extends Tool {
 			}
 		}
 	}
+
 	private static class WireCaret extends AbstractCaret {
 		Canvas canvas;
 		Wire wire;

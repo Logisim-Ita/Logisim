@@ -10,6 +10,7 @@ class PrefMonitorStringOpts extends AbstractPrefMonitor<String> {
 	private static boolean isSame(String a, String b) {
 		return a == null ? b == null : a.equals(b);
 	}
+
 	private String[] opts;
 	private String value;
 

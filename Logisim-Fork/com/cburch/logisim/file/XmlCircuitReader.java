@@ -64,6 +64,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 			}
 		}
 	}
+
 	private XmlReader.ReadContext reader;
 
 	private List<XmlReader.CircuitData> circuitsData;

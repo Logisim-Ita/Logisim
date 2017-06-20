@@ -127,7 +127,7 @@ public class CircuitState implements InstanceData {
 
 	private Circuit circuit; // circuit being simulated
 	private CircuitState parentState = null; // parent in tree of CircuitStates
-											private Component parentComp = null; // subcircuit component containing this
+	private Component parentComp = null; // subcircuit component containing this
 
 	// state
 	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();

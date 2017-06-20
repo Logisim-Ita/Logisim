@@ -127,6 +127,7 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		}
 		return ret;
 	}
+
 	private Selection selection;
 	private Listener listener;
 	private Map<AttributeSet, CanvasObject> selected;

@@ -127,6 +127,7 @@ class LibraryManager {
 			return file.toString();
 		}
 	}
+
 	private HashMap<LibraryDescriptor, WeakReference<LoadedLibrary>> fileMap;
 
 	private WeakHashMap<LoadedLibrary, LibraryDescriptor> invMap;

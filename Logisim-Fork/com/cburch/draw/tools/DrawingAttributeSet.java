@@ -87,6 +87,7 @@ public class DrawingAttributeSet implements AttributeSet, Cloneable {
 			}
 		}
 	}
+
 	static final List<Attribute<?>> ATTRS_ALL = UnmodifiableList
 			.create(new Attribute<?>[] { DrawAttr.FONT, DrawAttr.ALIGNMENT, DrawAttr.PAINT_TYPE, DrawAttr.STROKE_WIDTH,
 					DrawAttr.STROKE_COLOR, DrawAttr.FILL_COLOR, DrawAttr.TEXT_DEFAULT_FILL, DrawAttr.CORNER_RADIUS });

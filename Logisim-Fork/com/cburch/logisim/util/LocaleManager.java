@@ -33,6 +33,7 @@ public class LocaleManager {
 			return get();
 		}
 	}
+
 	// static members
 	private static final String SETTINGS_NAME = "settings";
 
@@ -170,6 +171,7 @@ public class LocaleManager {
 		repl = newRepl;
 		fireLocaleChanged();
 	}
+
 	// instance members
 	private String dir_name;
 	private String file_start;

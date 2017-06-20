@@ -290,6 +290,7 @@ public class Startup {
 		}
 		System.exit(-1);
 	}
+
 	// based on command line
 	boolean isTty;
 	private File templFile = null;

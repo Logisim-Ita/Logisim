@@ -563,6 +563,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			isSouthwest = false;
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -590,6 +591,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		int new_y = snapYToGrid(old_y);
 		e.translatePoint(new_x - old_x, new_y - old_y);
 	}
+
 	//
 	// static methods
 	//
@@ -600,6 +602,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			return ((x + 5) / 10) * 10;
 		}
 	}
+
 	public static int snapYToGrid(int y) {
 		if (y < 0) {
 			return -((-y + 5) / 10) * 10;
@@ -607,6 +610,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			return ((y + 5) / 10) * 10;
 		}
 	}
+
 	private Project proj;
 	private Tool drag_tool;
 	private Selection selection;

@@ -129,6 +129,7 @@ public class Frame extends LFrame implements LocaleListener {
 			}
 		}
 	}
+
 	class MyWindowListener extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent e) {
@@ -143,6 +144,7 @@ public class Frame extends LFrame implements LocaleListener {
 			layoutCanvas.computeSize(true);
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -203,6 +205,7 @@ public class Frame extends LFrame implements LocaleListener {
 			return null;
 		}
 	}
+
 	private static boolean isProjectFrameAt(int x, int y) {
 		for (Project current : Projects.getOpenProjects()) {
 			Frame frame = current.getFrame();

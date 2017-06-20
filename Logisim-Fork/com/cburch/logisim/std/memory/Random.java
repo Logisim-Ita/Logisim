@@ -79,6 +79,7 @@ public class Random extends InstanceFactory {
 			value = (int) (v >> 12);
 		}
 	}
+
 	private static final Attribute<Integer> ATTR_SEED = Attributes.forInteger("seed", Strings.getter("randomSeedAttr"));
 	private static final int OUT = 0;
 	private static final int CK = 1;

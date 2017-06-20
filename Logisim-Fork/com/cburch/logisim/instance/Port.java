@@ -30,6 +30,7 @@ public class Port {
 		else
 			throw new IllegalArgumentException("Not recognized port type");
 	}
+
 	private static boolean toExclusive(String s) {
 		if (s == null)
 			throw new IllegalArgumentException("Null exclusion type");
@@ -40,6 +41,7 @@ public class Port {
 		else
 			throw new IllegalArgumentException("Not recognized exclusion type");
 	}
+
 	private static int toType(String s) {
 		if (s == null)
 			throw new IllegalArgumentException("Null port type");
@@ -52,6 +54,7 @@ public class Port {
 		else
 			throw new IllegalArgumentException("Not recognized port type");
 	}
+
 	private int dx;
 	private int dy;
 	private int type;

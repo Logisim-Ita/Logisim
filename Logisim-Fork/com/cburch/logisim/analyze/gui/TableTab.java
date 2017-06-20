@@ -32,6 +32,7 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 			computePreferredSize();
 		}
 	}
+
 	/**
 	 * 
 	 */

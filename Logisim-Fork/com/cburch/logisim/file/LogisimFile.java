@@ -70,6 +70,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		ret.tools.add(new AddTool(ret.main.getSubcircuitFactory()));
 		return ret;
 	}
+
 	private static String getFirstLine(BufferedInputStream in) throws IOException {
 		byte[] first = new byte[512];
 		in.mark(first.length - 1);
@@ -84,6 +85,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		}
 		return new String(first, 0, lineBreak, "UTF-8");
 	}
+
 	public static LogisimFile load(File file, Loader loader) throws IOException {
 		InputStream in = new FileInputStream(file);
 		SAXException firstExcept = null;
@@ -114,6 +116,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 
 		return null;
 	}
+
 	public static LogisimFile load(InputStream in, Loader loader) throws IOException {
 		try {
 			return loadSub(in, loader);
@@ -122,6 +125,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 			return null;
 		}
 	}
+
 	public static LogisimFile loadSub(InputStream in, Loader loader) throws IOException, SAXException {
 		// fetch first line and then reset
 		BufferedInputStream inBuffered = new BufferedInputStream(in);
@@ -140,6 +144,7 @@ public class LogisimFile extends Library implements LibraryEventSource {
 		ret.loader = loader;
 		return ret;
 	}
+
 	private EventSourceWeakSupport<LibraryListener> listeners = new EventSourceWeakSupport<LibraryListener>();
 	private Loader loader;
 	private LinkedList<String> messages = new LinkedList<String>();

@@ -19,6 +19,7 @@ public abstract class Expression {
 
 		public int visitXor(Expression a, Expression b);
 	}
+
 	static interface Visitor {
 		public void visitAnd(Expression a, Expression b);
 
@@ -32,6 +33,7 @@ public abstract class Expression {
 
 		public void visitXor(Expression a, Expression b);
 	}
+
 	public static final int OR_LEVEL = 0;
 	public static final int XOR_LEVEL = 1;
 

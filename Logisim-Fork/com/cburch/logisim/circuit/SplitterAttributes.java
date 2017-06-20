@@ -68,6 +68,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			}
 		}
 	}
+
 	private static class BitOutOption {
 		int value;
 		boolean isVertical;
@@ -100,6 +101,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			}
 		}
 	}
+
 	public static final AttributeOption APPEAR_LEGACY = new AttributeOption("legacy",
 			Strings.getter("splitterAppearanceLegacy"));
 	public static final AttributeOption APPEAR_LEFT = new AttributeOption("left",
@@ -174,12 +176,13 @@ class SplitterAttributes extends AbstractAttributeSet {
 		}
 		return ret;
 	}
+
 	private ArrayList<Attribute<?>> attrs = new ArrayList<Attribute<?>>(INIT_ATTRIBUTES);
 	private SplitterParameters parameters;
 	AttributeOption appear = APPEAR_LEFT;
 	Direction facing = Direction.EAST;
 	byte fanout = 2; // number of ends this splits into
-									byte[] bit_end = new byte[2]; // how each bit maps to an end (0 if nowhere);
+	byte[] bit_end = new byte[2]; // how each bit maps to an end (0 if nowhere);
 
 	// other values will be between 1 and fanout
 	BitOutOption[] options = null;

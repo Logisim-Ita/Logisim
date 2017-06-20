@@ -26,18 +26,9 @@ public class RGBLed extends InstanceFactory {
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, Io.MULTI_BIT, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
 						Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.WEST, false, "", Io.LABEL_CENTER, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+				new Object[] { Direction.WEST, false, "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("rgbled.gif");
-	}
-
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			return null;
-		}
 	}
 
 	private void computeTextField(Instance instance) {
@@ -84,9 +75,9 @@ public class RGBLed extends InstanceFactory {
 
 	public void drawInstance(InstancePainter painter, boolean isGhost) {
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-		Bounds bds = painter.getBounds().expand(-1);
-		int x = bds.getX() - 1;
-		int y = bds.getY() - 1;
+		Bounds bds = painter.getBounds();
+		int x = bds.getX();
+		int y = bds.getY();
 		int cx = 0, cy = 0, cw = 0, ch = 0;
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
@@ -100,10 +91,10 @@ public class RGBLed extends InstanceFactory {
 			if (!isGhost)
 				g.setColor(Color.BLUE);
 			g.drawLine(x + 30, y + 20, x + 10, y + 20);
-			cx = bds.getX() - 1;
-			cy = bds.getY() - 1;
-			cw = bds.getWidth() - 8;
-			ch = bds.getHeight() + 2;
+			cx = bds.getX();
+			cy = bds.getY();
+			cw = bds.getWidth() - 10;
+			ch = bds.getHeight();
 		} else if (facing == Direction.WEST) {
 			if (!isGhost)
 				g.setColor(Color.RED);
@@ -114,10 +105,10 @@ public class RGBLed extends InstanceFactory {
 			if (!isGhost)
 				g.setColor(Color.BLUE);
 			g.drawLine(x + 20, y + 20, x, y + 20);
-			cx = bds.getX() + 9;
-			cy = bds.getY() - 1;
-			cw = bds.getWidth() - 8;
-			ch = bds.getHeight() + 2;
+			cx = bds.getX() + 10;
+			cy = bds.getY();
+			cw = bds.getWidth() - 10;
+			ch = bds.getHeight();
 		} else if (facing == Direction.SOUTH) {
 			if (!isGhost)
 				g.setColor(Color.RED);
@@ -128,10 +119,10 @@ public class RGBLed extends InstanceFactory {
 			if (!isGhost)
 				g.setColor(Color.BLUE);
 			g.drawLine(x + 20, y + 10, x + 20, y + 30);
-			cx = bds.getX() - 1;
-			cy = bds.getY() - 1;
-			cw = bds.getWidth() + 2;
-			ch = bds.getHeight() - 8;
+			cx = bds.getX();
+			cy = bds.getY();
+			cw = bds.getWidth();
+			ch = bds.getHeight() - 10;
 		} else if (facing == Direction.NORTH) {
 			if (!isGhost)
 				g.setColor(Color.RED);
@@ -142,10 +133,10 @@ public class RGBLed extends InstanceFactory {
 			if (!isGhost)
 				g.setColor(Color.BLUE);
 			g.drawLine(x + 20, y + 20, x + 20, y);
-			cx = bds.getX() - 1;
-			cy = bds.getY() + 9;
-			cw = bds.getWidth() + 2;
-			ch = bds.getHeight() - 8;
+			cx = bds.getX();
+			cy = bds.getY() + 10;
+			cw = bds.getWidth();
+			ch = bds.getHeight() - 10;
 		}
 		if (!isGhost) {
 			if (painter.getShowState()) {

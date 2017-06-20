@@ -24,3 +24,10 @@
 /RGBLed.class
 /PinAttributes.class
 /RGBLedAttributes.class
+/TimingDiagram$Logger.class
+/TimingDiagram.class
+/TimingDiagram$ClockState.class
+/ClockState.class
+/TimingDiagram$DiagramState.class
+/DiagramState.class
+/DigitalOscilloscope.class

@@ -248,6 +248,7 @@ public class OutputExpressions {
 		}
 		return true;
 	}
+
 	private static Entry[] computeColumn(TruthTable table, Expression expr) {
 		int rows = table.getRowCount();
 		int cols = table.getInputColumnCount();
@@ -265,6 +266,7 @@ public class OutputExpressions {
 		}
 		return values;
 	}
+
 	private static boolean implicantsSame(List<Implicant> a, List<Implicant> b) {
 		if (a == null) {
 			return b == null || b.size() == 0;
@@ -284,6 +286,7 @@ public class OutputExpressions {
 			return true;
 		}
 	}
+
 	private static boolean isAllUndefined(Entry[] a) {
 		for (int i = 0; i < a.length; i++) {
 			if (a[i] == Entry.ZERO || a[i] == Entry.ONE)
@@ -291,6 +294,7 @@ public class OutputExpressions {
 		}
 		return true;
 	}
+
 	private MyListener myListener = new MyListener();
 
 	private AnalyzerModel model;
