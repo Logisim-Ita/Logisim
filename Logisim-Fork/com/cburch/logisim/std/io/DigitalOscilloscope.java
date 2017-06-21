@@ -135,7 +135,6 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int inputs = painter.getAttributeValue(ATTR_INPUTS).intValue() + showclock;
 		int length = painter.getAttributeValue(ATTR_NSTATE).intValue();
 		int jr;
-		DiagramState diagramstate = getDiagramState(painter);
 		Graphics g = painter.getGraphics();
 		// draw border
 		g.setColor(painter.getAttributeValue(ATTR_COLOR));
@@ -149,6 +148,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		g.drawRoundRect(x, y, width, height, border, border);
 		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
 
+		DiagramState diagramstate = getDiagramState(painter);
 		GraphicsUtil.switchToWidth(g, 1);
 		for (int i = 0; i < inputs; i++) {
 			// arrow
@@ -156,8 +156,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 					new int[] { x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7,
 							x + border + 10 * -length * (reverse - 1) + 13 - reverse * 11,
 							x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7 },
-					new int[] { y + border + i * 30 - 3 + 30, y + border + i * 30 + 30, y + border + i * 30 + 3 + 30 },
-					3);
+					new int[] { y + border + i * 30 + 27, y + border + i * 30 + 30, y + border + i * 30 + 33 }, 3);
 			g.drawLine(x + border + 10 * -length * (reverse - 1) + 11 * reverse, y + border + i * 30 + 30,
 					x + border + 10 * -length * (reverse - 1) + 4 + 11 * reverse, y + border + i * 30 + 30);
 			// draw diagram
@@ -200,16 +199,26 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int length = state.getAttributeValue(ATTR_NSTATE).intValue();
 		Value clock = state.getPort(0);
 		DiagramState diagramstate = getDiagramState(state);
+		// get old value and set new value
 		Value lastclock = diagramstate.setLastClock(clock);
-		// for each front
-		if (lastclock != clock && lastclock != Value.UNKNOWN && clock != Value.UNKNOWN
-				&& state.getPort(inputs + 1) != Value.TRUE && state.getPort(inputs) != Value.FALSE) {
-			// inputs values
-			for (int i = 0; i < inputs; i++) {
-				for (int j = 0; j < length - 1; j++) {
-					diagramstate.setState(i, j, diagramstate.getState(i, j + 1));
+		// not disabled, not clear an clock connected
+		if (lastclock != Value.UNKNOWN && clock != Value.UNKNOWN && state.getPort(inputs + 1) != Value.TRUE
+				&& state.getPort(inputs) != Value.FALSE) {
+			// for each front
+			if (lastclock != clock) {
+				// inputs values
+				for (int i = 0; i < inputs; i++) {
+					// move back all old values
+					for (int j = 0; j < length - 1; j++) {
+						diagramstate.setState(i, j, diagramstate.getState(i, j + 1));
+					}
+					// set new value at the end
+					diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
 				}
-				diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
+			} else {// input's values can change also after clock front because
+					// of output's delays (Flip Flop, gates etc..)
+				for (int i = 1; i < inputs; i++)
+					diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
 			}
 		}
 		// clear

@@ -24,6 +24,7 @@ class DiagramState implements InstanceData {
 				diagram[i][j] = false;
 			}
 		}
+		LastClock = Value.UNKNOWN;
 	}
 
 	@Override // kept from ttystate
@@ -41,6 +42,7 @@ class DiagramState implements InstanceData {
 	}
 
 	public Value setLastClock(Value newClock) {
+		// copy, set and return copy
 		Value ret = LastClock;
 		LastClock = newClock;
 		return ret;
@@ -51,8 +53,8 @@ class DiagramState implements InstanceData {
 	}
 
 	public void updateSize(int inputs, int length) {
+		// if it's not the same size
 		if (inputs != Inputs || length != Length) {
-			// create a copy of old boolean matrix
 			int oldinputs = Inputs;
 			int oldlength = Length;
 			int h;
@@ -60,11 +62,12 @@ class DiagramState implements InstanceData {
 			// clear() function
 			Inputs = inputs;
 			Length = length;
-
+			// create a copy of old boolean matrix
 			boolean olddiagram[][] = Arrays.copyOf(diagram, diagram.length);
 			diagram = new boolean[Inputs][Length];
+			// set all to false
 			clear();
-
+			// set old values in new boolean matrix
 			for (int i = 0; i < Inputs && i < oldinputs; i++) {
 				h = oldlength - 1;
 				for (int j = Length - 1; j >= 0 && h >= 0; j--) {

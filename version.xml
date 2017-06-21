@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.8.0.2</jar_version>
+  <jar_version>2.8.0.3</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.8.0.2</exe_version>
+  <exe_version>2.8.0.3</exe_version>
   <changelog>
-*Updated Portuguese translations
+*Now the Digital Oscilloscope sets the last input value without moving the diagram also without the clock tick to avoid delays after the tick
   </changelog>
 </logisim>

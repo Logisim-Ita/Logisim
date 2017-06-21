@@ -66,7 +66,7 @@ public class Switch extends InstanceFactory {
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
 						Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, Color.WHITE, "",  Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
+				new Object[] { Direction.EAST, Color.WHITE, "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("switch.gif");
