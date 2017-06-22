@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Bounds;
@@ -24,11 +25,21 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	private static final Attribute<Integer> ATTR_INPUTS = Attributes.forIntegerRange("inputs",
 			Strings.getter("gateInputsAttr"), 1, 32);
+
 	private static final Attribute<Integer> ATTR_NSTATE = Attributes.forIntegerRange("nState",
-			Strings.getter("NStateAttr"), 1, 128);
+			Strings.getter("NStateAttr"), 4, 35);
+
+	public static final AttributeOption NO = new AttributeOption("no", Strings.getter("noOption"));
+	public static final AttributeOption TRIG_RISING = new AttributeOption("rising", Strings.getter("stdTriggerRising"));
+	public static final AttributeOption TRIG_FALLING = new AttributeOption("falling",
+			Strings.getter("stdTriggerFalling"));
+	public static final AttributeOption BOTH = new AttributeOption("both", Strings.getter("bothOption"));
+	private static final Attribute<AttributeOption> VERT_LINE = Attributes.forOption("frontlines",
+			Strings.getter("DrawClockFrontLine"), new AttributeOption[] { NO, TRIG_RISING, TRIG_FALLING, BOTH });
+
 	static final Attribute<Boolean> SHOW_CLOCK = Attributes.forBoolean("showclock",
 			Strings.getter("ShowClockAttribute"));
-	static final Attribute<Boolean> REVERSE = Attributes.forBoolean("ReverseDiagram", Strings.getter("ReverseDiagram"));
+
 	static final Attribute<Color> ATTR_COLOR = Attributes.forColor("color", Strings.getter("BorderColor"));
 
 	private final int border = 10;
@@ -36,11 +47,11 @@ public class DigitalOscilloscope extends InstanceFactory {
 	public DigitalOscilloscope() {
 		super("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"));
 		int inputs = Integer.valueOf(2);
-		int length = Integer.valueOf(30);
+		int length = Integer.valueOf(15);
 		setAttributes(
-				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, SHOW_CLOCK, REVERSE, ATTR_COLOR, StdAttr.LABEL,
+				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
 						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { inputs, length, true, false, new Color(0, 125, 255), "", Direction.NORTH,
+				new Object[] { inputs, length, NO, true, new Color(0, 175, 255), "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setIconName("digitaloscilloscope.gif");
 	}
@@ -79,7 +90,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	private DiagramState getDiagramState(InstanceState state) {
 		int inputs = state.getAttributeValue(ATTR_INPUTS).intValue() + 1;
-		int length = state.getAttributeValue(ATTR_NSTATE).intValue();
+		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
 		DiagramState ret = (DiagramState) state.getData();
 		if (ret == null) {
 			ret = new DiagramState(inputs, length);
@@ -92,7 +103,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int x = attrs.getValue(ATTR_NSTATE).intValue() * 10 + 2 * border + 15;
+		int x = attrs.getValue(ATTR_NSTATE).intValue() * 20 + 2 * border + 15;
 		int y = attrs.getValue(SHOW_CLOCK) ? (attrs.getValue(ATTR_INPUTS).intValue() + 1) * 30 + 3 * border
 				: attrs.getValue(ATTR_INPUTS).intValue() * 30 + 3 * border;
 		int showclock = attrs.getValue(SHOW_CLOCK) ? 30 : 0;
@@ -126,15 +137,14 @@ public class DigitalOscilloscope extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
 		// if showclock = true all diagram lines are moved down
-		int reverse = painter.getAttributeValue(REVERSE) ? 1 : 0;
 		int showclock = painter.getAttributeValue(SHOW_CLOCK) ? 1 : 0;
 		int x = bds.getX();
 		int y = bds.getY();
 		int width = bds.getWidth();
 		int height = bds.getHeight();
 		int inputs = painter.getAttributeValue(ATTR_INPUTS).intValue() + showclock;
-		int length = painter.getAttributeValue(ATTR_NSTATE).intValue();
-		int jr;
+		int length = painter.getAttributeValue(ATTR_NSTATE).intValue() * 2;
+		DiagramState diagramstate = getDiagramState(painter);
 		Graphics g = painter.getGraphics();
 		// draw border
 		g.setColor(painter.getAttributeValue(ATTR_COLOR));
@@ -143,48 +153,60 @@ public class DigitalOscilloscope extends InstanceFactory {
 		g.setColor(new Color(250, 250, 250));
 		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
 
+		// draw front lines if not disabled
+		if (painter.getAttributeValue(VERT_LINE) != NO) {
+			GraphicsUtil.switchToWidth(g, 1);
+			g.setColor(Color.GRAY);
+			for (int j = 1; j < length; j++) {
+				// rising or both || falling or both
+				if (((painter.getAttributeValue(VERT_LINE) == TRIG_RISING
+						|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == true
+						&& diagramstate.getState(0, j - 1) == false)
+						|| ((painter.getAttributeValue(VERT_LINE) == TRIG_FALLING
+								|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == false
+								&& diagramstate.getState(0, j - 1) == true))
+
+					g.drawLine(x + border + 10 * j, y + border, x + border + 10 * j, y + height - border);
+			}
+		}
+		
 		g.setColor(Color.BLACK);
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawRoundRect(x, y, width, height, border, border);
 		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
 
-		DiagramState diagramstate = getDiagramState(painter);
-		GraphicsUtil.switchToWidth(g, 1);
 		for (int i = 0; i < inputs; i++) {
 			// arrow
 			g.fillPolygon(
-					new int[] { x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7,
-							x + border + 10 * -length * (reverse - 1) + 13 - reverse * 11,
-							x + border + 10 * -length * (reverse - 1) + 4 + reverse * 7 },
+					new int[] { x + border + 10 * length + 4, x + border + 10 * length + 13,
+							x + border + 10 * length + 4 },
 					new int[] { y + border + i * 30 + 27, y + border + i * 30 + 30, y + border + i * 30 + 33 }, 3);
-			g.drawLine(x + border + 10 * -length * (reverse - 1) + 11 * reverse, y + border + i * 30 + 30,
-					x + border + 10 * -length * (reverse - 1) + 4 + 11 * reverse, y + border + i * 30 + 30);
+			g.drawLine(x + border + 10 * length, y + border + i * 30 + 30, x + border + 10 * length + 4,
+					y + border + i * 30 + 30);
 			// draw diagram
 			for (int j = 0; j < length; j++) {
-				jr = reverse == 1 ? length - j - 1 : j;
 				// vertical line
-				if (jr != 0 && diagramstate.getState(i + (showclock == 0 ? 1 : 0), jr) != diagramstate
-						.getState(i + (showclock == 0 ? 1 : 0), jr - 1))
-					g.drawLine(x + border + 10 * j + reverse * 25, y + 2 * border + 30 * i,
-							x + border + 10 * j + reverse * 25, y + border + 30 * (i + 1));
+				if (j != 0 && diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != diagramstate
+						.getState(i + (showclock == 0 ? 1 : 0), j - 1))
+					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * j,
+							y + border + 30 * (i + 1));
 				// 1 line
-				if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), jr)) {
-					g.drawLine(x + border + 10 * j + 15 * reverse, y + 2 * border + 30 * i,
-							x + border + 10 * (j + 1) + 15 * reverse, y + 2 * border + 30 * i);
-					if (jr == length - 1) {
-						g.drawLine(x + border + 10 * j + (reverse == 1 ? 15 : 10), y + 2 * border + 30 * i,
-								x + border + 10 * j + (reverse == 1 ? 15 : 10), y + border + 30 * (i + 1));
+				if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j)) {
+					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * (j + 1),
+							y + 2 * border + 30 * i);
+					if (j == length - 1) {
+						g.drawLine(x + border + 10 * (j + 1), y + 2 * border + 30 * i, x + border + 10 * (j + 1),
+								y + border + 30 * (i + 1));
 					}
 				}
 				// 0 line
 				else
-					g.drawLine(x + border + 10 * j + 15 * reverse, y + border + 30 * (i + 1),
-							x + border + 10 * (j + 1) + 15 * reverse, y + border + 30 * (i + 1));
+					g.drawLine(x + border + 10 * j, y + border + 30 * (i + 1), x + border + 10 * (j + 1),
+							y + border + 30 * (i + 1));
 			}
 		}
-
 		// draw ports
-		for (int i = 1; i < painter.getAttributeValue(ATTR_INPUTS) + 3; i++) {
+		for (int i = 1; i < inputs + 2; i++) {
 			painter.drawPort(i);
 		}
 		painter.drawClock(0, Direction.EAST);
@@ -196,7 +218,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		int inputs = state.getAttributeValue(ATTR_INPUTS).intValue() + 1;
-		int length = state.getAttributeValue(ATTR_NSTATE).intValue();
+		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
 		Value clock = state.getPort(0);
 		DiagramState diagramstate = getDiagramState(state);
 		// get old value and set new value
