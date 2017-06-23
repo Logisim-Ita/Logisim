@@ -3,8 +3,10 @@
 
 package com.cburch.logisim.std.io;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
@@ -51,7 +53,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
 						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { inputs, length, NO, true, new Color(0, 175, 255), "", Direction.NORTH,
+				new Object[] { inputs, length, TRIG_RISING, true, new Color(0, 240, 240), "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setIconName("digitaloscilloscope.gif");
 	}
@@ -145,7 +147,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int inputs = painter.getAttributeValue(ATTR_INPUTS).intValue() + showclock;
 		int length = painter.getAttributeValue(ATTR_NSTATE).intValue() * 2;
 		DiagramState diagramstate = getDiagramState(painter);
-		Graphics g = painter.getGraphics();
+		Graphics2D g = (Graphics2D) painter.getGraphics();
 		// draw border
 		g.setColor(painter.getAttributeValue(ATTR_COLOR));
 		g.fillRoundRect(x, y, width, height, border, border);
@@ -155,8 +157,9 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 		// draw front lines if not disabled
 		if (painter.getAttributeValue(VERT_LINE) != NO) {
-			GraphicsUtil.switchToWidth(g, 1);
-			g.setColor(Color.GRAY);
+			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
+			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+					new float[] { 6.0f, 4.0f }, 8.0f));
 			for (int j = 1; j < length; j++) {
 				// rising or both || falling or both
 				if (((painter.getAttributeValue(VERT_LINE) == TRIG_RISING
@@ -164,12 +167,12 @@ public class DigitalOscilloscope extends InstanceFactory {
 						&& diagramstate.getState(0, j - 1) == false)
 						|| ((painter.getAttributeValue(VERT_LINE) == TRIG_FALLING
 								|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == false
-								&& diagramstate.getState(0, j - 1) == true))
-
+								&& diagramstate.getState(0, j - 1) == true)) {
 					g.drawLine(x + border + 10 * j, y + border, x + border + 10 * j, y + height - border);
+				}
 			}
 		}
-		
+
 		g.setColor(Color.BLACK);
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawRoundRect(x, y, width, height, border, border);

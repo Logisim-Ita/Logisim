@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.8.0.4</jar_version>
+  <jar_version>2.8.0.5</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.8.0.4</exe_version>
+  <exe_version>2.8.0.5</exe_version>
   <changelog>
-*Digital Oscilloscope can draw vertical lines for each clock front
+*Graphical changes
   </changelog>
 </logisim>
