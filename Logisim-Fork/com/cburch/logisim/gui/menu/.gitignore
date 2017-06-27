@@ -34,3 +34,6 @@
 /WindowManagers$MyListener.class
 /WindowManagers$ProjectManager.class
 /WindowManagers.class
+/MenuSimulate$MyListener$CustomTickFrequencyChoice.class
+/CustomTickFrequencyChoice.class
+/MenuSimulate$CustomTickFrequencyChoice.class

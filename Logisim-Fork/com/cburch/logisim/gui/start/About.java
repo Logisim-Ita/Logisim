@@ -41,7 +41,7 @@ public class About {
 			addAncestorListener(this);
 
 			credits = new AboutCredits();
-			credits.setBounds(0, IMAGE_HEIGHT / 3, IMAGE_WIDTH, IMAGE_HEIGHT * 2 / 3);
+			credits.setBounds(0, 90, IMAGE_WIDTH, IMAGE_HEIGHT - 90);
 			add(credits);
 		}
 
@@ -70,14 +70,14 @@ public class About {
 
 			g.setColor(headerColor);
 			g.setFont(headerFont);
-			fm = g.getFontMetrics();
-			g.drawString("Logisim", x, y + 55);
+			g.drawString("Logisim", x, y + 45);
 			g.setFont(versionFont);
-			g.drawString(Main.VERSION_NAME, x + fm.stringWidth("Logisim") + 5, y + 55);
+			fm = g.getFontMetrics();
+			g.drawString(Main.VERSION_NAME, IMAGE_WIDTH - x - fm.stringWidth(Main.VERSION_NAME), y + 45);
 			g.setFont(copyrightFont);
 			fm = g.getFontMetrics();
 			str = "\u00a9 " + Main.COPYRIGHT_YEAR;
-			g.drawString(str, IMAGE_WIDTH - fm.stringWidth(str) - x, y + 16);
+			g.drawString(str, IMAGE_WIDTH - fm.stringWidth(str) - x, y + 6);
 		}
 
 		@Override
@@ -87,7 +87,7 @@ public class About {
 			try {
 				g.setColor(fadeColor);
 				g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-				drawText(g, 10, 5);
+				drawText(g, 10, 20);
 			} catch (Throwable t) {
 			}
 		}
@@ -116,7 +116,7 @@ public class About {
 		}
 	}
 
-	static final int IMAGE_WIDTH = 400;
+	static final int IMAGE_WIDTH = 380;
 
 	static final int IMAGE_HEIGHT = 250;
 

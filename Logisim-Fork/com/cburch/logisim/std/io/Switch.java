@@ -3,8 +3,9 @@
 
 package com.cburch.logisim.std.io;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.circuit.Wire;
@@ -164,16 +165,9 @@ public class Switch extends InstanceFactory {
 			color = new Color(hue, hue, hue);
 		}
 
-		Graphics g = painter.getGraphics();
-		int depress;
+		Graphics2D g = (Graphics2D) painter.getGraphics();
+		g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		if (val == Value.TRUE) { // case true output
-			Object labelLoc = painter.getAttributeValue(Io.ATTR_LABEL_LOC);
-			if (labelLoc == Io.LABEL_CENTER || labelLoc == Direction.NORTH || labelLoc == Direction.WEST) {
-				depress = DEPTH;
-			} else {
-				depress = 0;
-			}
-
 			if (facing == Direction.NORTH || facing == Direction.WEST) {
 				Location p = painter.getLocation();
 				int px = p.getX();
@@ -188,22 +182,14 @@ public class Switch extends InstanceFactory {
 			}
 
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {// horizontal
-				xp = new int[] { x, x + w - DEPTH, x + w, x + w, x };// grey
-																		// polygon
-																		// x
-																		// points
-				yp = new int[] { y + DEPTH, y, y + DEPTH, y + h, y + h }; // grey
-																			// poligon
-																			// y
-																			// points
-				xr = new int[] { x, x + w - DEPTH, x + w - DEPTH, x }; // white
-																		// polygon
-																		// x
-																		// points
-				yr = new int[] { y + DEPTH, y, y + h - DEPTH, y + h }; // white
-																		// poligon
-																		// y
-																		// points
+				// grey polygon x points
+				xp = new int[] { x, x + w - DEPTH, x + w, x + w, x };
+				// grey polygon y points
+				yp = new int[] { y + DEPTH, y, y + DEPTH, y + h, y + h };
+				// white polygon x points
+				xr = new int[] { x, x + w - DEPTH, x + w - DEPTH, x };
+				// white polygon y points
+				yr = new int[] { y + DEPTH, y, y + h - DEPTH, y + h };
 
 			} else {// vertical
 				xp = new int[] { x + DEPTH, x + w, x + w, x + DEPTH, x };
@@ -219,23 +205,22 @@ public class Switch extends InstanceFactory {
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
-				g.drawLine(x + ((w - DEPTH) / 2), y + (DEPTH / 2), x + ((w - DEPTH) / 2), y + h - (DEPTH / 2));
+				g.drawLine(x + ((w - DEPTH) / 2), y + (DEPTH / 2) + 1, x + ((w - DEPTH) / 2), y + h - (DEPTH / 2) - 1);
 				g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);
 				g.drawLine(x + ((w - DEPTH) / 6), y + ((h - DEPTH) / 2) + (DEPTH - DEPTH / 6), x + ((w - DEPTH) / 3),
 						y + ((h - DEPTH) / 2) + (DEPTH - DEPTH / 3));
-				g.drawOval(x + ((w - DEPTH) * 3 / 4) - (circle / 2), y + ((h - DEPTH) / 2 - (circle / 2)) + (DEPTH / 4),
-						circle, circle);
+				g.drawOval(x + ((w - DEPTH) * 3 / 4) - (circle / 2),
+						y + ((h - DEPTH) / 2 - (circle / 2)) + 1 + (DEPTH / 4), circle, circle - 1);
 			} else {
 				g.drawLine(x + w - DEPTH, y + DEPTH, x + w, y);
-				g.drawLine(x + (DEPTH / 2), y + ((h - DEPTH) / 2) + DEPTH, x + w - (DEPTH / 2),
+				g.drawLine(x + (DEPTH / 2) + 1, y + ((h - DEPTH) / 2) + DEPTH, x + w - (DEPTH / 2) - 1,
 						y + ((h - DEPTH) / 2) + DEPTH);
 				g.drawLine(x + ((w - DEPTH) / 2) + (DEPTH - DEPTH / 6), y + ((h - DEPTH) * 5 / 6) + DEPTH,
 						x + ((w - DEPTH) / 2) + (DEPTH - DEPTH / 3), y + ((h - DEPTH) * 2 / 3) + DEPTH);
-				g.drawOval(x + (DEPTH / 4) + ((w - DEPTH - circle) / 2), y + ((h - DEPTH) / 4 - (circle / 2)) + DEPTH,
-						circle, circle);
+				g.drawOval(x + (DEPTH / 4) + ((w - DEPTH - circle) / 2) + 1,
+						y + ((h - DEPTH) / 4 - (circle / 2)) + DEPTH, circle - 1, circle);
 			}
-		} else { // csse false output
-			depress = 0;
+		} else { // case false output
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
 				xp = new int[] { x, x + DEPTH, x + w, x + w, x };
 				yp = new int[] { y + DEPTH, y, y + DEPTH, y + h, y + h };
@@ -255,27 +240,26 @@ public class Switch extends InstanceFactory {
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+				// diagonal line inside gray polygon
 				g.drawLine(x + DEPTH, y + h - DEPTH, x, y + h);
-				g.drawLine(x + ((w - DEPTH) / 2) + DEPTH, y + (DEPTH / 2), x + ((w - DEPTH) / 2) + DEPTH,
-						y + h - (DEPTH / 2));
+				g.drawLine(x + ((w - DEPTH) / 2) + DEPTH, y + (DEPTH / 2) + 1, x + ((w - DEPTH) / 2) + DEPTH,
+						y + h - (DEPTH / 2) - 1);
 				g.drawLine(x + DEPTH + (w / 6), y + ((h - DEPTH) / 2) + (DEPTH / 6), x + DEPTH + (w / 3),
 						y + ((h - DEPTH) / 2) + (DEPTH / 3));
 				g.drawOval(x + ((w - DEPTH) * 3 / 4) - (circle / 2) + DEPTH,
-						y + ((h - DEPTH) / 2 - (circle / 2)) + (DEPTH * 3 / 4), circle, circle);
+						y + ((h - DEPTH) / 2 - (circle / 2)) + (DEPTH * 3 / 4) + 1, circle, circle - 1);
 			} else {
-				g.drawLine(x + (DEPTH / 2), y + ((h - DEPTH) / 2), x + w - (DEPTH / 2), y + ((h - DEPTH) / 2));
+				g.drawLine(x + (DEPTH / 2) + 1, y + ((h - DEPTH) / 2), x + w - (DEPTH / 2) - 1, y + ((h - DEPTH) / 2));
 				g.drawLine(x + w - DEPTH, y + h - DEPTH, x + w, y + h);
 				g.drawLine(x + ((w - DEPTH) / 2) + (DEPTH / 6), y + ((h - DEPTH) * 5 / 6),
 						x + ((w - DEPTH) / 2) + (DEPTH / 3), y + ((h - DEPTH) * 2 / 3));
-				g.drawOval(x + (DEPTH * 3 / 4) + ((w - DEPTH - circle) / 2), y + ((h - DEPTH) / 4 - (circle / 2)),
-						circle, circle);
+				g.drawOval(x + (DEPTH * 3 / 4) + ((w - DEPTH - circle) / 2) + 1, y + ((h - DEPTH) / 4 - (circle / 2)),
+						circle - 1, circle);
 			}
 		}
 
-		g.translate(depress, depress);
 		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
-		g.translate(-depress, -depress);
 		painter.drawPorts();
 	}
 

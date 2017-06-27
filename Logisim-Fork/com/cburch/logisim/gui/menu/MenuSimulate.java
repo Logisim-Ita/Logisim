@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
@@ -125,39 +126,69 @@ class MenuSimulate extends Menu {
 		 * 
 		 */
 		private static final long serialVersionUID = 4765228670969063276L;
-		private double freq;
+		private double freq = -1;
+		private boolean isChoice;
 
-		public TickFrequencyChoice(double value) {
-			freq = value;
+		public TickFrequencyChoice(double value, boolean ischoice) {
+			isChoice = ischoice;
+			if (!isChoice)
+				freq = value;
 			addActionListener(this);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (currentSim != null)
+			if (currentSim != null && !isChoice)
 				currentSim.setTickFrequency(freq);
+			if (isChoice) {
+				String Freq = JOptionPane.showInputDialog(null, Strings.get("EnterTickFrequency") + " (Hz)",
+						Strings.get("CustomFrequency"), JOptionPane.PLAIN_MESSAGE);
+				if (Freq != null) {// cancelled
+					try {
+						freq = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
+						if (freq > 0 && freq <= 65536) {
+							if (currentSim != null)
+								currentSim.setTickFrequency(freq);
+							localeChanged();
+						} else {
+							JOptionPane.showMessageDialog(null, Strings.get("FrequencyNumberNotAccepted"));
+						}
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, Strings.get("FrequencyNumberNotAccepted"));
+					}
+				}
+			}
 		}
 
 		public void localeChanged() {
 			double f = freq;
-			if (f < 1000) {
+			if (f < 1000 && f > 0) {
 				String hzStr;
 				if (Math.abs(f - Math.round(f)) < 0.0001) {
 					hzStr = "" + (int) Math.round(f);
 				} else {
 					hzStr = "" + f;
 				}
-				setText(StringUtil.format(Strings.get("simulateTickFreqItem"), hzStr));
-			} else {
+				if (!isChoice)
+					setText(StringUtil.format(Strings.get("simulateTickFreqItem"), hzStr));
+				else
+					setText(Strings.get("Custom") + ": "
+							+ StringUtil.format(Strings.get("simulateTickFreqItem"), hzStr));
+			} else if (f >= 1000) {
 				String kHzStr;
-				double kf = Math.round(f / 100) / 10.0;
+				double kf = (!isChoice) ? Math.round(f / 100) / 10.0 : Math.round(f * 1.0) / 1000.0;
 				if (kf == Math.round(kf)) {
 					kHzStr = "" + (int) kf;
 				} else {
 					kHzStr = "" + kf;
 				}
-				setText(StringUtil.format(Strings.get("simulateTickKFreqItem"), kHzStr));
-			}
+				if (!isChoice)
+					setText(StringUtil.format(Strings.get("simulateTickKFreqItem"), kHzStr));
+				else
+					setText(Strings.get("Custom") + ": "
+							+ StringUtil.format(Strings.get("simulateTickKFreqItem"), kHzStr));
+			} else // is choice and invalid number
+				setText(Strings.get("Custom"));
 		}
 	}
 
@@ -178,12 +209,15 @@ class MenuSimulate extends Menu {
 	private MenuItemCheckImpl ticksEnabled;
 	private MenuItemImpl tickOnce;
 	private JMenu tickFreq = new JMenu();
-	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(4096), new TickFrequencyChoice(2048),
-			new TickFrequencyChoice(1024), new TickFrequencyChoice(512), new TickFrequencyChoice(256),
-			new TickFrequencyChoice(128), new TickFrequencyChoice(64), new TickFrequencyChoice(32),
-			new TickFrequencyChoice(16), new TickFrequencyChoice(8), new TickFrequencyChoice(4),
-			new TickFrequencyChoice(2), new TickFrequencyChoice(1), new TickFrequencyChoice(0.5),
-			new TickFrequencyChoice(0.25), };
+	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(65536, false),
+			new TickFrequencyChoice(32768, false), new TickFrequencyChoice(16384, false),
+			new TickFrequencyChoice(8192, false), new TickFrequencyChoice(4096, false),
+			new TickFrequencyChoice(2048, false), new TickFrequencyChoice(1024, false),
+			new TickFrequencyChoice(512, false), new TickFrequencyChoice(256, false),
+			new TickFrequencyChoice(128, false), new TickFrequencyChoice(64, false), new TickFrequencyChoice(32, false),
+			new TickFrequencyChoice(16, false), new TickFrequencyChoice(8, false), new TickFrequencyChoice(4, false),
+			new TickFrequencyChoice(2, false), new TickFrequencyChoice(1, false), new TickFrequencyChoice(0.5, false),
+			new TickFrequencyChoice(0.25, false), new TickFrequencyChoice(0, true) };
 	private JMenu downStateMenu = new JMenu();
 	private ArrayList<CircuitStateMenuItem> downStateItems = new ArrayList<CircuitStateMenuItem>();
 	private JMenu upStateMenu = new JMenu();
