@@ -66,12 +66,8 @@ public class DisplayDecoder extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		g.setColor(Color.BLACK);
 		painter.drawPorts();
-		if (decval != -1) {// draw the dec number on the component
-			GraphicsUtil.drawCenteredText(g, Integer.toString(decval), bds.getX() + bds.getWidth() / 2,
-					bds.getY() + bds.getHeight() / 2);
-		} else {// unknown --> draw '-'
-			GraphicsUtil.drawCenteredText(g, "-", bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
-		}
+		GraphicsUtil.drawCenteredText(g, (decval != -1) ? Integer.toString(decval) : "-",
+				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 	}
 
 	@Override

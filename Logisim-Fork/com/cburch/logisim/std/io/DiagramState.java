@@ -24,6 +24,7 @@ class DiagramState implements InstanceData {
 				diagram[i][j] = false;
 			}
 		}
+		LastClock = Value.UNKNOWN;
 	}
 
 	@Override // kept from ttystate

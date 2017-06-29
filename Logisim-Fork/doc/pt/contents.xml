@@ -115,6 +115,7 @@
 		<tocitem target="plexers_mux" text="Multiplexador" image="icon_mux" />
 		<tocitem target="plexers_demux" text="Demultiplexador" image="icon_demux" />
 		<tocitem target="plexers_decoder" text="Decodificador" image="icon_decoder" />
+		<tocitem target="plexers_displaydecoder" text="Decodificador Display de 7-Segmentos" image="icon_displaydecoder" />
 		<tocitem target="plexers_priencod" text="Codificador de prioridades" image="icon_priencod" />
 		<tocitem target="plexers_selector" text="Seletor de bits" image="icon_selector" />
 	  </tocitem>
@@ -140,9 +141,12 @@
 	  </tocitem>
 	  <tocitem target="io" text="Biblioteca Entrada/Saída">
 		<tocitem target="io_button" text="Botão" image="icon_button" />
+		<tocitem target="io_switch" text="Interruptor" image="icon_switch" />
 		<tocitem target="io_joystick" text="Joystick" image="icon_joystick" />
 		<tocitem target="io_keyboard" text="Teclado" image="icon_keyboard" />
 		<tocitem target="io_led" text="LED" image="icon_led" />
+		<tocitem target="io_rgbled" text="RGB LED" image="icon_rgbled" />
+		<tocitem target="io_digitaloscilloscope" text="Osciloscópio digital" image="icon_digitaloscilloscope" />
 		<tocitem target="io_7seg" text="Display de 7-segmentos" image="icon_7seg" />
 		<tocitem target="io_hexdig" text="Display hexadecimal" image="icon_hexdig" />
 		<tocitem target="io_dotmat" text="Matriz de LEDs" image="icon_dotmat" />

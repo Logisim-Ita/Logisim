@@ -224,26 +224,28 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
 		Value clock = state.getPort(0);
 		DiagramState diagramstate = getDiagramState(state);
-		// get old value and set new value
-		Value lastclock = diagramstate.setLastClock(clock);
 		// not disabled, not clear an clock connected
-		if (lastclock != Value.UNKNOWN && clock != Value.UNKNOWN && state.getPort(inputs + 1) != Value.TRUE
-				&& state.getPort(inputs) != Value.FALSE) {
-			// for each front
-			if (lastclock != clock) {
-				// inputs values
-				for (int i = 0; i < inputs; i++) {
-					// move back all old values
-					for (int j = 0; j < length - 1; j++) {
-						diagramstate.setState(i, j, diagramstate.getState(i, j + 1));
+		if (clock != Value.UNKNOWN && state.getPort(inputs + 1) != Value.TRUE && state.getPort(inputs) != Value.FALSE) {
+			// get old value and set new value
+			Value lastclock = diagramstate.setLastClock(clock);
+			if (lastclock != Value.UNKNOWN) {
+				// for each front
+				if (lastclock != clock) {
+					// inputs values
+					for (int i = 0; i < inputs; i++) {
+						// move back all old values
+						for (int j = 0; j < length - 1; j++) {
+							diagramstate.setState(i, j, diagramstate.getState(i, j + 1));
+						}
+						// set new value at the end
+						diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
 					}
-					// set new value at the end
-					diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
+				} else {// input's values can change also after clock front
+						// because
+						// of output's delays (Flip Flop, gates etc..)
+					for (int i = 0; i < inputs; i++)
+						diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
 				}
-			} else {// input's values can change also after clock front because
-					// of output's delays (Flip Flop, gates etc..)
-				for (int i = 1; i < inputs; i++)
-					diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
 			}
 		}
 		// clear
