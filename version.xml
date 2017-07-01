@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.8.1.0</jar_version>
+  <jar_version>2.8.1.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.8.1.0</exe_version>
+  <exe_version>2.8.1.1</exe_version>
   <changelog>
-* Added new components in Library Reference
-* Huge clean in Library Reference:
-  -removed files of untranslated languages
-  -removed and all icon copies (now it uses the same ones that Logisim uses)
-  -removed all components' appearance images copies (now all languages use the same)
-  -old weight: 12.7MB - new weight: 5.77MB
+* Updated portuguese library reference and fixes in th english one
 * Fixes
   </changelog>
 </logisim>

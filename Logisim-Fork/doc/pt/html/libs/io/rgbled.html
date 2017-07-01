@@ -1,70 +1,74 @@
 <html>
 <head>
-<title>RGB LED</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>LED RGB</title>
 </head>
 
 <body bgcolor="FFFFFF">
 
-<h1><img  align="center" src="../../../../../resources/logisim/icons/rgbled.gif" width="32" height="32">
-<em>RGB LED</em></h1>
+<h1><img src="../../../../../resources/logisim/icons/rgbled.gif" align="center" width="32" height="32">
+<em>LED RGB</em></h1>
 
 <p><table>
-<tr><td><strong>Library:</strong></td>
-	<td><a href="index.html">Input/Output</a></td></tr>
-<tr><td><strong>Introduced:</strong></td>
+<tr><td><strong>Biblioteca:</strong></td>
+	<td><a href="index.html">Entrada/Saída</a></td></tr>
+<tr><td><strong>Introdução:</strong></td>
 	<td>2.7.1.11 (fork)</td></tr>
-<tr><td valign="top"><strong>Appearance:</strong></td>
+<tr><td valign="top"><strong>Aparência:</strong></td>
 	<td valign="top"><img src="../../../../en/img-libs/rgbled.png" width="42" height="30"></td></tr>
 </table></p>
 
-<h2>Behavior</h2>
+<h2>Comportamento</h2>
+<p>
+Cada entrada corresponde a uma cor (VERMELHO, VERDE, AZUL), 
+o LED RGB exibirá uma cor formada pela composição pelos valores de cada entrada (multi-bits)
+ou combinará as cores correspondentes a uma única entrada predominante (bit único).
+</p>
+<h2>Pinos</h2>
+<p>
+Um LED RGB tem três entradas, cada pino corresponde a uma cor (VERMELHO, VERDE, AZUL)
+e cada uma pode ser uma entrada de 1-bit ou de 7-bits.
+</p>
+<h2>Atributos</h2>
+<p>
+Quando o componente for selecionado ou estiver sendo incluído, 
+as teclas com setas poderão alterar o seu atributo <q>Direção</q>.
+</p>
+<dl><dt>Direção</dt>
+<dd>
+A localização do pino de entrada relativa do componente.
+</dd>
+<dt><em>Multibits</em>? </dt>
+<dd>
+Se verdadeiro, cada pino será uma entrada de 7-bits, 
+isso permitirá que seja usada a combinação de cores RGB.
+</dd>
 
-<p>Each input corresponds to a color (RED, GREEN, BLUE), 
-the RGB LED will display a color composed by the values of each input (multi-bit) 
-or will combine the colors corresponding to a true input (single-bit)</p>
-
-<h2>Pins</h2>
-
-<p>A RGB LED has three input-pins, each pin corresponds to a color (red, green or blu) 
-and it can be a 1-bit input or a 7-bit input.</p>
-
-<h2>Attributes</h2>
-
-<p>When the component is selected or being added,
-the arrow keys alter its <q>Facing</q> attribute.</p>
-
-<dl>
-
-<dt>Facing</dt>
-<dd>The location of the input pin relative to the component.</dd>
-
-<dt>Multibit?</dt>
-<dd>If true, each pin will be a 7-bit input, this will allow you 
-to use every RGB color combination</dd>
-
-<dt>Label</dt>
-<dd>The text within the label associated with the component.</dd>
-
-<dt>Label Location</dt>
-<dd>The location of the label relative to the component.</dd>
-
-<dt>Label Font</dt>
-<dd>The font with which to render the label.</dd>
-
-<dt>Label Color</dt>
-<dd>The color with which to draw the label.</dd>
-
+<dt>Rótulo </dt>
+<dd>
+O texto do rótulo associado ao componente. 
+</dd>
+<dt>Localização do rótulo </dt>
+<dd>
+A localização do rótulo relativa ao componente. 
+</dd>
+<dt>Fonte do rótulo</dt>
+<dd>
+Tipo de fonte a ser usada no rótulo. 
+</dd>
+<dt>Cor do rótulo </dt>
+<dd>
+Cor a ser utilizada no rótulo. 
+</dd>
 </dl>
 
-<h2>Poke Tool Behavior</h2>
+<h2>Comportamento da ferramenta Testar</h2>
+<p>Nenhum.</p>
 
-<p>None.</p>
-
-<h2>Text Tool Behavior</h2>
-
-<p>Allows the label associated with the component to be edited.</p>
-
-<p><a href="../index.html">Back to <em>Library Reference</em></a></p>
-
+<h2>Comportamento da ferramenta Texto</h2>
+<p>
+Permite que o rótulo associado ao componente possa ser editado.
+</p>
+<p><a href="../index.html">Voltar à <em>Referência para bibliotecas</em></a></p>
 </body>
 </html>
