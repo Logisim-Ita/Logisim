@@ -14,7 +14,7 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.util.UnmodifiableList;
 
 public class DrawAttr {
-	public static final Font DEFAULT_FONT = new Font("SansSerif", Font.PLAIN, 12);
+	public static final Font DEFAULT_FONT = new Font("sans serif", Font.PLAIN, 12);
 
 	public static final AttributeOption ALIGN_LEFT = new AttributeOption(Integer.valueOf(EditableLabel.LEFT),
 			Strings.getter("alignStart"));

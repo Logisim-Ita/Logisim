@@ -113,8 +113,8 @@ class TablePanel extends LogPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -4651623644637992336L;
-	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
+	private static final Font HEAD_FONT = new Font("sans serif", Font.BOLD, 14);
+	private static final Font BODY_FONT = new Font("sans serif", Font.PLAIN, 14);
 
 	private static final int COLUMN_SEP = 8;
 

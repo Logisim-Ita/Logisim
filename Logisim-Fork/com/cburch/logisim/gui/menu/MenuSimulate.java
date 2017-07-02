@@ -209,14 +209,13 @@ class MenuSimulate extends Menu {
 	private MenuItemCheckImpl ticksEnabled;
 	private MenuItemImpl tickOnce;
 	private JMenu tickFreq = new JMenu();
-	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(65536, false),
-			new TickFrequencyChoice(32768, false), new TickFrequencyChoice(16384, false),
-			new TickFrequencyChoice(8192, false), new TickFrequencyChoice(4096, false),
-			new TickFrequencyChoice(2048, false), new TickFrequencyChoice(1024, false),
-			new TickFrequencyChoice(512, false), new TickFrequencyChoice(256, false),
-			new TickFrequencyChoice(128, false), new TickFrequencyChoice(64, false), new TickFrequencyChoice(32, false),
-			new TickFrequencyChoice(16, false), new TickFrequencyChoice(8, false), new TickFrequencyChoice(4, false),
-			new TickFrequencyChoice(2, false), new TickFrequencyChoice(1, false), new TickFrequencyChoice(0.5, false),
+	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(8192, false),
+			new TickFrequencyChoice(4096, false), new TickFrequencyChoice(2048, false),
+			new TickFrequencyChoice(1024, false), new TickFrequencyChoice(512, false),
+			new TickFrequencyChoice(256, false), new TickFrequencyChoice(128, false),
+			new TickFrequencyChoice(64, false), new TickFrequencyChoice(32, false), new TickFrequencyChoice(16, false),
+			new TickFrequencyChoice(8, false), new TickFrequencyChoice(4, false), new TickFrequencyChoice(2, false),
+			new TickFrequencyChoice(1, false), new TickFrequencyChoice(0.5, false),
 			new TickFrequencyChoice(0.25, false), new TickFrequencyChoice(0, true) };
 	private JMenu downStateMenu = new JMenu();
 	private ArrayList<CircuitStateMenuItem> downStateItems = new ArrayList<CircuitStateMenuItem>();

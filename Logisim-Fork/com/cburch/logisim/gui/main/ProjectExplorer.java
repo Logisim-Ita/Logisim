@@ -573,7 +573,7 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 			// draw halo if appropriate
 			if (tool == haloedTool && AppPreferences.ATTRIBUTE_HALO.getBoolean()) {
 				g.setColor(Canvas.HALO_COLOR);
-				g.fillRoundRect(x, y, 20, 20, 10, 10);
+				g.fillRoundRect(x, y, 20, 20, 5, 5);
 				g.setColor(Color.BLACK);
 			}
 
@@ -591,7 +591,7 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 				int[] yp = { ty + 1, y + 20, y + 18, ty - 1 };
 				g.setColor(MAGNIFYING_INTERIOR);
 				g.fillOval(x + 5, y + 5, 10, 10);
-				g.setColor(Color.BLACK);
+				g.setColor(Color.darkGray);
 				g.drawOval(x + 5, y + 5, 10, 10);
 				g.fillPolygon(xp, yp, xp.length);
 			}
@@ -605,7 +605,7 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 
 	private static final String DIRTY_MARKER = "*";
 
-	static final Color MAGNIFYING_INTERIOR = new Color(200, 200, 255, 64);
+	static final Color MAGNIFYING_INTERIOR = new Color(200, 255, 255, 128);
 
 	private Project proj;
 	private MyListener myListener = new MyListener();

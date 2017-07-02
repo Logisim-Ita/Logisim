@@ -8,8 +8,8 @@ import javax.swing.JComboBox;
 import com.cburch.logisim.util.StringGetter;
 
 class PrefOption {
-	@SuppressWarnings("rawtypes")
-	static void setSelected(JComboBox combo, Object value) {
+
+	static <Option> void setSelected(JComboBox<Option> combo, Object value) {
 		for (int i = combo.getItemCount() - 1; i >= 0; i--) {
 			PrefOption opt = (PrefOption) combo.getItemAt(i);
 			if (opt.getValue().equals(value)) {

@@ -153,7 +153,7 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		field.setWrapStyleWord(true);
 		field.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), myListener);
 		field.getDocument().addDocumentListener(myListener);
-		field.setFont(new Font("Monospaced", Font.PLAIN, 14));
+		field.setFont(new Font("sans serif", Font.PLAIN, 14));
 
 		JPanel buttons = new JPanel();
 		buttons.add(clear);

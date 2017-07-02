@@ -488,7 +488,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					g.setColor(TICK_RATE_COLOR);
 					g.setFont(TICK_RATE_FONT);
 					FontMetrics fm = g.getFontMetrics();
-					int x = getWidth() - fm.stringWidth(hz) - 5;
+					int x = getWidth() - fm.stringWidth(hz) - 10;
 					int y = fm.getAscent() + 5;
 					g.drawString(hz, x, y);
 				}
@@ -568,7 +568,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	 * 
 	 */
 	private static final long serialVersionUID = -4680658517189289645L;
-	static final Color HALO_COLOR = new Color(192, 255, 255);
+	static final Color HALO_COLOR = new Color(200, 250, 255);
 	private static final int BOUNDS_BUFFER = 70;
 	// pixels shown in canvas beyond outermost boundaries
 	private static final int THRESH_SIZE_UPDATE = 10;
@@ -580,9 +580,9 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	private static final Color DEFAULT_ERROR_COLOR = new Color(192, 0, 0);
 
-	private static final Color TICK_RATE_COLOR = new Color(0, 0, 92, 92);
+	private static final Color TICK_RATE_COLOR = new Color(0, 0, 92, 128);
 
-	private static final Font TICK_RATE_FONT = new Font("serif", Font.BOLD, 12);
+	private static final Font TICK_RATE_FONT = new Font("sans serif", Font.BOLD, 13);
 
 	public static void snapToGrid(MouseEvent e) {
 		int old_x = e.getX();

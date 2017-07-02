@@ -246,7 +246,7 @@ class ExpressionView extends JPanel {
 			int[] badness = exprData.badness;
 
 			if (fm.stringWidth(text) <= width) {
-				lineText = new String[] { text  };
+				lineText = new String[] { text };
 				return;
 			}
 

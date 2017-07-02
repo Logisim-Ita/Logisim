@@ -50,8 +50,8 @@ class KarnaughMapPanel extends JPanel implements TruthTablePanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 5247410315278313982L;
-	private static final Font HEAD_FONT = new Font("Serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("Serif", Font.PLAIN, 14);
+	private static final Font HEAD_FONT = new Font("sans serif", Font.BOLD, 14);
+	private static final Font BODY_FONT = new Font("sans serif", Font.PLAIN, 14);
 
 	private static final Color[] IMP_COLORS = new Color[] { new Color(255, 0, 0, 128), new Color(0, 150, 0, 128),
 			new Color(0, 0, 255, 128), new Color(255, 0, 255, 128), };

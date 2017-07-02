@@ -1,69 +1,75 @@
-<html>
+﻿<html>
 <head>
-<title>7-Segment Display Decoder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
-
 <body bgcolor="FFFFFF">
+<h1><img src="../../../../../resources/logisim/icons/displaydecoder.gif" align="center" width="32" height="32">
+<em>Decodificador para <em>display</em> de 7-Segmentos</em></h1>
+<p>
+<table>
+<tbody>
+<tr>
+<td><strong>Biblioteca:</strong></td>
+<td><a href="index.html">Plexers</a></td>
+</tr>
+<tr>
+<td><strong>Introdução:</strong></td>
+<td>2.7.1.1 (Fork)</td>
+</tr>
+<tr>
+<td valign="top"><strong>Aparência:</strong></td>
+<td valign="top"><img src="../../../../en/img-libs/displaydecoder.png" width="69" height="128"></td>
+</tr>
+</tbody>
+</table>
+</p>
+<h2>Comportamento</h2>
+<p>
+O componente tem quatro pinos de entrada na sua extremidade oeste,
+cada entrada possui largura de 1 bit e a inferior é a mais significativa.
+Essas quatro entradas receberão o valor em binário e então,
+os setes pinos de saída correspondentes na extremidade leste 
+serão determinados para uso com o <em>display</em> de 7-segmentos.
+</p>
 
-<h1><img  align="center" src="../../../../../resources/logisim/icons/displaydecoder.gif" width="32" height="32">
-<em>7-Segment Display Decoder</em></h1>
+<p>Todas as entradas deverão estar conectadas.</p>
 
-<p><table>
-<tr><td><strong>Library:</strong></td>
-	<td><a href="index.html">Plexers</a></td></tr>
-<tr><td><strong>Introduced:</strong></td>
-	<td>2.7.1.1 (Fork)</td></tr>
-<tr><td valign="top"><strong>Appearance:</strong></td>
-	<td valign="top"><img src="../../../../en/img-libs/displaydecoder.png" width="69" height="128"></td></tr>
-</table></p>
+<h2>Pinos (supondo o componente voltado para leste)</h2>
 
-<h2>Behavior</h2>
-
-<p>The component has four input pins on its west edge, each input is 1 bit and the lower is the most significant.
-You have to use these four inputs to enter the binary number and then, in the seven output pins on the east edge, 
-will be set the values for the 7-segment display</p>
-
-<p>All the inputs have to be connected</p>
-
-<h2>Pins (assuming component faces east)</h2>
-
-<dl>
-
-<dt>West edge (4 inputs, bit width 1)</dt>
-<dd>Input values, indexed from A at the top/west end of the edge to D.
-D is the most significant bit</dd>
-
-<dt>East edge (7 outpus, bit width 1)</dt>
-<dd>Output values, indexed from a at the top/east end of the edge to g.
-Connect these outputs to the corresponding letter of the 7-segment display</dd>
-
-<dt>North edge (input, bit width 1)</dt>
-<dd>Enable: 0 disables the component.</dd>
-
+<dl><dt>Extremidade oeste (4 entradas, largura de bits igual a 1) </dt>
+<dd>Valores de entrada, endereçados a partir de A, o primeiro no topo/extremidade oeste,
+até D, sendo essa a do bit mais significativo. 
+</dd>
+<dt>Extremidade leste (7 saídas, largura de bits igual a 1) </dt>
+<dd>
+Valores de saída, endereçados a partir de <em>a</em>, no topo/extremidade leste,
+até <em>g</em>, correspondentes às letras do <em>display</em> de 7-segmentos.
+</dd>
+<dt>Extremidade norte (entrada, largura de bits igual a 1) </dt>
+<dd>Enable: 0 desbilita o componente. </dd>
 </dl>
 
-<h2>Attributes</h2>
+<h2>Atributos</h2>
 
-<p>When the component is selected or being added, 
-the arrow keys alter its <q>Facing</q> attribute.</p>
+<p>
+Quando o componente for selecionado ou estiver sendo incluído,
+as setas poderão alterar o seu atributo <q>Direção</q>.
+</p>
 
 <dl>
-
-<dt>Facing</dt>
-<dd>The direction of the component (its output relative to its input).</dt>
-
+<dt>Direção</dt>
+<dd>A direção do componente (sua saída em relação à entrada).</dd>
 </dl>
 
-<h2>Poke Tool Behavior</h2>
+<h2>Comportamento da ferramenta Testar</h2>
 
-<p>None.</p>
+<p>Nenhum.</p>
 
-<h2>Text Tool Behavior</h2>
+<h2>Comportamento da ferramenta Texto</h2>
 
-<p>None.</p>
+<p>Nenhum.</p>
 
-<p><a href="../index.html">Back to <em>Library Reference</em></a></p>
+<p><a href="../index.html">Voltar à <em>Referência para bibliotecas</em></a></p>
 
 </body>
 </html>
--

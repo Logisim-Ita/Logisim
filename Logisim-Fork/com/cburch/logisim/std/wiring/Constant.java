@@ -282,30 +282,33 @@ public class Constant extends InstanceFactory {
 	@Override
 	public void paintIcon(InstancePainter painter) {
 		int w = painter.getAttributeValue(StdAttr.WIDTH).getWidth();
-		int pinx = 16;
-		int piny = 9;
+		int pinx = 17;
+		int piny = 8;
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		if (dir == Direction.EAST) {
 		} // keep defaults
 		else if (dir == Direction.WEST) {
-			pinx = 4;
+			pinx = 0;
 		} else if (dir == Direction.NORTH) {
-			pinx = 9;
-			piny = 4;
+			pinx = 8;
+			piny = 2;
 		} else if (dir == Direction.SOUTH) {
-			pinx = 9;
-			piny = 16;
+			pinx = 8;
+			piny = 15;
 		}
 
 		Graphics g = painter.getGraphics();
+		g.setColor(BACKGROUND_COLOR);
+		g.fillRoundRect(2, 3, 16, 14, 3, 3);
+		g.setColor(Color.BLACK);
 		if (w == 1) {
 			int v = painter.getAttributeValue(ATTR_VALUE).intValue();
 			Value val = v == 1 ? Value.TRUE : Value.FALSE;
 			g.setColor(val.getColor());
-			GraphicsUtil.drawCenteredText(g, "" + v, 10, 9);
+			GraphicsUtil.drawCenteredText(g, "" + v, 11, 8);
 		} else {
 			g.setFont(g.getFont().deriveFont(9.0f));
-			GraphicsUtil.drawCenteredText(g, "x" + w, 10, 9);
+			GraphicsUtil.drawCenteredText(g, "x" + w, 11, 8);
 		}
 		g.fillOval(pinx, piny, 3, 3);
 	}
@@ -323,7 +326,7 @@ public class Constant extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		if (painter.shouldDrawColor()) {
 			g.setColor(BACKGROUND_COLOR);
-			g.fillRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
+			g.fillRoundRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), 3, 3);
 		}
 		if (v.getWidth() == 1) {
 			if (painter.shouldDrawColor())

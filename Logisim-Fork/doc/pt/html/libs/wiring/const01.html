@@ -1,69 +1,79 @@
-<html>
+﻿<html>
 <head>
-<title>Power/Ground</title>
+<title>Fonte/Terra</title>
 </head>
 
 <body bgcolor="FFFFFF">
 
-<h1><img  align="center" src="../../../../../resources/logisim/icons/power.gif" width="32" height="32"> <img  align="center" src="../../../../../resources/logisim/icons/ground.gif" width="32" height="32"> <em>Power/Ground</em></h1>
+<h1><img  align="center" src="../../../../../resources/logisim/icons/power.gif"  width="32" height="32"> 
+    <img  align="center" src="../../../../../resources/logisim/icons/ground.gif" width="32" height="32"> <em>Power/Ground</em></h1>
 
 <p><table>
-<tr><td><strong>Library:</strong></td>
-	<td><a href="index.html">Wiring</a></td></tr>
-<tr><td><strong>Introduced:</strong></td>
+<tr><td><strong>Biblioteca:</strong></td>
+	<td><a href="index.html">Conexões</a></td></tr>
+<tr><td><strong>Introdução:</strong></td>
 	<td>2.7.0</td></tr>
-<tr><td valign="top"><strong>Appearance:</strong></td>
+<tr><td valign="top"><strong>Aparência:</strong></td>
 	<td valign="top"><img src="../../../../en/img-libs/power.png" width="17" height="16">
-	<img src="../../../img-libs/ground.png" width="17" height="14"></td></tr>
+	<img src="../../../../en/img-libs/ground.png" width="17" height="14"></td></tr>
 </table></p>
 
-<h2>Behavior</h2>
+<h2>Comportamento</h2>
 
-<p>Emits a single value onto a wire.
-For a power element, indicated by a triangle, this value will be one
-(or, if the Data Bits attribute is more than 1, an all-ones value).
-For a ground element, indicated by an arrow
-of three shortening parallel lines, this value will be zero
-(or, if the Data Bits attribute is more than 1, an all-zero value).</p>
+<p>
+Conduzir um valor simples por um cabo.
+Para o elemento Fonte, indicado por um triângulo, o valor será um
+(ou, se o atributo Bits de Dados for maior do que 1, todos os valores iguais à um).
+Para o elemento Terra, indicado por uma seta formada por três linhas
+paralelas com tamanhos diferentes, esse valor será zero
+(ou, se o atributo Bits de Dados for maior do que 1, todos os valores iguais a zero).
+</p>
 
-<p>The same functionality can be achieved using the more versatile
-<a href="constant.html">Constant</a> component. The only reason to prefer
-ground and power is that they are standard electronic symbols.</p>
+<p>
+A mesma funcionalidade pode ser alcançada pelo uso mais versátil do componente
+<a href="constant.html">Constante</a>. A única razão para se preferir o uso dos
+componentes Terra e Fonte é que esses são símbolos eletrônicos padronizados.
+</p>
 
-<h2>Pins</h2>
+<h2>Pinos</h2>
 
-<p>There is only one pin, an output whose bit width matches the Data Bits
-attribute. The component constantly outputs the same value on this pin:
-for a ground component, the output is an all-zero value,
-and for a power component, the output is an all-one value.</p>
+<p>
+Há apenas um pino, uma saída cuja largura de bits irá concordar com o atributo 
+Bits de Dados. O componente constantemente irá fornecer à saída o mesmo valor 
+em seu pino: para o componente Terra, a saída será o valor zero,
+e para o componente Fonte, a saída será o valor um.
+</p>
 
 </dl>
 
-<h2>Attributes</h2>
+<h2>Atributos</h2>
 
-<p>When the component is selected or being added,
-Alt-0 through Alt-9 alter its <q>Data Bits</q> attribute
-and the arrow keys alter its <q>Facing</q> attribute.</p>
+<p>
+Quando o componente for selecionado ou estiver sendo incluído,
+as teclas de Alt-0 até Alt-9 poderão alterar o seu atributo <q>Bits de Dados</q>
+e as setas irão alterar seu atributo <q>Direção</q>.
+</p>
 
 <dl>
 
-<dt>Facing</dt>
-<dd>The direction in which the arrow will point from the location of its pin.</dd>
 
-<dt>Data Bits</dt>
-<dd>The bit width of the value placed onto the wire.</dd>
+<dt>Direção</dt>
+<dd>A direção do componente (sua saída em relação à entrada).</dd>
+
+<dt>Bits de Dados</dt>
+<dd>A largura de bits das entradas e saídas do componente.</dd>
 
 </dl>
 
-<h2>Poke Tool Behavior</h2>
+<h2>Comportamento da ferramenta Testar</h2>
 
-<p>None.</p>
+<p>Nenhum.</p>
 
-<h2>Text Tool Behavior</h2>
+<h2>Comportamento da ferramenta Texto</h2>
 
-<p>None.</p>
+<p>Nenhum.</p>
 
-<p><a href="../index.html">Back to <em>Library Reference</em></a></p>
+<p><a href="../index.html">Voltar à <em>Referência para bibliotecas</em></a></p>
 
 </body>
 </html>
