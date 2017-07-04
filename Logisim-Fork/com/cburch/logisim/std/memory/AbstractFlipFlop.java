@@ -134,10 +134,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(painter.getBounds().getX(), painter.getBounds().getY(), painter.getBounds().getWidth(),
-				painter.getBounds().getHeight());
-		GraphicsUtil.switchToWidth(g, 1);
+		painter.drawBounds();
 		painter.drawLabel();
 		if (painter.getShowState()) {
 			Location loc = painter.getLocation();

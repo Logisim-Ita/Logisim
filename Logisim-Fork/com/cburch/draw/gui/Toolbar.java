@@ -96,8 +96,8 @@ class Toolbar extends JComponent {
 	 * 
 	 */
 	private static final long serialVersionUID = 64497387805434962L;
-	private static int ICON_WIDTH = 20;
-	private static int ICON_HEIGHT = 20;
+	private static int ICON_WIDTH = 16;
+	private static int ICON_HEIGHT = 16;
 
 	private static int ICON_SEP = 4;
 

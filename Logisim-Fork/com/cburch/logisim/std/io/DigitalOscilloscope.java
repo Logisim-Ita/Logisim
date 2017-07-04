@@ -126,13 +126,9 @@ public class DigitalOscilloscope extends InstanceFactory {
 	@Override
 	public void paintGhost(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
-		int x = bds.getX();
-		int y = bds.getY();
-		int width = bds.getWidth();
-		int height = bds.getHeight();
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRoundRect(x, y, width, height, border, border);
+		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), border, border);
 	}
 
 	@Override
@@ -155,7 +151,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		g.setColor(new Color(250, 250, 250));
 		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
 
-		// draw front lines if not disabled
+		// draw clock edge lines if not disabled
 		if (painter.getAttributeValue(VERT_LINE) != NO) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
 			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
@@ -163,51 +159,64 @@ public class DigitalOscilloscope extends InstanceFactory {
 			for (int j = 1; j < length; j++) {
 				// rising or both || falling or both
 				if (((painter.getAttributeValue(VERT_LINE) == TRIG_RISING
-						|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == true
-						&& diagramstate.getState(0, j - 1) == false)
+						|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == Boolean.TRUE
+						&& diagramstate.getState(0, j - 1) == Boolean.FALSE)
 						|| ((painter.getAttributeValue(VERT_LINE) == TRIG_FALLING
-								|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == false
-								&& diagramstate.getState(0, j - 1) == true)) {
+								|| painter.getAttributeValue(VERT_LINE) == BOTH)
+								&& diagramstate.getState(0, j) == Boolean.FALSE
+								&& diagramstate.getState(0, j - 1) == Boolean.TRUE))
 					g.drawLine(x + border + 10 * j, y + border, x + border + 10 * j, y + height - border);
-				}
 			}
 		}
 
-		g.setColor(Color.BLACK);
-		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRoundRect(x, y, width, height, border, border);
-		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
-
 		for (int i = 0; i < inputs; i++) {
+			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker().darker().darker());
+			// horizontal line
+			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+			g.drawLine(x + border, y + border + i * 30 + 30, x + border + 10 * length + 4, y + border + i * 30 + 30);
+
+			GraphicsUtil.switchToWidth(g, 2);
+			if (diagramstate.getmoveback() && diagramstate.getState(i, length - 1) != null) {
+				g.setColor(Color.BLACK);
+				g.drawLine(x + border + 10 * length, y + border + i * 30 + 30, x + border + 10 * length + 4,
+						y + border + i * 30 + 30);
+			}
 			// arrow
 			g.fillPolygon(
 					new int[] { x + border + 10 * length + 4, x + border + 10 * length + 13,
 							x + border + 10 * length + 4 },
 					new int[] { y + border + i * 30 + 27, y + border + i * 30 + 30, y + border + i * 30 + 33 }, 3);
-			g.drawLine(x + border + 10 * length, y + border + i * 30 + 30, x + border + 10 * length + 4,
-					y + border + i * 30 + 30);
+			g.setColor(Color.BLACK);
 			// draw diagram
 			for (int j = 0; j < length; j++) {
 				// vertical line
-				if (j != 0 && diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != diagramstate
-						.getState(i + (showclock == 0 ? 1 : 0), j - 1))
+				if (j != 0
+						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != diagramstate
+								.getState(i + (showclock == 0 ? 1 : 0), j - 1)
+						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != null
+						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j - 1) != null)
 					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * j,
 							y + border + 30 * (i + 1));
 				// 1 line
-				if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j)) {
+				if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) == Boolean.TRUE) {
 					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * (j + 1),
 							y + 2 * border + 30 * i);
+					// vertical ending line if 1
 					if (j == length - 1) {
 						g.drawLine(x + border + 10 * (j + 1), y + 2 * border + 30 * i, x + border + 10 * (j + 1),
 								y + border + 30 * (i + 1));
 					}
 				}
 				// 0 line
-				else
+				else if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) == Boolean.FALSE)
 					g.drawLine(x + border + 10 * j, y + border + 30 * (i + 1), x + border + 10 * (j + 1),
 							y + border + 30 * (i + 1));
 			}
 		}
+
+		g.drawRoundRect(x, y, width, height, border, border);
+		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
+
 		// draw ports
 		for (int i = 1; i < inputs + 2; i++) {
 			painter.drawPort(i);
@@ -223,34 +232,47 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int inputs = state.getAttributeValue(ATTR_INPUTS).intValue() + 1;
 		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
 		Value clock = state.getPort(0);
+		Value enable = state.getPort(inputs);
+		Value clear = state.getPort(inputs + 1);
 		DiagramState diagramstate = getDiagramState(state);
+
 		// not disabled, not clear an clock connected
-		if (clock != Value.UNKNOWN && state.getPort(inputs + 1) != Value.TRUE && state.getPort(inputs) != Value.FALSE) {
+		if (clock != Value.UNKNOWN && clear != Value.TRUE && enable != Value.FALSE) {
 			// get old value and set new value
 			Value lastclock = diagramstate.setLastClock(clock);
 			if (lastclock != Value.UNKNOWN) {
 				// for each front
 				if (lastclock != clock) {
-					// inputs values
-					for (int i = 0; i < inputs; i++) {
-						// move back all old values
-						for (int j = 0; j < length - 1; j++) {
-							diagramstate.setState(i, j, diagramstate.getState(i, j + 1));
-						}
-						// set new value at the end
-						diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
+					if (diagramstate.getusedcell() < length - 1)
+						diagramstate.setusedcell(diagramstate.getusedcell() + 1);
+					// move back all old values
+					if (diagramstate.getmoveback() == true) {
+						diagramstate.moveback();
 					}
-				} else {// input's values can change also after clock front
-						// because
-						// of output's delays (Flip Flop, gates etc..)
+					if (diagramstate.getusedcell() == length - 1)
+						diagramstate.hastomoveback(true);
+					// input values
 					for (int i = 0; i < inputs; i++)
-						diagramstate.setState(i, length - 1, (state.getPort(i) == Value.TRUE) ? true : false);
+						// set new value at the end
+						diagramstate.setState(i, diagramstate.getusedcell(), (state.getPort(i) == Value.TRUE)
+								? Boolean.TRUE : (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
+
+				} else if (diagramstate.getusedcell() != -1) {
+					// input's values can change also after clock front because
+					// of output's delays (Flip Flop, gates etc..)
+					for (int i = 1; i < inputs; i++)
+						diagramstate.setState(i, diagramstate.getusedcell(), (state.getPort(i) == Value.TRUE)
+								? Boolean.TRUE : (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
 				}
 			}
 		}
 		// clear
-		else if (state.getPort(inputs + 1) == Value.TRUE)
+		else if (clear == Value.TRUE) {
 			diagramstate.clear();
+			diagramstate.setusedcell(-1);
+			diagramstate.setLastClock(Value.UNKNOWN);
+			diagramstate.hastomoveback(false);
+		}
 	}
 
 	private void updateports(Instance instance) {
@@ -267,6 +289,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		port[inputs + 2].setToolTip(Strings.getter("ClearDiagram"));
 		// clock
 		port[0].setToolTip(Strings.getter("DigitalOscilloscopeClock"));
+
 		instance.setPorts(port);
 	}
 }

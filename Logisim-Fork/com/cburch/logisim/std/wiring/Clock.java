@@ -207,7 +207,7 @@ public class Clock extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		java.awt.Graphics g = painter.getGraphics();
-		Bounds bds = painter.getBounds();
+		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		GraphicsUtil.switchToWidth(g, 2);
