@@ -1,8 +1,7 @@
-# Logisim
-Logisim is a circuit simulator, [originally available here](http://www.cburch.com/logisim/).
-This is an Eclipse italian fork based on original Logisim 2.7.1 version.
-## Website
-Contacts, tutorials, projects and download link all in [this](https://logisim.altervista.org) website!
+# Logisim Fork ITA
+Logisim is a circuit simulator, [originally available here](http://www.cburch.com/logisim/).<br><br>
+This is an italian fork based on original Logisim 2.7.1 version.<br>
+<b>Contacts, tutorials, projects and download link are all in [this](https://logisim.altervista.org) website!</b>
 ## Changelog
 * Italian translation!
 * Possibility to use french translations already done (not very well)
