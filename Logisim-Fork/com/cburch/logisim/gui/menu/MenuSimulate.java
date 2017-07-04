@@ -146,7 +146,7 @@ class MenuSimulate extends Menu {
 				if (Freq != null) {// cancelled
 					try {
 						freq = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
-						if (freq > 0 && freq <= 65536) {
+						if (freq > 0 && freq <= 8192) {
 							if (currentSim != null)
 								currentSim.setTickFrequency(freq);
 							localeChanged();

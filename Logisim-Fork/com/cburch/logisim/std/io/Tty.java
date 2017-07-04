@@ -33,7 +33,7 @@ public class Tty extends InstanceFactory {
 	private static final int COL_WIDTH = 7;
 	private static final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 64);
 
-	private static final Font DEFAULT_FONT = new Font("sans serif", Font.PLAIN, 12);
+	private static final Font DEFAULT_FONT = new Font("monospaced", Font.PLAIN, 12);
 
 	private static final Attribute<Integer> ATTR_COLUMNS = Attributes.forIntegerRange("cols",
 			Strings.getter("ttyColsAttr"), 1, 120);
@@ -83,7 +83,7 @@ public class Tty extends InstanceFactory {
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		int rows = getRowCount(attrs.getValue(ATTR_ROWS));
 		int cols = getColumnCount(attrs.getValue(ATTR_COLUMNS));
-		int width = 2 * BORDER + cols * COL_WIDTH;
+		int width = 2 * BORDER + cols * COL_WIDTH + 10;
 		int height = 2 * BORDER + rows * ROW_HEIGHT;
 		if (width < 30)
 			width = 30;

@@ -27,7 +27,7 @@ public class About {
 		private static final long serialVersionUID = 1104782885051596715L;
 		private final Color fadeColor = new Color(240, 240, 240);
 		private final Color headerColor = Value.TRUE_COLOR;
-		private final Font headerFont = new Font("Sans Serif", Font.BOLD, 60);
+		private final Font headerFont = new Font("Sans Serif", Font.BOLD, 55);
 		private final Font versionFont = new Font("Sans Serif", Font.BOLD, 25);
 		private final Font copyrightFont = new Font("Sans Serif", Font.ITALIC, 18);
 		private AboutCredits credits;
@@ -71,9 +71,9 @@ public class About {
 			g.setColor(headerColor);
 			g.setFont(headerFont);
 			g.drawString("Logisim", x, y + 45);
-			g.setFont(versionFont);
 			fm = g.getFontMetrics();
-			g.drawString(Main.VERSION_NAME, IMAGE_WIDTH - x - fm.stringWidth(Main.VERSION_NAME), y + 45);
+			g.setFont(versionFont);
+			g.drawString(Main.VERSION_NAME, fm.stringWidth("Logisim") + x + 10, y + 45);
 			g.setFont(copyrightFont);
 			fm = g.getFontMetrics();
 			str = "\u00a9 " + Main.COPYRIGHT_YEAR;
