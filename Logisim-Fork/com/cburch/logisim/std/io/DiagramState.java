@@ -30,14 +30,6 @@ class DiagramState implements InstanceData {
 		moveback = false;
 	}
 
-	public void hastomoveback(boolean b) {
-		moveback = b;
-	}
-
-	public boolean getmoveback() {
-		return moveback;
-	}
-
 	@Override // kept from ttystate
 	public DiagramState clone() {
 		try {
@@ -48,12 +40,20 @@ class DiagramState implements InstanceData {
 		}
 	}
 
+	public boolean getmoveback() {
+		return moveback;
+	}
+
 	public Boolean getState(int i, int j) {
 		return diagram[i][j];
 	}
 
 	public int getusedcell() {
 		return usedcell;
+	}
+
+	public void hastomoveback(boolean b) {
+		moveback = b;
 	}
 
 	public void moveback() { // move back all old values
@@ -71,12 +71,12 @@ class DiagramState implements InstanceData {
 		return ret;
 	}
 
-	public void setusedcell(int i) {
-		usedcell = i;
-	}
-
 	public void setState(int i, int j, Boolean b) {
 		diagram[i][j] = b;
+	}
+
+	public void setusedcell(int i) {
+		usedcell = i;
 	}
 
 	public void updateSize(int inputs, int length) {
