@@ -21,8 +21,6 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class DisplayDecoder extends InstanceFactory {
 
-	public int decval;// decimal output's value
-
 	public DisplayDecoder() {
 		super("DisplayDecoder", Strings.getter("DisplayDecoderComponent"));
 		setAttributes(new Attribute[] { StdAttr.FACING }, new Object[] { Direction.EAST });
@@ -34,6 +32,22 @@ public class DisplayDecoder extends InstanceFactory {
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
 		updatePorts(instance);
+	}
+
+	private int getdecval(InstanceState state) {
+		int decval = -1;
+		boolean enabled = (state.getPort(11) != Value.FALSE);
+		if (enabled && state.getPort(0) != Value.UNKNOWN && state.getPort(1) != Value.UNKNOWN
+				&& state.getPort(2) != Value.UNKNOWN && state.getPort(3) != Value.UNKNOWN) {
+			for (int i = 0; i < 4; i++) {// 0, 1, 2, 3
+				if (state.getPort(i) == Value.TRUE) {// if true input
+					// for example 1101 --> 8+4+1= 13(decimal)
+					decval += (int) Math.pow(2, i);
+				}
+			}
+			decval++;
+		}
+		return decval;
 	}
 
 	@Override
@@ -66,31 +80,17 @@ public class DisplayDecoder extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		g.setColor(Color.BLACK);
 		painter.drawPorts();
-		GraphicsUtil.drawCenteredText(g, (decval != -1) ? Integer.toString(decval) : "-",
+		GraphicsUtil.drawCenteredText(g, (getdecval(painter) != -1) ? Integer.toString(getdecval(painter)) : "-",
 				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
 		/*
-		 * 0->A 1->C 2->A 3->D 4->a 5->b 6->c 7->d 8->e 9->f 10->g
+		 * Ports: 0->A 1->C 2->A 3->D 4->a 5->b 6->c 7->d 8->e 9->f 10->g 11->
+		 * enable
 		 */
-		int input = 4;
-		decval = -1;
-		boolean enabled = (state.getPort(11) != Value.FALSE);
-		if (enabled) {
-			if (state.getPort(0) != Value.UNKNOWN && state.getPort(1) != Value.UNKNOWN
-					&& state.getPort(2) != Value.UNKNOWN && state.getPort(3) != Value.UNKNOWN) {
-				for (int i = 0; i < input; i++) {// 0, 1, 2, 3
-					if (state.getPort(i) == Value.TRUE) {// array's cell
-						decval += (int) Math.pow(2, i);// for example 1101 -->
-														// 8+4+1= 13(decimal)
-					}
-				}
-				decval++;
-			}
-		}
-		switch (decval) {
+		switch (getdecval(state)) {
 		case 0:
 			state.setPort(4, Value.TRUE, Plexers.DELAY);
 			state.setPort(5, Value.TRUE, Plexers.DELAY);
