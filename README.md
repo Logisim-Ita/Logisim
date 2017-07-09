@@ -20,8 +20,8 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 ## Retro-compatibility
 <p>You can use .circ files saved in the original version but if you have kept the default size value or the default number of inputs<br>
 in a gate, it will be changed with the new default values (narrow, 2 inputs)<br>
-This will happen only if you didn't change these attributes (if you have selected medium size it will work)<br><br>
-Examples:<br> You used an AND gate keeping the default size (medium) in the original version, in this version it will be narrow.
+This will happen only if you didn't change these attributes (if you have selected medium size it will work)<br>
+<b>Examples:</b><br> You used an AND gate keeping the default size (medium) in the original version, in this version it will be narrow.
 You used an AND gate and you selected medium size in the original version, in this version it will be medium.</p>
 P.S. Obviously you can't open a file containing new components in the original version
 
