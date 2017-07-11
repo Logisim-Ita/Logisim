@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import com.cburch.logisim.gui.start.Startup;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 8, 1, 9, "jar");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 8, 2, 0, "jar");
 
 	public static final String VERSION_NAME = VERSION.toString();
 

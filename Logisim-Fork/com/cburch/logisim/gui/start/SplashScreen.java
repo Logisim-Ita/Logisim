@@ -17,11 +17,6 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 public class SplashScreen extends JWindow implements ActionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private static class Marker {
 		int count;
 		String message;
@@ -31,6 +26,11 @@ public class SplashScreen extends JWindow implements ActionListener {
 			this.message = message;
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 

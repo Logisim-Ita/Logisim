@@ -20,14 +20,14 @@
 <h2>Behavior</h2>
 
 <p>This component allows the circuit to read keys typed from the keyboard -
-as long as the keys are representable in the 7-bit ASCII code.
+as long as the keys are representable in the 7-bit ASCII code / 16-bit UTF-16 code.
 After clicking the component using the poke tool, the user can type characters,
-which accumulate in a buffer. At all times, the ASCII value for the leftmost
+which accumulate in a buffer. At all times, the ASCII / UTF-16 value for the leftmost
 character in the buffer is sent out the rightmost output. When the clock input
 is triggered, the leftmost character disappears from the buffer and the new
 leftmost character is sent on the rightmost output.</p>
 
-<p>The supported characters for the buffer include all the printable ASCII
+<p>The supported characters for the buffer include all the printable ASCII / UTF-16
 characters, as well as space, newline, backspace, and control-L. In addition,
 the left-arrow and right-arrow keys move the cursor within the buffer, and the
 delete key deletes the character to the right of the cursor (if any).</p> 
@@ -59,7 +59,7 @@ characters.</dd>
 and 0 when the buffer is empty.</dd>
 
 <dt>South edge, rightmost pin (output, bit width 7)</dt>
-<dd>Data - the 7-bit ASCII code for the leftmost character in the buffer,
+<dd>Data - the 7-bit ASCII code / 16-bit UTF-16 code for the leftmost character in the buffer,
 or 0 if the buffer is empty.</dd>
 
 </dl>
@@ -67,6 +67,8 @@ or 0 if the buffer is empty.</dd>
 <h2>Attributes</h2>
 
 <dl>
+<dt>Data Bits</dt>
+<dd>Select if this component has to use 7-bit ASCII or 16-bit UTF-16 values</dd>
 
 <dt>Buffer Length</dt>
 <dd>The number of characters that the buffer can hold at once.</dd>

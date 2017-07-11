@@ -10,11 +10,13 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstancePoker;
@@ -121,6 +123,11 @@ public class Keyboard extends InstanceFactory {
 
 	private static final char FORM_FEED = '\u000c'; // control-L
 
+	public static final AttributeOption B7 = new AttributeOption(7, Strings.getter("ASCII (7-bit)"));
+	public static final AttributeOption B16 = new AttributeOption(16, Strings.getter("UTF-16 (16-bit)"));
+	private static final Attribute<AttributeOption> CHAR_BITS = Attributes.forOption("Char bit width",
+			Strings.getter("stdDataWidthAttr"), new AttributeOption[] { B7, B16 });
+
 	private static final Attribute<Integer> ATTR_BUFFER = Attributes.forIntegerRange("buflen",
 			Strings.getter("keybBufferLengthAttr"), 1, 256);
 
@@ -152,24 +159,17 @@ public class Keyboard extends InstanceFactory {
 
 	public Keyboard() {
 		super("Keyboard", Strings.getter("keyboardComponent"));
-		setAttributes(new Attribute[] { ATTR_BUFFER, StdAttr.EDGE_TRIGGER },
-				new Object[] { Integer.valueOf(32), StdAttr.TRIG_RISING });
+		setAttributes(new Attribute[] { CHAR_BITS, ATTR_BUFFER, StdAttr.EDGE_TRIGGER },
+				new Object[] { B7, Integer.valueOf(32), StdAttr.TRIG_RISING });
 		setOffsetBounds(Bounds.create(0, -15, WIDTH, HEIGHT));
 		setIconName("keyboard.gif");
 		setInstancePoker(Poker.class);
+	}
 
-		Port[] ps = new Port[5];
-		ps[CLR] = new Port(20, 10, Port.INPUT, 1);
-		ps[CK] = new Port(0, 0, Port.INPUT, 1);
-		ps[RE] = new Port(10, 10, Port.INPUT, 1);
-		ps[AVL] = new Port(130, 10, Port.OUTPUT, 1);
-		ps[OUT] = new Port(140, 10, Port.OUTPUT, 7);
-		ps[CLR].setToolTip(Strings.getter("keybClearTip"));
-		ps[CK].setToolTip(Strings.getter("keybClockTip"));
-		ps[RE].setToolTip(Strings.getter("keybEnableTip"));
-		ps[AVL].setToolTip(Strings.getter("keybAvailTip"));
-		ps[OUT].setToolTip(Strings.getter("keybOutputTip"));
-		setPorts(ps);
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updateports(instance);
 	}
 
 	private void drawBuffer(Graphics g, FontMetrics fm, String str, int dispStart, int dispEnd,
@@ -277,6 +277,12 @@ public class Keyboard extends InstanceFactory {
 	}
 
 	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == CHAR_BITS)
+			updateports(instance);
+	}
+
+	@Override
 	public void paintInstance(InstancePainter painter) {
 		boolean showState = painter.getShowState();
 		Graphics g = painter.getGraphics();
@@ -349,8 +355,26 @@ public class Keyboard extends InstanceFactory {
 
 			c = state.getChar(0);
 		}
-		Value out = Value.createKnown(BitWidth.create(7), c & 0x7F);
+		boolean ascii = circState.getAttributeValue(CHAR_BITS) == B7;
+		Value out = Value.createKnown(BitWidth.create(ascii ? 7 : 16), ascii ? c & 0x7F : c);
 		circState.setPort(OUT, out, DELAY0);
 		circState.setPort(AVL, c != '\0' ? Value.TRUE : Value.FALSE, DELAY1);
+	}
+
+	private void updateports(Instance instance) {
+		int b = instance.getAttributeValue(CHAR_BITS) == B7 ? 7 : 16;
+		String s = b == 7 ? "ASCII" : "UTF-16";
+		Port[] ps = new Port[5];
+		ps[CLR] = new Port(20, 10, Port.INPUT, 1);
+		ps[CK] = new Port(0, 0, Port.INPUT, 1);
+		ps[RE] = new Port(10, 10, Port.INPUT, 1);
+		ps[AVL] = new Port(130, 10, Port.OUTPUT, 1);
+		ps[OUT] = new Port(140, 10, Port.OUTPUT, b);
+		ps[CLR].setToolTip(Strings.getter("keybClearTip"));
+		ps[CK].setToolTip(Strings.getter("keybClockTip"));
+		ps[RE].setToolTip(Strings.getter("keybEnableTip"));
+		ps[AVL].setToolTip(Strings.getter("keybAvailTip"));
+		ps[OUT].setToolTip(Strings.getter("keybOutputTip", s));
+		instance.setPorts(ps);
 	}
 }
