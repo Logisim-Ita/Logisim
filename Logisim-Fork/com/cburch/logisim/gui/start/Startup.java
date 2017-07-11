@@ -324,7 +324,7 @@ public class Startup {
 	 * @return true if the code has been updated, and therefore the execution
 	 *         has to be stopped, false otherwise
 	 */
-	public boolean autoUpdate(boolean FromMenu) { // from "check version" = 1
+	public boolean autoUpdate() {
 		if (!Main.UPDATE || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line, or network connection not
 			// available
@@ -403,9 +403,6 @@ public class Startup {
 						JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
-		} else if (FromMenu) {
-			JOptionPane.showMessageDialog(null, Strings.get("NoUpdates"), Strings.get("Update"),
-					JOptionPane.INFORMATION_MESSAGE);
 		}
 		return (false);
 	}

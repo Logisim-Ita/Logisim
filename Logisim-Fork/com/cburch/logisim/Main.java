@@ -49,23 +49,17 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
-		if (startup == null) {
+		if (startup != null && !startup.autoUpdate()) {
+			try {
+				startup.run();
+			} catch (Throwable e) {
+				Writer result = new StringWriter();
+				PrintWriter printWriter = new PrintWriter(result);
+				e.printStackTrace(printWriter);
+				JOptionPane.showMessageDialog(null, result.toString());
+				System.exit(-1);
+			}
+		} else
 			System.exit(0);
-		} else {
-			// If the auto-updater actually performed an update, then quit the
-			// program, otherwise continue with the execution
-			if (!startup.autoUpdate(false)) {
-				try {
-					startup.run();
-				} catch (Throwable e) {
-					Writer result = new StringWriter();
-					PrintWriter printWriter = new PrintWriter(result);
-					e.printStackTrace(printWriter);
-					JOptionPane.showMessageDialog(null, result.toString());
-					System.exit(-1);
-				}
-			} else
-				System.exit(0);
-		}
 	}
 }
