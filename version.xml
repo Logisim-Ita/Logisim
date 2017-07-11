@@ -5,7 +5,7 @@
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
   <exe_version>2.8.2.0</exe_version>
   <changelog>
-* TTY and Keyboard components: added attribute to choose between ACII and UTF-16
+* TTY and Keyboard components: added attribute to choose between ASCII and UTF-16
 * Fixed the path of user guide icons
 * Reduced weight (5.77MB -> 5.42MB)
   </changelog>
