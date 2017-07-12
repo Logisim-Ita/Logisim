@@ -361,7 +361,7 @@ public class Startup {
 							logisimData.child("changelog").content()),
 					Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
-			if (answer == 1) {
+			if (answer != 0) {
 				// User refused to update -- we just hope he gets sufficiently
 				// annoyed by the message that he finally updates!
 				return (false);
@@ -391,16 +391,16 @@ public class Startup {
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
 
-			byte updateOk = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
+			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
-			if (updateOk == 1) {
+			if (updatemessage == "OK") {
 				JOptionPane.showMessageDialog(null,
 						StringUtil.format(Strings.get("UpdateSucceededMessage"), remoteVersion.toString()),
 						Strings.get("UpdateSucceeded"), JOptionPane.INFORMATION_MESSAGE);
 				return (true);
-			} else if (updateOk == 0) {
-				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailedMessage"), Strings.get("UpdateFailed"),
-						JOptionPane.ERROR_MESSAGE);
+			} else if (updatemessage != "CANCELLED") {
+				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailed") + ":\n" + updatemessage,
+						Strings.get("UpdateFailed"), JOptionPane.ERROR_MESSAGE);
 				return (false);
 			}
 		}
@@ -441,34 +441,28 @@ public class Startup {
 	 *         otherwise
 	 * @throws IOException
 	 */
-	private byte downloadInstallUpdatedVersion(String filePath, String destination) {
+	private String downloadInstallUpdatedVersion(String filePath, String destination) {
 
 		URL fileURL;
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
 			updatescreen.close();
-			System.err.println(
-					"The URL of the requested update file is malformed.\nPlease report this error to the software maintainer.\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "The URL of the requested update file is malformed.\nPlease report this error to the software maintainer";
 		}
 		URLConnection conn;
 		try {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
 			updatescreen.close();
-			System.err.println(
-					"Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
 			updatescreen.close();
-			System.err.println(
-					"Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Get remote file stream
@@ -477,9 +471,7 @@ public class Startup {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
 			updatescreen.close();
-			System.err.println(
-					"Cannot get remote file stream.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "Cannot get remote file stream.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Local file buffer
@@ -516,7 +508,7 @@ public class Startup {
 
 				} else {
 					updatescreen.close();
-					return 2;
+					return "CANCELLED";
 				}
 
 				deplacement += currentBit;
@@ -527,25 +519,21 @@ public class Startup {
 
 		} catch (IOException e) {
 			updatescreen.close();
-			System.err.println(
-					"An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer";
 		}
 		// Close remote stream
 		try {
 			is.close();
 		} catch (IOException e) {
 			updatescreen.close();
-			System.err.println("Error encountered while closing the remote stream!");
 			e.printStackTrace();
+			return "Error encountered while closing the remote stream!";
 		}
 
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
 			updatescreen.close();
-			System.err.println(
-					"An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Open stream for local Jar and write data
@@ -554,28 +542,18 @@ public class Startup {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
 			updatescreen.close();
-			System.err.println("An error occured while opening the local Jar file.\n-- AUTO-UPDATE ABORTED --");
-			return 0;
+			return "An error occured while opening the local Jar file";
 		}
 		try {
 			destinationFile.write(data);
 			destinationFile.flush();
+			destinationFile.close();
 		} catch (IOException e) {
 			updatescreen.close();
-			System.err.println(
-					"An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
-		} finally {
-			try {
-				destinationFile.close();
-			} catch (IOException e) {
-				updatescreen.close();
-				System.err.println(
-						"Error encountered while closing the local destination file!\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim.");
-				return 0;
-			}
+			return "An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim";
 		}
 		updatescreen.close();
-		return 1;
+		return "OK";
 	}
 
 	List<File> getFilesToOpen() {

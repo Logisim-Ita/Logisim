@@ -116,7 +116,7 @@ public class About {
 		}
 	}
 
-	static final int IMAGE_WIDTH = 380;
+	static final int IMAGE_WIDTH = 400;
 
 	static final int IMAGE_HEIGHT = 250;
 

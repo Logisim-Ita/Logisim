@@ -5,15 +5,16 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 ## Changelog
 * Italian translation!
 * Possibility to use french translations already done (not very well)
-* Default gates' attributes: narrow, 2 inputs
 * New components:
 	* I/O->Switch
 	* I/O->RGB LED
 	* (new) Digital Oscilloscope!!!
 	* Plexers->7-Segment Display Decoder
+* TTY and Keyboard components can use 16-bit values (UTF-16)
 * Added 7-Segment Display input names
 * Zoom in and out using mouse wheel
 * Autoupdates!
+* Default gates' attributes: narrow, 2 inputs
 * Some small graphic editing
 ## Features we want to add
 * Suggest us everything at logisimit@gmail.com
