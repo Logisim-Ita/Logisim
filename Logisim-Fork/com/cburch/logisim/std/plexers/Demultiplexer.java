@@ -31,7 +31,7 @@ public class Demultiplexer extends InstanceFactory {
 				new Attribute[] { StdAttr.FACING, Plexers.ATTR_SELECT_LOC, Plexers.ATTR_SELECT, StdAttr.WIDTH,
 						Plexers.ATTR_TRISTATE, Plexers.ATTR_DISABLED, Plexers.ATTR_ENABLE },
 				new Object[] { Direction.EAST, Plexers.SELECT_BOTTOM_LEFT, Plexers.DEFAULT_SELECT, BitWidth.ONE,
-						Plexers.DEFAULT_TRISTATE, Plexers.DISABLED_FLOATING, Boolean.TRUE });
+						Plexers.DEFAULT_TRISTATE, Plexers.DISABLED_FLOATING, Boolean.FALSE });
 		setKeyConfigurator(JoinedConfigurator.create(new BitWidthConfigurator(Plexers.ATTR_SELECT, 1, 5, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 		setFacingAttribute(StdAttr.FACING);

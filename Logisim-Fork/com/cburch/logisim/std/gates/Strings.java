@@ -16,4 +16,8 @@ class Strings {
 	public static StringGetter getter(String key) {
 		return source.getter(key);
 	}
+
+	public static StringGetter getter(String key, String arg) {
+		return source.getter(key, arg);
+	}
 }

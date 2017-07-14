@@ -10,6 +10,7 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 	* I/O->RGB LED
 	* (new) Digital Oscilloscope!!!
 	* Plexers->7-Segment Display Decoder
+* Controlled Buffer / Inverter: Negate Control Input
 * TTY and Keyboard components can use 16-bit values (UTF-16)
 * Added 7-Segment Display input names
 * Zoom in and out using mouse wheel

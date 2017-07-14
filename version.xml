@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.8.2.1</jar_version>
+  <jar_version>2.8.2.5</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.8.2.1</exe_version>
+  <exe_version>2.8.2.5</exe_version>
   <changelog>
-* Autoupdater fix
-* The message "Update failed" will include the error
+* Digital Oscilloscope now shows the clock number + small changes
+* Controlled Buffer and Controlled Inverter have a new attribute to negate the control input
+* Multiplexer, Demultiplexer and Decoder: enable input disabled by default
+* 7-Segment Display Decoder can use a single multibit input
+* Log's table window will change the color of values each 10 cycles
   </changelog>
 </logisim>

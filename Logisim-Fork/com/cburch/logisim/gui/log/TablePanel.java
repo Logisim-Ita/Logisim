@@ -113,8 +113,8 @@ class TablePanel extends LogPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -4651623644637992336L;
-	private static final Font HEAD_FONT = new Font("sans serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("sans serif", Font.PLAIN, 14);
+	private static final Font HEAD_FONT = new Font("sans serif", Font.BOLD, 16);
+	private static final Font BODY_FONT = new Font("sans serif", Font.BOLD, 14);
 
 	private static final int COLUMN_SEP = 8;
 
@@ -126,6 +126,9 @@ class TablePanel extends LogPanel {
 	private int rowCount = 0;
 	private int tableWidth;
 	private int tableHeight;
+	private Color[] colors = { Color.BLACK, new Color(160, 0, 220), Color.MAGENTA, new Color(245, 0, 0),
+			new Color(255, 160, 0), new Color(175, 191, 13), Color.GREEN.darker(), Color.BLUE, Color.CYAN.darker(),
+			Color.GRAY };
 	private VerticalScrollBar vsb;
 
 	public TablePanel(LogFrame frame) {
@@ -254,6 +257,7 @@ class TablePanel extends LogPanel {
 			int offs = rowCount - log.size();
 			y = y0 + Math.max(offs, firstRow) * cellHeight;
 			for (int row = Math.max(offs, firstRow); row < lastRow; row++) {
+				g.setColor(colors[((row + log.firstIndex()) / 10) % 10]);
 				Value val = log.get(row - offs);
 				String label = val.toDisplayString(radix);
 				int width = bodyMetric.stringWidth(label);

@@ -5,6 +5,7 @@ package com.cburch.logisim.std.io;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -48,7 +49,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	public DigitalOscilloscope() {
 		super("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"));
-		int inputs = Integer.valueOf(2);
+		int inputs = Integer.valueOf(3);
 		int length = Integer.valueOf(15);
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
@@ -105,10 +106,10 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int x = attrs.getValue(ATTR_NSTATE).intValue() * 20 + 2 * border + 15;
-		int y = attrs.getValue(SHOW_CLOCK) ? (attrs.getValue(ATTR_INPUTS).intValue() + 1) * 30 + 3 * border
+		int x = attrs.getValue(ATTR_NSTATE).intValue() * 30 + 2 * border + 15;
+		int y = attrs.getValue(SHOW_CLOCK) ? (attrs.getValue(ATTR_INPUTS).intValue() + 1) * 30 + 3 * border + 2
 				: attrs.getValue(ATTR_INPUTS).intValue() * 30 + 3 * border;
-		int showclock = attrs.getValue(SHOW_CLOCK) ? 30 : 0;
+		int showclock = attrs.getValue(SHOW_CLOCK) ? 32 : 0;
 		return Bounds.create(0, -border - showclock, x, y);
 	}
 
@@ -149,7 +150,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		g.fillRoundRect(x, y, width, height, border, border);
 
 		g.setColor(new Color(250, 250, 250));
-		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
+		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
 
 		// draw clock edge lines if not disabled
 		if (painter.getAttributeValue(VERT_LINE) != NO) {
@@ -165,27 +166,31 @@ public class DigitalOscilloscope extends InstanceFactory {
 								|| painter.getAttributeValue(VERT_LINE) == BOTH)
 								&& diagramstate.getState(0, j) == Boolean.FALSE
 								&& diagramstate.getState(0, j - 1) == Boolean.TRUE))
-					g.drawLine(x + border + 10 * j, y + border, x + border + 10 * j, y + height - border);
+					g.drawLine(x + border + 15 * j, y + border, x + border + 15 * j, y + height - border);
 			}
 		}
-
+		byte nck = (byte) (length / 2);
+		g.setFont(new Font("sans serif", Font.PLAIN, 8));
 		for (int i = 0; i < inputs; i++) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker().darker().darker());
 			// horizontal line
 			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
-			g.drawLine(x + border, y + border + i * 30 + 30, x + border + 10 * length + 4, y + border + i * 30 + 30);
+			g.drawLine(x + border, y + border + i * 30 + 30 + showclock * 2, x + border + 15 * length + 4,
+					y + border + i * 30 + 30 + showclock * 2);
 
 			GraphicsUtil.switchToWidth(g, 2);
 			if (diagramstate.getmoveback() && diagramstate.getState(i, length - 1) != null) {
 				g.setColor(Color.BLACK);
-				g.drawLine(x + border + 10 * length, y + border + i * 30 + 30, x + border + 10 * length + 4,
-						y + border + i * 30 + 30);
+				g.drawLine(x + border + 15 * length, y + border + i * 30 + 30 + showclock * 2,
+						x + border + 15 * length + 4, y + border + i * 30 + 30 + showclock * 2);
 			}
 			// arrow
 			g.fillPolygon(
-					new int[] { x + border + 10 * length + 4, x + border + 10 * length + 13,
-							x + border + 10 * length + 4 },
-					new int[] { y + border + i * 30 + 27, y + border + i * 30 + 30, y + border + i * 30 + 33 }, 3);
+					new int[] { x + border + 15 * length + 4, x + border + 15 * length + 13,
+							x + border + 15 * length + 4 },
+					new int[] { y + border + i * 30 + 27 + showclock * 2, y + border + i * 30 + 30 + showclock * 2,
+							y + border + i * 30 + 33 + showclock * 2 },
+					3);
 			g.setColor(Color.BLACK);
 			// draw diagram
 			for (int j = 0; j < length; j++) {
@@ -195,27 +200,36 @@ public class DigitalOscilloscope extends InstanceFactory {
 								.getState(i + (showclock == 0 ? 1 : 0), j - 1)
 						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != null
 						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j - 1) != null)
-					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * j,
-							y + border + 30 * (i + 1));
+					g.drawLine(x + border + 15 * j, y + 2 * border + 30 * i + showclock * 2, x + border + 15 * j,
+							y + border + 30 * (i + 1) + showclock * 2);
 				// 1 line
 				if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) == Boolean.TRUE) {
-					g.drawLine(x + border + 10 * j, y + 2 * border + 30 * i, x + border + 10 * (j + 1),
-							y + 2 * border + 30 * i);
+					g.drawLine(x + border + 15 * j, y + 2 * border + 30 * i + showclock * 2, x + border + 15 * (j + 1),
+							y + 2 * border + 30 * i + showclock * 2);
 					// vertical ending line if 1
 					if (j == length - 1) {
-						g.drawLine(x + border + 10 * (j + 1), y + 2 * border + 30 * i, x + border + 10 * (j + 1),
-								y + border + 30 * (i + 1));
+						g.drawLine(x + border + 15 * (j + 1), y + 2 * border + 30 * i + showclock * 2,
+								x + border + 15 * (j + 1), y + border + 30 * (i + 1) + showclock * 2);
+					}
+					if (i == 0 && painter.getAttributeValue(VERT_LINE) != NO) {// drawclocknumber
+						nck--;
+						Integer cknum = ((diagramstate.getclocknumber() - nck) > 0)
+								? diagramstate.getclocknumber() - nck : 100 + (diagramstate.getclocknumber() - nck - 1);
+						g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
+						GraphicsUtil.drawCenteredText(g, cknum.toString() + '°', x + border + 15 * j + 8,
+								y + border + 5);
+						g.setColor(Color.BLACK);
 					}
 				}
 				// 0 line
 				else if (diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) == Boolean.FALSE)
-					g.drawLine(x + border + 10 * j, y + border + 30 * (i + 1), x + border + 10 * (j + 1),
-							y + border + 30 * (i + 1));
+					g.drawLine(x + border + 15 * j, y + border + 30 * (i + 1) + showclock * 2,
+							x + border + 15 * (j + 1), y + border + 30 * (i + 1) + showclock * 2);
 			}
 		}
 
 		g.drawRoundRect(x, y, width, height, border, border);
-		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border, border);
+		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
 
 		// draw ports
 		for (int i = 1; i < inputs + 2; i++) {
@@ -248,6 +262,8 @@ public class DigitalOscilloscope extends InstanceFactory {
 					// move back all old values
 					if (diagramstate.getmoveback() == true) {
 						diagramstate.moveback();
+						if (clock == Value.TRUE)
+							diagramstate.setclocknumber(diagramstate.getclocknumber() + 1);
 					}
 					if (diagramstate.getusedcell() == length - 1)
 						diagramstate.hastomoveback(true);
@@ -272,6 +288,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			diagramstate.setusedcell(-1);
 			diagramstate.setLastClock(Value.UNKNOWN);
 			diagramstate.hastomoveback(false);
+			diagramstate.setclocknumber(length / 2);
 		}
 	}
 

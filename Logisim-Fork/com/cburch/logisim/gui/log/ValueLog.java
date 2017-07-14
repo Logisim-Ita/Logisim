@@ -30,6 +30,10 @@ class ValueLog {
 		}
 	}
 
+	public short firstIndex() {
+		return firstIndex;
+	}
+
 	public Value get(int index) {
 		int i = firstIndex + index;
 		if (i >= LOG_SIZE)

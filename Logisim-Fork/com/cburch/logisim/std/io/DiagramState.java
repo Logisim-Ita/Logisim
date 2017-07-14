@@ -12,6 +12,7 @@ class DiagramState implements InstanceData {
 	private boolean moveback = false;
 	private Boolean diagram[][];
 	private int Inputs, Length; // current inputs and length (number of states)
+	private int clocknumber;
 
 	public DiagramState(int inputs, int length) {
 		LastClock = Value.UNKNOWN;
@@ -19,6 +20,7 @@ class DiagramState implements InstanceData {
 		clear();
 		Inputs = inputs;
 		Length = length;
+		clocknumber = (Length / 2);
 	}
 
 	public void clear() { // set all to false
@@ -38,6 +40,10 @@ class DiagramState implements InstanceData {
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}
+	}
+
+	public int getclocknumber() {
+		return clocknumber;
 	}
 
 	public boolean getmoveback() {
@@ -64,6 +70,10 @@ class DiagramState implements InstanceData {
 		}
 	}
 
+	public void setclocknumber(int i) {
+		clocknumber = i < 100 ? i : 1;
+	}
+
 	public Value setLastClock(Value newClock) {
 		// copy, set and return copy
 		Value ret = LastClock;
@@ -88,6 +98,7 @@ class DiagramState implements InstanceData {
 			// clear() function
 			Inputs = inputs;
 			Length = length;
+			clocknumber = clocknumber + (Length - oldlength) / 2;
 			// create a copy of old boolean matrix
 			Boolean olddiagram[][] = Arrays.copyOf(diagram, diagram.length);
 			diagram = new Boolean[Inputs][Length];

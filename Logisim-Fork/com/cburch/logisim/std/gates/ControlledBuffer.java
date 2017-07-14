@@ -37,6 +37,8 @@ class ControlledBuffer extends InstanceFactory {
 			Strings.getter("controlledRightHanded"));
 	private static final AttributeOption LEFT_HANDED = new AttributeOption("left",
 			Strings.getter("controlledLeftHanded"));
+	static final Attribute<Boolean> NEGATE_CONTROL = Attributes.forBoolean("negatecontrol",
+			Strings.getter("NegateBufferControl"));
 	private static final Attribute<AttributeOption> ATTR_CONTROL = Attributes.forOption("control",
 			Strings.getter("controlledControlOption"), new AttributeOption[] { RIGHT_HANDED, LEFT_HANDED });
 
@@ -55,13 +57,15 @@ class ControlledBuffer extends InstanceFactory {
 		if (isInverter) {
 			setAttributes(
 					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, NotGate.ATTR_SIZE, ATTR_CONTROL, StdAttr.LABEL,
-							StdAttr.LABEL_FONT },
-					new Object[] { Direction.EAST, BitWidth.ONE, NotGate.SIZE_WIDE, RIGHT_HANDED, "",
-							StdAttr.DEFAULT_LABEL_FONT });
+							StdAttr.LABEL_FONT, NEGATE_CONTROL },
+					new Object[] { Direction.EAST, BitWidth.ONE, NotGate.SIZE_NARROW, RIGHT_HANDED, "",
+							StdAttr.DEFAULT_LABEL_FONT, Boolean.FALSE });
 		} else {
 			setAttributes(
-					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_CONTROL, StdAttr.LABEL, StdAttr.LABEL_FONT },
-					new Object[] { Direction.EAST, BitWidth.ONE, RIGHT_HANDED, "", StdAttr.DEFAULT_LABEL_FONT });
+					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_CONTROL, StdAttr.LABEL, StdAttr.LABEL_FONT,
+							NEGATE_CONTROL },
+					new Object[] { Direction.EAST, BitWidth.ONE, RIGHT_HANDED, "", StdAttr.DEFAULT_LABEL_FONT,
+							Boolean.FALSE });
 		}
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
@@ -136,6 +140,8 @@ class ControlledBuffer extends InstanceFactory {
 		} else if (attr == ATTR_CONTROL) {
 			configurePorts(instance);
 			NotGate.configureLabel(instance, false, instance.getPortLocation(2));
+		} else if (attr == NEGATE_CONTROL) {
+			instance.fireInvalidated();
 		}
 	}
 
@@ -184,7 +190,19 @@ class ControlledBuffer extends InstanceFactory {
 		if (painter.getShowState()) {
 			g.setColor(painter.getPort(2).getColor());
 		}
-		g.drawLine(pt0.getX(), pt0.getY(), pt1.getX(), pt1.getY());
+		if (painter.getAttributeValue(NEGATE_CONTROL) == false)
+			g.drawLine(pt0.getX(), pt0.getY(), pt1.getX(), pt1.getY());
+		else {
+			GraphicsUtil.switchToWidth(g, 2);
+			g.setColor(Color.BLACK);
+			int x = (pt0.getX() <= pt1.getX()) ? pt0.getX() : pt1.getX();
+			int y = (pt0.getY() <= pt1.getY()) ? pt0.getY() : pt1.getY();
+			if (face == Direction.EAST || face == Direction.WEST)
+				x -= 3;
+			else
+				y -= 3;
+			g.drawOval(x, y, 6, 6);
+		}
 
 		// draw triangle
 		g.setColor(Color.BLACK);
@@ -230,7 +248,7 @@ class ControlledBuffer extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		Value control = state.getPort(2);
+		Value control = (state.getAttributeValue(NEGATE_CONTROL) == false) ? state.getPort(2) : state.getPort(2).not();
 		BitWidth width = state.getAttributeValue(StdAttr.WIDTH);
 		if (control == Value.TRUE) {
 			Value in = state.getPort(1);
