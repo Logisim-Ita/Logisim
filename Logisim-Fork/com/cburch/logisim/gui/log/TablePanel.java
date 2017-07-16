@@ -126,9 +126,9 @@ class TablePanel extends LogPanel {
 	private int rowCount = 0;
 	private int tableWidth;
 	private int tableHeight;
-	private Color[] colors = { Color.BLACK, new Color(160, 0, 220), Color.MAGENTA, new Color(245, 0, 0),
-			new Color(255, 160, 0), new Color(175, 191, 13), Color.GREEN.darker(), Color.BLUE, Color.CYAN.darker(),
-			Color.GRAY };
+	private Color[] colors = { new Color(48, 48, 48), new Color(128, 128, 128), new Color(144, 64, 192),
+			new Color(192, 0, 192), new Color(0, 0, 255), new Color(0, 192, 192), new Color(0, 128, 0),
+			new Color(0, 192, 0), new Color(255, 96, 128), new Color(222, 0, 0) };
 	private VerticalScrollBar vsb;
 
 	public TablePanel(LogFrame frame) {

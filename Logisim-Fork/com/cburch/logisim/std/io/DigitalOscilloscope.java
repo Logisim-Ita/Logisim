@@ -216,7 +216,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 						Integer cknum = ((diagramstate.getclocknumber() - nck) > 0)
 								? diagramstate.getclocknumber() - nck : 100 + (diagramstate.getclocknumber() - nck - 1);
 						g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
-						GraphicsUtil.drawCenteredText(g, cknum.toString() + '°', x + border + 15 * j + 8,
+						GraphicsUtil.drawCenteredText(g, cknum.toString(), x + border + 15 * j + 7,
 								y + border + 5);
 						g.setColor(Color.BLACK);
 					}
