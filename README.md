@@ -15,6 +15,7 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Added 7-Segment Display input names
 * Zoom in and out using mouse wheel
 * Autoupdates!
+* Big fixes to Log menu and Log output file
 * Default gates' attributes: narrow, 2 inputs
 * Some small graphic editing
 ## Features we want to add
