@@ -215,7 +215,7 @@ class TablePanel extends LogPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
+		computePreferredSize();
 		Dimension sz = getSize();
 		int top = Math.max(0, (sz.height - tableHeight) / 2);
 		int left = Math.max(0, (sz.width - tableWidth) / 2);

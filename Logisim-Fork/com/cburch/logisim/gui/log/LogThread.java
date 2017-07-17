@@ -32,6 +32,8 @@ class LogThread extends Thread implements ModelListener {
 	// entering this method.
 	private void addEntry(Value[] values) {
 		if (writer == null) {
+			if (model.getFile().length() == 0)
+				headerDirty = true;
 			try {
 				writer = new PrintWriter(new FileWriter(model.getFile(), true));
 			} catch (IOException e) {
@@ -44,8 +46,13 @@ class LogThread extends Thread implements ModelListener {
 			if (model.getFileHeader()) {
 				StringBuilder buf = new StringBuilder();
 				for (int i = 0; i < sel.size(); i++) {
-					if (i > 0)
-						buf.append("\t");
+					if (i > 0) {
+						buf.append("  ");
+						int l = (sel.get(i - 1).toString() + "  ").length() - values[i - 1].toString().length();
+						if (l < 2)
+							for (int j = 0; j < (-l + 2); j++)
+								buf.append(" ");
+					}
 					buf.append(sel.get(i).toString());
 				}
 				writer.println(buf.toString());
@@ -54,8 +61,14 @@ class LogThread extends Thread implements ModelListener {
 		}
 		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < values.length; i++) {
-			if (i > 0)
-				buf.append("\t");
+			if (i > 0) {
+				int l = (sel.get(i - 1).toString() + "  ").length() - values[i - 1].toString().length();
+				if (l > 2)
+					for (int j = 0; j < l; j++)
+						buf.append(" ");
+				else
+					buf.append("  ");
+			}
 			if (values[i] != null) {
 				int radix = sel.get(i).getRadix();
 				buf.append(values[i].toDisplayString(radix));
@@ -135,6 +148,13 @@ class LogThread extends Thread implements ModelListener {
 				writer.close();
 				writer = null;
 			}
+		}
+	}
+
+	public void fileChanged() {
+		if (writer != null) {
+			writer.close();
+			writer = null;
 		}
 	}
 

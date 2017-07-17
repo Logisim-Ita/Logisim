@@ -117,11 +117,10 @@ class Model {
 	}
 
 	public void setFile(File value) {
-		if (file == null ? value == null : file.equals(value))
-			return;
 		file = value;
 		fileEnabled = file != null;
 		fireFilePropertyChanged(new ModelEvent());
+		logger.fileChanged();
 	}
 
 	public void setFileEnabled(boolean value) {

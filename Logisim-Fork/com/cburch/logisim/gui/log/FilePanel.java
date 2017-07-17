@@ -50,6 +50,7 @@ class FilePanel extends LogPanel {
 							Strings.get("fileExistsTitle"), 0, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					if (option == 0) {
 						try {
+							getModel().setFileEnabled(false);
 							FileWriter delete = new FileWriter(file);
 							delete.close();
 						} catch (IOException e) {
