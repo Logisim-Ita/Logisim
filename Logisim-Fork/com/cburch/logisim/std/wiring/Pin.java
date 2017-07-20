@@ -399,7 +399,7 @@ public class Pin extends InstanceFactory {
 			if (attrs.width.getWidth() <= 1) {
 				Value receiving = state.receiving;
 				g.setColor(receiving.getColor());
-				g.fillOval(x + 4, y + 4, 14, 14);
+				g.fillOval(x + 4, y + 4, 13, 13);
 
 				if (attrs.width.getWidth() == 1) {
 					g.setColor(Color.WHITE);
