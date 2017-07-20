@@ -71,13 +71,9 @@ public class Pin extends InstanceFactory {
 			if (width.getWidth() == 1) {
 				return 0;
 			} else {
-				Bounds bds = state.getInstance().getBounds(); // intentionally
-																// with no
-																// graphics
-																// object - we
-																// don't want
-																// label
-																// included
+				// intentionally with no graphics object - we don't want label
+				// included
+				Bounds bds = state.getInstance().getBounds();
 				int i = (bds.getX() + bds.getWidth() - e.getX()) / 10;
 				int j = (bds.getY() + bds.getHeight() - e.getY()) / 20;
 				int bit = 8 * j + i;
@@ -376,10 +372,8 @@ public class Pin extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Graphics g = painter.getGraphics();
-		Bounds bds = painter.getInstance().getBounds(); // intentionally with no
-														// graphics object - we
-														// don't want label
-														// included
+		// intentionally with no graphics object - we don't want label included
+		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		GraphicsUtil.switchToWidth(g, 2);
@@ -405,7 +399,7 @@ public class Pin extends InstanceFactory {
 			if (attrs.width.getWidth() <= 1) {
 				Value receiving = state.receiving;
 				g.setColor(receiving.getColor());
-				g.fillOval(x + 4, y + 4, 13, 13);
+				g.fillOval(x + 4, y + 4, 14, 14);
 
 				if (attrs.width.getWidth() == 1) {
 					g.setColor(Color.WHITE);

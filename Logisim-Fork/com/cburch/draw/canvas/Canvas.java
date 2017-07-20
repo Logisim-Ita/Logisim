@@ -5,6 +5,8 @@ package com.cburch.draw.canvas;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
@@ -13,6 +15,7 @@ import javax.swing.JPopupMenu;
 import com.cburch.draw.model.CanvasModel;
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.undo.Action;
+import com.cburch.logisim.prefs.AppPreferences;
 
 public class Canvas extends JComponent {
 	/**
@@ -31,7 +34,6 @@ public class Canvas extends JComponent {
 		model = null;
 		listener = new CanvasListener(this);
 		selection = new Selection();
-
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
 		addKeyListener(listener);
@@ -59,11 +61,21 @@ public class Canvas extends JComponent {
 	}
 
 	protected void paintBackground(Graphics g) {
+		if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		g.clearRect(0, 0, getWidth(), getHeight());
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
+		if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		paintBackground(g);
 		paintForeground(g);
 	}

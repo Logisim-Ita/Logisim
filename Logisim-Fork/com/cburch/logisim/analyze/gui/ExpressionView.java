@@ -6,6 +6,8 @@ package com.cburch.logisim.analyze.gui;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import javax.swing.JPanel;
 
 import com.cburch.logisim.analyze.model.Expression;
 import com.cburch.logisim.analyze.model.ExpressionVisitor;
+import com.cburch.logisim.prefs.AppPreferences;
 
 class ExpressionView extends JPanel {
 	private static class ExpressionData {
@@ -380,6 +383,11 @@ class ExpressionView extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
+		if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		super.paintComponent(g);
 
 		if (renderData != null) {

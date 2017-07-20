@@ -17,6 +17,7 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Autoupdates!
 * Big fixes to Log menu and Log output file
 * Default gates' attributes: narrow, 2 inputs
+* Anti Aliasing option
 * Some small graphic editing
 ## Features we want to add
 * Suggest us everything at logisimit@gmail.com

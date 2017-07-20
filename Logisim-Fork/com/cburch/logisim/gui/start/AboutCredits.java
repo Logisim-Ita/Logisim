@@ -12,11 +12,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.prefs.AppPreferences;
 
 class AboutCredits extends JComponent {
 	private static class CreditsLine {
@@ -134,6 +136,11 @@ class AboutCredits extends JComponent {
 
 	@Override
 	protected void paintComponent(Graphics g) {
+		if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		FontMetrics[] fms = new FontMetrics[font.length];
 		for (int i = 0; i < fms.length; i++) {
 			fms[i] = g.getFontMetrics(font[i]);

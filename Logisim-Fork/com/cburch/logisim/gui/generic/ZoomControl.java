@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
@@ -16,6 +18,8 @@ import javax.swing.AbstractSpinnerModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+
+import com.cburch.logisim.prefs.AppPreferences;
 
 public class ZoomControl extends JPanel {
 	private class GridIcon extends JComponent implements MouseListener, PropertyChangeListener {
@@ -60,6 +64,11 @@ public class ZoomControl extends JPanel {
 
 		@Override
 		protected void paintComponent(Graphics g) {
+			if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			}
 			int width = getWidth();
 			int height = getHeight();
 			g.setColor(state ? Color.black : getBackground().darker());
