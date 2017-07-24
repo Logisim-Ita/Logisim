@@ -16,12 +16,15 @@ public interface StdAttr {
 			Strings.getter("stdFacingAttr"));
 
 	public static final Attribute<BitWidth> WIDTH = Attributes.forBitWidth("width", Strings.getter("stdDataWidthAttr"));
-
+	public static final AttributeOption TRIG_LATCH = new AttributeOption("latch", Strings.getter("stdTriggerLatch"));
 	public static final AttributeOption TRIG_RISING = new AttributeOption("rising", Strings.getter("stdTriggerRising"));
 	public static final AttributeOption TRIG_FALLING = new AttributeOption("falling",
 			Strings.getter("stdTriggerFalling"));
 	public static final AttributeOption TRIG_HIGH = new AttributeOption("high", Strings.getter("stdTriggerHigh"));
 	public static final AttributeOption TRIG_LOW = new AttributeOption("low", Strings.getter("stdTriggerLow"));
+	public static final Attribute<AttributeOption> FULL_TRIGGER = Attributes.forOption("trigger",
+			Strings.getter("stdTriggerAttr"),
+			new AttributeOption[] { TRIG_RISING, TRIG_FALLING, TRIG_HIGH, TRIG_LOW, TRIG_LATCH });
 	public static final Attribute<AttributeOption> TRIGGER = Attributes.forOption("trigger",
 			Strings.getter("stdTriggerAttr"), new AttributeOption[] { TRIG_RISING, TRIG_FALLING, TRIG_HIGH, TRIG_LOW });
 	public static final Attribute<AttributeOption> EDGE_TRIGGER = Attributes.forOption("trigger",
