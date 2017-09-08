@@ -88,7 +88,7 @@ public class Rom extends Mem {
 		}
 	}
 
-	private static class ContentsCell extends JLabel implements MouseListener {
+	public static class ContentsCell extends JLabel implements MouseListener {
 		/**
 		 * 
 		 */

@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>ROM</title>
+</head>
+
+<body bgcolor="FFFFFF">
+
+<h1><img  align="center" src="../../../../../resources/logisim/icons/plarom.gif" width="32" height="32">
+<em>PLA ROM</em></h1>
+
+<p><table>
+<tr><td><strong>Library:</strong></td>
+	<td><a href="index.html">Memory</a></td></tr>
+<tr><td><strong>Introduced:</strong></td>
+	<td>2.8.5.0 (Fork)</td></tr>
+<tr><td valign="top"><strong>Appearance:</strong></td>
+	<td valign="top"><img src="../../../img-libs/plarom.png" width="110" height="110"></td></tr>
+<tr><td valign="top"><strong>Edit Window appearance:</strong></td>
+	<td valign="top"><img src="../../../img-libs/plaromwindow.png" width="361" height="278"></td></tr>
+</table></p>
+
+<h2>Behavior</h2>
+
+<p>The PLA ROM works as the original PLA ROM, each input bit has two wires, one connected normally
+and the other connected to a not gate.
+In the edit window you can connect clicking on the node each input wire to an and input wire or
+with the and output wire and the or input wire.
+The component will compute the value and return it to the output pin</p>
+
+<h2>Pins</h2>
+
+<dl>
+
+<dt>On west edge (input)</dt>
+<dd>The value of this input will have the bit width selected on the attribute "Number Of Inputs".
+This value will change the output value depending of the connected nodes inside the component</dd>
+
+<dt>On east edge (output)</dt>
+<dd>Outputs the value computed by the component with the bitwidth selected on the attribute "Number Of Outputs".</dd>
+
+<dt><var>clr</var> on south edge (input, bit width 1)</dt>
+<dd>If its value is True, it will deselect all the nodes inside the component</dd>
+
+<dt><var>en</var> on north edge (input, bit width 1)</dt>
+<dd>If its value is False, it will disable the component</dd>
+
+</dl>
+
+<h2>Attributes</h2>
+
+<dl>
+
+<dt>Number Of Inputs</dt>
+<dd>The bit width of the input pin.</dd>
+
+<dt>Number Of Internal And</dt>
+<dd>The number of and gates inside the component.</dd>
+
+<dt>Number Of Outputs</dt>
+<dd>The bit width of the output pin.</dd>
+
+</dl>
+
+<h2>Poke Tool Behavior</h2>
+
+<p>Clicking on the "Edit" button on the component will show the edit window.</p>
+
+<h2>Text Tool Behavior</h2>
+
+<p>None.</p>
+
+<h2>Menu Tool Behavior</h2>
+
+<p>Clicking on the "Edit Contents..." button will show the edit window.</p>
+
+<p><a href="../index.html">Back to <em>Library Reference</em></a></p>
+
+</body>
+</html>

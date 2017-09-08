@@ -121,6 +121,7 @@
 	<mapID target="mem_random" url="en/html/libs/mem/random.html" />
 	<mapID target="mem_ram" url="en/html/libs/mem/ram.html" />
 	<mapID target="mem_rom" url="en/html/libs/mem/rom.html" />
+	<mapID target="mem_plarom" url="en/html/libs/mem/plarom.html" />
 	<mapID target="io" url="en/html/libs/io/index.html" />
 	<mapID target="io_button" url="en/html/libs/io/button.html" />
 	<mapID target="io_switch" url="en/html/libs/io/switch.html" />
@@ -187,6 +188,7 @@
 	<mapID target="icon_random" url="../resources/logisim/icons/random.gif" />
 	<mapID target="icon_ram" url="../resources/logisim/icons/ram.gif" />
 	<mapID target="icon_rom" url="../resources/logisim/icons/rom.gif" />
+	<mapID target="icon_plarom" url="../resources/logisim/icons/plarom.gif" />
 	<mapID target="icon_button" url="../resources/logisim/icons/button.gif" />
 	<mapID target="icon_switch" url="../resources/logisim/icons/switch.gif" />
 	<mapID target="icon_joystick" url="../resources/logisim/icons/joystick.gif" />

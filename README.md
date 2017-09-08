@@ -6,9 +6,10 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Italian translation!
 * Possibility to use french translations already done (not very well)
 * New components:
+	* I/O->Digital Oscilloscope
 	* I/O->Switch
 	* I/O->RGB LED
-	* (new) Digital Oscilloscope!!!
+	* Memory->PLA ROM
 	* Plexers->7-Segment Display Decoder
 * Controlled Buffer / Inverter: Negate Control Input
 * FF D, S-R: Latch option in trigger list
@@ -21,7 +22,6 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Anti Aliasing option
 * Some small graphic editing
 ## Features we want to add
-* PLA ROM
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
 <p>You can use .circ files saved in the original version but if you have kept the default size value or the default number of inputs<br>

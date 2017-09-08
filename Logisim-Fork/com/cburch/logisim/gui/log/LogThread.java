@@ -96,6 +96,13 @@ class LogThread extends Thread implements ModelListener {
 		}
 	}
 
+	public void fileChanged() {
+		if (writer != null) {
+			writer.close();
+			writer = null;
+		}
+	}
+
 	@Override
 	public void filePropertyChanged(ModelEvent event) {
 		synchronized (lock) {
@@ -148,13 +155,6 @@ class LogThread extends Thread implements ModelListener {
 				writer.close();
 				writer = null;
 			}
-		}
-	}
-
-	public void fileChanged() {
-		if (writer != null) {
-			writer.close();
-			writer = null;
 		}
 	}
 

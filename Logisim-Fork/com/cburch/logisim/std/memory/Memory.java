@@ -25,7 +25,8 @@ public class Memory extends Library {
 					"ShiftRegister"),
 			new FactoryDescription("Random", Strings.getter("randomComponent"), "random.gif", "Random"),
 			new FactoryDescription("RAM", Strings.getter("ramComponent"), "ram.gif", "Ram"),
-			new FactoryDescription("ROM", Strings.getter("romComponent"), "rom.gif", "Rom"), };
+			new FactoryDescription("ROM", Strings.getter("romComponent"), "rom.gif", "Rom"),
+			new FactoryDescription("PlaRom", Strings.getter("PlaRomComponent"), "plarom.gif", "PlaRom"), };
 
 	private List<Tool> tools = null;
 

@@ -196,6 +196,8 @@ public class HexFrame extends LFrame {
 		myListener.localeChanged();
 		pack();
 
+		setLocationRelativeTo(null);
+
 		Dimension size = getSize();
 		Dimension screen = getToolkit().getScreenSize();
 		if (size.width > screen.width || size.height > screen.height) {

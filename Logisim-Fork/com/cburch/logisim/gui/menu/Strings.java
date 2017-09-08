@@ -6,7 +6,7 @@ package com.cburch.logisim.gui.menu;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.StringGetter;
 
-class Strings {
+public class Strings {
 	private static LocaleManager source = new LocaleManager("resources/logisim", "menu");
 
 	public static String get(String key) {

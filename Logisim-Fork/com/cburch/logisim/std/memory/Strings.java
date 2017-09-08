@@ -4,7 +4,6 @@
 package com.cburch.logisim.std.memory;
 
 import com.cburch.logisim.util.LocaleManager;
-
 import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 

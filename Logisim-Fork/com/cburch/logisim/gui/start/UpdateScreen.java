@@ -31,8 +31,6 @@ public class UpdateScreen extends JWindow {
 
 	boolean inClose = false; // for avoiding mutual recursion
 
-	long startTime = System.currentTimeMillis();
-
 	JFrame f;
 	JButton cancel = new JButton(Strings.get("startupCancelButton"));
 	JProgressBar progress;
@@ -125,10 +123,7 @@ public class UpdateScreen extends JWindow {
 	public void setVisible(boolean value) {
 		if (value) {
 			f.pack();
-			Dimension dim = getToolkit().getScreenSize();
-			int x = (int) (dim.getWidth() - f.getWidth()) / 2;
-			int y = (int) (dim.getHeight() - f.getHeight()) / 2;
-			f.setLocation(x, y);
+			f.setLocationRelativeTo(null);
 		}
 		f.setVisible(value);
 	}

@@ -105,6 +105,11 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
+	//
+	// abstract methods intended to be implemented in subclasses
+	//
+	protected abstract String getInputName(int index);
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == triggerAttribute) {
@@ -112,11 +117,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			instance.recomputeBounds();
 		}
 	}
-
-	//
-	// abstract methods intended to be implemented in subclasses
-	//
-	protected abstract String getInputName(int index);
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
