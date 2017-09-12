@@ -130,6 +130,7 @@
         <tocitem target="mem_random" image="icon_random" text="Random"/>
         <tocitem target="mem_ram" image="icon_ram" text="RAM"/>
         <tocitem target="mem_rom" image="icon_rom" text="ROM"/>
+		<tocitem target="mem_plarom" text="PLA ROM" image="icon_plarom" />
       </tocitem>
       <tocitem target="io" text="Input/Output library">
         <tocitem target="io_button" image="icon_button" text="Button"/>

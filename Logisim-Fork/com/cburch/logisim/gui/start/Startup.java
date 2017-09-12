@@ -598,14 +598,14 @@ public class Startup {
 	 */
 	private boolean networkConnectionAvailable() {
 		try {
-			URL url = new URL("http://www.google.com");
-			URLConnection uC = url.openConnection();
+			URLConnection uC = new URL("http://www.google.com").openConnection();
 			uC.connect();
 			return (true);
 		} catch (MalformedURLException e) {
 			System.err.println("The URL used to check the connectivity is malformed -- no Google?");
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.err.println("No Internet connection");
 			// If we get here, the connection somehow failed
 			return (false);
 		}

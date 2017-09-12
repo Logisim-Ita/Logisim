@@ -138,6 +138,7 @@
 		<tocitem target="mem_random" text="Генератор случайных чисел" image="icon_random" />
 		<tocitem target="mem_ram" text="ОЗУ" image="icon_ram" />
 		<tocitem target="mem_rom" text="ПЗУ" image="icon_rom" />
+		<tocitem target="mem_plarom" text="PLA ROM" image="icon_plarom" />
 	  </tocitem>
 	  <tocitem target="io" text="Библиотека Ввод/вывод">
 		<tocitem target="io_button" text="Кнопка" image="icon_button" />

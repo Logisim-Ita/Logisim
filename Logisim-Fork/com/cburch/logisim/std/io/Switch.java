@@ -36,17 +36,14 @@ public class Switch extends InstanceFactory {
 
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			return data == null ? Value.FALSE : (Value) data.getValue();
+			return state.getPort(0);
 		}
 	}
 
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
-			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			Value val = data == null ? Value.FALSE : (Value) data.getValue();
-			setValue(state, val.not());// opposite value
+			setValue(state, state.getPort(0).not());// opposite value
 		}
 
 		private void setValue(InstanceState state, Value val) {
@@ -123,7 +120,6 @@ public class Switch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		// changed to a rectangle
 		return Bounds.create(-20, -15, 20, 30).rotate(Direction.EAST, facing, 0, 0);
 	}
 

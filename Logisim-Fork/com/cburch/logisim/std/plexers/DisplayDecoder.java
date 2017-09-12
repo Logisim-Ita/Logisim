@@ -22,13 +22,12 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class DisplayDecoder extends InstanceFactory {
 
-	static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
+	private static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
 
 	public DisplayDecoder() {
 		super("DisplayDecoder", Strings.getter("DisplayDecoderComponent"));
 		setAttributes(new Attribute[] { StdAttr.FACING, MULTI_BIT }, new Object[] { Direction.EAST, Boolean.FALSE });
 		setIconName("displaydecoder.gif");
-		setFacingAttribute(StdAttr.FACING);
 	}
 
 	@Override
@@ -40,19 +39,17 @@ public class DisplayDecoder extends InstanceFactory {
 	private int getdecval(InstanceState state) {
 		int decval = -1;
 		boolean multibit = state.getAttributeValue(MULTI_BIT) == Boolean.TRUE;
-		if (state.getPort(7) != Value.FALSE) {// enabled
-			if (!multibit && state.getPort(8) != Value.UNKNOWN && state.getPort(9) != Value.UNKNOWN
-					&& state.getPort(10) != Value.UNKNOWN && state.getPort(11) != Value.UNKNOWN) {
-				for (int i = 8; i < 12; i++) {// 0, 1, 2, 3
-					if (state.getPort(i) == Value.TRUE) {// if true input
-						// for example 1101 --> 8+4+1= 13(decimal)
-						decval += (int) Math.pow(2, (i - 8));
-					}
+		if (!multibit && state.getPort(8) != Value.UNKNOWN && state.getPort(9) != Value.UNKNOWN
+				&& state.getPort(10) != Value.UNKNOWN && state.getPort(11) != Value.UNKNOWN) {
+			for (int i = 8; i < 12; i++) {// 0, 1, 2, 3
+				if (state.getPort(i) == Value.TRUE) {// if true input
+					// for example 1101 --> 8+4+1= 13(decimal)
+					decval += (int) Math.pow(2, (i - 8));
 				}
-				decval++;
-			} else if (multibit & state.getPort(8) != Value.UNKNOWN)
-				decval = state.getPort(8).toIntValue();
-		}
+			}
+			decval++;
+		} else if (multibit & state.getPort(8) != Value.UNKNOWN)
+			decval = state.getPort(8).toIntValue();
 		return decval;
 	}
 
@@ -85,7 +82,9 @@ public class DisplayDecoder extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		painter.drawBounds();
 		Bounds bds = painter.getBounds();
-		GraphicsUtil.drawCenteredText(g, (getdecval(painter) != -1) ? Integer.toString(getdecval(painter)) : "-",
+		GraphicsUtil.drawCenteredText(g,
+				painter.getPort(7) == Value.FALSE ? "!" + Strings.get("memEnableLabel")
+						: (getdecval(painter) != -1) ? Integer.toString(getdecval(painter)) : "-",
 				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		for (int i = 0; i < 8 + (painter.getAttributeValue(MULTI_BIT) ? 1 : 4); i++) {
 			if (i != 7)
@@ -98,169 +97,171 @@ public class DisplayDecoder extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		// Ports: 0->a 1->b 2->c 3->d 4->e 5->f 6->g 7->enable
-		switch (getdecval(state)) {
-		case 0:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.FALSE, Plexers.DELAY);
-			break;
-		case 1:
-			state.setPort(0, Value.FALSE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.FALSE, Plexers.DELAY);
-			state.setPort(6, Value.FALSE, Plexers.DELAY);
-			break;
-		case 2:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.FALSE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.FALSE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 3:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.FALSE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 4:
-			state.setPort(0, Value.FALSE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 5:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 6:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 7:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.FALSE, Plexers.DELAY);
-			state.setPort(6, Value.FALSE, Plexers.DELAY);
-			break;
-		case 8:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 9:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.FALSE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 10:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 11:
-			state.setPort(0, Value.FALSE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 12:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.FALSE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.FALSE, Plexers.DELAY);
-			break;
-		case 13:
-			state.setPort(0, Value.FALSE, Plexers.DELAY);
-			state.setPort(1, Value.TRUE, Plexers.DELAY);
-			state.setPort(2, Value.TRUE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.FALSE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 14:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.FALSE, Plexers.DELAY);
-			state.setPort(3, Value.TRUE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		case 15:
-			state.setPort(0, Value.TRUE, Plexers.DELAY);
-			state.setPort(1, Value.FALSE, Plexers.DELAY);
-			state.setPort(2, Value.FALSE, Plexers.DELAY);
-			state.setPort(3, Value.FALSE, Plexers.DELAY);
-			state.setPort(4, Value.TRUE, Plexers.DELAY);
-			state.setPort(5, Value.TRUE, Plexers.DELAY);
-			state.setPort(6, Value.TRUE, Plexers.DELAY);
-			break;
-		default:
-			state.setPort(0, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(1, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(2, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(3, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(4, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(5, Value.UNKNOWN, Plexers.DELAY);
-			state.setPort(6, Value.UNKNOWN, Plexers.DELAY);
-			break;
+		if (state.getPort(7) != Value.FALSE) {// enabled
+			// Ports: 0->a 1->b 2->c 3->d 4->e 5->f 6->g 7->enable
+			switch (getdecval(state)) {
+			case 0:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.FALSE, Plexers.DELAY);
+				break;
+			case 1:
+				state.setPort(0, Value.FALSE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.FALSE, Plexers.DELAY);
+				state.setPort(6, Value.FALSE, Plexers.DELAY);
+				break;
+			case 2:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.FALSE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.FALSE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 3:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.FALSE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 4:
+				state.setPort(0, Value.FALSE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 5:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 6:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 7:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.FALSE, Plexers.DELAY);
+				state.setPort(6, Value.FALSE, Plexers.DELAY);
+				break;
+			case 8:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 9:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.FALSE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 10:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 11:
+				state.setPort(0, Value.FALSE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 12:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.FALSE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.FALSE, Plexers.DELAY);
+				break;
+			case 13:
+				state.setPort(0, Value.FALSE, Plexers.DELAY);
+				state.setPort(1, Value.TRUE, Plexers.DELAY);
+				state.setPort(2, Value.TRUE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.FALSE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 14:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.FALSE, Plexers.DELAY);
+				state.setPort(3, Value.TRUE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			case 15:
+				state.setPort(0, Value.TRUE, Plexers.DELAY);
+				state.setPort(1, Value.FALSE, Plexers.DELAY);
+				state.setPort(2, Value.FALSE, Plexers.DELAY);
+				state.setPort(3, Value.FALSE, Plexers.DELAY);
+				state.setPort(4, Value.TRUE, Plexers.DELAY);
+				state.setPort(5, Value.TRUE, Plexers.DELAY);
+				state.setPort(6, Value.TRUE, Plexers.DELAY);
+				break;
+			default:
+				state.setPort(0, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(1, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(2, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(3, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(4, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(5, Value.UNKNOWN, Plexers.DELAY);
+				state.setPort(6, Value.UNKNOWN, Plexers.DELAY);
+				break;
+			}
 		}
 	}
 
 	private void updatePorts(Instance instance) {
 		Object dir = instance.getAttributeValue(StdAttr.FACING);
 		boolean multibit = instance.getAttributeValue(MULTI_BIT) == Boolean.TRUE;
-		int in = multibit ? 1 : 4;
-		int out = 7;
+		int in = multibit ? 1 : 4;// number of input ports
+		int out = 7;// number of output ports
 		char cin = 65;// Letter A (to D in for)
 		char cout = 97;// Letter a (to g in for)
 		Port[] ps = new Port[in + out + 1];

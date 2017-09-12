@@ -102,12 +102,9 @@ public class PlaRomData implements InstanceData {
 	}
 
 	public Value[] getOutputValues() {
-		Value[] OutputValuecopy = Arrays.copyOf(OutputValue, OutputValue.length);
-		for (int i = 0; i < getOutputs() / 2; i++) {// reverse array
+		Value[] OutputValuecopy = new Value[getOutputs()];
+		for (int i = getOutputs() - 1; i >= 0; i--)// reverse array
 			OutputValuecopy[i] = OutputValue[OutputValue.length - i - 1];
-			OutputValuecopy[OutputValue.length - i - 1] = OutputValue[i];
-			;
-		}
 		return OutputValuecopy;
 	}
 
@@ -126,6 +123,7 @@ public class PlaRomData implements InstanceData {
 
 	public void setAndOutputValue(int row, int column, boolean b) {
 		this.AndOutput[row][column] = b;
+		// update all values
 		setAndValue();
 		setOutputValue();
 	}
@@ -162,6 +160,7 @@ public class PlaRomData implements InstanceData {
 
 	public void setInputAndValue(int row, int column, boolean b) {
 		this.InputAnd[row][column] = b;
+		// update all values
 		setAndValue();
 		setOutputValue();
 	}
@@ -216,7 +215,7 @@ public class PlaRomData implements InstanceData {
 			InitializeInputValue();
 			setAndValue();
 			setOutputValue();
-			window.pack();
+			window.UpdateWindow();
 		}
 	}
 }

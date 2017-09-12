@@ -3,7 +3,6 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -20,6 +19,7 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
+import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
@@ -29,6 +29,25 @@ import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class PlaRom extends InstanceFactory {
+
+	public static class Logger extends InstanceLogger {
+
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			/*
+			 * return Strings.getter("PlaRomComponent").toString() + " " +
+			 * state.getAttributeValue(ATTR_INPUTS) + "x" +
+			 * state.getAttributeValue(ATTR_AND) + "x" +
+			 * state.getAttributeValue(ATTR_OUTPUTS);
+			 */
+			return null;
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			return state.getPort(1);
+		}
+	}
 
 	private static class PlaMenu implements ActionListener, MenuExtender {
 		private JMenuItem edit;
@@ -41,8 +60,7 @@ public class PlaRom extends InstanceFactory {
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			Object src = evt.getSource();
-			if (src == edit) {
+			if (evt.getSource() == edit) {
 				PlaRomData data = PlaRom.getPlaRomData(instance, circState);
 				PlaRomEditWindow window = data.getWindow();
 				window.setVisible(true);
@@ -54,9 +72,9 @@ public class PlaRom extends InstanceFactory {
 			this.circState = proj.getCircuitState();
 			boolean enabled = circState != null;
 
-			edit = createItem(enabled, Strings.get("ramEditMenuItem"));
+			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
 			menu.addSeparator();
-			menu.add(edit);
+			menu.add(this.edit);
 		}
 
 		private JMenuItem createItem(boolean enabled, String label) {
@@ -68,7 +86,7 @@ public class PlaRom extends InstanceFactory {
 	}
 
 	public static class Poker extends InstancePoker {
-		boolean isPressed = true;
+		private boolean isPressed = true;
 
 		private boolean isInside(InstanceState state, MouseEvent e) {
 			Location loc = state.getInstance().getLocation();
@@ -94,7 +112,7 @@ public class PlaRom extends InstanceFactory {
 
 		@Override
 		public void paint(InstancePainter painter) {
-			Graphics2D g = (Graphics2D) painter.getGraphics();
+			Graphics g = painter.getGraphics();
 			Bounds bds = painter.getBounds();
 			g.setFont(new Font("sans serif", Font.BOLD, 11));
 			g.setColor((isPressed) ? Color.LIGHT_GRAY : Color.WHITE);
@@ -149,6 +167,7 @@ public class PlaRom extends InstanceFactory {
 		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS }, new Object[] { 4, 4, 4 });
 		setOffsetBounds(Bounds.create(0, -40, 80, 80));
 		setInstancePoker(Poker.class);
+		setInstanceLogger(Logger.class);
 	}
 
 	@Override
@@ -167,10 +186,8 @@ public class PlaRom extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS) {
+		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS)
 			updateports(instance);
-			instance.recomputeBounds();
-		}
 	}
 
 	@Override
@@ -216,20 +233,17 @@ public class PlaRom extends InstanceFactory {
 		}
 		if (window.getVisible())
 			window.mp.repaint();
-		if (enable != Value.FALSE || (enable == Value.FALSE && clear == Value.TRUE)) {
-			Value outputvalue = Value.create(data.getOutputValues());
-			// for (int j = 0; j < data.getOutputs(); j++)
-			// outputvalue.set(j, data.getOutputValue(j));
-			state.setPort(1, outputvalue, Mem.DELAY);
-		}
+		if (enable != Value.FALSE || clear == Value.TRUE)
+			// update the output port value if is enabled or if clear is true
+			state.setPort(1, Value.create(data.getOutputValues()), Mem.DELAY);
 	}
 
 	private void updateports(Instance instance) {
-		int inputs = instance.getAttributeValue(ATTR_INPUTS);
-		int outputs = instance.getAttributeValue(ATTR_OUTPUTS);
+		int inputbitwidth = instance.getAttributeValue(ATTR_INPUTS);
+		int outputbitwidth = instance.getAttributeValue(ATTR_OUTPUTS);
 		Port[] ps = new Port[4];
-		ps[0] = new Port(0, 0, Port.INPUT, inputs);
-		ps[1] = new Port(80, 0, Port.OUTPUT, outputs);
+		ps[0] = new Port(0, 0, Port.INPUT, inputbitwidth);
+		ps[1] = new Port(80, 0, Port.OUTPUT, outputbitwidth);
 		ps[2] = new Port(40, 40, Port.INPUT, 1); // clear
 		ps[3] = new Port(40, -40, Port.INPUT, 1); // enable
 		ps[0].setToolTip(Strings.getter("demultiplexerInTip"));

@@ -32,29 +32,29 @@ public class DigitalOscilloscope extends InstanceFactory {
 	private static final Attribute<Integer> ATTR_NSTATE = Attributes.forIntegerRange("nState",
 			Strings.getter("NStateAttr"), 4, 35);
 
-	public static final AttributeOption NO = new AttributeOption("no", Strings.getter("noOption"));
-	public static final AttributeOption TRIG_RISING = new AttributeOption("rising", Strings.getter("stdTriggerRising"));
-	public static final AttributeOption TRIG_FALLING = new AttributeOption("falling",
+	private static final AttributeOption NO = new AttributeOption("no", Strings.getter("noOption"));
+	private static final AttributeOption TRIG_RISING = new AttributeOption("rising",
+			Strings.getter("stdTriggerRising"));
+	private static final AttributeOption TRIG_FALLING = new AttributeOption("falling",
 			Strings.getter("stdTriggerFalling"));
-	public static final AttributeOption BOTH = new AttributeOption("both", Strings.getter("bothOption"));
+	private static final AttributeOption BOTH = new AttributeOption("both", Strings.getter("bothOption"));
+
 	private static final Attribute<AttributeOption> VERT_LINE = Attributes.forOption("frontlines",
 			Strings.getter("DrawClockFrontLine"), new AttributeOption[] { NO, TRIG_RISING, TRIG_FALLING, BOTH });
 
-	static final Attribute<Boolean> SHOW_CLOCK = Attributes.forBoolean("showclock",
+	private static final Attribute<Boolean> SHOW_CLOCK = Attributes.forBoolean("showclock",
 			Strings.getter("ShowClockAttribute"));
 
-	static final Attribute<Color> ATTR_COLOR = Attributes.forColor("color", Strings.getter("BorderColor"));
+	private static final Attribute<Color> ATTR_COLOR = Attributes.forColor("color", Strings.getter("BorderColor"));
 
 	private final int border = 10;
 
 	public DigitalOscilloscope() {
 		super("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"));
-		int inputs = Integer.valueOf(3);
-		int length = Integer.valueOf(15);
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
 						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { inputs, length, TRIG_RISING, true, new Color(0, 240, 240), "", Direction.NORTH,
+				new Object[] { 3, 15, TRIG_RISING, true, new Color(0, 240, 240), "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setIconName("digitaloscilloscope.gif");
 	}
@@ -297,10 +297,10 @@ public class DigitalOscilloscope extends InstanceFactory {
 		for (int i = 0; i <= inputs; i++) {
 			port[i] = new Port(0, 30 * i, Port.INPUT, 1);
 		}
-		// clear
+		// enable
 		port[inputs + 1] = new Port(20, 30 * inputs + 2 * border, Port.INPUT, 1);
 		port[inputs + 1].setToolTip(Strings.getter("priorityEncoderEnableInTip"));
-		// enable
+		// clear
 		port[inputs + 2] = new Port(30, 30 * inputs + 2 * border, Port.INPUT, 1);
 		port[inputs + 2].setToolTip(Strings.getter("ClearDiagram"));
 		// clock

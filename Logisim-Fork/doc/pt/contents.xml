@@ -138,6 +138,7 @@
 		<tocitem target="mem_random" text="Gerador aleatório" image="icon_random" />
 		<tocitem target="mem_ram" text="RAM" image="icon_ram" />
 		<tocitem target="mem_rom" text="ROM" image="icon_rom" />
+		<tocitem target="mem_plarom" text="PLA ROM" image="icon_plarom" />
 	  </tocitem>
 	  <tocitem target="io" text="Biblioteca Entrada/Saída">
 		<tocitem target="io_button" text="Botão" image="icon_button" />

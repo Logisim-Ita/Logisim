@@ -275,20 +275,18 @@ public class PlaRomEditWindow extends LFrame {
 	}
 
 	@Override
-	public void pack() {
+	public void setVisible(boolean b) {
+		UpdateWindow();
+		this.window.setVisible(b);
+	}
+
+	public void UpdateWindow() {
 		window.setTitle("Logisim: Pla Rom " + data.getSizeString() + " Edit Window");
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (sp.getPreferredSize().getHeight() >= screenSize.getHeight()
 				|| sp.getPreferredSize().getWidth() >= screenSize.getWidth())
 			window.setExtendedState(Frame.MAXIMIZED_BOTH);
-		this.window.setSize(mp.getPreferredSize());
 		this.window.pack();
 		this.window.setLocationRelativeTo(null);
-	}
-
-	@Override
-	public void setVisible(boolean b) {
-		pack();
-		this.window.setVisible(b);
 	}
 }

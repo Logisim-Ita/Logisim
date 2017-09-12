@@ -168,13 +168,13 @@ public class RGBLed extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING) {
+		if (attr == Io.MULTI_BIT)
+			updateports(instance);
+		else if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			computeTextField(instance);
-		} else if (attr == Io.ATTR_LABEL_LOC) {
+		} else if (attr == Io.ATTR_LABEL_LOC)
 			computeTextField(instance);
-		}
-		updateports(instance);
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class RGBLed extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
-		Object facing = instance.getAttributeValue(StdAttr.FACING);
+		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		BitWidth bits = (instance.getAttributeValue(Io.MULTI_BIT)) ? BitWidth.create(8) : BitWidth.ONE;
 		Port[] port = new Port[3];
 		if (facing == Direction.NORTH || facing == Direction.SOUTH) {
