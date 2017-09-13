@@ -13,6 +13,7 @@ import com.cburch.logisim.std.gates.Gates;
 import com.cburch.logisim.std.io.Io;
 import com.cburch.logisim.std.memory.Memory;
 import com.cburch.logisim.std.plexers.Plexers;
+import com.cburch.logisim.std.ttl7400.TTL7400;
 import com.cburch.logisim.std.wiring.Wiring;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
@@ -21,7 +22,7 @@ public class Builtin extends Library {
 	private List<Library> libraries = null;
 
 	public Builtin() {
-		libraries = Arrays.asList(new Library[] { new Base(), new Gates(), new Wiring(), new Plexers(),
+		libraries = Arrays.asList(new Library[] { new Base(), new Gates(), new TTL7400(), new Wiring(), new Plexers(),
 				new Arithmetic(), new Memory(), new Io(), });
 	}
 
