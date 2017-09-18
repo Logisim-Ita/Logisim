@@ -392,9 +392,6 @@ public class Startup {
 			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
 			if (updatemessage == "OK") {
-				JOptionPane.showMessageDialog(null,
-						StringUtil.format(Strings.get("UpdateSucceededMessage"), remoteVersion.toString()),
-						Strings.get("UpdateSucceeded"), JOptionPane.INFORMATION_MESSAGE);
 				return (true);
 			} else if (updatemessage != "CANCELLED") {
 				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailed") + ":\n" + updatemessage,
@@ -608,6 +605,17 @@ public class Startup {
 			return (false);
 		}
 		return (false);
+	}
+
+	public void restart() {
+		try {
+			String[] exexute = { "java", "-jar",
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getAbsolutePath() };
+			Runtime.getRuntime().exec(exexute);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void run() {

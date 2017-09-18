@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.9.0.0</jar_version>
+  <jar_version>2.9.1.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.9.0.0</exe_version>
+  <exe_version>2.9.1.0</exe_version>
   <changelog>
-* TTL gates (7400, 7402, 7404, 7408, 7432, 7486, 747266)
-* New tab "Fork" in Preference menu
-* Auto Updates can be disabled in Preference/Fork/AutoUpdates
+* Logisim will autorestart after autoupdates
   </changelog>
 </logisim>

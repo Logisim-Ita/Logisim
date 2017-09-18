@@ -25,7 +25,6 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 ## Features we want to add
 * Internal view of TTL components
 * TTL flip flops
-* Auto restart after auto update
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
 <p>You can use .circ files saved in the original version but if you have kept the default size value or the default number of inputs<br>
