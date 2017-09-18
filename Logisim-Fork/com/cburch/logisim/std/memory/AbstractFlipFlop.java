@@ -186,7 +186,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
-		int numInputs = inputs;
+		int numInputs = this.inputs;
 		int withclock = instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1;
 		Port[] ps = new Port[numInputs + STD_PORTS + withclock];
 		if (numInputs == 1)

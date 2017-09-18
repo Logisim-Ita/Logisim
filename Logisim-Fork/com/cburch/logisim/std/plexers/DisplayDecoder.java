@@ -258,7 +258,7 @@ public class DisplayDecoder extends InstanceFactory {
 	}
 
 	private void updatePorts(Instance instance) {
-		Object dir = instance.getAttributeValue(StdAttr.FACING);
+		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		boolean multibit = instance.getAttributeValue(MULTI_BIT) == Boolean.TRUE;
 		int in = multibit ? 1 : 4;// number of input ports
 		int out = 7;// number of output ports

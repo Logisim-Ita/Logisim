@@ -22,8 +22,7 @@ class LayoutOptions extends OptionsPanel {
 	public LayoutOptions(PreferencesFrame window) {
 		super(window);
 
-		checks = new PrefBoolean[] { new PrefBoolean(AppPreferences.ANTI_ALIASING, Strings.getter("Anti Aliasing")),
-				new PrefBoolean(AppPreferences.PRINTER_VIEW, Strings.getter("layoutPrinterView")),
+		checks = new PrefBoolean[] { new PrefBoolean(AppPreferences.PRINTER_VIEW, Strings.getter("layoutPrinterView")),
 				new PrefBoolean(AppPreferences.ATTRIBUTE_HALO, Strings.getter("layoutAttributeHalo")),
 				new PrefBoolean(AppPreferences.COMPONENT_TIPS, Strings.getter("layoutShowTips")),
 				new PrefBoolean(AppPreferences.MOVE_KEEP_CONNECT, Strings.getter("layoutMoveKeepConnect")),

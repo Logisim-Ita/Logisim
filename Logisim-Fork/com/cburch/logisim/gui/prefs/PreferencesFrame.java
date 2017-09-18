@@ -96,7 +96,7 @@ public class PreferencesFrame extends LFrame {
 		setJMenuBar(new LogisimMenuBar(this, null));
 
 		panels = new OptionsPanel[] { new TemplateOptions(this), new IntlOptions(this), new WindowOptions(this),
-				new LayoutOptions(this), new ExperimentalOptions(this), };
+				new LayoutOptions(this), new ExperimentalOptions(this), new ForkOptions(this), };
 		tabbedPane = new JTabbedPane();
 		int intlIndex = -1;
 		for (int index = 0; index < panels.length; index++) {

@@ -34,12 +34,6 @@ public class PlaRom extends InstanceFactory {
 
 		@Override
 		public String getLogName(InstanceState state, Object option) {
-			/*
-			 * return Strings.getter("PlaRomComponent").toString() + " " +
-			 * state.getAttributeValue(ATTR_INPUTS) + "x" +
-			 * state.getAttributeValue(ATTR_AND) + "x" +
-			 * state.getAttributeValue(ATTR_OUTPUTS);
-			 */
 			return null;
 		}
 

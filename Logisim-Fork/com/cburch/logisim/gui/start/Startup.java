@@ -215,8 +215,6 @@ public class Startup {
 				ret.showSplash = false;
 			} else if (arg.equals("-clearprefs")) {
 				// already handled above
-			} else if (arg.equals("-noupdates")) {
-				Main.UPDATE = false;
 			} else if (arg.charAt(0) == '-') {
 				printUsage();
 				return null;
@@ -325,7 +323,7 @@ public class Startup {
 	 *         has to be stopped, false otherwise
 	 */
 	public boolean autoUpdate() {
-		if (!Main.UPDATE || !networkConnectionAvailable()) {
+		if (!AppPreferences.AUTO_UPDATES.getBoolean() || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line, or network connection not
 			// available
 			return (false);

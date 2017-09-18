@@ -173,6 +173,7 @@ public class RGBLed extends InstanceFactory {
 		else if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			computeTextField(instance);
+			updateports(instance);
 		} else if (attr == Io.ATTR_LABEL_LOC)
 			computeTextField(instance);
 	}

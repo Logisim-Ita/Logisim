@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import com.cburch.logisim.gui.start.Startup;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 8, 5, 1, "jar");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 9, 0, 0, "jar");
 
 	public static final String VERSION_NAME = VERSION.toString();
 
@@ -41,7 +41,6 @@ public class Main {
 	 * annoying for developers, therefore we let them disable it from the
 	 * command line with the '-noupdates' option.
 	 */
-	public static boolean UPDATE = true;
 
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 

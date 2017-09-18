@@ -41,11 +41,11 @@ public class DrawAttr {
 			1000);
 
 	public static final List<Attribute<?>> ATTRS_TEXT // for text
-	= createAttributes(new Attribute[] { FONT, ALIGNMENT, FILL_COLOR });
+			= createAttributes(new Attribute[] { FONT, ALIGNMENT, FILL_COLOR });
 	public static final List<Attribute<?>> ATTRS_TEXT_TOOL // for text tool
-	= createAttributes(new Attribute[] { FONT, ALIGNMENT, TEXT_DEFAULT_FILL });
+			= createAttributes(new Attribute[] { FONT, ALIGNMENT, TEXT_DEFAULT_FILL });
 	public static final List<Attribute<?>> ATTRS_STROKE // for line, polyline
-	= createAttributes(new Attribute[] { STROKE_WIDTH, STROKE_COLOR });
+			= createAttributes(new Attribute[] { STROKE_WIDTH, STROKE_COLOR });
 
 	// attribute lists for rectangle, oval, polygon
 	private static final List<Attribute<?>> ATTRS_FILL_STROKE = createAttributes(
