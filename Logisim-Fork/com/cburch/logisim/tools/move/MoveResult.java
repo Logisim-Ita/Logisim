@@ -55,13 +55,11 @@ public class MoveResult {
 	}
 
 	public Collection<Wire> getWiresToAdd() {
-		@SuppressWarnings("unchecked")
 		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
 		return ret;
 	}
 
 	public Collection<Wire> getWiresToRemove() {
-		@SuppressWarnings("unchecked")
 		Collection<Wire> ret = (Collection<Wire>) replacements.getAdditions();
 		return ret;
 	}

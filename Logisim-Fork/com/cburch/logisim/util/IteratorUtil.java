@@ -121,11 +121,9 @@ public class IteratorUtil {
 
 	public static <E> Iterator<E> createJoinedIterator(Iterator<? extends E> i0, Iterator<? extends E> i1) {
 		if (!i0.hasNext()) {
-			@SuppressWarnings("unchecked")
 			Iterator<E> ret = (Iterator<E>) i1;
 			return ret;
 		} else if (!i1.hasNext()) {
-			@SuppressWarnings("unchecked")
 			Iterator<E> ret = (Iterator<E>) i0;
 			return ret;
 		} else {

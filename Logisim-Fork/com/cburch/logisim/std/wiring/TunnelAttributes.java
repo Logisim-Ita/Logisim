@@ -115,7 +115,6 @@ class TunnelAttributes extends AbstractAttributeSet {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == StdAttr.FACING)
 			return (V) facing;

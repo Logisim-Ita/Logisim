@@ -81,11 +81,11 @@ public class JTreeUtil {
 
 	/*
 	 * This class is the most important. It manages all the DnD behavior. It is
-	 * abstract because it contains two abstract methods: public abstract
-	 * boolean canPerformAction(JTree target, Object draggedNode, int action,
-	 * Point location); public abstract boolean executeDrop(DNDTree tree, Object
-	 * draggedNode, Object newParentNode, int action); we have to override to
-	 * give the required behavior of DnD in your tree.
+	 * abstract because it contains two abstract methods: public abstract boolean
+	 * canPerformAction(JTree target, Object draggedNode, int action, Point
+	 * location); public abstract boolean executeDrop(DNDTree tree, Object
+	 * draggedNode, Object newParentNode, int action); we have to override to give
+	 * the required behavior of DnD in your tree.
 	 */
 	private static class TreeTransferHandler implements DragGestureListener, DragSourceListener, DropTargetListener {
 		private JTree tree;
@@ -110,9 +110,8 @@ public class JTreeUtil {
 		@Override
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			/*
-			 * if (dsde.getDropSuccess() && dsde.getDropAction() ==
-			 * DnDConstants.ACTION_MOVE && draggedNodeParent != null) {
-			 * ((DefaultTreeModel) tree.getModel())
+			 * if (dsde.getDropSuccess() && dsde.getDropAction() == DnDConstants.ACTION_MOVE
+			 * && draggedNodeParent != null) { ((DefaultTreeModel) tree.getModel())
 			 * .nodeStructureChanged(draggedNodeParent); }
 			 */
 		}

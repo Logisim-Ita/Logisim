@@ -36,11 +36,9 @@ public class SmallSet<E> extends AbstractSet<E> {
 				pos = 1;
 				hasNext = false;
 				removeOk = true;
-				@SuppressWarnings("unchecked")
 				E ret = (E) myValues;
 				return ret;
 			} else {
-				@SuppressWarnings("unchecked")
 				E ret = ((E[]) myValues)[pos];
 				++pos;
 				hasNext = pos < size;
@@ -148,7 +146,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 				}
 			}
 		} else if (oldSize <= HASH_POINT) {
-			@SuppressWarnings("unchecked")
 			E[] vals = (E[]) oldValues;
 			for (int i = 0; i < oldSize; i++) {
 				Object val = vals[i];
@@ -172,7 +169,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 				return true;
 			}
 		} else {
-			@SuppressWarnings("unchecked")
 			HashSet<E> vals = (HashSet<E>) oldValues;
 			if (vals.add(value)) {
 				version = newVersion;
@@ -202,7 +198,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 			for (int i = size - 1; i >= 0; i--)
 				retVals[i] = oldVals[i];
 		} else {
-			@SuppressWarnings("unchecked")
 			HashSet<E> oldVals = (HashSet<E>) this.values;
 			values = oldVals.clone();
 		}
@@ -225,7 +220,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 			}
 			return false;
 		} else {
-			@SuppressWarnings("unchecked")
 			HashSet<E> vals = (HashSet<E>) values;
 			return vals.contains(value);
 		}
@@ -249,7 +243,6 @@ public class SmallSet<E> extends AbstractSet<E> {
 				return new ArrayIterator();
 			}
 		} else {
-			@SuppressWarnings("unchecked")
 			HashSet<E> set = (HashSet<E>) values;
 			return set.iterator();
 		}

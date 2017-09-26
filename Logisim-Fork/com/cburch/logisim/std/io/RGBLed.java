@@ -142,11 +142,14 @@ public class RGBLed extends InstanceFactory {
 			if (painter.getShowState()) {
 				// value=0->input false, value=-1->input unknown
 				int red = (painter.getPort(0).toIntValue() > 0)
-						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(0).toIntValue() : 255 : 0;
+						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(0).toIntValue() : 255
+						: 0;
 				int green = (painter.getPort(1).toIntValue() > 0)
-						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(1).toIntValue() : 255 : 0;
+						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(1).toIntValue() : 255
+						: 0;
 				int blue = (painter.getPort(2).toIntValue() > 0)
-						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(2).toIntValue() : 255 : 0;
+						? (painter.getAttributeValue(Io.MULTI_BIT)) ? painter.getPort(2).toIntValue() : 255
+						: 0;
 				GraphicsUtil.switchToWidth(g, 1);
 				Color onColor = new Color(red, green, blue);
 				g.setColor(onColor);

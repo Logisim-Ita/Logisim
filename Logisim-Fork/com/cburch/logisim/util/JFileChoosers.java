@@ -13,10 +13,10 @@ import com.cburch.logisim.prefs.AppPreferences;
 public class JFileChoosers {
 	/*
 	 * A user reported that JFileChooser's constructor sometimes resulted in
-	 * IOExceptions when Logisim is installed under a system administrator
-	 * account and then is attempted to run as a regular user. This class is an
-	 * attempt to be a bit more robust about which directory the JFileChooser
-	 * opens up under. (23 Feb 2010)
+	 * IOExceptions when Logisim is installed under a system administrator account
+	 * and then is attempted to run as a regular user. This class is an attempt to
+	 * be a bit more robust about which directory the JFileChooser opens up under.
+	 * (23 Feb 2010)
 	 */
 	private static class LogisimFileChooser extends JFileChooser {
 		/**

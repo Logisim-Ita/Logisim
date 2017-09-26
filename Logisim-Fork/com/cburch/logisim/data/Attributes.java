@@ -260,7 +260,6 @@ public class Attributes {
 			this.end = end;
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
 			if (end - start + 1 > 32) {
@@ -272,7 +271,7 @@ public class Attributes {
 						options[i - start] = Integer.valueOf(i);
 					}
 				}
-				JComboBox combo = new JComboBox(options);
+				JComboBox<Object> combo = new JComboBox<Object>(options);
 				if (value == null)
 					combo.setSelectedIndex(-1);
 				else
@@ -311,10 +310,9 @@ public class Attributes {
 			this.vals = vals;
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public java.awt.Component getCellEditor(Object value) {
-			JComboBox combo = new JComboBox(vals);
+			JComboBox<Object> combo = new JComboBox<Object>(vals);
 			combo.setRenderer(new OptionComboRenderer<V>(this));
 			if (value == null)
 				combo.setSelectedIndex(-1);
@@ -354,13 +352,11 @@ public class Attributes {
 			this.attr = attr;
 		}
 
-		@SuppressWarnings("rawtypes")
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-				boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index,
+				boolean isSelected, boolean cellHasFocus) {
 			Component ret = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (ret instanceof JLabel) {
-				@SuppressWarnings("unchecked")
 				V val = (V) value;
 				((JLabel) ret).setText(value == null ? "" : attr.toDisplayString(val));
 			}

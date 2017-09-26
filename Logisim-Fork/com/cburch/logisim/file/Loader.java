@@ -184,11 +184,10 @@ public class Loader implements LibraryLoader {
 		// can revert by deleting the above declaration and reinstating the
 		// below.
 		/*
-		 * URL url; try { url = new URL("file", "localhost",
-		 * file.getCanonicalPath()); } catch (MalformedURLException e1) { throw
-		 * new LoadFailedException("Internal error: Malformed URL"); } catch
-		 * (IOException e1) { throw new
-		 * LoadFailedException(Strings.get("jarNotOpenedError")); }
+		 * URL url; try { url = new URL("file", "localhost", file.getCanonicalPath()); }
+		 * catch (MalformedURLException e1) { throw new
+		 * LoadFailedException("Internal error: Malformed URL"); } catch (IOException
+		 * e1) { throw new LoadFailedException(Strings.get("jarNotOpenedError")); }
 		 * URLClassLoader loader = new URLClassLoader(new URL[] { url });
 		 */
 
@@ -206,7 +205,7 @@ public class Loader implements LibraryLoader {
 		// instantiate library
 		Library ret;
 		try {
-			ret = (Library) retClass.newInstance();
+			ret = (Library) retClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new LoadFailedException(StringUtil.format(Strings.get("jarLibraryNotCreatedError"), className));
 		}

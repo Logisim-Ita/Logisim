@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JComboBox;
+
 import com.cburch.logisim.data.AbstractAttributeSet;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
@@ -30,11 +32,10 @@ class SplitterAttributes extends AbstractAttributeSet {
 			return new BitOutAttribute(which, options);
 		}
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public java.awt.Component getCellEditor(Integer value) {
 			int index = value.intValue();
-			javax.swing.JComboBox combo = new javax.swing.JComboBox(options);
+			JComboBox<Object> combo = new JComboBox<Object>(options);
 			combo.setSelectedIndex(index);
 			return combo;
 		}
@@ -282,7 +283,6 @@ class SplitterAttributes extends AbstractAttributeSet {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == StdAttr.FACING) {
 			return (V) facing;

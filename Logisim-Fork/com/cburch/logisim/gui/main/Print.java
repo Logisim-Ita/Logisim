@@ -62,7 +62,8 @@ public class Print {
 			Graphics2D g2 = g instanceof Graphics2D ? (Graphics2D) g : null;
 			FontMetrics fm = g.getFontMetrics();
 			String head = (header != null && !header.equals(""))
-					? format(header, pageIndex + 1, circuits.size(), circ.getName()) : null;
+					? format(header, pageIndex + 1, circuits.size(), circ.getName())
+					: null;
 			int headHeight = (head == null ? 0 : fm.getHeight());
 
 			// Compute image size
@@ -141,8 +142,7 @@ public class Print {
 		GridBagLayout gridbag;
 		GridBagConstraints gbc;
 
-		@SuppressWarnings("rawtypes")
-		ParmsPanel(JList list) {
+		ParmsPanel(JList<?> list) {
 			// set up components
 			rotateToFit = new JCheckBox();
 			rotateToFit.setSelected(true);

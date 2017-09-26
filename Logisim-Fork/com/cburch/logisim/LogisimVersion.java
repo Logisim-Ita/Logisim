@@ -4,34 +4,33 @@ public class LogisimVersion {
 	public static final int FINAL_REVISION = Integer.MAX_VALUE / 4;
 
 	/**
-	 * Create a new version object for the current Logisim instance (the
-	 * constructor is private) where the revision number is set to its default
-	 * value and no variant is used
+	 * Create a new version object for the current Logisim instance (the constructor
+	 * is private) where the revision number is set to its default value and no
+	 * variant is used
 	 */
 	public static LogisimVersion get(int major, int minor, int release) {
 		return (get(major, minor, release, FINAL_REVISION, ""));
 	}
 
 	/**
-	 * Create a new version object for the current Logisim instance (the
-	 * constructor is private) where no variant is used
+	 * Create a new version object for the current Logisim instance (the constructor
+	 * is private) where no variant is used
 	 */
 	public static LogisimVersion get(int major, int minor, int release, int revision) {
 		return (get(major, minor, release, revision, ""));
 	}
 
 	/**
-	 * Create a new version object for the current Logisim instance (the
-	 * constructor is private)
+	 * Create a new version object for the current Logisim instance (the constructor
+	 * is private)
 	 */
 	public static LogisimVersion get(int major, int minor, int release, int revision, String variant) {
 		return (new LogisimVersion(major, minor, release, revision, variant));
 	}
 
 	/**
-	 * Create a new version object for the current Logisim instance (the
-	 * constructor is private) where the revision field is set to its default
-	 * value
+	 * Create a new version object for the current Logisim instance (the constructor
+	 * is private) where the revision field is set to its default value
 	 */
 	public static LogisimVersion get(int major, int minor, int release, String variant) {
 		return (get(major, minor, release, FINAL_REVISION, variant));
@@ -39,8 +38,8 @@ public class LogisimVersion {
 
 	/**
 	 * Parse a string containing a version number and returns the corresponding
-	 * LogisimVersion object. No exception is thrown if the version string
-	 * contains non-integers, because literal values are allowed.
+	 * LogisimVersion object. No exception is thrown if the version string contains
+	 * non-integers, because literal values are allowed.
 	 *
 	 * @return LogisimVersion built from the string passed as parameter
 	 */
@@ -95,11 +94,11 @@ public class LogisimVersion {
 	}
 
 	/**
-	 * Compare two Logisim version, returning whether the one passed as
-	 * parameter is newer than the current one or not
+	 * Compare two Logisim version, returning whether the one passed as parameter is
+	 * newer than the current one or not
 	 *
-	 * @return Negative value if the current version is older than the one
-	 *         passed as parameter
+	 * @return Negative value if the current version is older than the one passed as
+	 *         parameter
 	 */
 	public int compareTo(LogisimVersion other) {
 		int ret = this.major - other.major;
@@ -152,8 +151,8 @@ public class LogisimVersion {
 	}
 
 	/**
-	 * If the considered Logisim version is a jar, returns true. Assumption:
-	 * It's identified by a variant equals to "jar"
+	 * If the considered Logisim version is a jar, returns true. Assumption: It's
+	 * identified by a variant equals to "jar"
 	 */
 	public boolean isJar() {
 		return (variant.equals("jar"));

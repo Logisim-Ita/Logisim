@@ -52,10 +52,9 @@ class GrayCounter extends InstanceFactory {
 	/**
 	 * The configureNewInstance method is invoked every time a new instance is
 	 * created. In the superclass, the method doesn't do anything, since the new
-	 * instance is pretty thoroughly configured already by default. But
-	 * sometimes you need to do something particular to each instance, so you
-	 * would override the method. In this case, we need to set up the location
-	 * for its label.
+	 * instance is pretty thoroughly configured already by default. But sometimes
+	 * you need to do something particular to each instance, so you would override
+	 * the method. In this case, we need to set up the location for its label.
 	 */
 	@Override
 	protected void configureNewInstance(Instance instance) {

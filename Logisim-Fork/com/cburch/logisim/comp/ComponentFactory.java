@@ -38,14 +38,13 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	public String getDisplayName();
 
 	/**
-	 * Retrieves special-purpose features for this factory. This technique
-	 * allows for future Logisim versions to add new features for components
-	 * without requiring changes to existing components. It also removes the
-	 * necessity for the Component API to directly declare methods for each
-	 * individual feature. In most cases, the <code>key</code> is a
-	 * <code>Class</code> object corresponding to an interface, and the method
-	 * should return an implementation of that interface if it supports the
-	 * feature.
+	 * Retrieves special-purpose features for this factory. This technique allows
+	 * for future Logisim versions to add new features for components without
+	 * requiring changes to existing components. It also removes the necessity for
+	 * the Component API to directly declare methods for each individual feature. In
+	 * most cases, the <code>key</code> is a <code>Class</code> object corresponding
+	 * to an interface, and the method should return an implementation of that
+	 * interface if it supports the feature.
 	 * 
 	 * As of this writing, possible values for <code>key</code> include:
 	 * <code>TOOL_TIP</code> (return a <code>String</code>) and
@@ -53,9 +52,8 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	 * 
 	 * @param key
 	 *            an object representing a feature.
-	 * @return an object representing information about how the component
-	 *         supports the feature, or <code>null</code> if it does not support
-	 *         the feature.
+	 * @return an object representing information about how the component supports
+	 *         the feature, or <code>null</code> if it does not support the feature.
 	 */
 	public Object getFeature(Object key, AttributeSet attrs);
 

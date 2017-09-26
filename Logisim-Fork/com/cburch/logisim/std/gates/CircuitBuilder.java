@@ -456,15 +456,13 @@ public class CircuitBuilder {
 			if (spine.size() > 0) {
 				// create wire connecting pin to spine
 				/*
-				 * This should no longer matter - the wires will be repaired
-				 * anyway by the circuit's WireRepair class. if (spine.size() ==
-				 * 2 && spine.get(0).equals(spine.get(1))) { // a freak accident
-				 * where the input is used just once, // and it happens that the
-				 * pin is placed where no // spine is necessary Iterator<Wire>
-				 * it = circuit.getWires(spineLoc).iterator(); Wire existing =
-				 * it.next(); Wire replace = Wire.create(loc,
-				 * existing.getEnd1()); result.replace(existing, replace); }
-				 * else {
+				 * This should no longer matter - the wires will be repaired anyway by the
+				 * circuit's WireRepair class. if (spine.size() == 2 &&
+				 * spine.get(0).equals(spine.get(1))) { // a freak accident where the input is
+				 * used just once, // and it happens that the pin is placed where no // spine is
+				 * necessary Iterator<Wire> it = circuit.getWires(spineLoc).iterator(); Wire
+				 * existing = it.next(); Wire replace = Wire.create(loc, existing.getEnd1());
+				 * result.replace(existing, replace); } else {
 				 */
 				result.add(Wire.create(loc, spineLoc));
 				// }

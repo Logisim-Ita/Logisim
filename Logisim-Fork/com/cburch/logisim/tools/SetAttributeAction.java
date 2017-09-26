@@ -70,7 +70,6 @@ public class SetAttributeAction extends Action {
 	}
 
 	public void set(Component comp, Attribute<?> attr, Object value) {
-		@SuppressWarnings("unchecked")
 		Attribute<Object> a = (Attribute<Object>) attr;
 		comps.add(comp);
 		attrs.add(a);

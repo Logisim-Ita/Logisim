@@ -11,7 +11,7 @@ import com.cburch.logisim.comp.ComponentFactory;
 
 public abstract class SimulationTreeNode implements TreeNode {
 	@Override
-	public abstract Enumeration<?> children();
+	public abstract Enumeration<? extends TreeNode> children();
 
 	@Override
 	public abstract boolean getAllowsChildren();

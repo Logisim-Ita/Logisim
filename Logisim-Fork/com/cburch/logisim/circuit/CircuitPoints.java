@@ -177,7 +177,6 @@ class CircuitPoints {
 	}
 
 	Collection<Wire> getWires(Location loc) {
-		@SuppressWarnings("unchecked")
 		Collection<Wire> ret = (Collection<Wire>) find(loc, true);
 		return ret;
 	}

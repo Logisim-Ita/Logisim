@@ -399,8 +399,8 @@ public class GifEncoder {
 	private byte pixels_[], colors_[];
 
 	/**
-	 * Construct a GifEncoder. The constructor will convert the image to an
-	 * indexed color array. <B>This may take some time.</B>
+	 * Construct a GifEncoder. The constructor will convert the image to an indexed
+	 * color array. <B>This may take some time.</B>
 	 * <P>
 	 *
 	 * Each array stores intensity values for the image. In other words, r[x][y]
@@ -425,17 +425,16 @@ public class GifEncoder {
 	}
 
 	/**
-	 * Construct a GIFEncoder. The constructor will convert the image to an
-	 * indexed color array. <B>This may take some time.</B>
+	 * Construct a GIFEncoder. The constructor will convert the image to an indexed
+	 * color array. <B>This may take some time.</B>
 	 * <P>
 	 * 
 	 * @param image
-	 *            The image to encode. The image <B>must</B> be completely
-	 *            loaded.
+	 *            The image to encode. The image <B>must</B> be completely loaded.
 	 * @exception AWTException
 	 *                Will be thrown if the pixel grab fails. This can happen if
-	 *                Java runs out of memory. It may also indicate that the
-	 *                image contains more than 256 colors.
+	 *                Java runs out of memory. It may also indicate that the image
+	 *                contains more than 256 colors.
 	 */
 	public GifEncoder(Image image, ProgressMonitor monitor) throws AWTException {
 		width_ = (short) image.getWidth(null);
@@ -503,8 +502,8 @@ public class GifEncoder {
 
 	/**
 	 * Writes the image out to a stream in the GIF file format. This will be a
-	 * single GIF87a image, non-interlaced, with no background color. <B>This
-	 * may take some time.</B>
+	 * single GIF87a image, non-interlaced, with no background color. <B>This may
+	 * take some time.</B>
 	 * <P>
 	 *
 	 * @param output

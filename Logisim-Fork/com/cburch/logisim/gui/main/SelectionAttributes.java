@@ -56,7 +56,6 @@ class SelectionAttributes extends AbstractAttributeSet {
 		if (sit.hasNext()) {
 			AttributeSet first = sit.next().getAttributeSet();
 			for (Attribute<?> attr : first.getAttributes()) {
-				@SuppressWarnings("unchecked")
 				Attribute<Object> attrObj = (Attribute<Object>) attr;
 				attrMap.put(attrObj, first.getValue(attr));
 			}
@@ -214,7 +213,6 @@ class SelectionAttributes extends AbstractAttributeSet {
 		} else {
 			int i = findIndex(attr);
 			Object[] vs = values;
-			@SuppressWarnings("unchecked")
 			V ret = (V) (i >= 0 && i < vs.length ? vs[i] : null);
 			return ret;
 		}
@@ -333,7 +331,6 @@ class SelectionAttributes extends AbstractAttributeSet {
 					Object newVal = newValues[i];
 					boolean sameVals = oldVal == null ? newVal == null : oldVal.equals(newVal);
 					if (!sameVals) {
-						@SuppressWarnings("unchecked")
 						Attribute<Object> attr = (Attribute<Object>) oldAttrs[i];
 						fireAttributeValueChanged(attr, newVal);
 					}

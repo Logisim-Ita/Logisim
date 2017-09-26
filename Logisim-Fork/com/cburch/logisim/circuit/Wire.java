@@ -252,7 +252,6 @@ public final class Wire implements Component, AttributeSet, CustomHandles, Itera
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == dir_attr) {
 			return (V) (is_x_equal ? VALUE_VERT : VALUE_HORZ);

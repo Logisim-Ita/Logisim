@@ -172,8 +172,7 @@ class ExportImage {
 		GridBagConstraints gbc;
 		Dimension curScaleDim;
 
-		@SuppressWarnings("rawtypes")
-		OptionsPanel(JList list) {
+		OptionsPanel(JList<?> list) {
 			// set up components
 			formatPng = new JRadioButton("PNG");
 			formatGif = new JRadioButton("GIF");

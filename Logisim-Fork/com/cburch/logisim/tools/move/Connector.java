@@ -313,11 +313,11 @@ class Connector {
 
 	/**
 	 * Creates a list of the connections to make, sorted according to their
-	 * location. If, for example, we are moving an east-facing AND gate
-	 * southeast, then we prefer to connect the inputs from the top down to
-	 * minimize the chances that the created wires will interfere with each
-	 * other - but if we are moving that gate northeast, we prefer to connect
-	 * the inputs from the bottom up.
+	 * location. If, for example, we are moving an east-facing AND gate southeast,
+	 * then we prefer to connect the inputs from the top down to minimize the
+	 * chances that the created wires will interfere with each other - but if we are
+	 * moving that gate northeast, we prefer to connect the inputs from the bottom
+	 * up.
 	 */
 	private static void sortConnects(ArrayList<ConnectionData> connects, final int dx, final int dy) {
 		Collections.sort(connects, new Comparator<ConnectionData>() {

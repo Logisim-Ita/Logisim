@@ -319,8 +319,8 @@ public class Startup {
 	 * Original idea taken from logisim-evolution:
 	 * https://github.com/reds-heig/logisim-evolution
 	 * 
-	 * @return true if the code has been updated, and therefore the execution
-	 *         has to be stopped, false otherwise
+	 * @return true if the code has been updated, and therefore the execution has to
+	 *         be stopped, false otherwise
 	 */
 	public boolean autoUpdate() {
 		if (!AppPreferences.AUTO_UPDATES.getBoolean() || !networkConnectionAvailable()) {
@@ -349,8 +349,9 @@ public class Startup {
 		ArgonXML logisimData = new ArgonXML(in, "logisim");
 
 		// Get the appropriate remote version number
-		LogisimVersion remoteVersion = LogisimVersion.parse(Main.VERSION.isJar()
-				? logisimData.child("jar_version").content() : logisimData.child("exe_version").content());
+		LogisimVersion remoteVersion = LogisimVersion
+				.parse(Main.VERSION.isJar() ? logisimData.child("jar_version").content()
+						: logisimData.child("exe_version").content());
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
@@ -425,8 +426,7 @@ public class Startup {
 	 * from autoUpdate(), and install it at the specified location
 	 * 
 	 * Original idea taken from:
-	 * http://baptiste-wicht.developpez.com/tutoriels/java/update/ by Baptiste
-	 * Wicht
+	 * http://baptiste-wicht.developpez.com/tutoriels/java/update/ by Baptiste Wicht
 	 *
 	 * @param filePath
 	 *            remote file URL
@@ -583,11 +583,11 @@ public class Startup {
 	/**
 	 * Check if network connection is available.
 	 * 
-	 * This function tries to connect to google in order to test the
-	 * availability of a network connection. This step is needed before
-	 * attempting to perform an auto-update. It assumes that google is
-	 * accessible -- usually this is the case, and it should also provide a
-	 * quick reply to the connection attempt, reducing the lag.
+	 * This function tries to connect to google in order to test the availability of
+	 * a network connection. This step is needed before attempting to perform an
+	 * auto-update. It assumes that google is accessible -- usually this is the
+	 * case, and it should also provide a quick reply to the connection attempt,
+	 * reducing the lag.
 	 * 
 	 * @return true if the connection is available, false otherwise
 	 */

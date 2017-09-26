@@ -32,7 +32,6 @@ abstract class FillableCanvasObject extends AbstractCanvasObject {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == DrawAttr.PAINT_TYPE) {
 			return (V) paintType;

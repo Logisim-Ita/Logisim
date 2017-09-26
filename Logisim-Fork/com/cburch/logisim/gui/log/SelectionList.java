@@ -12,10 +12,9 @@ import javax.swing.ListSelectionModel;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Value;
 
-@SuppressWarnings("rawtypes")
-class SelectionList extends JList {
+class SelectionList extends JList<Object> {
 
-	private class Model extends AbstractListModel implements ModelListener {
+	private class Model extends AbstractListModel<Object> implements ModelListener {
 		/**
 		 * 
 		 */
@@ -52,8 +51,8 @@ class SelectionList extends JList {
 		private static final long serialVersionUID = -4073277461206824795L;
 
 		@Override
-		public java.awt.Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-				boolean hasFocus) {
+		public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index,
+				boolean isSelected, boolean hasFocus) {
 			java.awt.Component ret = super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
 			if (ret instanceof JLabel && value instanceof SelectionItem) {
 				JLabel label = (JLabel) ret;
@@ -73,7 +72,6 @@ class SelectionList extends JList {
 
 	private Selection selection;
 
-	@SuppressWarnings("unchecked")
 	public SelectionList() {
 		selection = null;
 		setModel(new Model());

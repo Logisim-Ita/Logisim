@@ -23,7 +23,9 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Anti Aliasing option
 * Some small graphic editing
 ## Features we want to add
-* Internal view of TTL components
+* Move to Java 9
+* Change Flip Flops layout
+* Add TTL Display Decoder
 * TTL flip flops
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility

@@ -492,7 +492,6 @@ public class AddTool extends Tool {
 			return;
 		AttributeSet base = getBaseAttributes();
 		Object feature = source.getFeature(ComponentFactory.FACING_ATTRIBUTE_KEY, base);
-		@SuppressWarnings("unchecked")
 		Attribute<Direction> attr = (Attribute<Direction>) feature;
 		if (attr != null) {
 			Action act = ToolAttributeAction.create(this, attr, facing);

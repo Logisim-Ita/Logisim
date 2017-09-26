@@ -69,7 +69,7 @@ public class LayoutThumbnail extends JComponent {
 			ComponentDrawContext context = new ComponentDrawContext(this, circuit, circuitState, g, gCopy);
 			context.setShowState(false);
 			context.setShowColor(false);
-			circuit.draw(context, Collections.<Component> emptySet());
+			circuit.draw(context, Collections.<Component>emptySet());
 			if (ports != null) {
 				gCopy.setColor(AppearancePort.COLOR);
 				int width = Math.max(4, (int) ((2 / scale) + 0.5));

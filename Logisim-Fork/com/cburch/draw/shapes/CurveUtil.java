@@ -7,8 +7,8 @@ import com.cburch.logisim.data.Bounds;
 
 public class CurveUtil {
 	/**
-	 * getBounds and findNearestPoint are based translated from the ActionScript
-	 * of Olivier Besson's Bezier class for collision detection. Code from:
+	 * getBounds and findNearestPoint are based translated from the ActionScript of
+	 * Olivier Besson's Bezier class for collision detection. Code from:
 	 * http://blog.gludion.com/2009/08/distance-to-quadratic-bezier-curve.html
 	 */
 

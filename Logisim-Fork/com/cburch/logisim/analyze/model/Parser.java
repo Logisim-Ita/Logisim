@@ -220,17 +220,17 @@ public class Parser {
 	 * I wrote this without thinking, and then realized that this is quite
 	 * complicated because of removing operators. I haven't bothered to do it
 	 * correctly; instead, it just regenerates a string from the raw expression.
-	 * static String removeVariable(String in, String variable) { StringBuilder
-	 * ret = new StringBuilder(); ArrayList tokens = toTokens(in, true); Token
-	 * lastWhite = null; for (int i = 0, n = tokens.size(); i < n; i++) { Token
-	 * token = (Token) tokens.get(i); if (token.type == TOKEN_IDENT &&
-	 * token.text.equals(variable)) { ; // just ignore it } else if (token.type
-	 * == TOKEN_WHITE) { if (lastWhite != null) { if (lastWhite.text.length() >=
+	 * static String removeVariable(String in, String variable) { StringBuilder ret
+	 * = new StringBuilder(); ArrayList tokens = toTokens(in, true); Token lastWhite
+	 * = null; for (int i = 0, n = tokens.size(); i < n; i++) { Token token =
+	 * (Token) tokens.get(i); if (token.type == TOKEN_IDENT &&
+	 * token.text.equals(variable)) { ; // just ignore it } else if (token.type ==
+	 * TOKEN_WHITE) { if (lastWhite != null) { if (lastWhite.text.length() >=
 	 * token.text.length()) { ; // don't repeat shorter whitespace } else {
 	 * ret.replace(ret.length() - lastWhite.text.length(), ret.length(),
 	 * token.text); lastWhite = token; } } else { lastWhite = token;
-	 * ret.append(token.text); } } else { lastWhite = null;
-	 * ret.append(token.text); } } return ret.toString(); }
+	 * ret.append(token.text); } } else { lastWhite = null; ret.append(token.text);
+	 * } } return ret.toString(); }
 	 */
 
 	static String replaceVariable(String in, String oldName, String newName) {

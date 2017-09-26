@@ -2,19 +2,26 @@ package com.cburch.logisim.std.ttl;
 
 import java.util.List;
 
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.tools.FactoryDescription;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
 
 public class TTL extends Library {
 	private static FactoryDescription[] DESCRIPTIONS = {
-			new FactoryDescription("7400", Strings.getter("7400"), "ttl.gif", "Ttl7400"),
-			new FactoryDescription("7402", Strings.getter("7402"), "ttl.gif", "Ttl7402"),
-			new FactoryDescription("7404", Strings.getter("7404"), "ttl.gif", "Ttl7404"),
-			new FactoryDescription("7408", Strings.getter("7408"), "ttl.gif", "Ttl7408"),
-			new FactoryDescription("7432", Strings.getter("7432"), "ttl.gif", "Ttl7432"),
-			new FactoryDescription("7486", Strings.getter("7486"), "ttl.gif", "Ttl7486"),
-			new FactoryDescription("747266", Strings.getter("747266"), "ttl.gif", "Ttl747266"), };
+			new FactoryDescription("7400", Strings.getter("7400: quad 2-input NAND gate"), "ttl.gif", "Ttl7400"),
+			new FactoryDescription("7402", Strings.getter("7402: quad 2-input NOR gate"), "ttl.gif", "Ttl7402"),
+			new FactoryDescription("7404", Strings.getter("7404: hex inverter"), "ttl.gif", "Ttl7404"),
+			new FactoryDescription("7408", Strings.getter("7408: quad 2-input AND gate"), "ttl.gif", "Ttl7408"),
+			new FactoryDescription("7432", Strings.getter("7432: quad 2-input OR gate"), "ttl.gif", "Ttl7432"),
+			new FactoryDescription("7486", Strings.getter("7486: quad 2-input XOR gate"), "ttl.gif", "Ttl7486"),
+			new FactoryDescription("747266", Strings.getter("747266: quad 2-input XNOR gate"), "ttl.gif",
+					"Ttl747266"), };
+
+	static final Attribute<Boolean> VCC_GND = Attributes.forBoolean("VccGndPorts", Strings.getter("VccGndPorts"));
+	static final Attribute<Boolean> DRAW_INTERNAL_STRUCTURE = Attributes.forBoolean("ShowInternalStructure",
+			Strings.getter("ShowInternalStructure"));
 
 	private List<Tool> tools = null;
 

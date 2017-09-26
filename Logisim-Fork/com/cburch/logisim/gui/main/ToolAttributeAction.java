@@ -40,7 +40,6 @@ public class ToolAttributeAction extends Action {
 		Map<Attribute<?>, Object> newValues = config.getAttributeValues();
 		Map<Attribute<?>, Object> oldValues = new HashMap<Attribute<?>, Object>(newValues.size());
 		for (Map.Entry<Attribute<?>, Object> entry : newValues.entrySet()) {
-			@SuppressWarnings("unchecked")
 			Attribute<Object> attr = (Attribute<Object>) entry.getKey();
 			oldValues.put(attr, attrs.getValue(attr));
 			attrs.setValue(attr, entry.getValue());
@@ -58,7 +57,6 @@ public class ToolAttributeAction extends Action {
 		AttributeSet attrs = config.getEvent().getAttributeSet();
 		Map<Attribute<?>, Object> oldValues = this.oldValues;
 		for (Map.Entry<Attribute<?>, Object> entry : oldValues.entrySet()) {
-			@SuppressWarnings("unchecked")
 			Attribute<Object> attr = (Attribute<Object>) entry.getKey();
 			attrs.setValue(attr, entry.getValue());
 		}

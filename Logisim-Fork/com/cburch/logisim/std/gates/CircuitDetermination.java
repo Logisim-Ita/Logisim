@@ -282,8 +282,8 @@ abstract class CircuitDetermination {
 	}
 
 	/**
-	 * Converts all gates to NANDs. Note that this will fail with an exception
-	 * if any XOR/XNOR gates are used.
+	 * Converts all gates to NANDs. Note that this will fail with an exception if
+	 * any XOR/XNOR gates are used.
 	 */
 	void convertToNands() {
 	}
@@ -301,10 +301,10 @@ abstract class CircuitDetermination {
 	}
 
 	/**
-	 * Repairs two errors that may have cropped up in creating the circuit.
-	 * First, if there are gates with more inputs than their capacity, we repair
-	 * them. Second, any XOR/XNOR gates with more than 2 inputs should really be
-	 * Odd/Even Parity gates.
+	 * Repairs two errors that may have cropped up in creating the circuit. First,
+	 * if there are gates with more inputs than their capacity, we repair them.
+	 * Second, any XOR/XNOR gates with more than 2 inputs should really be Odd/Even
+	 * Parity gates.
 	 */
 	void repair() {
 	}

@@ -368,14 +368,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		@Override
 		public void propagationCompleted(SimulatorEvent e) {
 			/*
-			 * This was a good idea for a while... but it leads to problems when
-			 * a repaint is done just before a user action takes place. //
-			 * repaint - but only if it's been a while since the last one long
-			 * now = System.currentTimeMillis(); if (now > lastRepaint +
-			 * repaintDuration) { lastRepaint = now; // (ensure that multiple
-			 * requests aren't made repaintDuration = 15 + (int) (20 *
-			 * Math.random()); // repaintDuration is for jittering the repaints
-			 * to // reduce aliasing effects repaint(); }
+			 * This was a good idea for a while... but it leads to problems when a repaint
+			 * is done just before a user action takes place. // repaint - but only if it's
+			 * been a while since the last one long now = System.currentTimeMillis(); if
+			 * (now > lastRepaint + repaintDuration) { lastRepaint = now; // (ensure that
+			 * multiple requests aren't made repaintDuration = 15 + (int) (20 *
+			 * Math.random()); // repaintDuration is for jittering the repaints to // reduce
+			 * aliasing effects repaint(); }
 			 */
 			paintThread.requestRepaint();
 		}
@@ -429,14 +428,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		void paintContents(Graphics g) {
 			/*
 			 * TODO this is for the SimulatorPrototype class int speed =
-			 * proj.getSimulator().getSimulationSpeed(); String speedStr; if
-			 * (speed >= 10000000) { speedStr = (speed / 1000000) + " MHz"; }
-			 * else if (speed >= 1000000) { speedStr = (speed / 100000) / 10.0 +
-			 * " MHz"; } else if (speed >= 10000) { speedStr = (speed / 1000) +
-			 * " KHz"; } else if (speed >= 10000) { speedStr = (speed / 100) /
-			 * 10.0 + " KHz"; } else { speedStr = speed + " Hz"; } FontMetrics
-			 * fm = g.getFontMetrics(); g.drawString(speedStr, getWidth() - 10 -
-			 * fm.stringWidth(speedStr), getHeight() - 10);
+			 * proj.getSimulator().getSimulationSpeed(); String speedStr; if (speed >=
+			 * 10000000) { speedStr = (speed / 1000000) + " MHz"; } else if (speed >=
+			 * 1000000) { speedStr = (speed / 100000) / 10.0 + " MHz"; } else if (speed >=
+			 * 10000) { speedStr = (speed / 1000) + " KHz"; } else if (speed >= 10000) {
+			 * speedStr = (speed / 100) / 10.0 + " KHz"; } else { speedStr = speed + " Hz";
+			 * } FontMetrics fm = g.getFontMetrics(); g.drawString(speedStr, getWidth() - 10
+			 * - fm.stringWidth(speedStr), getHeight() - 10);
 			 */
 
 			StringGetter message = errorMessage;

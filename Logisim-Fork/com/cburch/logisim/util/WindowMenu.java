@@ -158,7 +158,7 @@ public class WindowMenu extends JMenu {
 			((WindowClosable) owner).requestClose();
 		} else if (owner != null) {
 			int action = owner.getDefaultCloseOperation();
-			if (action == JFrame.EXIT_ON_CLOSE) {
+			if (action == WindowConstants.EXIT_ON_CLOSE) {
 				System.exit(0);
 			} else if (action == WindowConstants.HIDE_ON_CLOSE) {
 				owner.setVisible(false);

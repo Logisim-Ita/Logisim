@@ -136,7 +136,6 @@ public class RoundRectangle extends Rectangular {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == DrawAttr.CORNER_RADIUS) {
 			return (V) Integer.valueOf(radius);

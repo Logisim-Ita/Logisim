@@ -126,15 +126,15 @@ public class Propagator {
 	private CircuitState root; // root of state tree
 
 	/**
-	 * The number of clock cycles to let pass before deciding that the circuit
-	 * is oscillating.
+	 * The number of clock cycles to let pass before deciding that the circuit is
+	 * oscillating.
 	 */
 	private int simLimit = 1000;
 	/**
 	 * On average, one out of every 2**simRandomShift propagations through a
-	 * component is delayed one step more than the component requests. This
-	 * noise is intended to address some circuits that would otherwise oscillate
-	 * within Logisim (though they wouldn't oscillate in practice).
+	 * component is delayed one step more than the component requests. This noise is
+	 * intended to address some circuits that would otherwise oscillate within
+	 * Logisim (though they wouldn't oscillate in practice).
 	 */
 	private volatile int simRandomShift;
 	private PriorityQueue<SetData> toProcess = new PriorityQueue<SetData>();
@@ -243,16 +243,15 @@ public class Propagator {
 	/*
 	 * TODO for the SimulatorPrototype class void step() { clock++;
 	 * 
-	 * // propagate all values for this clock tick HashMap visited = new
-	 * HashMap(); // State -> set of ComponentPoints handled while
-	 * (!toProcess.isEmpty()) { SetData data; data = (SetData) toProcess.peek();
-	 * if (data.time != clock) break; toProcess.remove(); CircuitState state =
-	 * data.state;
+	 * // propagate all values for this clock tick HashMap visited = new HashMap();
+	 * // State -> set of ComponentPoints handled while (!toProcess.isEmpty()) {
+	 * SetData data; data = (SetData) toProcess.peek(); if (data.time != clock)
+	 * break; toProcess.remove(); CircuitState state = data.state;
 	 * 
-	 * // if it's already handled for this clock tick, continue HashSet handled
-	 * = (HashSet) visited.get(state); if (handled != null) { if
-	 * (!handled.add(new ComponentPoint(data.cause, data.loc))) continue; } else
-	 * { handled = new HashSet(); visited.put(state, handled); handled.add(new
+	 * // if it's already handled for this clock tick, continue HashSet handled =
+	 * (HashSet) visited.get(state); if (handled != null) { if (!handled.add(new
+	 * ComponentPoint(data.cause, data.loc))) continue; } else { handled = new
+	 * HashSet(); visited.put(state, handled); handled.add(new
 	 * ComponentPoint(data.cause, data.loc)); }
 	 * 
 	 * if (oscAdding) oscPoints.add(state, data.loc);
@@ -356,8 +355,8 @@ public class Propagator {
 		}
 		toProcess.add(new SetData(clock + delay, setDataSerialNumber, state, pt, cause, val));
 		/*
-		 * DEBUGGING - comment out Simulator.log(clock + ": set " + pt + " in "
-		 * + state + " to " + val + " by " + cause + " after " + delay); //
+		 * DEBUGGING - comment out Simulator.log(clock + ": set " + pt + " in " + state
+		 * + " to " + val + " by " + cause + " after " + delay); //
 		 */
 
 		setDataSerialNumber++;
@@ -404,9 +403,8 @@ public class Propagator {
 			}
 
 			/*
-			 * DEBUGGING - comment out Simulator.log(data.time + ": proc " +
-			 * data.loc + " in " + data.state + " to " + data.val + " by " +
-			 * data.cause); //
+			 * DEBUGGING - comment out Simulator.log(data.time + ": proc " + data.loc +
+			 * " in " + data.state + " to " + data.val + " by " + data.cause); //
 			 */
 
 			if (changedPoints != null)

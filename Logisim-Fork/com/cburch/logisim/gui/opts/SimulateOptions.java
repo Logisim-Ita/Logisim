@@ -63,10 +63,9 @@ class SimulateOptions extends OptionsPanel {
 			ComboOption.setSelected(gateUndefined, val);
 		}
 
-		@SuppressWarnings("rawtypes")
 		private void loadSimLimit(Integer val) {
 			int value = val.intValue();
-			ComboBoxModel model = simLimit.getModel();
+			ComboBoxModel<Object> model = simLimit.getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Integer opt = (Integer) model.getElementAt(i);
 				if (opt.intValue() == value) {
@@ -88,15 +87,13 @@ class SimulateOptions extends OptionsPanel {
 	private MyListener myListener = new MyListener();
 
 	private JLabel simLimitLabel = new JLabel();
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private JComboBox simLimit = new JComboBox(
+	private JComboBox<Object> simLimit = new JComboBox<Object>(
 			new Integer[] { Integer.valueOf(200), Integer.valueOf(500), Integer.valueOf(1000), Integer.valueOf(2000),
 					Integer.valueOf(5000), Integer.valueOf(10000), Integer.valueOf(20000), Integer.valueOf(50000), });
 	private JCheckBox simRandomness = new JCheckBox();
 	private JLabel gateUndefinedLabel = new JLabel();
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private JComboBox gateUndefined = new JComboBox(new Object[] { new ComboOption(Options.GATE_UNDEFINED_IGNORE),
-			new ComboOption(Options.GATE_UNDEFINED_ERROR) });
+	private JComboBox<Object> gateUndefined = new JComboBox<Object>(new Object[] {
+			new ComboOption(Options.GATE_UNDEFINED_IGNORE), new ComboOption(Options.GATE_UNDEFINED_ERROR) });
 
 	public SimulateOptions(OptionsFrame window) {
 		super(window);

@@ -163,7 +163,6 @@ public class LogisimFileActions {
 				if (srcAttrs != null && dstTool != null) {
 					AttributeSet dstAttrs = dstTool.getAttributeSet();
 					for (Attribute<?> attrBase : srcAttrs.getAttributes()) {
-						@SuppressWarnings("unchecked")
 						Attribute<Object> attr = (Attribute<Object>) attrBase;
 						Object srcValue = srcAttrs.getValue(attr);
 						Object dstValue = dstAttrs.getValue(attr);

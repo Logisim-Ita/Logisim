@@ -58,7 +58,6 @@ class TextAttributes extends AbstractAttributeSet {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == Text.ATTR_TEXT)
 			return (V) text;

@@ -70,6 +70,7 @@ class WireRepair extends CircuitTransaction {
 		this.circuit = circuit;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	private void doMerges(CircuitMutator mutator) {
 		MergeSets sets = new MergeSets();
 		for (Location loc : circuit.wires.points.getSplitLocations()) {
@@ -159,8 +160,8 @@ class WireRepair extends CircuitTransaction {
 	/*
 	 * for debugging: private void printWires(String prefix, PrintStream out) {
 	 * boolean first = true; for (Wire w : circuit.getWires()) { if (first) {
-	 * out.println(prefix + ": " + w); first = false; } else { out.println(
-	 * "      " + w); } } out.println(prefix + ": none"); }
+	 * out.println(prefix + ": " + w); first = false; } else { out.println( "      "
+	 * + w); } } out.println(prefix + ": none"); }
 	 */
 
 	private void doOverlaps(CircuitMutator mutator) {

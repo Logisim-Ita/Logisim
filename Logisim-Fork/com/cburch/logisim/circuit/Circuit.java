@@ -85,7 +85,6 @@ public class Circuit {
 		private HashMap<Location, EndData> toMap(Object val) {
 			HashMap<Location, EndData> map = new HashMap<Location, EndData>();
 			if (val instanceof List) {
-				@SuppressWarnings("unchecked")
 				List<EndData> valList = (List<EndData>) val;
 				for (EndData end : valList) {
 					if (end != null) {

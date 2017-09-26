@@ -61,8 +61,8 @@ public class CounterPoker extends InstancePoker {
 	}
 
 	/**
-	 * Draws an indicator that the caret is being selected. Here, we'll draw a
-	 * red rectangle around the value.
+	 * Draws an indicator that the caret is being selected. Here, we'll draw a red
+	 * rectangle around the value.
 	 */
 	@Override
 	public void paint(InstancePainter painter) {

@@ -427,23 +427,21 @@ class KarnaughMapPanel extends JPanel implements TruthTablePanel {
 			// handle half going off right edge
 			g.fillRoundRect(x + 3 * cellWidth + IMP_INSET, top, w, h, d, d);
 			/*
-			 * This is the proper way, with no rounded rectangles along the
-			 * table's edge; but I found that the different regions were liable
-			 * to overlap, particularly the arcs with the rectangles. (Plus, I
-			 * was too lazy to figure this out for the 16 case.) int y0 = y +
-			 * rowMin * cellHeight + IMP_INSET; int y1 = y + rowMax * cellHeight
-			 * + cellHeight - IMP_INSET; int dy = y1 - y0; int x0 = x +
+			 * This is the proper way, with no rounded rectangles along the table's edge;
+			 * but I found that the different regions were liable to overlap, particularly
+			 * the arcs with the rectangles. (Plus, I was too lazy to figure this out for
+			 * the 16 case.) int y0 = y + rowMin * cellHeight + IMP_INSET; int y1 = y +
+			 * rowMax * cellHeight + cellHeight - IMP_INSET; int dy = y1 - y0; int x0 = x +
 			 * cellWidth - IMP_INSET; int x1 = x + 3 * cellWidth + IMP_INSET;
 			 * 
-			 * // half going off left edge g.fillRect(x, y0, cellWidth -
-			 * IMP_INSET - IMP_RADIUS, dy); g.fillRect(x0 - IMP_RADIUS, y0 +
-			 * IMP_RADIUS, IMP_RADIUS, dy - d); g.fillArc(x0 - d, y0, d, d, 0,
-			 * 90); g.fillArc(x0 - d, y1 - d, d, d, 0, -90);
+			 * // half going off left edge g.fillRect(x, y0, cellWidth - IMP_INSET -
+			 * IMP_RADIUS, dy); g.fillRect(x0 - IMP_RADIUS, y0 + IMP_RADIUS, IMP_RADIUS, dy
+			 * - d); g.fillArc(x0 - d, y0, d, d, 0, 90); g.fillArc(x0 - d, y1 - d, d, d, 0,
+			 * -90);
 			 * 
-			 * // half going off right edge g.fillRect(x1 + IMP_RADIUS, y0,
-			 * cellWidth - IMP_INSET - IMP_RADIUS, dy); g.fillRect(x1, y0 +
-			 * IMP_RADIUS, IMP_RADIUS, dy - d); g.fillArc(x1, y0, d, d, 180,
-			 * 90); g.fillArc(x1, y1 - d, d, d, 180, -90);
+			 * // half going off right edge g.fillRect(x1 + IMP_RADIUS, y0, cellWidth -
+			 * IMP_INSET - IMP_RADIUS, dy); g.fillRect(x1, y0 + IMP_RADIUS, IMP_RADIUS, dy -
+			 * d); g.fillArc(x1, y0, d, d, 180, 90); g.fillArc(x1, y1 - d, d, d, 180, -90);
 			 */
 		} else { // numRows == 4
 			int left = x + colMin * cellWidth + IMP_INSET;

@@ -323,7 +323,7 @@ public class TableSorter extends AbstractTableModel {
 			// returns Object. We can't cast an Object to an int but we can
 			// cast it to an Integer and then extract the int from the Integer.
 			// But first, make sure it can be done.
-			Integer i = new Integer(0);
+			Integer i = Integer.valueOf(0);
 			if (!i.getClass().isInstance(retVal)) {
 				throw new ClassCastException();
 			}
@@ -492,7 +492,6 @@ public class TableSorter extends AbstractTableModel {
 		if (comparator == null) {
 			columnComparators.remove(type);
 		} else {
-			@SuppressWarnings("unchecked")
 			Comparator<Object> castComparator = (Comparator<Object>) comparator;
 			columnComparators.put(type, castComparator);
 		}

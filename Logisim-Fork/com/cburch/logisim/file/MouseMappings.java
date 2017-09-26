@@ -115,6 +115,7 @@ public class MouseMappings {
 	//
 	// package-protected methods
 	//
+	@SuppressWarnings("unlikely-arg-type")
 	void replaceAll(Map<Tool, Tool> toolMap) {
 		boolean changed = false;
 		for (Map.Entry<Integer, Tool> entry : map.entrySet()) {

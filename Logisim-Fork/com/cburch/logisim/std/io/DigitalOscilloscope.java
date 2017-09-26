@@ -214,7 +214,8 @@ public class DigitalOscilloscope extends InstanceFactory {
 					if (i == 0 && painter.getAttributeValue(VERT_LINE) != NO) {// drawclocknumber
 						nck--;
 						Integer cknum = ((diagramstate.getclocknumber() - nck) > 0)
-								? diagramstate.getclocknumber() - nck : 100 + (diagramstate.getclocknumber() - nck - 1);
+								? diagramstate.getclocknumber() - nck
+								: 100 + (diagramstate.getclocknumber() - nck - 1);
 						g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
 						GraphicsUtil.drawCenteredText(g, cknum.toString(), x + border + 15 * j + 7, y + border + 5);
 						g.setColor(Color.BLACK);
@@ -269,15 +270,17 @@ public class DigitalOscilloscope extends InstanceFactory {
 					// input values
 					for (int i = 0; i < inputs; i++)
 						// set new value at the end
-						diagramstate.setState(i, diagramstate.getusedcell(), (state.getPort(i) == Value.TRUE)
-								? Boolean.TRUE : (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
+						diagramstate.setState(i, diagramstate.getusedcell(),
+								(state.getPort(i) == Value.TRUE) ? Boolean.TRUE
+										: (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
 
 				} else if (diagramstate.getusedcell() != -1) {
 					// input's values can change also after clock front because
 					// of output's delays (Flip Flop, gates etc..)
 					for (int i = 1; i < inputs; i++)
-						diagramstate.setState(i, diagramstate.getusedcell(), (state.getPort(i) == Value.TRUE)
-								? Boolean.TRUE : (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
+						diagramstate.setState(i, diagramstate.getusedcell(),
+								(state.getPort(i) == Value.TRUE) ? Boolean.TRUE
+										: (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
 				}
 			}
 		}

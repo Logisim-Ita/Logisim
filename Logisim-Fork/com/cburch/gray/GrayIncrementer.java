@@ -19,17 +19,17 @@ import com.cburch.logisim.instance.StdAttr;
  */
 class GrayIncrementer extends InstanceFactory {
 	/*
-	 * Note that there are no instance variables. There is only one instance of
-	 * this class created, which manages all instances of the component. Any
-	 * information associated with individual instances should be handled
-	 * through attributes. For GrayIncrementer, each instance has a "bit width"
-	 * that it works with, and so we'll have an attribute.
+	 * Note that there are no instance variables. There is only one instance of this
+	 * class created, which manages all instances of the component. Any information
+	 * associated with individual instances should be handled through attributes.
+	 * For GrayIncrementer, each instance has a "bit width" that it works with, and
+	 * so we'll have an attribute.
 	 */
 
 	/**
-	 * Computes the next gray value in the sequence after prev. This static
-	 * method just does some bit twiddling; it doesn't have much to do with
-	 * Logisim except that it manipulates Value and BitWidth objects.
+	 * Computes the next gray value in the sequence after prev. This static method
+	 * just does some bit twiddling; it doesn't have much to do with Logisim except
+	 * that it manipulates Value and BitWidth objects.
 	 */
 	static Value nextGray(Value prev) {
 		BitWidth bits = prev.getBitWidth();
@@ -56,32 +56,31 @@ class GrayIncrementer extends InstanceFactory {
 		super("Gray Code Incrementer");
 
 		/*
-		 * This is how we can set up the attributes for GrayIncrementers. In
-		 * this case, there is just one attribute - the width - whose default is
-		 * 4. The StdAttr class defines several commonly occurring attributes,
-		 * including one for "bit width." It's best to use those StdAttr
-		 * attributes when appropriate: A user can then select several
-		 * components (even from differing factories) with the same attribute
-		 * and modify them all at once.
+		 * This is how we can set up the attributes for GrayIncrementers. In this case,
+		 * there is just one attribute - the width - whose default is 4. The StdAttr
+		 * class defines several commonly occurring attributes, including one for
+		 * "bit width." It's best to use those StdAttr attributes when appropriate: A
+		 * user can then select several components (even from differing factories) with
+		 * the same attribute and modify them all at once.
 		 */
 		setAttributes(new Attribute[] { StdAttr.WIDTH }, new Object[] { BitWidth.create(4) });
 
 		/*
-		 * The "offset bounds" is the location of the bounding rectangle
-		 * relative to the mouse location. Here, we're choosing the component to
-		 * be 30x30, and we're anchoring it relative to its primary output (as
-		 * is typical for Logisim), which happens to be in the center of the
-		 * east edge. Thus, the top left corner of the bounding box is 30 pixels
-		 * west and 15 pixels north of the mouse location.
+		 * The "offset bounds" is the location of the bounding rectangle relative to the
+		 * mouse location. Here, we're choosing the component to be 30x30, and we're
+		 * anchoring it relative to its primary output (as is typical for Logisim),
+		 * which happens to be in the center of the east edge. Thus, the top left corner
+		 * of the bounding box is 30 pixels west and 15 pixels north of the mouse
+		 * location.
 		 */
 		setOffsetBounds(Bounds.create(-30, -15, 30, 30));
 
 		/*
-		 * The ports are locations where wires can be connected to this
-		 * component. Each port object says where to find the port relative to
-		 * the component's anchor location, then whether the port is an
-		 * input/output/both, and finally the expected bit width for the port.
-		 * The bit width can be a constant (like 1) or an attribute (as here).
+		 * The ports are locations where wires can be connected to this component. Each
+		 * port object says where to find the port relative to the component's anchor
+		 * location, then whether the port is an input/output/both, and finally the
+		 * expected bit width for the port. The bit width can be a constant (like 1) or
+		 * an attribute (as here).
 		 */
 		setPorts(new Port[] { new Port(-30, 0, Port.INPUT, StdAttr.WIDTH),
 				new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH), });
@@ -99,10 +98,9 @@ class GrayIncrementer extends InstanceFactory {
 	}
 
 	/**
-	 * Computes the current output for this component. This method is invoked
-	 * any time any of the inputs change their values; it may also be invoked in
-	 * other circumstances, even if there is no reason to expect it to change
-	 * anything.
+	 * Computes the current output for this component. This method is invoked any
+	 * time any of the inputs change their values; it may also be invoked in other
+	 * circumstances, even if there is no reason to expect it to change anything.
 	 */
 	@Override
 	public void propagate(InstanceState state) {

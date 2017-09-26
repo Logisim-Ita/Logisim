@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.cburch.logisim.gui.generic.LFrame;
@@ -46,7 +47,7 @@ public class UpdateScreen extends JWindow {
 			icon = new ImageIcon(url);
 
 		f = new JFrame(Strings.get("Update"));
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		f.setResizable(false);
 		if (icon != null)
 			f.setIconImage(icon.getImage());

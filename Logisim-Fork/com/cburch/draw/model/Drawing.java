@@ -222,7 +222,6 @@ public class Drawing implements CanvasModel {
 		HashMap<AttributeMapKey, Object> oldValues;
 		oldValues = new HashMap<AttributeMapKey, Object>();
 		for (AttributeMapKey key : values.keySet()) {
-			@SuppressWarnings("unchecked")
 			Attribute<Object> attr = (Attribute<Object>) key.getAttribute();
 			Object oldValue = key.getObject().getValue(attr);
 			oldValues.put(key, oldValue);
@@ -232,7 +231,6 @@ public class Drawing implements CanvasModel {
 			for (Map.Entry<AttributeMapKey, Object> entry : values.entrySet()) {
 				AttributeMapKey key = entry.getKey();
 				CanvasObject shape = key.getObject();
-				@SuppressWarnings("unchecked")
 				Attribute<Object> attr = (Attribute<Object>) key.getAttribute();
 				shape.setValue(attr, entry.getValue());
 				overlaps.invalidateShape(shape);

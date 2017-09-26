@@ -81,7 +81,7 @@ public class SelectTool extends AbstractTool {
 			curAction = IDLE;
 			Selection sel = canvas.getSelection();
 			sel.clearDrawsSuppressed();
-			sel.setMovingShapes(Collections.<CanvasObject> emptySet(), 0, 0);
+			sel.setMovingShapes(Collections.<CanvasObject>emptySet(), 0, 0);
 			sel.clearSelected();
 			sel.setSelected(before, true);
 			sel.setHandleSelected(handle);

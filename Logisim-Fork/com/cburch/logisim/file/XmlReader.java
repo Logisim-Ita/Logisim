@@ -116,7 +116,6 @@ class XmlReader {
 				List<Attribute<?>> attrList = attrs.getAttributes();
 				if (i >= attrList.size())
 					break;
-				@SuppressWarnings("unchecked")
 				Attribute<Object> attr = (Attribute<Object>) attrList.get(i);
 				String attrName = attr.getName();
 				String attrVal = attrsDefined.get(attrName);

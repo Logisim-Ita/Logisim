@@ -108,7 +108,7 @@ public class GraphicsUtil {
 		return ret;
 	}
 
-	static public void switchToWidth(Graphics g, int width) {
+	static public void switchToWidth(Graphics g, float width) {
 		if (g instanceof Graphics2D) {
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setStroke(new BasicStroke(width));

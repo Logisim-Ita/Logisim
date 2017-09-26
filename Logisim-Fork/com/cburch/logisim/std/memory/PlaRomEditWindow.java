@@ -23,6 +23,7 @@ import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.prefs.AppPreferences;
+import com.cburch.logisim.std.ttl.Drawgates;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class PlaRomEditWindow extends LFrame {
@@ -45,13 +46,6 @@ public class PlaRomEditWindow extends LFrame {
 			setLayout(null);
 			setBackground(Color.WHITE);
 			super.addMouseListener(this);
-		}
-
-		private void drawAnd(Graphics g, int x, int y) {
-			int[] xp = new int[] { x + 16, x, x, x + 16 };
-			int[] yp = new int[] { y - 16, y - 16, y + 16, y + 16 };
-			GraphicsUtil.drawCenteredArc(g, x + 16, y, 16, 270, 180);
-			g.drawPolyline(xp, yp, 4);
 		}
 
 		private void drawNot(Graphics g, int x, int y) {
@@ -198,7 +192,7 @@ public class PlaRomEditWindow extends LFrame {
 				g.drawLine(IMAGE_BORDER + 36 + 40 * inputs, IMAGE_BORDER + 30 + 40 * i,
 						IMAGE_BORDER + 40 * (inputs + 1) + 20 + 40 * (outputs - 1), IMAGE_BORDER + 30 + 40 * i);
 				g.setColor(Color.BLACK);
-				drawAnd(g, IMAGE_BORDER + 4 + 40 * inputs, IMAGE_BORDER + 30 + 40 * i);
+				Drawgates.paintAnd(g, IMAGE_BORDER + 36 + 40 * inputs, IMAGE_BORDER + 30 + 40 * i, 32, 32, false);
 			}
 			for (Integer i = 1; i <= outputs; i++) {
 				g.drawLine(IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 70,
@@ -266,27 +260,29 @@ public class PlaRomEditWindow extends LFrame {
 	public void InitializeWindow() {
 		this.window = new LFrame();
 		this.window.setLayout(new BorderLayout());
-		LogisimMenuBar menubar = new LogisimMenuBar(window, null);
-		window.setJMenuBar(menubar);
-		this.mp = new MyPanel(this.data, state, instate);
+		LogisimMenuBar menubar = new LogisimMenuBar(this.window, null);
+		this.window.setJMenuBar(menubar);
+		this.mp = new MyPanel(this.data, this.state, this.instate);
 		this.sp = new JScrollPane(this.mp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		window.add(sp, BorderLayout.CENTER);
+		this.window.add(this.sp, BorderLayout.CENTER);
 	}
 
 	@Override
 	public void setVisible(boolean b) {
-		UpdateWindow();
+		if (!this.window.isVisible()) {
+			UpdateWindow();
+			this.window.setLocationRelativeTo(null);
+		}
 		this.window.setVisible(b);
 	}
 
 	public void UpdateWindow() {
-		window.setTitle("Logisim: Pla Rom " + data.getSizeString() + " Edit Window");
+		this.window.setTitle("Logisim: Pla Rom " + this.data.getSizeString() + " Edit Window");
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if (sp.getPreferredSize().getHeight() >= screenSize.getHeight()
-				|| sp.getPreferredSize().getWidth() >= screenSize.getWidth())
-			window.setExtendedState(Frame.MAXIMIZED_BOTH);
+		if (this.sp.getPreferredSize().getHeight() >= screenSize.getHeight()
+				|| this.sp.getPreferredSize().getWidth() >= screenSize.getWidth())
+			this.window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.window.pack();
-		this.window.setLocationRelativeTo(null);
 	}
 }

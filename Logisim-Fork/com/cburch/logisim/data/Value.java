@@ -74,7 +74,8 @@ public class Value {
 			int mask = 1 << i;
 			if (values[i] == TRUE)
 				value |= mask;
-			else if (values[i] == FALSE) /* do nothing */;
+			else if (values[i] == FALSE)
+				/* do nothing */;
 			else if (values[i] == UNKNOWN)
 				unknown |= mask;
 			else if (values[i] == ERROR)

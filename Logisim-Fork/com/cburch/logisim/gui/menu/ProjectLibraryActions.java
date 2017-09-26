@@ -35,14 +35,12 @@ public class ProjectLibraryActions {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static class LibraryJList extends JList {
+	private static class LibraryJList extends JList<Object> {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 7410413645303806363L;
 
-		@SuppressWarnings("unchecked")
 		LibraryJList(List<Library> libraries) {
 			ArrayList<BuiltinOption> options = new ArrayList<BuiltinOption>();
 			for (Library lib : libraries) {
@@ -52,12 +50,11 @@ public class ProjectLibraryActions {
 		}
 
 		Library[] getSelectedLibraries() {
-			@SuppressWarnings("deprecation")
-			Object[] selected = getSelectedValues();
-			if (selected != null && selected.length > 0) {
-				Library[] libs = new Library[selected.length];
-				for (int i = 0; i < selected.length; i++) {
-					libs[i] = ((BuiltinOption) selected[i]).lib;
+			List<Object> selected = getSelectedValuesList();
+			if (selected != null && selected.size() > 0) {
+				Library[] libs = new Library[selected.size()];
+				for (int i = 0; i < selected.size(); i++) {
+					libs[i] = ((BuiltinOption) selected.get(i)).lib;
 				}
 				return libs;
 			} else {

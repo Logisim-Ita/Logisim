@@ -14,8 +14,8 @@ public class Components extends Library {
 	/**
 	 * The list of all tools contained in this library. Technically, libraries
 	 * contain tools, which is a slightly more general concept than components;
-	 * practically speaking, though, you'll most often want to create AddTools
-	 * for new components that can be added into the circuit.
+	 * practically speaking, though, you'll most often want to create AddTools for
+	 * new components that can be added into the circuit.
 	 */
 	private List<AddTool> tools;
 

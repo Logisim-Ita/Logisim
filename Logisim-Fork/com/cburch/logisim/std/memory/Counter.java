@@ -199,11 +199,10 @@ public class Counter extends InstanceFactory {
 			newVal = newValue.toIntValue();
 			carry = newVal == (ld && ct ? 0 : max);
 			/*
-			 * I would want this if I were worried about the carry signal
-			 * outrunning the clock. But the component's delay should be enough
-			 * to take care of it. if (carry) { if (triggerType ==
-			 * StdAttr.TRIG_FALLING) { carry = clock == Value.TRUE; } else {
-			 * carry = clock == Value.FALSE; } }
+			 * I would want this if I were worried about the carry signal outrunning the
+			 * clock. But the component's delay should be enough to take care of it. if
+			 * (carry) { if (triggerType == StdAttr.TRIG_FALLING) { carry = clock ==
+			 * Value.TRUE; } else { carry = clock == Value.FALSE; } }
 			 */
 		}
 

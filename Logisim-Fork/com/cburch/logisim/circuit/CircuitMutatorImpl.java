@@ -123,7 +123,6 @@ class CircuitMutatorImpl implements CircuitMutator {
 	public void set(Circuit circuit, Component comp, Attribute<?> attr, Object newValue) {
 		if (circuit.contains(comp)) {
 			modified.add(circuit);
-			@SuppressWarnings("unchecked")
 			Attribute<Object> a = (Attribute<Object>) attr;
 			AttributeSet attrs = comp.getAttributeSet();
 			Object oldValue = attrs.getValue(a);
@@ -134,7 +133,6 @@ class CircuitMutatorImpl implements CircuitMutator {
 
 	@Override
 	public void setForCircuit(Circuit circuit, Attribute<?> attr, Object newValue) {
-		@SuppressWarnings("unchecked")
 		Attribute<Object> a = (Attribute<Object>) attr;
 		AttributeSet attrs = circuit.getStaticAttributes();
 		Object oldValue = attrs.getValue(a);

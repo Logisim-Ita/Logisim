@@ -14,8 +14,7 @@ import javax.swing.event.ListSelectionListener;
 
 import com.cburch.logisim.prefs.AppPreferences;
 
-@SuppressWarnings("rawtypes")
-class LocaleSelector extends JList implements LocaleListener, ListSelectionListener {
+class LocaleSelector extends JList<Object> implements LocaleListener, ListSelectionListener {
 	private static class LocaleOption implements Runnable {
 		private Locale locale;
 		private String text;
@@ -54,10 +53,9 @@ class LocaleSelector extends JList implements LocaleListener, ListSelectionListe
 
 	private LocaleOption[] items;
 
-	@SuppressWarnings({ "unchecked" })
 	LocaleSelector(Locale[] locales) {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel<Object> model = new DefaultListModel<Object>();
 		items = new LocaleOption[locales.length];
 		for (int i = 0; i < locales.length; i++) {
 			items[i] = new LocaleOption(locales[i]);

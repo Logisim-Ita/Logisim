@@ -37,8 +37,7 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		@Override
 		public void attributeValueChanged(AttributeEvent e) {
 			if (selected.containsKey(e.getSource())) {
-				@SuppressWarnings("unchecked")
-				Attribute<Object> attr = (Attribute<Object>) e.getAttribute();
+				Attribute<?> attr = e.getAttribute();
 				Attribute<?>[] attrs = SelectionAttributes.this.selAttrs;
 				Object[] values = SelectionAttributes.this.selValues;
 				for (int i = 0; i < attrs.length; i++) {
@@ -175,7 +174,6 @@ public class SelectionAttributes extends AbstractAttributeSet {
 		Object[] values = this.selValues;
 		for (int i = 0; i < attrs.length; i++) {
 			if (attrs[i] == attr) {
-				@SuppressWarnings("unchecked")
 				V ret = (V) values[i];
 				return ret;
 			}

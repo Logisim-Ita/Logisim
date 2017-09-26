@@ -126,19 +126,18 @@ public class PainterShaped {
 		}
 
 		/*
-		 * used prior to 2.5.1, when moved to GeneralPath int wingHeight =
-		 * (totalHeight - mainHeight) / 2; double wingCenterX = wingHeight *
-		 * Math.sqrt(3) / 2; double mainCenterX = mainHeight * Math.sqrt(3) / 2;
+		 * used prior to 2.5.1, when moved to GeneralPath int wingHeight = (totalHeight
+		 * - mainHeight) / 2; double wingCenterX = wingHeight * Math.sqrt(3) / 2; double
+		 * mainCenterX = mainHeight * Math.sqrt(3) / 2;
 		 * 
 		 * for (int i = 0; i < inputs; i++) { Location loci =
 		 * factory.getInputOffset(attrs, i); int disti = 5 +
-		 * loc0.manhattanDistanceTo(loci); if (disti > totalHeight - disti) { //
-		 * ensure on top half disti = totalHeight - disti; } double dx; if
-		 * (disti < wingHeight) { // point is on wing int dy = wingHeight / 2 -
-		 * disti; dx = Math.sqrt(wingHeight * wingHeight - dy * dy) -
-		 * wingCenterX; } else { // point is on main shield int dy = totalHeight
-		 * / 2 - disti; dx = Math.sqrt(mainHeight * mainHeight - dy * dy) -
-		 * mainCenterX; } lengths[i] = (int) (dx - 0.5); }
+		 * loc0.manhattanDistanceTo(loci); if (disti > totalHeight - disti) { // ensure
+		 * on top half disti = totalHeight - disti; } double dx; if (disti < wingHeight)
+		 * { // point is on wing int dy = wingHeight / 2 - disti; dx =
+		 * Math.sqrt(wingHeight * wingHeight - dy * dy) - wingCenterX; } else { // point
+		 * is on main shield int dy = totalHeight / 2 - disti; dx = Math.sqrt(mainHeight
+		 * * mainHeight - dy * dy) - mainCenterX; } lengths[i] = (int) (dx - 0.5); }
 		 */
 		return lengths;
 	}
@@ -244,12 +243,12 @@ public class PainterShaped {
 		 * The following, used previous to version 2.5.1, didn't use GeneralPath
 		 * g.setColor(Color.LIGHT_GRAY); if (width < 40) {
 		 * GraphicsUtil.drawCenteredArc(g, -30, -21, 36, -90, 53);
-		 * GraphicsUtil.drawCenteredArc(g, -30, 21, 36, 90, -53); } else if
-		 * (width < 60) { GraphicsUtil.drawCenteredArc(g, -50, -37, 62, -90,
-		 * 53); GraphicsUtil.drawCenteredArc(g, -50, 37, 62, 90, -53); } else {
+		 * GraphicsUtil.drawCenteredArc(g, -30, 21, 36, 90, -53); } else if (width < 60)
+		 * { GraphicsUtil.drawCenteredArc(g, -50, -37, 62, -90, 53);
+		 * GraphicsUtil.drawCenteredArc(g, -50, 37, 62, 90, -53); } else {
 		 * GraphicsUtil.drawCenteredArc(g, -70, -50, 85, -90, 53);
-		 * GraphicsUtil.drawCenteredArc(g, -70, 50, 85, 90, -53); }
-		 * paintShield(g, -width, 0, width, height);
+		 * GraphicsUtil.drawCenteredArc(g, -70, 50, 85, 90, -53); } paintShield(g,
+		 * -width, 0, width, height);
 		 */
 
 		GeneralPath path;
@@ -273,14 +272,14 @@ public class PainterShaped {
 		g.translate(-xlate, 0);
 
 		/*
-		 * The following, used previous to version 2.5.1, didn't use GeneralPath
-		 * if (width < 40) { GraphicsUtil.drawCenteredArc(g, x - 26, y, 30, -30,
-		 * 60); } else if (width < 60) { GraphicsUtil.drawCenteredArc(g, x - 43,
-		 * y, 50, -30, 60); } else { GraphicsUtil.drawCenteredArc(g, x - 60, y,
-		 * 70, -30, 60); } if (height > width) { // we need to draw the shield
-		 * GraphicsUtil.drawCenteredArc(g, x - dx, y - (width + extra) / 2,
-		 * extra, -30, 60); GraphicsUtil.drawCenteredArc(g, x - dx, y + (width +
-		 * extra) / 2, extra, -30, 60); }
+		 * The following, used previous to version 2.5.1, didn't use GeneralPath if
+		 * (width < 40) { GraphicsUtil.drawCenteredArc(g, x - 26, y, 30, -30, 60); }
+		 * else if (width < 60) { GraphicsUtil.drawCenteredArc(g, x - 43, y, 50, -30,
+		 * 60); } else { GraphicsUtil.drawCenteredArc(g, x - 60, y, 70, -30, 60); } if
+		 * (height > width) { // we need to draw the shield
+		 * GraphicsUtil.drawCenteredArc(g, x - dx, y - (width + extra) / 2, extra, -30,
+		 * 60); GraphicsUtil.drawCenteredArc(g, x - dx, y + (width + extra) / 2, extra,
+		 * -30, 60); }
 		 */
 	}
 

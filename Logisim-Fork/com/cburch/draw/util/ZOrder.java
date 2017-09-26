@@ -94,7 +94,6 @@ public class ZOrder {
 		ArrayList<E> ret = new ArrayList<E>(objects.size());
 		for (CanvasObject o : objs) {
 			if (set.contains(o)) {
-				@SuppressWarnings("unchecked")
 				E toAdd = (E) o;
 				ret.add(toAdd);
 			}

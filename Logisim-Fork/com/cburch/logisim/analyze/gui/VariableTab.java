@@ -93,8 +93,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static class VariableListModel extends AbstractListModel implements VariableListListener {
+	private static class VariableListModel extends AbstractListModel<Object> implements VariableListListener {
 		/**
 		 * 
 		 */
@@ -164,8 +163,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 	private VariableList data;
 	private MyListener myListener = new MyListener();
 
-	@SuppressWarnings("rawtypes")
-	private JList list = new JList();
+	private JList<Object> list = new JList<Object>();
 	private JTextField field = new JTextField();
 	private JButton remove = new JButton();
 	private JButton moveUp = new JButton();
@@ -174,7 +172,6 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 	private JButton rename = new JButton();
 	private JLabel error = new JLabel(" ");
 
-	@SuppressWarnings("unchecked")
 	VariableTab(VariableList data) {
 		this.data = data;
 

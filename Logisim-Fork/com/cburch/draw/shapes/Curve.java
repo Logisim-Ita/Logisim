@@ -191,6 +191,7 @@ public class Curve extends FillableCanvasObject {
 		return ret;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public Handle moveHandle(HandleGesture gesture) {
 		Handle[] hs = getHandleArray(gesture);

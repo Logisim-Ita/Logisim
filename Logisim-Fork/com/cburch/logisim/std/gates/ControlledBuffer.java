@@ -51,8 +51,9 @@ class ControlledBuffer extends InstanceFactory {
 	private boolean isInverter;
 
 	private ControlledBuffer(boolean isInverter) {
-		super(isInverter ? "Controlled Inverter" : "Controlled Buffer", isInverter
-				? Strings.getter("controlledInverterComponent") : Strings.getter("controlledBufferComponent"));
+		super(isInverter ? "Controlled Inverter" : "Controlled Buffer",
+				isInverter ? Strings.getter("controlledInverterComponent")
+						: Strings.getter("controlledBufferComponent"));
 		this.isInverter = isInverter;
 		if (isInverter) {
 			setAttributes(

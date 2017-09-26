@@ -79,7 +79,7 @@ public class CanvasModelEvent extends EventObject {
 	// the boolean parameter is just because the compiler insists upon it to
 	// avoid an erasure conflict with the first constructor
 	private CanvasModelEvent(boolean dummy, CanvasModel source, int action, Collection<ReorderRequest> requests) {
-		this(source, action, Collections.<CanvasObject> emptySet());
+		this(source, action, Collections.<CanvasObject>emptySet());
 
 		ArrayList<CanvasObject> affected;
 		affected = new ArrayList<CanvasObject>(requests.size());
@@ -136,7 +136,7 @@ public class CanvasModelEvent extends EventObject {
 
 	private CanvasModelEvent(CanvasModel source, int action, Map<AttributeMapKey, Object> oldValues,
 			Map<AttributeMapKey, Object> newValues) {
-		this(source, action, Collections.<CanvasObject> emptySet());
+		this(source, action, Collections.<CanvasObject>emptySet());
 
 		HashSet<CanvasObject> affected;
 		affected = new HashSet<CanvasObject>(newValues.size());

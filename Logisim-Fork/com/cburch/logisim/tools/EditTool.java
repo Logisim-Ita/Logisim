@@ -164,7 +164,6 @@ public class EditTool extends Tool {
 		AttributeSet attrs = comp.getAttributeSet();
 		Object key = ComponentFactory.FACING_ATTRIBUTE_KEY;
 		Attribute<?> a = (Attribute<?>) comp.getFactory().getFeature(key, attrs);
-		@SuppressWarnings("unchecked")
 		Attribute<Direction> ret = (Attribute<Direction>) a;
 		return ret;
 	}

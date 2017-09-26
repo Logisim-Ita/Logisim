@@ -74,7 +74,6 @@ public class CircuitState implements InstanceData {
 			} else if (action == CircuitEvent.ACTION_CHANGE) {
 				Object data = event.getData();
 				if (data instanceof Collection) {
-					@SuppressWarnings("unchecked")
 					Collection<Component> comps = (Collection<Component>) data;
 					markComponentsDirty(comps);
 					if (base != null) {

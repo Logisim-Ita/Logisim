@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <project version="1.0">
   <lib name="0" desc="#Base">
     <tool name="Text Tool">

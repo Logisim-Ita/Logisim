@@ -111,7 +111,6 @@ public class Line extends AbstractCanvasObject {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == DrawAttr.STROKE_COLOR) {
 			return (V) strokeColor;

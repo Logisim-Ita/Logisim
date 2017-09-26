@@ -113,7 +113,6 @@ public class AttrTable extends JPanel implements LocaleListener {
 			}
 		}
 
-		@SuppressWarnings("rawtypes")
 		@Override
 		public Object getCellEditorValue() {
 			// Returns the value contained in the editor.
@@ -121,13 +120,12 @@ public class AttrTable extends JPanel implements LocaleListener {
 			if (comp instanceof JTextField) {
 				return ((JTextField) comp).getText();
 			} else if (comp instanceof JComboBox) {
-				return ((JComboBox) comp).getSelectedItem();
+				return ((JComboBox<?>) comp).getSelectedItem();
 			} else {
 				return null;
 			}
 		}
 
-		@SuppressWarnings("rawtypes")
 		@Override
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int rowIndex,
 				int columnIndex) {
@@ -142,7 +140,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 
 				Component editor = row.getEditor(parent);
 				if (editor instanceof JComboBox) {
-					((JComboBox) editor).addActionListener(this);
+					((JComboBox<?>) editor).addActionListener(this);
 					editor.addFocusListener(this);
 				} else if (editor instanceof JInputComponent) {
 					JInputComponent input = (JInputComponent) editor;

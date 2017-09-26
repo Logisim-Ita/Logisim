@@ -121,8 +121,8 @@ class AboutCredits extends JComponent {
 		lines.add(new CreditsLine(2,
 				"\u0443\u043D\u0438\u0432\u0435\u0440\u0441\u0438\u0442\u0435\u0442 \u043F\u0435\u0447\u0430\u0442\u0438"));
 		/*
-		 * If you fork Logisim, feel free to change the above lines, but please
-		 * do not change these last four lines!
+		 * If you fork Logisim, feel free to change the above lines, but please do not
+		 * change these last four lines!
 		 */
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleOriginal")));
 		lines.add(new CreditsLine(1, "Carl Burch"));

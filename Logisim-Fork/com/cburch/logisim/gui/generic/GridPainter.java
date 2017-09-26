@@ -138,17 +138,15 @@ public class GridPainter {
 			}
 
 			/*
-			 * Original code by Carl Burch int x0 = 10 * (int) Math.ceil(clip.x
-			 * / f / 10); int x1 = x0 + (int)(clip.width / f); int y0 = 10 *
-			 * (int) Math.ceil(clip.y / f / 10); int y1 = y0 + (int)
-			 * (clip.height / f); int s = f > 0.5 ? 1 : f > 0.25 ? 2 : 3; int i0
-			 * = s - ((x0 + 10*s - 1) % (s * 10)) / 10 - 1; int j0 = s - ((y1 +
-			 * 10*s - 1) % (s * 10)) / 10 - 1; for (int i = 0; i < s; i++) { for
-			 * (int x = x0+i*10; x < x1; x += s*10) { for (int j = 0; j < s;
-			 * j++) { g.setColor(i == i0 && j == j0 ? Color.gray :
-			 * GRID_ZOOMED_OUT_COLOR); for (int y = y0+j*10; y < y1; y += s*10)
-			 * { int sx = (int) Math.round(f * x); int sy = (int) Math.round(f *
-			 * y); g.fillRect(sx, sy, 1, 1); } } } }
+			 * Original code by Carl Burch int x0 = 10 * (int) Math.ceil(clip.x / f / 10);
+			 * int x1 = x0 + (int)(clip.width / f); int y0 = 10 * (int) Math.ceil(clip.y / f
+			 * / 10); int y1 = y0 + (int) (clip.height / f); int s = f > 0.5 ? 1 : f > 0.25
+			 * ? 2 : 3; int i0 = s - ((x0 + 10*s - 1) % (s * 10)) / 10 - 1; int j0 = s -
+			 * ((y1 + 10*s - 1) % (s * 10)) / 10 - 1; for (int i = 0; i < s; i++) { for (int
+			 * x = x0+i*10; x < x1; x += s*10) { for (int j = 0; j < s; j++) { g.setColor(i
+			 * == i0 && j == j0 ? Color.gray : GRID_ZOOMED_OUT_COLOR); for (int y = y0+j*10;
+			 * y < y1; y += s*10) { int sx = (int) Math.round(f * x); int sy = (int)
+			 * Math.round(f * y); g.fillRect(sx, sy, 1, 1); } } } }
 			 */
 		}
 	}

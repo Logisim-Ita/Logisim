@@ -58,8 +58,8 @@ public class Analyze {
 	private static final int MAX_ITERATIONS = 100;
 
 	/**
-	 * Checks whether any of the recently placed expressions in the expression
-	 * map are self-referential; if so, return it.
+	 * Checks whether any of the recently placed expressions in the expression map
+	 * are self-referential; if so, return it.
 	 */
 	private static Expression checkForCircularExpressions(ExpressionMap expressionMap) throws AnalyzeException {
 		for (Location point : expressionMap.dirtyPoints) {
@@ -210,8 +210,8 @@ public class Analyze {
 	// getPinLabels
 	//
 	/**
-	 * Returns a sorted map from Pin objects to String objects, listed in
-	 * canonical order (top-down order, with ties broken left-right).
+	 * Returns a sorted map from Pin objects to String objects, listed in canonical
+	 * order (top-down order, with ties broken left-right).
 	 */
 	public static SortedMap<Instance, String> getPinLabels(Circuit circuit) {
 		Comparator<Instance> locOrder = new Comparator<Instance>() {

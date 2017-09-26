@@ -9,8 +9,7 @@ import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.util.StringGetter;
 
 class ComboOption {
-	@SuppressWarnings("rawtypes")
-	static void setSelected(JComboBox combo, Object value) {
+	static void setSelected(JComboBox<?> combo, Object value) {
 		for (int i = combo.getItemCount() - 1; i >= 0; i--) {
 			ComboOption opt = (ComboOption) combo.getItemAt(i);
 			if (opt.getValue().equals(value)) {

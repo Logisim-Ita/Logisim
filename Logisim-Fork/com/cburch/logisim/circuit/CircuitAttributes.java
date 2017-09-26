@@ -28,7 +28,6 @@ public class CircuitAttributes extends AbstractAttributeSet {
 
 		@Override
 		public void attributeValueChanged(AttributeEvent e) {
-			@SuppressWarnings("unchecked")
 			Attribute<Object> a = (Attribute<Object>) e.getAttribute();
 			fireAttributeValueChanged(a, e.getValue());
 		}
@@ -134,7 +133,6 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <E> E getValue(Attribute<E> attr) {
 		if (attr == StdAttr.FACING)
 			return (E) facing;
@@ -198,4 +196,5 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			}
 		}
 	}
+
 }

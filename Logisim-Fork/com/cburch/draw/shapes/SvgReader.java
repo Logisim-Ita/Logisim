@@ -64,9 +64,8 @@ public class SvgReader {
 						type = -1;
 					break;
 				/*
-				 * not supported case 'L': case 'l': case 'H': case 'h': case
-				 * 'V': case 'v': if (type == 0 || type == 2) type = 2; else
-				 * type = -1; break;
+				 * not supported case 'L': case 'l': case 'H': case 'h': case 'V': case 'v': if
+				 * (type == 0 || type == 2) type = 2; else type = -1; break;
 				 */
 				default:
 					type = -1;

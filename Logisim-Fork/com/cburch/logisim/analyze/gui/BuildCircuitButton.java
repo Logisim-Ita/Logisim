@@ -36,14 +36,12 @@ class BuildCircuitButton extends JButton {
 		 */
 		private static final long serialVersionUID = 5325461232777384226L;
 		private JLabel projectLabel = new JLabel();
-		@SuppressWarnings("rawtypes")
-		private JComboBox project;
+		private JComboBox<Object> project;
 		private JLabel nameLabel = new JLabel();
 		private JTextField name = new JTextField(10);
 		private JCheckBox twoInputs = new JCheckBox();
 		private JCheckBox nands = new JCheckBox();
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		DialogPanel() {
 			List<Project> projects = Projects.getOpenProjects();
 			Object[] options = new Object[projects.size()];
@@ -55,7 +53,7 @@ class BuildCircuitButton extends JButton {
 					initialSelection = options[i];
 				}
 			}
-			project = new JComboBox(options);
+			project = new JComboBox<Object>(options);
 			if (options.length == 1) {
 				project.setSelectedItem(options[0]);
 				project.setEnabled(false);

@@ -299,8 +299,8 @@ class ComponentSelector extends JTree {
 		}
 
 		@Override
-		public Enumeration<?> children() {
-			return Collections.enumeration(Collections.emptySet());
+		public Enumeration<? extends TreeNode> children() {
+			return (Enumeration<? extends TreeNode>) Collections.enumeration(Collections.emptySet());
 		}
 
 		@Override
