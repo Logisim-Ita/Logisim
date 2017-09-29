@@ -6,7 +6,7 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Italian translation!
 * Possibility to use french translations already done (not very well)
 * New components:
-	* TTL gates (7400, 7402, 7404, 7408, 7432, 7486, 747266)
+	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7486, 747266)
 	* I/O->Digital Oscilloscope
 	* I/O->Switch
 	* I/O->RGB LED
@@ -25,7 +25,6 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 ## Features we want to add
 * Move to Java 9
 * Change Flip Flops layout
-* Add TTL Display Decoder
 * TTL flip flops
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility

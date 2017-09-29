@@ -19,8 +19,9 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public abstract class AbstractTtlGate extends InstanceFactory {
 
-	protected static final int pinwidth = 10, pinheight = 7, height = 60, width = 140;
+	protected static final int pinwidth = 10, pinheight = 7, height = 60;
 	private String name;
+	protected int pinnumber;
 
 	protected AbstractTtlGate(String name) {
 		super(name);
@@ -31,6 +32,10 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				new Object[] { Direction.EAST, false, false, "", StdAttr.DEFAULT_LABEL_FONT });
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
+		if (this.name == "7447")
+			this.pinnumber = 16;
+		else
+			this.pinnumber = 14;
 	}
 
 	private void computeTextField(Instance instance) {
@@ -54,7 +59,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction dir = attrs.getValue(StdAttr.FACING);
-		return Bounds.create(0, -30, width, height).rotate(Direction.EAST, dir, 0, 0);
+		return Bounds.create(0, -30, this.pinnumber * 10, height).rotate(Direction.EAST, dir, 0, 0);
 	}
 
 	@Override
@@ -77,18 +82,18 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		int xp = x, yp = y;
 		int width = bds.getWidth();
 		int height = bds.getHeight();
-		for (int i = 0; i < 14; i++) {
-			if (i < 7) {
+		for (int i = 0; i < this.pinnumber; i++) {
+			if (i < this.pinnumber / 2) {
 				if (dir == Direction.WEST || dir == Direction.EAST)
 					xp = i * 20 + (10 - pinwidth / 2) + x;
 				else
 					yp = i * 20 + (10 - pinwidth / 2) + y;
 			} else {
 				if (dir == Direction.WEST || dir == Direction.EAST) {
-					xp = (i - 7) * 20 + (10 - pinwidth / 2) + x;
+					xp = (i - this.pinnumber / 2) * 20 + (10 - pinwidth / 2) + x;
 					yp = height + y - pinheight;
 				} else {
-					yp = (i - 7) * 20 + (10 - pinwidth / 2) + y;
+					yp = (i - this.pinnumber / 2) * 20 + (10 - pinwidth / 2) + y;
 					xp = width + x - pinheight;
 				}
 			}
@@ -147,8 +152,8 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			int xp = x, yp = y;
 			int width = bds.getWidth();
 			int height = bds.getHeight();
-			for (int i = 0; i < 14; i++) {
-				if (i == 7) {
+			for (int i = 0; i < this.pinnumber; i++) {
+				if (i == this.pinnumber / 2) {
 					xp = x;
 					yp = y;
 					g.setColor(Color.DARK_GRAY);
@@ -179,17 +184,17 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					else // east
 						g.fillArc(xp - 7, yp + height / 2 - 7, 14, 14, 270, 180);
 				}
-				if (i < 7) {
+				if (i < this.pinnumber / 2) {
 					if (dir == Direction.WEST || dir == Direction.EAST)
 						xp = i * 20 + (10 - pinwidth / 2) + x;
 					else
 						yp = i * 20 + (10 - pinwidth / 2) + y;
 				} else {
 					if (dir == Direction.WEST || dir == Direction.EAST) {
-						xp = (i - 7) * 20 + (10 - pinwidth / 2) + x;
+						xp = (i - this.pinnumber / 2) * 20 + (10 - pinwidth / 2) + x;
 						yp = height + y - pinheight;
 					} else {
-						yp = (i - 7) * 20 + (10 - pinwidth / 2) + y;
+						yp = (i - this.pinnumber / 2) * 20 + (10 - pinwidth / 2) + y;
 						xp = width + x - pinheight;
 					}
 				}
@@ -240,7 +245,6 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	private void paintInternalBase(InstancePainter painter) {
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		Bounds bds = painter.getBounds();
-		paintBase(painter, false);
 		int x = bds.getX();
 		int y = bds.getY();
 		int width = bds.getWidth();
@@ -251,18 +255,24 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			width = bds.getHeight();
 			height = bds.getWidth();
 		}
-		int c = this.name != "7404" ? 4 : 6;
-		for (int i = 0; i < c; i++) {
-			paintInternal(painter, x + (c != 6 ? i % 2 != 0 ? 60 : 0 : i % 3 * 40) + (i < c / 2 ? 0 : 20), y, height,
-					!(i < c / 2));
+		if (this.name != "7447") {
+			paintBase(painter, false);
+			int c = this.name != "7404" ? 4 : 6;
+			for (int i = 0; i < c; i++) {
+				paintInternal(painter, x + (c != 6 ? i % 2 != 0 ? 60 : 0 : i % 3 * 40) + (i < c / 2 ? 0 : 20), y,
+						height, !(i < c / 2));
+			}
+		} else {
+			paintBase(painter, true);
+			paintInternal(painter, x, y, height, false);
 		}
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
-		if (state.getAttributeValue(TTL.VCC_GND)
-				&& (state.getPort(12) != Value.FALSE || state.getPort(13) != Value.TRUE))
-			for (int i = 0; i < 14; i++)
+		if (state.getAttributeValue(TTL.VCC_GND) && (state.getPort(this.pinnumber - 2) != Value.FALSE
+				|| state.getPort(this.pinnumber - 1) != Value.TRUE))
+			for (int i = 0; i < this.pinnumber; i++)
 				state.setPort(i, Value.UNKNOWN, 1);
 		else
 			ttlpropagate(state);
@@ -272,66 +282,78 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 
 	private void updateports(Instance instance) {
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
-		Port[] ps = new Port[instance.getAttributeValue(TTL.VCC_GND) ? 14 : 12];
+		Port[] ps = new Port[instance.getAttributeValue(TTL.VCC_GND) ? this.pinnumber : this.pinnumber - 2];
 		int dx = 0, dy = 0, portnumber = 1;
-		for (int i = 0; i < ps.length; i++) {
-			if (i < 6 || i == 12) {
-				if (i == 12)
-					i = 6;
+		String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g", "f" };
+		for (int i = 0; i < ps.length; i++) {// GND->12,Vcc->13
+			if (i < this.pinnumber / 2 - 1 || i == this.pinnumber - 2) {
+				if (i == this.pinnumber - 2)
+					i = this.pinnumber / 2 - 1;
 				if (dir == Direction.EAST) {
 					dx = i * 20 + 10;
 					dy = 30;
 				} else if (dir == Direction.WEST) {
-					dx = (6 - i) * 20 - 130;
+					dx = -10 - 20 * i;
 					dy = -30;
 				} else if (dir == Direction.NORTH) {
 					dx = 30;
-					dy = (5 - i) * 20 - 110;
+					dy = -10 - 20 * i;
 				} else {// SOUTH
 					dx = -30;
 					dy = i * 20 + 10;
 				}
-				if (i == 6)
-					i = 12;
+				if (i == this.pinnumber / 2 - 1)
+					i = this.pinnumber - 2;
 				else
 					portnumber = i + 1;
-			} else if (i > 5) {
-				if (i == 13)
-					i = 5;
+			} else if (i > this.pinnumber / 2 - 2) {
+				if (i == this.pinnumber - 1)
+					i = this.pinnumber / 2 - 2;
 				if (dir == Direction.EAST) {
-					dx = (i - 5) * 20 + 10;
+					dx = (i - (this.pinnumber / 2 - 1)) * 20 + 30;
 					dy = -30;
 				} else if (dir == Direction.WEST) {
-					dx = (11 - i) * 20 - 130;
+					dx = -30 - (i - (this.pinnumber / 2 - 1)) * 20;
 					dy = 30;
 				} else if (dir == Direction.NORTH) {
 					dx = -30;
-					dy = (10 - i) * 20 - 110;
+					dy = -30 - (i - (this.pinnumber / 2 - 1)) * 20;
 				} else {// SOUTH
 					dx = 30;
-					dy = (i - 5) * 20 + 10;
+					dy = (i - (this.pinnumber / 2 - 1)) * 20 + 30;
 				}
-				if (i == 5)
-					i = 13;
+				if (i == this.pinnumber / 2 - 2)
+					i = this.pinnumber - 1;
 				else
-					portnumber = 13 - (i - 6);
+					portnumber = this.pinnumber - 1 - (i - (this.pinnumber / 2 - 1));
 			}
-			if (i > 11) {
+			if (i > this.pinnumber - 3) {
 				ps[i] = new Port(dx, dy, Port.INPUT, 1);
-				if (i == 12)// GND
-					ps[i].setToolTip(Strings.getter("GND: 7"));
+				if (i == this.pinnumber - 2)// GND
+					ps[i].setToolTip(Strings.getter("GND: " + this.pinnumber / 2));
 				else// Vcc
-					ps[i].setToolTip(Strings.getter("Vcc: 14"));
-			} else if (this.name != "7404") {// 2 inputs 1 output
-				if ((i + 1) % 3 != 0) {
+					ps[i].setToolTip(Strings.getter("Vcc: " + this.pinnumber));
+			} else if (this.name == "7404") {// 1 inputs 1 output
+				if (i % 2 == 0) {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(portnumber)));
 				} else {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(portnumber)));
 				}
-			} else {// 1 input 1 output
-				if (i % 2 == 0) {
+			} else if (this.name == "7447") {
+				if (i < this.pinnumber / 2 - 1) {
+					ps[i] = new Port(dx, dy, Port.INPUT, 1);
+					ps[i].setToolTip(Strings.getter("multiplexerInTip",
+							String.valueOf(portnumber) + ": " + Ttl7447portnames[i]));
+				} else {
+					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
+					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
+							String.valueOf(portnumber) + ": " + Ttl7447portnames[i]));
+				}
+
+			} else {// 2 input 1 output
+				if ((i + 1) % 3 != 0) {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(portnumber)));
 				} else {

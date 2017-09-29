@@ -2,12 +2,12 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.9.5.0</jar_version>
+  <jar_version>2.9.6.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.9.5.0</exe_version>
+  <exe_version>2.9.6.0</exe_version>
   <changelog>
-* TTL new attributes: include Vcc and GND pins and Show Internal Structure
-* Moved to Eclipse Oxygen waiting for stable java 9 support
-* Code fixes
+* New TTL 7447: BCD to 7-segment decoder
+* Changed Display Decoder logic, now it includes LT, BI and RBI inputs
+* Now Logisim should be compatible with java 1.5+ but still compiled with java 1.8
   </changelog>
 </logisim>
