@@ -37,7 +37,7 @@ class ControlledBuffer extends InstanceFactory {
 			Strings.getter("controlledRightHanded"));
 	private static final AttributeOption LEFT_HANDED = new AttributeOption("left",
 			Strings.getter("controlledLeftHanded"));
-	static final Attribute<Boolean> NEGATE_CONTROL = Attributes.forBoolean("negatecontrol",
+	private static final Attribute<Boolean> NEGATE_CONTROL = Attributes.forBoolean("negatecontrol",
 			Strings.getter("NegateBufferControl"));
 	private static final Attribute<AttributeOption> ATTR_CONTROL = Attributes.forOption("control",
 			Strings.getter("controlledControlOption"), new AttributeOption[] { RIGHT_HANDED, LEFT_HANDED });

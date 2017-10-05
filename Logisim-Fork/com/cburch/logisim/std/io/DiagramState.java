@@ -32,7 +32,7 @@ class DiagramState implements InstanceData {
 		moveback = false;
 	}
 
-	@Override // kept from ttystate
+	@Override
 	public DiagramState clone() {
 		try {
 			DiagramState ret = (DiagramState) super.clone();

@@ -157,8 +157,6 @@ public class AppPreferences {
 	// Layout preferences
 	public static final String ADD_AFTER_UNCHANGED = "unchanged";
 	public static final String ADD_AFTER_EDIT = "edit";
-	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
-	public static final PrefMonitor<Boolean> AUTO_UPDATES = create(new PrefMonitorBoolean("AutoUpdates", true));
 	public static final PrefMonitor<Boolean> PRINTER_VIEW = create(new PrefMonitorBoolean("printerView", false));
 	public static final PrefMonitor<Boolean> ATTRIBUTE_HALO = create(new PrefMonitorBoolean("attributeHalo", true));
 	public static final PrefMonitor<Boolean> COMPONENT_TIPS = create(new PrefMonitorBoolean("componentTips", true));
@@ -193,6 +191,9 @@ public class AppPreferences {
 	public static final PrefMonitor<String> GRAPHICS_ACCELERATION = create(
 			new PrefMonitorStringOpts("graphicsAcceleration",
 					new String[] { ACCEL_DEFAULT, ACCEL_NONE, ACCEL_OPENGL, ACCEL_D3D }, ACCEL_DEFAULT));
+	//fork preferences
+	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
+	public static final PrefMonitor<Boolean> AUTO_UPDATES = create(new PrefMonitorBoolean("AutoUpdates", true));
 	// hidden window preferences - not part of the preferences dialog, changes
 	// to preference does not affect current windows, and the values are not
 	// saved until the application is closed

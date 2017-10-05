@@ -15,7 +15,7 @@ class ForkOptions extends OptionsPanel {
 	public ForkOptions(PreferencesFrame frame) {
 		super(frame);
 		checks = new PrefBoolean[] { new PrefBoolean(AppPreferences.ANTI_ALIASING, Strings.getter("AntiAliasing")),
-				new PrefBoolean(AppPreferences.AUTO_UPDATES, Strings.getter("AutoUpdates")), };
+				new PrefBoolean(AppPreferences.AUTO_UPDATES, Strings.getter("AutoUpdates")) };
 		JPanel panel = new JPanel();
 		setLayout(new TableLayout(1));
 		for (int i = 0; i < checks.length; i++) {

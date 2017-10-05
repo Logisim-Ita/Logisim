@@ -5,6 +5,7 @@ package com.cburch.logisim.gui.generic;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -44,18 +45,27 @@ public class CanvasPane extends JScrollPane {
 		public void propertyChange(PropertyChangeEvent e) {
 			String prop = e.getPropertyName();
 			if (prop.equals(ZoomModel.ZOOM)) {
+				// mouse point
+				Point point = getMousePosition(true);
 				double oldZoom = ((Double) e.getOldValue()).doubleValue();
 				Rectangle r = getViewport().getViewRect();
-				double cx = (r.x + r.width / 2) / oldZoom;
-				double cy = (r.y + r.height / 2) / oldZoom;
+				double cx = (r.getX() + r.getWidth() / 2) / oldZoom;
+				double cy = (r.getY() + r.getHeight() / 2) / oldZoom;
 
 				double newZoom = ((Double) e.getNewValue()).doubleValue();
 				contents.recomputeSize();
 				r = getViewport().getViewRect();
-				int hv = (int) (cx * newZoom) - r.width / 2;
-				int vv = (int) (cy * newZoom) - r.height / 2;
-				getHorizontalScrollBar().setValue(hv);
-				getVerticalScrollBar().setValue(vv);
+				if (point != null) {//mouse is pointing something
+					int newX = (int) Math.round(r.getX() / oldZoom * newZoom + point.getX() / oldZoom * newZoom - point.getX());
+					int newY = (int) Math.round(r.getY() / oldZoom * newZoom + point.getY() / oldZoom * newZoom - point.getY());
+					getHorizontalScrollBar().setValue(newX);
+					getVerticalScrollBar().setValue(newY);
+				} else {//mouse is outside from canvas panel
+					int hv = (int) (cx * newZoom - r.getWidth() / 2);
+					int vv = (int) (cy * newZoom - r.getHeight() / 2);
+					getHorizontalScrollBar().setValue(hv);
+					getVerticalScrollBar().setValue(vv);
+				}
 			}
 		}
 	}

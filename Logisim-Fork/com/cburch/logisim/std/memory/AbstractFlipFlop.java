@@ -4,14 +4,16 @@
 package com.cburch.logisim.std.memory;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
+import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
@@ -22,6 +24,7 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.std.plexers.Plexers;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringGetter;
 
@@ -44,9 +47,9 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		boolean isPressed = true;
 
 		private boolean isInside(InstanceState state, MouseEvent e) {
-			Location loc = state.getInstance().getLocation();
-			int dx = e.getX() - (loc.getX() - 20);
-			int dy = e.getY() - (loc.getY() + 10);
+			Bounds bds = state.getInstance().getBounds();
+			int dx = e.getX() - (bds.getX() + bds.getWidth() / 2);
+			int dy = e.getY() - (bds.getY() + bds.getHeight() / 2);
 			int d2 = dx * dx + dy * dy;
 			return d2 < 8 * 8;
 		}
@@ -74,21 +77,46 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		Value curValue = Value.FALSE;
 	}
 
-	private static final int STD_PORTS = 5;
+	private static final int STD_PORTS = 4;
 	private int inputs;
+	private Boolean newlayout = Boolean.TRUE;
 	private Attribute<AttributeOption> triggerAttribute;
+
+	// attribute clear preset position
+	private static final AttributeOption ABOVE_BELOW = new AttributeOption("ABOVE_BELOW", Strings.getter("AboveBelow"));
+	private static final AttributeOption BELOW_ABOVE = new AttributeOption("BELOW_ABOVE", Strings.getter("BelowAbove"));
+	private static final AttributeOption LEGACY = new AttributeOption("LEGACY", Strings.getter("Legacy"));
+	private static final Attribute<AttributeOption> PRE_CLR_POSITION = Attributes.forOption("Pre/Clr Positions",
+			Strings.getter("PresetClearPosition"), new AttributeOption[] { ABOVE_BELOW, BELOW_ABOVE, LEGACY });
+	// attribute negate clear preset
+	private static final Attribute<Boolean> NEGATE_PRE_CLR = Attributes.forBoolean("NegatePresetClear",
+			Strings.getter("NegatePresetClear"));
+	// attribute use old ff layout
+	private static final Attribute<Boolean> NEW_FF_LAYOUT = Attributes.forBoolean("NewFFLayout",
+			Strings.getter("NewFFLayout"));
 
 	protected AbstractFlipFlop(String name, String iconName, StringGetter desc, int numInputs,
 			boolean allowLevelTriggers) {
 		super(name, desc);
 		setIconName(iconName);
 		triggerAttribute = allowLevelTriggers ? StdAttr.FULL_TRIGGER : StdAttr.EDGE_TRIGGER;
-		setAttributes(new Attribute[] { triggerAttribute, StdAttr.LABEL, StdAttr.LABEL_FONT },
-				new Object[] { StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT });
-		setOffsetBounds(Bounds.create(-40, -10, 40, 40));
+		setAttributes(
+				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, Plexers.ATTR_ENABLE,
+						NEW_FF_LAYOUT, StdAttr.LABEL, StdAttr.LABEL_FONT },
+				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, "",
+						StdAttr.DEFAULT_LABEL_FONT });
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
-		inputs = numInputs;
+		this.inputs = numInputs;
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Boolean newlayout = attrs.getValue(NEW_FF_LAYOUT);
+		int width = newlayout ? 60 : 40;
+		int height = newlayout ? 80 : 40;
+		int offs = newlayout ? -20 : -10;
+		return Bounds.create(-width, offs, width, height);
 	}
 
 	protected abstract Value computeValue(Value[] inputs, Value curValue);
@@ -99,6 +127,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
+		this.newlayout = instance.getAttributeValue(NEW_FF_LAYOUT);
 		Bounds bds = instance.getBounds();
 		updateports(instance);
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
@@ -112,43 +141,171 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == triggerAttribute) {
-			updateports(instance);
+		if (attr == triggerAttribute || attr == Plexers.ATTR_ENABLE || attr == PRE_CLR_POSITION
+				|| attr == NEGATE_PRE_CLR) {
 			instance.recomputeBounds();
+			updateports(instance);
+		} else if (attr == NEW_FF_LAYOUT) {
+			this.newlayout = instance.getAttributeValue(NEW_FF_LAYOUT);
+			if (!this.newlayout) {
+				instance.getAttributeSet().setValue(PRE_CLR_POSITION, LEGACY);
+				instance.getAttributeSet().setValue(Plexers.ATTR_ENABLE, Boolean.TRUE);
+			}
+			instance.recomputeBounds();
+			updateports(instance);
+		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter, true);
+	}
+
+	private void paintBase(InstancePainter painter, boolean isGhost) {
+		Graphics g = painter.getGraphics();
+		Bounds bds = painter.getBounds();
+		int n = inputs;
+		int enable = painter.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0;
+		// 0=above/below,1=below/above,2=legacy
+		int prclrpos = painter.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
+				: painter.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2;
+		boolean prclrneg = painter.getAttributeValue(NEGATE_PRE_CLR);
+
+		if (!this.newlayout) {
+			painter.drawBounds();
+			if (isGhost)
+				return;
+		} else {
+			GraphicsUtil.switchToWidth(g, 2);
+			g.drawRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20);
+		}
+
+		if (!isGhost) {
+			g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+			if (painter.getShowState()) {
+				StateData myState = (StateData) painter.getData();
+				if (myState != null) {
+					int x = bds.getX();
+					int y = bds.getY();
+					g.setColor(myState.curValue.getColor());
+					g.fillOval(x + bds.getWidth() / 2 - 6, y + bds.getHeight() / 2 - 6, 13, 13);
+					g.setColor(Color.WHITE);
+					GraphicsUtil.drawCenteredText(g, myState.curValue.toDisplayString(), x + bds.getWidth() / 2 + 1,
+							y + bds.getHeight() / 2 - 1);
+					g.setColor(Color.BLACK);
+				}
+			}
+		}
+
+		if (!this.newlayout) {// old layout
+			// Q
+			painter.drawPort(n, "Q", Direction.WEST);
+			// Qn
+			painter.drawPort(n + 1);
+			g.setColor(Color.GRAY);
+			painter.drawPort(n + 2, "0", prclrpos == 1 ? Direction.NORTH : Direction.SOUTH);
+			painter.drawPort(n + 3, "1", prclrpos == 0 ? Direction.NORTH : Direction.SOUTH);
+			if (enable != 0) {
+				if (prclrpos == 2)
+					painter.drawPort(n + 4, Strings.get("memEnableLabel"), Direction.SOUTH);
+				else // if the enable is above i don't print the label because there isn't enough
+						// space
+					painter.drawPort(n + 4);
+			}
+			g.setColor(Color.BLACK);
+			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH)
+				painter.drawClock(n + STD_PORTS + enable, Direction.EAST);
+			for (int i = 0; i < n; i++)
+				painter.drawPort(i, getInputName(i), Direction.EAST);
+
+		} else { // new layout
+			if (prclrpos == 2 && enable != 0)
+				// lower centered port line for enable
+				g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight(),
+						bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - 10);
+			if (prclrpos != 2) {
+				if (!prclrneg) {
+					// upper centered port line (pr/clr)
+					g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY(), bds.getX() + bds.getWidth() / 2,
+							bds.getY() + 10);
+					// lower centered port line (pr/clr)
+					g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight(),
+							bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - 10);
+				} else {// negated pr/clr
+					g.drawOval(bds.getX() + 26, bds.getY() + 2, 8, 8);
+					g.drawOval(bds.getX() + 26, bds.getY() + bds.getHeight() - 10, 8, 8);
+				}
+				if (enable != 0)
+					// enable input line (up/left) only if not legacy position
+					g.drawLine(bds.getX() + 20, bds.getY(), bds.getX() + 20, bds.getY() + 10);
+			} else {// 1st and 3rd lower line if legacy position
+				if (!prclrneg) {
+					g.drawLine(bds.getX() + 20, bds.getY() + bds.getHeight(), bds.getX() + 20,
+							bds.getY() + bds.getHeight() - 10);
+					g.drawLine(bds.getX() + 40, bds.getY() + bds.getHeight(), bds.getX() + 40,
+							bds.getY() + bds.getHeight() - 10);
+				} else {// negated pr/clr
+					g.drawOval(bds.getX() + 16, bds.getY() + bds.getHeight() - 10, 8, 8);
+					g.drawOval(bds.getX() + 36, bds.getY() + bds.getHeight() - 10, 8, 8);
+				}
+			}
+			if (!isGhost) {
+				if (enable != 0)// enable not disabled
+					painter.drawPort(n + 4);
+				g.setColor(Color.GRAY);
+				GraphicsUtil.drawCenteredText(g, "0",
+						prclrpos != 2 ? bds.getX() + bds.getWidth() / 2
+								: this.newlayout ? bds.getX() + 40 : bds.getX() + 30,
+						prclrpos != 1 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
+				GraphicsUtil.drawCenteredText(g, "1",
+						prclrpos != 2 ? bds.getX() + bds.getWidth() / 2
+								: this.newlayout ? bds.getX() + 20 : bds.getX() + 10,
+						prclrpos != 0 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
+				g.setColor(Color.BLACK);
+			}
+			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
+				if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_FALLING)
+					g.drawLine(bds.getX(), bds.getY() + 20, bds.getX() + 10, bds.getY() + 20);
+				else
+					g.drawOval(bds.getX() + 2, bds.getY() + 16, 8, 8);
+				// triangle
+				g.drawLine(bds.getX() + 11, bds.getY() + 16, bds.getX() + 15, bds.getY() + 20);
+				g.drawLine(bds.getX() + 11, bds.getY() + 24, bds.getX() + 15, bds.getY() + 20);
+				if (!isGhost)
+					painter.drawPort(n + STD_PORTS + enable);
+			}
+			for (int i = 0; i < n; i++) {
+				// inputs
+				g.drawLine(bds.getX(), bds.getY() + (i + 1 == n ? 60 : 40), bds.getX() + 10,
+						bds.getY() + (i + 1 == n ? 60 : 40));
+				if (!isGhost) {
+					GraphicsUtil.drawCenteredText(g, getInputName(i), bds.getX() + 16,
+							bds.getY() + (i + 1 == n ? 58 : 40));
+					painter.drawPort(i);
+				}
+			}
+			// Qn
+			g.drawOval(bds.getX() + bds.getWidth() - 10, bds.getY() + bds.getHeight() - 24, 8, 8);
+			// Q
+			g.drawLine(bds.getX() + bds.getWidth() - 10, bds.getY() + 20, bds.getX() + bds.getWidth(), bds.getY() + 20);
+			if (!isGhost) {
+				// Q
+				GraphicsUtil.drawCenteredText(g, "Q", bds.getX() + 42, bds.getY() + 17);
+				painter.drawPort(n);
+				// Qn
+				painter.drawPort(n + 1);
+				// clear
+				painter.drawPort(n + 2);
+				// preset
+				painter.drawPort(n + 3);
+			}
 		}
 	}
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		paintBase(painter, false);
 		painter.drawLabel();
-		if (painter.getShowState()) {
-			Location loc = painter.getLocation();
-			StateData myState = (StateData) painter.getData();
-			if (myState != null) {
-				int x = loc.getX();
-				int y = loc.getY();
-				g.setColor(myState.curValue.getColor());
-				g.fillOval(x - 26, y + 4, 13, 13);
-				g.setColor(Color.WHITE);
-				GraphicsUtil.drawCenteredText(g, myState.curValue.toDisplayString(), x - 19, y + 9);
-				g.setColor(Color.BLACK);
-			}
-		}
-
-		int n = inputs;
-		g.setColor(Color.GRAY);
-		painter.drawPort(n + 2, "0", Direction.SOUTH);
-		painter.drawPort(n + 3, "1", Direction.SOUTH);
-		painter.drawPort(n + 4, Strings.get("memEnableLabel"), Direction.SOUTH);
-		g.setColor(Color.BLACK);
-		painter.drawPort(n, "Q", Direction.WEST);
-		painter.drawPort(n + 1);
-		if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH)
-			painter.drawClock(n + STD_PORTS, Direction.EAST);
-		for (int i = 0; i < n; i++)
-			painter.drawPort(i, getInputName(i), Direction.EAST);
 	}
 
 	@Override
@@ -160,15 +317,19 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		}
 
 		int n = inputs;
+		int enable = state.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0;
 		int withclock = state.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1;
 		Object triggerType = state.getAttributeValue(triggerAttribute);
-		boolean triggered = (withclock == 1) ? data.updateClock(state.getPort(n + STD_PORTS), triggerType) : true;
+		Value clear = state.getAttributeValue(NEGATE_PRE_CLR) ? state.getPort(n + 2).not() : state.getPort(n + 2);
+		Value preset = state.getAttributeValue(NEGATE_PRE_CLR) ? state.getPort(n + 3).not() : state.getPort(n + 3);
+		boolean triggered = (withclock == 1) ? data.updateClock(state.getPort(n + STD_PORTS + enable), triggerType)
+				: true;
 
-		if (state.getPort(n + 2) == Value.TRUE) { // clear requested
+		if (clear == Value.FALSE) { // clear requested
 			data.curValue = Value.FALSE;
-		} else if (state.getPort(n + 3) == Value.TRUE) { // preset requested
+		} else if (preset == Value.FALSE) { // preset requested
 			data.curValue = Value.TRUE;
-		} else if (triggered && state.getPort(n + 4) != Value.FALSE) {
+		} else if (triggered && (enable != 0 ? state.getPort(n + 4) != Value.FALSE : true)) {
 			// Clock has triggered and flip-flop is enabled: Update the state
 			Value[] inputs = new Value[n];
 			for (int i = 0; i < n; i++) {
@@ -186,32 +347,47 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
+		Bounds bds = instance.getBounds();
+		// 0=above/below,1=below/above,2=legacy
+		int prclrpos = instance.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
+				: instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2;
+		int enable = instance.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0;
 		int numInputs = this.inputs;
 		int withclock = instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1;
-		Port[] ps = new Port[numInputs + STD_PORTS + withclock];
+		Port[] ps = new Port[numInputs + STD_PORTS + withclock + enable];
 		if (numInputs == 1)
-			ps[0] = new Port(-40, 20, Port.INPUT, 1);
+			ps[0] = new Port(-bds.getWidth(), this.newlayout ? 40 : 20, Port.INPUT, 1);
 		else if (numInputs == 2) {
-			ps[0] = new Port(-40, 0, Port.INPUT, 1);
-			ps[1] = new Port(-40, 20, Port.INPUT, 1);
+			ps[0] = new Port(-bds.getWidth(), this.newlayout ? 20 : 0, Port.INPUT, 1);
+			ps[1] = new Port(-bds.getWidth(), this.newlayout ? 40 : 20, Port.INPUT, 1);
 		} else {
 			throw new RuntimeException("flip-flop input > 2");
 		}
 
 		if (instance.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
-			ps[numInputs + STD_PORTS] = new Port(-40, 10 * (numInputs - 1), Port.INPUT, 1);
-			ps[numInputs + STD_PORTS].setToolTip(Strings.getter("flipFlopClockTip"));
+			ps[numInputs + STD_PORTS + enable] = new Port(-bds.getWidth(), this.newlayout ? 0 : 10 * (numInputs - 1),
+					Port.INPUT, 1);
+			ps[numInputs + STD_PORTS + enable].setToolTip(Strings.getter("flipFlopClockTip"));
 		}
 		ps[numInputs] = new Port(0, 0, Port.OUTPUT, 1); // Q
-		ps[numInputs + 1] = new Port(0, 20, Port.OUTPUT, 1); // Qn
-		ps[numInputs + 2] = new Port(-10, 30, Port.INPUT, 1); // Clear
-		ps[numInputs + 3] = new Port(-30, 30, Port.INPUT, 1); // Preset
-		ps[numInputs + 4] = new Port(-20, 30, Port.INPUT, 1); // Enable
+		ps[numInputs + 1] = new Port(0, this.newlayout ? 40 : 20, Port.OUTPUT, 1); // Qn
+		ps[numInputs + 2] = new Port(prclrpos == 2 ? this.newlayout ? -bds.getWidth() / 3 : -10 : -bds.getWidth() / 2,
+				prclrpos == 1 ? this.newlayout ? -20 : -10 : this.newlayout ? bds.getHeight() - 20 : 30, Port.INPUT, 1); // Clear
+		ps[numInputs + 3] = new Port(
+				prclrpos == 2 ? this.newlayout ? -bds.getWidth() * 2 / 3 : -30 : -bds.getWidth() / 2,
+				prclrpos == 0 ? this.newlayout ? -20 : -10 : this.newlayout ? bds.getHeight() - 20 : 30, Port.INPUT, 1); // Preset
+		if (enable != 0) {
+			ps[numInputs + 4] = new Port(
+					prclrpos == 2 ? -bds.getWidth() / 2 : -bds.getWidth() + (this.newlayout ? 20 : 10),
+					this.newlayout ? -20 + (prclrpos == 2 ? bds.getHeight() : 0) : prclrpos == 2 ? 30 : -10, Port.INPUT,
+					1); // Enable
+			ps[numInputs + 4].setToolTip(Strings.getter("flipFlopEnableTip"));
+		}
 		ps[numInputs].setToolTip(Strings.getter("flipFlopQTip"));
 		ps[numInputs + 1].setToolTip(Strings.getter("flipFlopNotQTip"));
 		ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip"));
 		ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip"));
-		ps[numInputs + 4].setToolTip(Strings.getter("flipFlopEnableTip"));
+
 		instance.setPorts(ps);
 	}
 }
