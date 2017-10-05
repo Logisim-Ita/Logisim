@@ -425,10 +425,20 @@ class XmlReader {
 			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").endsWith("Flip-Flop")) {
+						//add the new attributes and set them to look like old flip-flops
+						Element prclrpos = doc.createElement("a");
+						prclrpos.setAttribute("name", "Pre/Clr Positions");
+						prclrpos.setAttribute("val", "LEGACY");
+						compElt.appendChild(prclrpos);
+						Element enable = doc.createElement("a");
+						enable.setAttribute("name", "enable");
+						enable.setAttribute("val", "true");
+						compElt.appendChild(enable);
 						Element newlayout = doc.createElement("a");
 						newlayout.setAttribute("name", "NewFFLayout");
-						newlayout.setAttribute("value", "false");
+						newlayout.setAttribute("val", "false");
 						compElt.appendChild(newlayout);
+
 					}
 				}
 			}
