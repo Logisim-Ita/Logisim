@@ -421,6 +421,18 @@ class XmlReader {
 			repairForWiringLibrary(doc, root);
 			repairForLegacyLibrary(doc, root);
 		}
+		if (version.compareTo(LogisimVersion.get(2, 10, 0, 0)) < 0) {
+			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").endsWith("Flip-Flop")) {
+						Element newlayout = doc.createElement("a");
+						newlayout.setAttribute("name", "NewFFLayout");
+						newlayout.setAttribute("value", "false");
+						compElt.appendChild(newlayout);
+					}
+				}
+			}
+		}
 	}
 
 	private Document loadXmlFrom(InputStream is) throws SAXException, IOException {

@@ -191,7 +191,7 @@ public class AppPreferences {
 	public static final PrefMonitor<String> GRAPHICS_ACCELERATION = create(
 			new PrefMonitorStringOpts("graphicsAcceleration",
 					new String[] { ACCEL_DEFAULT, ACCEL_NONE, ACCEL_OPENGL, ACCEL_D3D }, ACCEL_DEFAULT));
-	//fork preferences
+	// fork preferences
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
 	public static final PrefMonitor<Boolean> AUTO_UPDATES = create(new PrefMonitorBoolean("AutoUpdates", true));
 	// hidden window preferences - not part of the preferences dialog, changes
