@@ -55,12 +55,14 @@ public class CanvasPane extends JScrollPane {
 				double newZoom = ((Double) e.getNewValue()).doubleValue();
 				contents.recomputeSize();
 				r = getViewport().getViewRect();
-				if (point != null) {//mouse is pointing something
-					int newX = (int) Math.round(r.getX() / oldZoom * newZoom + point.getX() / oldZoom * newZoom - point.getX());
-					int newY = (int) Math.round(r.getY() / oldZoom * newZoom + point.getY() / oldZoom * newZoom - point.getY());
+				if (point != null) {// mouse is pointing something
+					int newX = (int) Math
+							.round(r.getX() / oldZoom * newZoom + point.getX() / oldZoom * newZoom - point.getX());
+					int newY = (int) Math
+							.round(r.getY() / oldZoom * newZoom + point.getY() / oldZoom * newZoom - point.getY());
 					getHorizontalScrollBar().setValue(newX);
 					getVerticalScrollBar().setValue(newY);
-				} else {//mouse is outside from canvas panel
+				} else {// mouse is outside from canvas panel
 					int hv = (int) (cx * newZoom - r.getWidth() / 2);
 					int vv = (int) (cy * newZoom - r.getHeight() / 2);
 					getHorizontalScrollBar().setValue(hv);

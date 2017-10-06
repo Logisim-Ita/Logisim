@@ -421,11 +421,63 @@ class XmlReader {
 			repairForWiringLibrary(doc, root);
 			repairForLegacyLibrary(doc, root);
 		}
+		// compatibility for new gates attributes
+		if (version.compareTo(LogisimVersion.get(2, 7, 2, 0)) <= 0) {
+			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null) {
+						if (compElt.getAttribute("name").equals("AND Gate")
+								|| compElt.getAttribute("name").equals("NAND Gate")
+								|| compElt.getAttribute("name").equals("OR Gate")
+								|| compElt.getAttribute("name").equals("NOR Gate")
+								|| compElt.getAttribute("name").equals("XOR Gate")
+								|| compElt.getAttribute("name").equals("XNOR Gate")) {
+							boolean defaultsizeattribute = true;
+							boolean defaultinputsattribute = true;
+							// check if the attribute is already defined
+							for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+								if (attrElt.getAttribute("name").equals("size"))
+									defaultsizeattribute = false;
+								if (attrElt.getAttribute("name").equals("inputs"))
+									defaultinputsattribute = false;
+							}
+							// if these attributes are not defined, set them to match with old default value
+							if (defaultsizeattribute) {
+								Element sizeattribute = doc.createElement("a");
+								sizeattribute.setAttribute("name", "size");
+								sizeattribute.setAttribute("val", "50");
+								compElt.appendChild(sizeattribute);
+							}
+							if (defaultinputsattribute) {
+								Element inputsattribute = doc.createElement("a");
+								inputsattribute.setAttribute("name", "inputs");
+								inputsattribute.setAttribute("val", "5");
+								compElt.appendChild(inputsattribute);
+							}
+						} else if (compElt.getAttribute("name").equals("NOT Gate")) { // the not hasn't the inputs
+																						// attribute
+							boolean defaultsizeattribute = true;
+							for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+								if (attrElt.getAttribute("name").startsWith("size"))
+									defaultsizeattribute = false;
+							}
+							if (defaultsizeattribute) {
+								Element sizeattribute = doc.createElement("a");
+								sizeattribute.setAttribute("name", "size");
+								sizeattribute.setAttribute("val", "30");
+								compElt.appendChild(sizeattribute);
+							}
+						}
+					}
+				}
+			}
+		}
+		// compatibility for new ff layout
 		if (version.compareTo(LogisimVersion.get(2, 10, 0, 0)) < 0) {
 			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").endsWith("Flip-Flop")) {
-						//add the new attributes and set them to look like old flip-flops
+						// add the new attributes and set them to look like old flip-flops
 						Element prclrpos = doc.createElement("a");
 						prclrpos.setAttribute("name", "Pre/Clr Positions");
 						prclrpos.setAttribute("val", "LEGACY");

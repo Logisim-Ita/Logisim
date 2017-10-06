@@ -191,9 +191,9 @@ public class DigitalOscilloscope extends InstanceFactory {
 					new int[] { y + border + i * 30 + 27 + showclock * 2, y + border + i * 30 + 30 + showclock * 2,
 							y + border + i * 30 + 33 + showclock * 2 },
 					3);
-			if (showclock == 1 && i == 0)//clock diagram color
+			if (showclock == 1 && i == 0)// clock diagram color
 				g.setColor(painter.getAttributeValue(ATTR_COLOR).darker().darker());
-			else//input diagrams color
+			else// input diagrams color
 				g.setColor(Color.BLACK);
 			// draw diagram
 			for (int j = 0; j < length; j++) {
@@ -214,7 +214,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 						g.drawLine(x + border + 15 * (j + 1), y + 2 * border + 30 * i + showclock * 2,
 								x + border + 15 * (j + 1), y + border + 30 * (i + 1) + showclock * 2);
 					}
-					if (i == 0 && painter.getAttributeValue(VERT_LINE) != NO) {// drawclocknumber
+					if (i == 0 && painter.getAttributeValue(VERT_LINE) != NO && showclock == 1) {// drawclocknumber
 						nck--;
 						Integer cknum = ((diagramstate.getclocknumber() - nck) > 0)
 								? diagramstate.getclocknumber() - nck

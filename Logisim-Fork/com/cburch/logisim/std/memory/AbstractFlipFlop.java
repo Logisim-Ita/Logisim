@@ -78,12 +78,10 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	}
 
 	private static final int STD_PORTS = 4;
-	private int inputs;
-	private Attribute<AttributeOption> triggerAttribute;
-
 	// attribute clear preset position
 	private static final AttributeOption ABOVE_BELOW = new AttributeOption("ABOVE_BELOW", Strings.getter("AboveBelow"));
 	private static final AttributeOption BELOW_ABOVE = new AttributeOption("BELOW_ABOVE", Strings.getter("BelowAbove"));
+
 	private static final AttributeOption LEGACY = new AttributeOption("LEGACY", Strings.getter("Legacy"));
 	private static final Attribute<AttributeOption> PRE_CLR_POSITION = Attributes.forOption("Pre/Clr Positions",
 			Strings.getter("PresetClearPosition"), new AttributeOption[] { ABOVE_BELOW, BELOW_ABOVE, LEGACY });
@@ -93,6 +91,8 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	// attribute use old ff layout
 	private static final Attribute<Boolean> NEW_FF_LAYOUT = Attributes.forBoolean("NewFFLayout",
 			Strings.getter("NewFFLayout"));
+	private int inputs;
+	private Attribute<AttributeOption> triggerAttribute;
 
 	protected AbstractFlipFlop(String name, String iconName, StringGetter desc, int numInputs,
 			boolean allowLevelTriggers) {
@@ -108,15 +108,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		setInstanceLogger(Logger.class);
 		this.inputs = numInputs;
 	}
-
-	@Override
-	public Bounds getOffsetBounds(AttributeSet attrs) {
-		Boolean newlayout = attrs.getValue(NEW_FF_LAYOUT);
-		int width = newlayout ? 60 : 40;
-		int height = newlayout ? 80 : 40;
-		int offs = newlayout ? -20 : -10;
-		return Bounds.create(-width, offs, width, height);
-	} 
 
 	protected abstract Value computeValue(Value[] inputs, Value curValue);
 
@@ -138,6 +129,15 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	protected abstract String getInputName(int index);
 
 	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Boolean newlayout = attrs.getValue(NEW_FF_LAYOUT);
+		int width = newlayout ? 60 : 40;
+		int height = newlayout ? 80 : 40;
+		int offs = newlayout ? -20 : -10;
+		return Bounds.create(-width, offs, width, height);
+	}
+
+	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == triggerAttribute || attr == Plexers.ATTR_ENABLE || attr == PRE_CLR_POSITION
 				|| attr == NEGATE_PRE_CLR) {
@@ -151,11 +151,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			instance.recomputeBounds();
 			updateports(instance);
 		}
-	}
-
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		paintBase(painter, true);
 	}
 
 	private void paintBase(InstancePainter painter, boolean isGhost) {
@@ -295,6 +290,11 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				painter.drawPort(n + 3);
 			}
 		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter, true);
 	}
 
 	@Override

@@ -219,7 +219,7 @@ public class DisplayDecoder extends InstanceFactory {
 
 	public DisplayDecoder() {
 		super("DisplayDecoder", Strings.getter("DisplayDecoderComponent"));
-		setAttributes(new Attribute[] { StdAttr.FACING, MULTI_BIT }, new Object[] { Direction.EAST, Boolean.FALSE });
+		setAttributes(new Attribute[] { StdAttr.FACING, MULTI_BIT }, new Object[] { Direction.EAST, Boolean.TRUE });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("displaydecoder.gif");
 	}
