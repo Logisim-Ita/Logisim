@@ -18,6 +18,7 @@ public class AnalyzerManager extends WindowMenuItemManager implements LocaleList
 		if (analysisWindow == null) {
 			analysisWindow = new Analyzer();
 			analysisWindow.pack();
+			analysisWindow.setLocationRelativeTo(null);
 			if (analysisManager != null)
 				analysisManager.frameOpened(analysisWindow);
 		}

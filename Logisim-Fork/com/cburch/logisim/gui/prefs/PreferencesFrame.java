@@ -121,5 +121,6 @@ public class PreferencesFrame extends LFrame {
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 		pack();
+		setLocationRelativeTo(null);
 	}
 }

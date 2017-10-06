@@ -41,7 +41,7 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	 */
 	private static final long serialVersionUID = -8687487329361908314L;
 	private static final Font HEAD_FONT = new Font("sans serif", Font.BOLD, 14);
-	private static final Font BODY_FONT = new Font("sans serif", Font.PLAIN, 14);
+	private static final Font BODY_FONT = new Font("sans serif", Font.BOLD, 14);
 	private static final int COLUMN_SEP = 8;
 
 	private static final int HEADER_SEP = 4;
@@ -57,7 +57,10 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	private Entry provisionalValue = null;
 	private TableTabCaret caret;
 	private TableTabClip clip;
-
+	private final Color[] colors = { new Color(48, 48, 48), new Color(128, 128, 128), new Color(144, 64, 192),
+			new Color(192, 0, 192), new Color(0, 0, 255), new Color(0, 192, 192), new Color(0, 128, 0),
+			new Color(0, 192, 0), new Color(255, 96, 128), new Color(222, 0, 0) };
+	
 	public TableTab(TruthTable table) {
 		this.table = table;
 		table.addTruthTableListener(myListener);
@@ -260,11 +263,11 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 		super.paintComponent(g);
-
+		GraphicsUtil.switchToWidth(g, 1.5f);
 		caret.paintBackground(g);
 
 		Dimension sz = getSize();
-		int top = Math.max(0, (sz.height - tableHeight) / 2);
+		int top = Math.max(0, (sz.height - tableHeight) / 2)+5;
 		int left = Math.max(0, (sz.width - tableWidth) / 2);
 		int inputs = table.getInputColumnCount();
 		int outputs = table.getOutputColumnCount();
@@ -274,7 +277,6 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 			return;
 		}
 
-		g.setColor(Color.GRAY);
 		int lineX = left + (cellWidth + COLUMN_SEP) * inputs - COLUMN_SEP / 2;
 		if (inputs == 0)
 			lineX = left + cellWidth + COLUMN_SEP / 2;
@@ -282,7 +284,6 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		g.drawLine(left, lineY, left + tableWidth, lineY);
 		g.drawLine(lineX, top, lineX, top + tableHeight);
 
-		g.setColor(Color.BLACK);
 		g.setFont(HEAD_FONT);
 		FontMetrics headerMetric = g.getFontMetrics();
 		int x = left;
@@ -313,6 +314,7 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 			left += cellWidth + COLUMN_SEP;
 		boolean provisional = false;
 		for (int i = firstRow; i < lastRow; i++) {
+			g.setColor(colors[i % 10]);
 			x = left;
 			for (int j = 0; j < inputs + outputs; j++) {
 				Entry entry = j < inputs ? table.getInputEntry(i, j) : table.getOutputEntry(i, j - inputs);

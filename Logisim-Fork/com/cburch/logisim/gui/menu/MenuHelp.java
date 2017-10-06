@@ -93,6 +93,7 @@ class MenuHelp extends JMenu implements ActionListener {
 					helpFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 					helpFrame.getContentPane().add(helpComponent);
 					helpFrame.pack();
+					helpFrame.setLocationRelativeTo(null);
 				} else {
 					helpFrame.getContentPane().removeAll();
 					helpFrame.getContentPane().add(helpComponent);

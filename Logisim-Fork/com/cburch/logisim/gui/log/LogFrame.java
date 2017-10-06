@@ -175,6 +175,7 @@ public class LogFrame extends LFrame {
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	Model getModel() {

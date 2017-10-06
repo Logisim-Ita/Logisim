@@ -129,6 +129,7 @@ public class OptionsFrame extends LFrame {
 		LocaleManager.addLocaleListener(myListener);
 		myListener.localeChanged();
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	public LogisimFile getLogisimFile() {

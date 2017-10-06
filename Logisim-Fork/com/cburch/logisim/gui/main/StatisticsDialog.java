@@ -194,7 +194,7 @@ public class StatisticsDialog extends JDialog implements ActionListener {
 		contents.add(tablePane, BorderLayout.CENTER);
 		contents.add(buttonPanel, BorderLayout.PAGE_END);
 		this.pack();
-
+		this.setLocationRelativeTo(null);
 		Dimension pref = contents.getPreferredSize();
 		if (pref.width > 750 || pref.height > 550) {
 			if (pref.width > 750)
