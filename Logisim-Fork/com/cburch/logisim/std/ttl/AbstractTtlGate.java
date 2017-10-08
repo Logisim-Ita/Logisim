@@ -19,11 +19,15 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public abstract class AbstractTtlGate extends InstanceFactory {
 
+	protected final String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
+			"e" };
+	protected final String Ttl74283portnames[] = { "∑2", "B2", "A2", "∑1", "A1", "B1", "CIN", "B3", "A3", "∑3", "A4",
+			"B4", "∑4", "COUT" };
 	protected static final int pinwidth = 10, pinheight = 7, height = 60;
 	private String name;
 	protected int pinnumber;
 
-	protected AbstractTtlGate(String name) {
+	protected AbstractTtlGate(String name, int pins) {
 		super(name);
 		setIconName("ttl.gif");
 		setAttributes(
@@ -32,10 +36,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				new Object[] { Direction.EAST, false, false, "", StdAttr.DEFAULT_LABEL_FONT });
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
-		if (this.name == "7447")
-			this.pinnumber = 16;
-		else
-			this.pinnumber = 14;
+		this.pinnumber = pins;
 	}
 
 	private void computeTextField(Instance instance) {
@@ -131,7 +132,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		}
 		g.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 7));
 		GraphicsUtil.drawCenteredText(g, "Vcc", xp + 10, yp + pinheight + 4);
-		GraphicsUtil.drawCenteredText(g, "GND", xp + width - 10, yp + height - pinheight - 8);
+		GraphicsUtil.drawCenteredText(g, "GND", xp + width - 10, yp + height - pinheight - 7);
 	}
 
 	@Override
@@ -255,7 +256,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			width = bds.getHeight();
 			height = bds.getWidth();
 		}
-		if (this.name != "7447") {
+		if (this.pinnumber == 14) {
 			paintBase(painter, false);
 			int c = this.name != "7404" ? 4 : 6;
 			for (int i = 0; i < c; i++) {
@@ -284,7 +285,6 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		Port[] ps = new Port[instance.getAttributeValue(TTL.VCC_GND) ? this.pinnumber : this.pinnumber - 2];
 		int dx = 0, dy = 0, portnumber = 1;
-		String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g", "f" };
 		for (int i = 0; i < ps.length; i++) {// GND->12,Vcc->13
 			if (i < this.pinnumber / 2 - 1 || i == this.pinnumber - 2) {
 				if (i == this.pinnumber - 2)
@@ -345,13 +345,23 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				if (i < this.pinnumber / 2 - 1) {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + Ttl7447portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttl7447portnames[i]));
 				} else {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + Ttl7447portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttl7447portnames[i]));
 				}
 
+			} else if (this.name == "74283") {
+				if (i == 0 || i == 3 || i == 9 || i == 12 || i == 13) {
+					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
+					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
+							String.valueOf(portnumber) + ": " + this.Ttl74283portnames[i]));
+				} else {
+					ps[i] = new Port(dx, dy, Port.INPUT, 1);
+					ps[i].setToolTip(Strings.getter("multiplexerInTip",
+							String.valueOf(portnumber) + ": " + this.Ttl74283portnames[i]));
+				}
 			} else {// 2 input 1 output
 				if ((i + 1) % 3 != 0) {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
