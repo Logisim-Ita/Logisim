@@ -21,6 +21,8 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 
 	protected final String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
 			"e" };
+	protected final String Ttl7485portnames[] = { "B3", "A<B", "A=B", "A>B", "A<B", "A=B", "A>B", "A3", "B2", "A2",
+			"A1", "B1", "A0", "B0" };
 	protected final String Ttl74283portnames[] = { "∑2", "B2", "A2", "∑1", "A1", "B1", "CIN", "B3", "A3", "∑3", "A4",
 			"B4", "∑4", "COUT" };
 	protected static final int pinwidth = 10, pinheight = 7, height = 60;
@@ -350,6 +352,17 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
 							String.valueOf(portnumber) + ": " + this.Ttl7447portnames[i]));
+				}
+
+			} else if (this.name == "7485") {
+				if (i < 7 && i > 3) {
+					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
+					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
+							String.valueOf(portnumber) + ": " + this.Ttl7485portnames[i]));
+				} else {
+					ps[i] = new Port(dx, dy, Port.INPUT, 1);
+					ps[i].setToolTip(Strings.getter("multiplexerInTip",
+							String.valueOf(portnumber) + ": " + this.Ttl7485portnames[i]));
 				}
 
 			} else if (this.name == "74283") {
