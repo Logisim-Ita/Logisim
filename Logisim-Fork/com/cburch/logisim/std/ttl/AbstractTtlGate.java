@@ -19,13 +19,13 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public abstract class AbstractTtlGate extends InstanceFactory {
 
+	protected static final int pinwidth = 10, pinheight = 7, height = 60;
 	protected final String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
 			"e" };
 	protected final String Ttl7485portnames[] = { "B3", "A<B", "A=B", "A>B", "A<B", "A=B", "A>B", "A3", "B2", "A2",
 			"A1", "B1", "A0", "B0" };
 	protected final String Ttl74283portnames[] = { "∑2", "B2", "A2", "∑1", "A1", "B1", "CIN", "B3", "A3", "∑3", "A4",
 			"B4", "∑4", "COUT" };
-	protected static final int pinwidth = 10, pinheight = 7, height = 60;
 	private String name;
 	protected int pinnumber;
 

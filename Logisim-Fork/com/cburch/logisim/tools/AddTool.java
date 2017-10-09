@@ -298,6 +298,21 @@ public class AddTool extends Tool {
 					canvas.getProject().undoAction();
 					lastAddition = null;
 				}
+				break;
+			case KeyEvent.VK_DELETE:
+			case KeyEvent.VK_ESCAPE:
+				if (state == SHOW_GHOST) {
+					Project proj = canvas.getProject();
+					Tool next = determineNext(proj);
+					if (next != null) {
+						proj.setTool(next);
+						Action act = SelectionActions.dropAll(canvas.getSelection());
+						if (act != null) {
+							proj.doAction(act);
+						}
+					}
+				}
+				break;
 			}
 		}
 	}

@@ -6,38 +6,34 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Italian translation!
 * Possibility to use french translations already done (not very well)
 * New components:
-	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7486, 747266)
+	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7485, 7486, 74283, 747266)
 	* I/O->Digital Oscilloscope
 	* I/O->Switch
 	* I/O->RGB LED
 	* Memory->PLA ROM
 	* Plexers->7-Segment Display Decoder
-* Controlled Buffer / Inverter: Negate Control Input
+* New FF layout and attributes
 * FF D, S-R: Latch option in trigger list
+* Controlled Buffer / Inverter: Negate Control Input
+* Press ESC or DEL to cancel "Add Tool" action
 * TTY and Keyboard components can use 16-bit values (UTF-16)
 * Added 7-Segment Display input names
-* Zoom in and out using mouse wheel
+* Zoom in and out using mouse wheel where you're pointing at
 * Autoupdates!
 * Big fixes to Log menu and Log output file
-* Default gates' attributes: narrow, 2 inputs
+* Default gates attributes: narrow, 2 inputs
 * Anti Aliasing option
-* Some small graphic editing
+* Some small graphical changes
 ## Features we want to add
 * Move to Java 9
 * Change Flip Flops layout
 * TTL flip flops
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
-<p>You can use .circ files saved in the original version but if you have kept the default size value or the default number of inputs<br>
-in a gate, it will be changed with the new default values (narrow, 2 inputs)<br>
-This will happen only if you didn't change these attributes (if you have selected medium size it will work)<br>
-<b>Examples:</b><br> You used an AND gate keeping the default size (medium) in the original version, in this version it will be narrow.
-You used an AND gate and you selected medium size in the original version, in this version it will be medium.</p>
-P.S. Obviously you can't open a file containing new components in the original version
-
+I should have solved every problem with new changes, contact us if you have any kind of problem
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile & use
 Watch our tutorials on "TUTORIAL" section of our [website](https://logisim.altervista.org)
 ## Translation
-New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one,if you want so contact me at logisimit@gmail.com
+New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one, if you want so, contact me at logisimit@gmail.com

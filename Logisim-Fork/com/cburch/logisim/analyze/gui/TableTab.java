@@ -57,10 +57,10 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 	private Entry provisionalValue = null;
 	private TableTabCaret caret;
 	private TableTabClip clip;
-	private final Color[] colors = { new Color(48, 48, 48), new Color(128, 128, 128), new Color(144, 64, 192),
-			new Color(192, 0, 192), new Color(0, 0, 255), new Color(0, 192, 192), new Color(0, 128, 0),
-			new Color(0, 192, 0), new Color(255, 96, 128), new Color(222, 0, 0) };
-	
+	private final Color[] colors = { new Color(128, 128, 128), new Color(144, 64, 192), new Color(192, 0, 192),
+			new Color(0, 0, 255), new Color(0, 192, 192), new Color(0, 128, 0), new Color(0, 192, 0),
+			new Color(255, 96, 128), new Color(222, 0, 0), new Color(48, 48, 48) };
+
 	public TableTab(TruthTable table) {
 		this.table = table;
 		table.addTruthTableListener(myListener);
@@ -267,7 +267,7 @@ class TableTab extends JPanel implements TruthTablePanel, TabInterface {
 		caret.paintBackground(g);
 
 		Dimension sz = getSize();
-		int top = Math.max(0, (sz.height - tableHeight) / 2)+5;
+		int top = Math.max(0, (sz.height - tableHeight) / 2);
 		int left = Math.max(0, (sz.width - tableWidth) / 2);
 		int inputs = table.getInputColumnCount();
 		int outputs = table.getOutputColumnCount();

@@ -93,9 +93,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		//
 		@Override
 		public void keyPressed(KeyEvent e) {
-			Tool tool = proj.getTool();
-			if (tool != null)
-				tool.keyPressed(Canvas.this, e);
+			if (e.getKeyCode() == KeyEvent.VK_F5) {
+				Canvas.this.repaint();
+			} else {
+				Tool tool = proj.getTool();
+				if (tool != null)
+					tool.keyPressed(Canvas.this, e);
+			}
 		}
 
 		@Override

@@ -6,8 +6,16 @@
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
   <exe_version>2.10.0.0</exe_version>
   <changelog>
-* New TTL 7447: BCD to 7-segment decoder
-* Changed Display Decoder logic, now it includes LT, BI and RBI inputs
-* Now Logisim should be compatible with java 1.5+ but still compiled with java 1.8
+* New Flip-Flops attributes and new layout(fully retro-compatible)
+* New TTL 7485: 4-bit magnitude comparator
+* New TTL 74283: 4-bit binary full adder
+* Solved every kind of retro-compatibility problem
+* Mouse wheel now will zoom where you're pointing at
+* Press ESC or DEL to cancel "add tool" function
+* Truth table is now displayed with a different color for each row
+* Press F5 to repaint canvas
+* Fixed a bug in Digital Oscilloscope and in translations
+* All the menu windows now will open at the screen center
+* Display Decoder: multibit attribute changed into true by default
   </changelog>
 </logisim>

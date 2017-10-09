@@ -8,7 +8,7 @@ import com.cburch.logisim.instance.InstanceState;
 public class Ttl7486 extends AbstractTtlGate {
 
 	public Ttl7486() {
-		super("7486",14);
+		super("7486", 14);
 	}
 
 	@Override
