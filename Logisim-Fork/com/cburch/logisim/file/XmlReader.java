@@ -639,8 +639,8 @@ class XmlReader {
 			wiringElt = doc.createElement("lib");
 			wiringElt.setAttribute("desc", "#Wiring");
 			wiringElt.setAttribute("name", wiringLabel);
-			root.insertBefore(wiringElt, lastLibElt.getNextSibling());
-
+			if (lastLibElt != null)
+				root.insertBefore(wiringElt, lastLibElt.getNextSibling());
 			newBaseLabel = null;
 			newBaseElt = null;
 		}

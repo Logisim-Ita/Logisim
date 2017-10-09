@@ -324,7 +324,7 @@ public class Startup {
 	 */
 	public boolean autoUpdate() {
 		if (!AppPreferences.AUTO_UPDATES.getBoolean() || !networkConnectionAvailable()) {
-			// Auto-update disabled from command line, or network connection not
+			// Auto-update disabled from command line or preference window, or network connection not
 			// available
 			return (false);
 		}
