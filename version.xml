@@ -13,7 +13,7 @@
 * Mouse wheel now will zoom where you're pointing at
 * Press ESC or DEL to cancel "add tool" function
 * Truth table is now displayed with a different color for each row
-* Press F5 to repaint canvas
+* Press F5 to repaint
 * Fixed a bug in Digital Oscilloscope and in translations
 * All the menu windows now will open at the screen center
 * Display Decoder: multibit attribute changed into true by default
