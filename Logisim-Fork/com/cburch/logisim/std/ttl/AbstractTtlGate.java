@@ -20,14 +20,9 @@ import com.cburch.logisim.util.GraphicsUtil;
 public abstract class AbstractTtlGate extends InstanceFactory {
 
 	protected static final int pinwidth = 10, pinheight = 7, height = 60;
-	protected final String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
-			"e" };
-	protected final String Ttl7485portnames[] = { "B3", "A<B", "A=B", "A>B", "A<B", "A=B", "A>B", "A3", "B2", "A2",
-			"A1", "B1", "A0", "B0" };
-	protected final String Ttl74283portnames[] = { "∑2", "B2", "A2", "∑1", "A1", "B1", "CIN", "B3", "A3", "∑3", "A4",
-			"B4", "∑4", "COUT" };
 	private String name;
 	protected int pinnumber;
+	protected String[] Ttlportnames = null;
 
 	protected AbstractTtlGate(String name, int pins) {
 		super(name);
@@ -39,6 +34,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
 		this.pinnumber = pins;
+	}
+
+	protected AbstractTtlGate(String name, int pins, String[] Ttlportnames) {
+		this(name, pins);
+		this.Ttlportnames = Ttlportnames;
 	}
 
 	private void computeTextField(Instance instance) {
@@ -347,33 +347,33 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				if (i < this.pinnumber / 2 - 1) {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttl7447portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				} else {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttl7447portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				}
 
 			} else if (this.name == "7485") {
 				if (i < 7 && i > 3) {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttl7485portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				} else {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttl7485portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				}
 
 			} else if (this.name == "74283") {
 				if (i == 0 || i == 3 || i == 9 || i == 12 || i == 13) {
 					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
 					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttl74283portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				} else {
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttl74283portnames[i]));
+							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
 				}
 			} else {// 2 input 1 output
 				if ((i + 1) % 3 != 0) {

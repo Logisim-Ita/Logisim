@@ -8,8 +8,11 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl7485 extends AbstractTtlGate {
+	protected final static String Ttl7485portnames[] = { "B3", "A<B", "A=B", "A>B", "A<B", "A=B", "A>B", "A3", "B2",
+			"A2", "A1", "B1", "A0", "B0" };
+
 	public Ttl7485() {
-		super("7485", 16);
+		super("7485", 16, Ttl7485portnames);
 	}
 
 	@Override
@@ -19,7 +22,7 @@ public class Ttl7485 extends AbstractTtlGate {
 				height - 2 * AbstractTtlGate.pinheight - 20);
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 7; j++) {
-				GraphicsUtil.drawCenteredText(g, super.Ttl7485portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
+				GraphicsUtil.drawCenteredText(g, Ttl7485portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
 						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
 			}
 		}

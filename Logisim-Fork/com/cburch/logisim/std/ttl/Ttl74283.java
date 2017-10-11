@@ -9,8 +9,11 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl74283 extends AbstractTtlGate {
+	protected final static String[] Ttl74283portnames = { "∑2", "B2", "A2", "∑1", "A1", "B1", "CIN", "B3", "A3", "∑3",
+			"A4", "B4", "∑4", "COUT" };
+
 	public Ttl74283() {
-		super("74283", 16);
+		super("74283", 16, Ttl74283portnames);
 	}
 
 	@Override
@@ -20,7 +23,7 @@ public class Ttl74283 extends AbstractTtlGate {
 				height - 2 * AbstractTtlGate.pinheight - 20);
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 7; j++) {
-				GraphicsUtil.drawCenteredText(g, super.Ttl74283portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
+				GraphicsUtil.drawCenteredText(g, Ttl74283portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
 						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
 			}
 		}
@@ -38,16 +41,11 @@ public class Ttl74283 extends AbstractTtlGate {
 		byte B4 = state.getPort(11) == Value.TRUE ? (byte) 8 : 0;
 		byte CIN = state.getPort(6) == Value.TRUE ? (byte) 1 : 0;
 		byte sum = (byte) (A1 + A2 + A3 + A4 + B1 + B2 + B3 + B4 + CIN);
-		if (sum > 15) {
-			sum -= 16;
-			state.setPort(13, Value.TRUE, 1);
-		} else {
-			state.setPort(13, Value.FALSE, 1);
-		}
-		Value output = Value.createKnown(BitWidth.create(4), sum);
+		Value output = Value.createKnown(BitWidth.create(5), sum);
 		state.setPort(3, output.get(0), 1);
 		state.setPort(0, output.get(1), 1);
 		state.setPort(9, output.get(2), 1);
 		state.setPort(12, output.get(3), 1);
+		state.setPort(13, output.get(4), 1);
 	}
 }

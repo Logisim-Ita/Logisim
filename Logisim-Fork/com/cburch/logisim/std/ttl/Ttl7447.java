@@ -8,9 +8,12 @@ import com.cburch.logisim.std.plexers.DisplayDecoder;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl7447 extends AbstractTtlGate {
+	
+	protected final static String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
+	"e" };
 
 	public Ttl7447() {
-		super("7447", 16);
+		super("7447", 16,Ttl7447portnames);
 	}
 
 	@Override
@@ -20,7 +23,7 @@ public class Ttl7447 extends AbstractTtlGate {
 				height - 2 * AbstractTtlGate.pinheight - 20);
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 7; j++) {
-				GraphicsUtil.drawCenteredText(g, super.Ttl7447portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
+				GraphicsUtil.drawCenteredText(g, Ttl7447portnames[j + (i * 7)], x + 10 + j * 20 + i * 20,
 						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
 			}
 		}
