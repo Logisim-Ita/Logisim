@@ -6,7 +6,7 @@
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
   <exe_version>2.10.0.0</exe_version>
   <changelog>
-* New Flip-Flops attributes and new layout(fully retro-compatible)
+* New Flip-Flops attributes and new layout (fully retro-compatible)
 * New TTL 7485: 4-bit magnitude comparator
 * New TTL 74283: 4-bit binary full adder
 * Solved every kind of retro-compatibility problem
