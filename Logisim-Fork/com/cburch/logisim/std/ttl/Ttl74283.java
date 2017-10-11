@@ -41,6 +41,8 @@ public class Ttl74283 extends AbstractTtlGate {
 		if (sum > 15) {
 			sum -= 16;
 			state.setPort(13, Value.TRUE, 1);
+		} else {
+			state.setPort(13, Value.FALSE, 1);
 		}
 		Value output = Value.createKnown(BitWidth.create(4), sum);
 		state.setPort(3, output.get(0), 1);
