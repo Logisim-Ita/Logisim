@@ -17,5 +17,6 @@
 * Fixed a bug in Digital Oscilloscope and in translations
 * All the menu windows now will open at the screen center
 * Display Decoder: multibit attribute changed into true by default
+* Solved empty template bug
   </changelog>
 </logisim>
