@@ -11,7 +11,7 @@
 * New TTL 74283: 4-bit binary full adder
 * Solved every kind of retro-compatibility problem
 * Mouse wheel now will zoom where you're pointing at
-* Press ESC or DEL to cancel "add tool" function
+* Press ESC or DEL to cancel "add tool" action
 * Truth table is now displayed with a different color for each row
 * Press F5 to repaint
 * Fixed a bug in Digital Oscilloscope and in translations
