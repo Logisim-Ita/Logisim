@@ -36,7 +36,7 @@ public class Ttl74283 extends AbstractTtlGate {
 		byte B2 = state.getPort(1) == Value.TRUE ? (byte) 2 : 0;
 		byte B3 = state.getPort(7) == Value.TRUE ? (byte) 4 : 0;
 		byte B4 = state.getPort(11) == Value.TRUE ? (byte) 8 : 0;
-		byte CIN = (byte) state.getPort(6).toIntValue();
+		byte CIN = state.getPort(6) == Value.TRUE ? (byte) 1 : 0;
 		byte sum = (byte) (A1 + A2 + A3 + A4 + B1 + B2 + B3 + B4 + CIN);
 		if (sum > 15) {
 			sum -= 16;
