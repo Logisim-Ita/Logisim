@@ -622,8 +622,8 @@ class XmlReader {
 
 		Element wiringElt;
 		String wiringLabel;
-		Element newBaseElt;
-		String newBaseLabel;
+		Element newBaseElt = null;
+		String newBaseLabel = null;
 		if (oldBaseElt != null) {
 			wiringLabel = oldBaseLabel;
 			wiringElt = oldBaseElt;
@@ -641,8 +641,6 @@ class XmlReader {
 			wiringElt.setAttribute("name", wiringLabel);
 			if (lastLibElt != null)
 				root.insertBefore(wiringElt, lastLibElt.getNextSibling());
-			newBaseLabel = null;
-			newBaseElt = null;
 		}
 
 		HashMap<String, String> labelMap = new HashMap<String, String>();
