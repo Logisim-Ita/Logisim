@@ -26,7 +26,6 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 * Some small graphical changes
 ## Features we want to add
 * Move to Java 9
-* Change Flip Flops layout
 * TTL flip flops
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
