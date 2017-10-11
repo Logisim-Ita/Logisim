@@ -8,12 +8,12 @@ import com.cburch.logisim.std.plexers.DisplayDecoder;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl7447 extends AbstractTtlGate {
-	
-	protected final static String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c", "d",
-	"e" };
+
+	protected final static String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "f", "g", "a", "b", "c",
+			"d", "e" };
 
 	public Ttl7447() {
-		super("7447", 16,Ttl7447portnames);
+		super("7447", 16, Ttl7447portnames);
 	}
 
 	@Override

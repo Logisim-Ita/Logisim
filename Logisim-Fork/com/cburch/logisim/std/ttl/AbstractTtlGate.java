@@ -20,9 +20,10 @@ import com.cburch.logisim.util.GraphicsUtil;
 public abstract class AbstractTtlGate extends InstanceFactory {
 
 	protected static final int pinwidth = 10, pinheight = 7, height = 60;
-	private String name;
 	protected int pinnumber;
-	protected String[] Ttlportnames = null;
+	private String name;
+	private int ngatestodraw = 0;
+	private String[] Ttlportnames = null;
 
 	protected AbstractTtlGate(String name, int pins) {
 		super(name);
@@ -34,6 +35,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
 		this.pinnumber = pins;
+	}
+
+	protected AbstractTtlGate(String name, int pins, int ngatestodrawforside) {
+		this(name, pins);
+		this.ngatestodraw = ngatestodrawforside * 2;
 	}
 
 	protected AbstractTtlGate(String name, int pins, String[] Ttlportnames) {
@@ -258,16 +264,19 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			width = bds.getHeight();
 			height = bds.getWidth();
 		}
-		if (this.pinnumber == 14) {
-			paintBase(painter, false);
-			int c = this.name != "7404" ? 4 : 6;
-			for (int i = 0; i < c; i++) {
-				paintInternal(painter, x + (c != 6 ? i % 2 != 0 ? 60 : 0 : i % 3 * 40) + (i < c / 2 ? 0 : 20), y,
-						height, !(i < c / 2));
-			}
-		} else {
+
+		// int c = this.name != "7404" ? 4 : 6;
+		if (this.ngatestodraw == 0) {
 			paintBase(painter, true);
 			paintInternal(painter, x, y, height, false);
+		} else {
+			paintBase(painter, false);
+			for (int i = 0; i < this.ngatestodraw; i++) {
+				paintInternal(painter,
+						x + (i < this.ngatestodraw / 2 ? i : i - this.ngatestodraw / 2)
+								* ((width - 20) / (this.ngatestodraw / 2)) + (i < this.ngatestodraw / 2 ? 0 : 20),
+						y, height, !(i < this.ngatestodraw / 2));
+			}
 		}
 	}
 
