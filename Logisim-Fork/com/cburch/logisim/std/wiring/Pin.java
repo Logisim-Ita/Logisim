@@ -282,6 +282,8 @@ public class Pin extends InstanceFactory {
 			instance.recomputeBounds();
 			PinAttributes attrs = (PinAttributes) instance.getAttributeSet();
 			Probe.configureLabel(instance, attrs.labelloc, attrs.facing);
+		} else if (attr == Pin.ATTR_TRISTATE || attr == Pin.ATTR_PULL) {
+			instance.fireInvalidated();
 		}
 	}
 

@@ -44,6 +44,7 @@ import com.cburch.logisim.util.LocaleManager;
 public class AttrTable extends JPanel implements LocaleListener {
 	private class CellEditor implements TableCellEditor, FocusListener, ActionListener {
 		LinkedList<CellEditorListener> listeners = new LinkedList<CellEditorListener>();
+		AttrTableModelRow currentRow;
 		Component currentEditor;
 
 		//
@@ -163,6 +164,7 @@ public class AttrTable extends JPanel implements LocaleListener {
 				} else {
 					editor.addFocusListener(this);
 				}
+				currentRow = row;
 				currentEditor = editor;
 				return editor;
 			}
@@ -287,6 +289,10 @@ public class AttrTable extends JPanel implements LocaleListener {
 				attrModel.removeAttrTableModelListener(this);
 				return;
 			}
+			TableCellEditor ed = table.getCellEditor();
+			if (ed != null) {
+				ed.cancelCellEditing();
+			}
 			fireTableChanged();
 		}
 
@@ -307,6 +313,11 @@ public class AttrTable extends JPanel implements LocaleListener {
 			if (e.getSource() != attrModel) {
 				attrModel.removeAttrTableModelListener(this);
 				return;
+			}
+			int row = e.getRowIndex();
+			TableCellEditor ed = table.getCellEditor();
+			if (row >= 0 && ed instanceof CellEditor && attrModel.getRow(row) == ((CellEditor) ed).currentRow) {
+				ed.cancelCellEditing();
 			}
 			fireTableChanged();
 		}
@@ -363,8 +374,9 @@ public class AttrTable extends JPanel implements LocaleListener {
 		void setAttrTableModel(AttrTableModel value) {
 			if (attrModel != value) {
 				TableCellEditor editor = table.getCellEditor();
-				if (editor != null)
+				if (editor != null) {
 					editor.cancelCellEditing();
+				}
 				attrModel.removeAttrTableModelListener(this);
 				attrModel = value;
 				attrModel.addAttrTableModelListener(this);
