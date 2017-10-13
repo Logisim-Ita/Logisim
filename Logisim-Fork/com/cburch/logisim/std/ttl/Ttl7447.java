@@ -13,7 +13,7 @@ public class Ttl7447 extends AbstractTtlGate {
 			"d", "e" };
 
 	public Ttl7447() {
-		super("7447", 16, Ttl7447portnames);
+		super("7447", 16,new int[] {9,10,11,12,13,14,15}, Ttl7447portnames);
 	}
 
 	@Override

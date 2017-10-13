@@ -13,7 +13,7 @@ public class Ttl74283 extends AbstractTtlGate {
 			"A4", "B4", "∑4", "COUT" };
 
 	public Ttl74283() {
-		super("74283", 16, Ttl74283portnames);
+		super("74283", 16, new int[] { 1, 4, 9, 10, 13 }, Ttl74283portnames);
 	}
 
 	@Override
