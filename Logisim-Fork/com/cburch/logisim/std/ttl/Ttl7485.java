@@ -12,7 +12,7 @@ public class Ttl7485 extends AbstractTtlGate {
 			"A2", "A1", "B1", "A0", "B0" };
 
 	public Ttl7485() {
-		super("7485", 16, Ttl7485portnames);
+		super("7485", 16,new int[] {5,6,7}, Ttl7485portnames);
 	}
 
 	@Override

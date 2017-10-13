@@ -24,8 +24,9 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	private String name;
 	private int ngatestodraw = 0;
 	private String[] Ttlportnames = null;
+	private int[] outputports;
 
-	protected AbstractTtlGate(String name, int pins) {
+	protected AbstractTtlGate(String name, int pins, int[] outputports) {
 		super(name);
 		setIconName("ttl.gif");
 		setAttributes(
@@ -35,15 +36,16 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
 		this.pinnumber = pins;
+		this.outputports = outputports;
 	}
 
-	protected AbstractTtlGate(String name, int pins, int ngatestodrawforside) {
-		this(name, pins);
+	protected AbstractTtlGate(String name, int pins, int[] outputports, int ngatestodrawforside) {
+		this(name, pins, outputports);
 		this.ngatestodraw = ngatestodrawforside * 2;
 	}
 
-	protected AbstractTtlGate(String name, int pins, String[] Ttlportnames) {
-		this(name, pins);
+	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
+		this(name, pins, outputports);
 		this.Ttlportnames = Ttlportnames;
 	}
 
@@ -293,13 +295,18 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	abstract public void ttlpropagate(InstanceState state);
 
 	private void updateports(Instance instance) {
+		Bounds bds = instance.getBounds();
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		Port[] ps = new Port[instance.getAttributeValue(TTL.VCC_GND) ? this.pinnumber : this.pinnumber - 2];
-		int dx = 0, dy = 0, portnumber = 1;
-		for (int i = 0; i < ps.length; i++) {// GND->12,Vcc->13
-			if (i < this.pinnumber / 2 - 1 || i == this.pinnumber - 2) {
-				if (i == this.pinnumber - 2)
-					i = this.pinnumber / 2 - 1;
+		int dx = 0, dy = 0, width = bds.getWidth();
+		boolean isoutput = false;
+		for (int i = 0; i < ps.length; i++) {
+			for (int j = 0; j < this.outputports.length; j++) {
+				if (this.outputports[j] == i + 1)
+					isoutput = true;
+			}
+			// set the position
+			if (i < this.pinnumber / 2 - 1) {
 				if (dir == Direction.EAST) {
 					dx = i * 20 + 10;
 					dy = 30;
@@ -313,87 +320,47 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					dx = -30;
 					dy = i * 20 + 10;
 				}
-				if (i == this.pinnumber / 2 - 1)
-					i = this.pinnumber - 2;
-				else
-					portnumber = i + 1;
-			} else if (i > this.pinnumber / 2 - 2) {
-				if (i == this.pinnumber - 1)
-					i = this.pinnumber / 2 - 2;
+			} else {
 				if (dir == Direction.EAST) {
-					dx = (i - (this.pinnumber / 2 - 1)) * 20 + 30;
+					dx = width - (i - this.pinnumber / 2) * 20 - 10;
 					dy = -30;
 				} else if (dir == Direction.WEST) {
-					dx = -30 - (i - (this.pinnumber / 2 - 1)) * 20;
+					dx = (i - this.pinnumber / 2) * 20 - 10;
 					dy = 30;
 				} else if (dir == Direction.NORTH) {
 					dx = -30;
-					dy = -30 - (i - (this.pinnumber / 2 - 1)) * 20;
+					dy = (i - this.pinnumber / 2) * 20 - 10;
 				} else {// SOUTH
 					dx = 30;
-					dy = (i - (this.pinnumber / 2 - 1)) * 20 + 30;
+					dy = width - (i - this.pinnumber / 2) * 20 - 10;
 				}
-				if (i == this.pinnumber / 2 - 2)
-					i = this.pinnumber - 1;
+			}
+			// Set the port (output/input)
+			if (isoutput) {// output port
+				ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
+				if (this.Ttlportnames == null)
+					ps[i].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(i + 1)));
 				else
-					portnumber = this.pinnumber - 1 - (i - (this.pinnumber / 2 - 1));
-			}
-			if (i > this.pinnumber - 3) {
-				ps[i] = new Port(dx, dy, Port.INPUT, 1);
-				if (i == this.pinnumber - 2)// GND
+					ps[i].setToolTip(
+							Strings.getter("demultiplexerOutTip", String.valueOf(i + 1) + ": " + this.Ttlportnames[i]));
+			} else {// input port
+
+				if (instance.getAttributeValue(TTL.VCC_GND) != Boolean.FALSE && i == this.pinnumber - 1) { // Vcc
+					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("GND: " + this.pinnumber / 2));
-				else// Vcc
+				} else if (instance.getAttributeValue(TTL.VCC_GND) != Boolean.FALSE && i == this.pinnumber / 2 - 1) {// GND
+					ps[i] = new Port(dx, dy, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("Vcc: " + this.pinnumber));
-			} else if (this.name == "7404") {// 1 inputs 1 output
-				if (i % 2 == 0) {
-					ps[i] = new Port(dx, dy, Port.INPUT, 1);
-					ps[i].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(portnumber)));
-				} else {
-					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
-					ps[i].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(portnumber)));
-				}
-			} else if (this.name == "7447") {
-				if (i < this.pinnumber / 2 - 1) {
-					ps[i] = new Port(dx, dy, Port.INPUT, 1);
-					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				} else {
-					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
-					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				}
-
-			} else if (this.name == "7485") {
-				if (i < 7 && i > 3) {
-					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
-					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				} else {
-					ps[i] = new Port(dx, dy, Port.INPUT, 1);
-					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				}
-
-			} else if (this.name == "74283") {
-				if (i == 0 || i == 3 || i == 9 || i == 12 || i == 13) {
-					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
-					ps[i].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				} else {
-					ps[i] = new Port(dx, dy, Port.INPUT, 1);
-					ps[i].setToolTip(Strings.getter("multiplexerInTip",
-							String.valueOf(portnumber) + ": " + this.Ttlportnames[i]));
-				}
-			} else {// 2 input 1 output
-				if ((i + 1) % 3 != 0) {
-					ps[i] = new Port(dx, dy, Port.INPUT, 1);
-					ps[i].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(portnumber)));
-				} else {
-					ps[i] = new Port(dx, dy, Port.OUTPUT, 1);
-					ps[i].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(portnumber)));
+				} else if (i != this.pinnumber - 1 && i != this.pinnumber / 2 - 1) {// normal output
+					ps[(i > ps.length / 2) ? i - 1 : i] = new Port(dx, dy, Port.INPUT, 1);
+					if (this.Ttlportnames == null)
+						ps[i].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(i + 1)));
+					else
+						ps[i].setToolTip(Strings.getter("multiplexerInTip",
+								String.valueOf(i + 1) + ": " + this.Ttlportnames[i]));
 				}
 			}
-
+			isoutput = false;
 		}
 		instance.setPorts(ps);
 	}
