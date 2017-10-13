@@ -422,7 +422,7 @@ class XmlReader {
 			repairForLegacyLibrary(doc, root);
 		}
 		// compatibility for new gates attributes
-		if (version.compareTo(LogisimVersion.get(2, 7, 2, 0)) <= 0) {
+		if (version.compareTo(LogisimVersion.get(2, 7, 2, 255)) <= 0) {
 			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null) {

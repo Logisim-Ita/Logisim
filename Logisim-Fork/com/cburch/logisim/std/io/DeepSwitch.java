@@ -1,18 +1,13 @@
 package com.cburch.logisim.std.io;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 
-import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceDataSingleton;
@@ -23,10 +18,7 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.std.io.Switch.Logger;
-import com.cburch.logisim.std.io.Switch.Poker;
 import com.cburch.logisim.util.GraphicsUtil;
-import com.cburch.logisim.util.StringGetter;
 
 public class DeepSwitch extends InstanceFactory {
 	public static class Logger extends InstanceLogger {
@@ -40,7 +32,7 @@ public class DeepSwitch extends InstanceFactory {
 			return state.getPort(0);
 		}
 	}
-	
+
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
@@ -60,8 +52,9 @@ public class DeepSwitch extends InstanceFactory {
 
 	private static final Attribute<Integer> ATTR_NSWITCHES = Attributes.forIntegerRange("NSwitches",
 			Strings.getter("NumberOfSwitch"), 1, 32);
-	
+
 	private static final int DEPTH = 3;
+
 	public DeepSwitch() {
 		super("DeepSwitch", Strings.getter("DeepSwitchComponent"));
 		setAttributes(
@@ -74,7 +67,7 @@ public class DeepSwitch extends InstanceFactory {
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
 	}
-	
+
 	private void computeTextField(Instance instance) {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		Object labelLoc = instance.getAttributeValue(Io.ATTR_LABEL_LOC);
@@ -112,18 +105,21 @@ public class DeepSwitch extends InstanceFactory {
 
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
 	}
+
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
 		computeTextField(instance);
 		updateports(instance);
 	}
+
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int x =attrs.getValue(ATTR_NSWITCHES).intValue()*30+15;
-		return Bounds.create(0,0,x,30).rotate(Direction.EAST, facing, 0, 0);
+		int x = attrs.getValue(ATTR_NSWITCHES).intValue() * 30 + 15;
+		return Bounds.create(0, 0, x, 30).rotate(Direction.EAST, facing, 0, 0);
 	}
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
@@ -133,6 +129,7 @@ public class DeepSwitch extends InstanceFactory {
 			computeTextField(instance);
 		}
 	}
+
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
@@ -154,20 +151,19 @@ public class DeepSwitch extends InstanceFactory {
 			int hue = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
 			color = new Color(hue, hue, hue);
 		}
-		
-		
+
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
-		
 
 	}
+
 	private void updateports(Instance instance) {
 		int switches = instance.getAttributeValue(ATTR_NSWITCHES).intValue();
 		Port[] port = new Port[switches];
 		for (int i = 0; i <= switches; i++) {
-			port[i] = new Port(30*i, 0, Port.OUTPUT, 1);
+			port[i] = new Port(30 * i, 0, Port.OUTPUT, 1);
 		}
 	}
 

@@ -23,8 +23,11 @@ public class Ttl7404 extends AbstractTtlGate {
 
 	@Override
 	public void ttlpropagate(InstanceState state) {
-		for (int i = 1; i < 12; i += 2) {
+		for (int i = 1; i < 6; i += 2) {
 			state.setPort(i, state.getPort(i - 1).not(), 1);
+		}
+		for (int i = 6; i < 12; i += 2) {
+			state.setPort(i, state.getPort(i + 1).not(), 1);
 		}
 	}
 
