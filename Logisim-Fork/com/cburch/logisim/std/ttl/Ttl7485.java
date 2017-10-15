@@ -1,32 +1,20 @@
 package com.cburch.logisim.std.ttl;
 
-import java.awt.Graphics;
-
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl7485 extends AbstractTtlGate {
-	protected final static String Ttl7485portnames[] = { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B", "B0", "A0",
-			"B1", "A1", "A2", "B2", "A3" };
+	protected final static String portnames[] = { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B", "B0", "A0", "B1",
+			"A1", "A2", "B2", "A3" };
 
 	public Ttl7485() {
-		super("7485", 16, new int[] { 5, 6, 7 }, Ttl7485portnames);
+		super("7485", 16, new int[] { 5, 6, 7 }, portnames);
 	}
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
-		Graphics g = painter.getGraphics();
-		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, super.pinnumber * 10 - 20,
-				height - 2 * AbstractTtlGate.pinheight - 20);
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 7; j++) {
-				GraphicsUtil.drawCenteredText(g, Ttl7485portnames[j + (i * 7)],
-						i == 0 ? x + 10 + j * 20 : x + 160 - j * 20 - 10,
-						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
-			}
-		}
+		Drawgates.paintPortNames(painter, x, y, height, portnames);
 	}
 
 	@Override

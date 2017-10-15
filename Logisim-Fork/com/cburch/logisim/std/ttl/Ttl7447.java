@@ -1,33 +1,21 @@
 package com.cburch.logisim.std.ttl;
 
-import java.awt.Graphics;
-
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.std.plexers.DisplayDecoder;
-import com.cburch.logisim.util.GraphicsUtil;
 
 public class Ttl7447 extends AbstractTtlGate {
 
-	protected final static String Ttl7447portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a",
-			"g", "f" };
+	protected final static String portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g",
+			"f" };
 
 	public Ttl7447() {
-		super("7447", 16, new int[] { 9, 10, 11, 12, 13, 14, 15 }, Ttl7447portnames);
+		super("7447", 16, new int[] { 9, 10, 11, 12, 13, 14, 15 }, portnames);
 	}
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
-		Graphics g = painter.getGraphics();
-		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, super.pinnumber * 10 - 20,
-				height - 2 * AbstractTtlGate.pinheight - 20);
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 7; j++) {
-				GraphicsUtil.drawCenteredText(g, Ttl7447portnames[j + (i * 7)],
-						i == 0 ? x + 10 + j * 20 : x + 160 - j * 20 - 10,
-						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
-			}
-		}
+		Drawgates.paintPortNames(painter, x, y, height, portnames);
 	}
 
 	@Override
