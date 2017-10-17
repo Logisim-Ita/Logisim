@@ -57,16 +57,16 @@ class ControlledBuffer extends InstanceFactory {
 		this.isInverter = isInverter;
 		if (isInverter) {
 			setAttributes(
-					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, NotGate.ATTR_SIZE, ATTR_CONTROL, StdAttr.LABEL,
-							StdAttr.LABEL_FONT, NEGATE_CONTROL },
-					new Object[] { Direction.EAST, BitWidth.ONE, NotGate.SIZE_NARROW, RIGHT_HANDED, "",
-							StdAttr.DEFAULT_LABEL_FONT, Boolean.FALSE });
+					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, NotGate.ATTR_SIZE, ATTR_CONTROL, NEGATE_CONTROL,
+							StdAttr.LABEL, StdAttr.LABEL_FONT },
+					new Object[] { Direction.EAST, BitWidth.ONE, NotGate.SIZE_NARROW, RIGHT_HANDED, Boolean.FALSE, "",
+							StdAttr.DEFAULT_LABEL_FONT });
 		} else {
 			setAttributes(
-					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_CONTROL, StdAttr.LABEL, StdAttr.LABEL_FONT,
-							NEGATE_CONTROL },
-					new Object[] { Direction.EAST, BitWidth.ONE, RIGHT_HANDED, "", StdAttr.DEFAULT_LABEL_FONT,
-							Boolean.FALSE });
+					new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_CONTROL, NEGATE_CONTROL, StdAttr.LABEL,
+							StdAttr.LABEL_FONT },
+					new Object[] { Direction.EAST, BitWidth.ONE, RIGHT_HANDED, Boolean.FALSE, "",
+							StdAttr.DEFAULT_LABEL_FONT });
 		}
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));

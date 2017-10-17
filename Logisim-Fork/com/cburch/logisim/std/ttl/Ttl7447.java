@@ -6,16 +6,15 @@ import com.cburch.logisim.std.plexers.DisplayDecoder;
 
 public class Ttl7447 extends AbstractTtlGate {
 
-	protected final static String portnames[] = { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g",
-			"f" };
-
 	public Ttl7447() {
-		super("7447", 16, new int[] { 9, 10, 11, 12, 13, 14, 15 }, portnames);
+		super("7447", 16, new int[] { 9, 10, 11, 12, 13, 14, 15 },
+				new String[] { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g", "f" });
 	}
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
-		Drawgates.paintPortNames(painter, x, y, height, portnames);
+		super.paintBase(painter, true);
+		Drawgates.paintPortNames(painter, x, y, height, super.portnames);
 	}
 
 	@Override

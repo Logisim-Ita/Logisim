@@ -23,7 +23,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	protected int pinnumber;
 	private String name;
 	private int ngatestodraw = 0;
-	private String[] Ttlportnames = null;
+	protected String[] portnames = null;
 	private int[] outputports;
 
 	protected AbstractTtlGate(String name, int pins, int[] outputports) {
@@ -46,7 +46,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 
 	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
 		this(name, pins, outputports);
-		this.Ttlportnames = Ttlportnames;
+		this.portnames = Ttlportnames;
 	}
 
 	private void computeTextField(Instance instance) {
@@ -84,7 +84,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		}
 	}
 
-	private void paintBase(InstancePainter painter, boolean drawname) {
+	protected void paintBase(InstancePainter painter, boolean drawname) {
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		Bounds bds = painter.getBounds();
@@ -267,11 +267,9 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			height = bds.getWidth();
 		}
 
-		// int c = this.name != "7404" ? 4 : 6;
-		if (this.ngatestodraw == 0) {
-			paintBase(painter, true);
+		if (this.ngatestodraw == 0)
 			paintInternal(painter, x, y, height, false);
-		} else {
+		else {
 			paintBase(painter, false);
 			for (int i = 0; i < this.ngatestodraw; i++) {
 				paintInternal(painter,
@@ -285,10 +283,13 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		if (state.getAttributeValue(TTL.VCC_GND) && (state.getPort(this.pinnumber - 2) != Value.FALSE
-				|| state.getPort(this.pinnumber - 1) != Value.TRUE))
-			for (int i = 0; i < this.pinnumber; i++)
-				state.setPort(i, Value.UNKNOWN, 1);
-		else
+				|| state.getPort(this.pinnumber - 1) != Value.TRUE)) {
+			int port = 0;
+			for (int i = 0; i < this.outputports.length; i++) {
+				port = this.outputports[i] - (this.outputports[i] >= this.pinnumber / 2 ? 2 : 1);
+				state.setPort(port, Value.UNKNOWN, 1);
+			}
+		} else
 			ttlpropagate(state);
 	}
 
@@ -343,11 +344,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			// Set the port (output/input)
 			if (isoutput) {// output port
 				ps[portindex] = new Port(dx, dy, Port.OUTPUT, 1);
-				if (this.Ttlportnames == null)
+				if (this.portnames == null)
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(i + 1)));
 				else
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip",
-							String.valueOf(i + 1) + ": " + this.Ttlportnames[portindex]));
+							String.valueOf(i + 1) + ": " + this.portnames[portindex]));
 			} else {// input port
 				if (hasvccgnd && i == this.pinnumber - 1) { // Vcc
 					ps[i] = new Port(dx, dy, Port.INPUT, 1);
@@ -360,11 +361,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					portindex--;
 				} else if (i != this.pinnumber - 1 && i != this.pinnumber / 2 - 1) {// normal output
 					ps[portindex] = new Port(dx, dy, Port.INPUT, 1);
-					if (this.Ttlportnames == null)
+					if (this.portnames == null)
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(i + 1)));
 					else
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip",
-								String.valueOf(i + 1) + ": " + this.Ttlportnames[portindex]));
+								String.valueOf(i + 1) + ": " + this.portnames[portindex]));
 				}
 			}
 			isoutput = false;

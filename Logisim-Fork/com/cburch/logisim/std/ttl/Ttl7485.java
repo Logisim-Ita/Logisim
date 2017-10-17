@@ -5,16 +5,16 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 
 public class Ttl7485 extends AbstractTtlGate {
-	protected final static String portnames[] = { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B", "B0", "A0", "B1",
-			"A1", "A2", "B2", "A3" };
 
 	public Ttl7485() {
-		super("7485", 16, new int[] { 5, 6, 7 }, portnames);
+		super("7485", 16, new int[] { 5, 6, 7 }, new String[] { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B", "B0",
+				"A0", "B1", "A1", "A2", "B2", "A3" });
 	}
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
-		Drawgates.paintPortNames(painter, x, y, height, portnames);
+		super.paintBase(painter, true);
+		Drawgates.paintPortNames(painter, x, y, height, super.portnames);
 	}
 
 	@Override

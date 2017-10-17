@@ -18,6 +18,8 @@ public class TTL extends Library {
 			new FactoryDescription("7447", Strings.getter("7447: BCD to 7-segment decoder"), "ttl.gif", "Ttl7447"),
 			new FactoryDescription("7485", Strings.getter("7485: 4-bit magnitude comparator"), "ttl.gif", "Ttl7485"),
 			new FactoryDescription("7486", Strings.getter("7486: quad 2-input XOR gate"), "ttl.gif", "Ttl7486"),
+			new FactoryDescription("74165", Strings.getter("74165: 8-bit parallel-to-serial shift register"), "ttl.gif",
+					"Ttl74165"),
 			new FactoryDescription("74283", Strings.getter("74283: 4-bit binary full adder"), "ttl.gif", "Ttl74283"),
 			new FactoryDescription("747266", Strings.getter("747266: quad 2-input XNOR gate"), "ttl.gif",
 					"Ttl747266"), };

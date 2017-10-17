@@ -85,7 +85,7 @@ public class Drawgates {
 
 	static void paintPortNames(InstancePainter painter, int x, int y, int height, String[] portnames) {
 		Graphics g = painter.getGraphics();
-		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, portnames.length - 2 * 10 - 20,
+		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, portnames.length * 10,
 				height - 2 * AbstractTtlGate.pinheight - 20);
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < portnames.length / 2; j++) {
