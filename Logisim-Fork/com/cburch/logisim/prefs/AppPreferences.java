@@ -193,7 +193,11 @@ public class AppPreferences {
 					new String[] { ACCEL_DEFAULT, ACCEL_NONE, ACCEL_OPENGL, ACCEL_D3D }, ACCEL_DEFAULT));
 	// fork preferences
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
-	public static final PrefMonitor<Boolean> AUTO_UPDATES = create(new PrefMonitorBoolean("AutoUpdates", true));
+	public static final String ALWAYS = "Always";
+	public static final String ASKME = "Ask Me";
+	public static final String NO = "No";
+	public static final PrefMonitor<String> AUTO_UPDATES = create(
+			new PrefMonitorStringOpts("AutoUpdates", new String[] { ALWAYS, ASKME, NO }, ASKME));
 	// hidden window preferences - not part of the preferences dialog, changes
 	// to preference does not affect current windows, and the values are not
 	// saved until the application is closed

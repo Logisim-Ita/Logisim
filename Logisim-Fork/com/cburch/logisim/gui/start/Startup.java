@@ -323,7 +323,7 @@ public class Startup {
 	 *         be stopped, false otherwise
 	 */
 	public boolean autoUpdate() {
-		if (!AppPreferences.AUTO_UPDATES.getBoolean() || !networkConnectionAvailable()) {
+		if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line or preference window, or network
 			// connection not
 			// available
@@ -356,15 +356,17 @@ public class Startup {
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
-			int answer = JOptionPane.showConfirmDialog(null,
-					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
-							logisimData.child("changelog").content()),
-					Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.ASKME)) {
+				int answer = JOptionPane.showConfirmDialog(null,
+						StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
+								logisimData.child("changelog").content()),
+						Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
-			if (answer != 0) {
-				// User refused to update -- we just hope he gets sufficiently
-				// annoyed by the message that he finally updates!
-				return (false);
+				if (answer != 0) {
+					// User refused to update -- we just hope he gets sufficiently
+					// annoyed by the message that he finally updates!
+					return (false);
+				}
 			}
 			try {
 				updatescreen = new UpdateScreen();
