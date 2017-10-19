@@ -116,8 +116,8 @@ public class DipSwitch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int x = attrs.getValue(ATTR_NSWITCHES).intValue() * 30 + 16;
-		return Bounds.create(0, 0, x, 30).rotate(Direction.EAST, facing, 0, 0);
+		int y = attrs.getValue(ATTR_NSWITCHES).intValue() * 20;
+		return Bounds.create(0, -y / 2, 30, y).rotate(Direction.EAST, facing, 0, 0);
 	}
 
 	@Override
@@ -134,24 +134,15 @@ public class DipSwitch extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
+		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		painter.drawBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		int w = bds.getWidth();
 		int h = bds.getHeight();
+		int switches = painter.getAttributeValue(ATTR_NSWITCHES).intValue();
+		for(int i=0;i<switches-1;i++) {
 
-		Value val;
-		if (painter.getShowState()) {
-			InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
-			val = data == null ? Value.FALSE : (Value) data.getValue();
-		} else {
-			val = Value.FALSE;
-		}
-
-		Color color = painter.getAttributeValue(Io.ATTR_COLOR);
-		if (!painter.shouldDrawColor()) {
-			int hue = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
-			color = new Color(hue, hue, hue);
 		}
 		painter.drawLabel();
 		painter.drawPorts();
@@ -163,15 +154,26 @@ public class DipSwitch extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
+		Bounds bds = instance.getBounds();
+		Direction dir = instance.getAttributeValue(StdAttr.FACING);
+		int offset=(dir==Direction.EAST || dir==Direction.WEST ?bds.getHeight()/2:bds.getWidth()/2);
 		int switches = instance.getAttributeValue(ATTR_NSWITCHES).intValue();
 		Port[] ports = new Port[switches];
-		Direction dir=instance.getAttributeValue(StdAttr.FACING);
-		if(dir==Direction.EAST){
-		for (int i = 0; i < ports.length; i++) {
-			ports[i] = new Port(30 * i+8, 0, Port.OUTPUT, 1);
+
+		if (dir == Direction.EAST) {
+			for (int i = 0; i < ports.length; i++)
+				ports[i] = new Port(30, 20 * i +10-offset, Port.OUTPUT, 1);
+		} else if (dir == Direction.WEST) {
+			for (int i = 0; i < ports.length; i++)
+				ports[i] = new Port(-30,20 * i + 10 -offset, Port.OUTPUT, 1);
+		}else if (dir == Direction.NORTH) {
+			for (int i = 0; i < ports.length; i++)
+				ports[i] = new Port( 20 * i +10-offset,-30, Port.OUTPUT, 1);
+		} else if (dir == Direction.SOUTH) {
+			for (int i = 0; i < ports.length; i++)
+				ports[i] = new Port(20 * i + 10-offset,30, Port.OUTPUT, 1);
 		}
 		instance.setPorts(ports);
-		}
 	}
 
 }
