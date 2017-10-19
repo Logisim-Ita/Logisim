@@ -9,6 +9,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceDataSingleton;
@@ -37,7 +38,31 @@ public class DipSwitch extends InstanceFactory {
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
-			setValue(state, state.getPort(0).not());// opposite value
+			Location loc = state.getInstance().getLocation();
+			int cx = loc.getX();
+			int cy = loc.getY();
+			int switches=state.getAttributeValue(ATTR_NSWITCHES);
+			Direction dir = state.getAttributeValue(StdAttr.FACING);
+			int gx=e.getX();
+			int gy=e.getY();
+			int offset=switches*10;
+			int x=gx-cx ;
+			int y=gy-cy ;
+			for(int i=0;i<switches;i++) {
+				if((x+offset>5+20*i && x+offset<15+20*i)&&(y>5 && y<25) && (dir == Direction.SOUTH)) {
+					setValue(state, state.getPort(i).not());// opposite value
+					break;
+				}else if((y+offset>5+20*i && y+offset<15+20*i)&&(x>5 && x<25) && (dir== Direction.EAST )) {
+					setValue(state, state.getPort(i).not());// opposite value
+					break;
+				}else if((x+offset>5+20*i && x+offset<15+20*i)&&(y<-5 && y>-25) && (dir== Direction.NORTH )) {
+					setValue(state, state.getPort(i).not());// opposite value
+					break;
+				}else if((y+offset>5+20*i && y+offset<15+20*i)&&(x<-5 && x>-25) && ( dir == Direction.WEST)) {
+					setValue(state, state.getPort(i).not());// opposite value
+					break;
+				}
+			}
 		}
 
 		private void setValue(InstanceState state, Value val) {
@@ -202,7 +227,7 @@ public class DipSwitch extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-
+		
 	}
 
 	private void updateports(Instance instance) {
