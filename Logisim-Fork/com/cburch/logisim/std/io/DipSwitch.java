@@ -20,7 +20,7 @@ import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
 
-public class DeepSwitch extends InstanceFactory {
+public class DipSwitch extends InstanceFactory {
 	public static class Logger extends InstanceLogger {
 		@Override
 		public String getLogName(InstanceState state, Object option) {
@@ -55,8 +55,8 @@ public class DeepSwitch extends InstanceFactory {
 
 	private static final int DEPTH = 3;
 
-	public DeepSwitch() {
-		super("DeepSwitch", Strings.getter("DeepSwitchComponent"));
+	public DipSwitch() {
+		super("DipSwitch", Strings.getter("DipSwitchComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
 						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
@@ -116,7 +116,7 @@ public class DeepSwitch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int x = attrs.getValue(ATTR_NSWITCHES).intValue() * 30 + 15;
+		int x = attrs.getValue(ATTR_NSWITCHES).intValue() * 30 + 16;
 		return Bounds.create(0, 0, x, 30).rotate(Direction.EAST, facing, 0, 0);
 	}
 
@@ -125,6 +125,7 @@ public class DeepSwitch extends InstanceFactory {
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
 			instance.recomputeBounds();
 			computeTextField(instance);
+			updateports(instance);
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
 		}
@@ -133,6 +134,7 @@ public class DeepSwitch extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
+		painter.drawBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		int w = bds.getWidth();
@@ -151,7 +153,8 @@ public class DeepSwitch extends InstanceFactory {
 			int hue = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
 			color = new Color(hue, hue, hue);
 		}
-
+		painter.drawLabel();
+		painter.drawPorts();
 	}
 
 	@Override
@@ -161,9 +164,13 @@ public class DeepSwitch extends InstanceFactory {
 
 	private void updateports(Instance instance) {
 		int switches = instance.getAttributeValue(ATTR_NSWITCHES).intValue();
-		Port[] port = new Port[switches];
-		for (int i = 0; i <= switches; i++) {
-			port[i] = new Port(30 * i, 0, Port.OUTPUT, 1);
+		Port[] ports = new Port[switches];
+		Direction dir=instance.getAttributeValue(StdAttr.FACING);
+		if(dir==Direction.EAST){
+		for (int i = 0; i < ports.length; i++) {
+			ports[i] = new Port(30 * i+8, 0, Port.OUTPUT, 1);
+		}
+		instance.setPorts(ports);
 		}
 	}
 
