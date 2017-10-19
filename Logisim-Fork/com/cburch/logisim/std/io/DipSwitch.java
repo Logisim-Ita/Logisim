@@ -1,6 +1,7 @@
 package com.cburch.logisim.std.io;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.data.Attribute;
@@ -136,14 +137,65 @@ public class DipSwitch extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		painter.drawBounds();
+		
 		int x = bds.getX();
 		int y = bds.getY();
 		int w = bds.getWidth();
 		int h = bds.getHeight();
 		int switches = painter.getAttributeValue(ATTR_NSWITCHES).intValue();
-		for(int i=0;i<switches-1;i++) {
-
+		Graphics g = painter.getGraphics();
+		int val=0;
+		GraphicsUtil.switchToWidth(g, 2);
+		if (dir == Direction.EAST) {
+			g.setColor(Color.BLACK);
+			for(int i=1;i<switches;i++) {
+				g.drawLine(0+x,i*20+y,30+x,i*20+y);
+				
+			}
+			for(int i=0;i<switches;i++) {
+				g.setColor(Color.BLACK);
+				g.fillRect(5+x,i*20+5+y,20,10);
+				g.setColor(Color.GRAY);
+				g.drawRect(15+x,i*20+5+y,10,10);
+			}
+		} else if (dir == Direction.WEST) {
+			g.setColor(Color.BLACK);
+			for(int i=1;i<switches;i++) {
+				g.drawLine(0+x,i*20+y,30+x,i*20+y);
+				
+			}
+			for(int i=0;i<switches;i++) {
+				g.setColor(Color.BLACK);
+				g.fillRect(5+x,i*20+5+y,20,10);
+				g.setColor(Color.GRAY);
+				g.drawRect(15+x,i*20+5+y,10,10);
+			}
+		}else if (dir == Direction.NORTH) {
+			g.setColor(Color.BLACK);
+			for(int i=1;i<switches;i++) {
+				g.drawLine(i*20+x,0+y,i*20+x,30+y);
+				
+			}
+			for(int i=0;i<switches;i++) {
+				g.setColor(Color.BLACK);
+				g.fillRect(i*20+5+x,5+y,10,20);
+				g.setColor(Color.GRAY);
+				g.drawRect(i*20+5+x,15+y,10,10);
+			}
+		} else if (dir == Direction.SOUTH) {
+			g.setColor(Color.BLACK);
+			for(int i=1;i<switches;i++) {
+				g.drawLine(i*20+x,30+y,i*20+x,0+y);
+				
+			}
+			for(int i=0;i<switches;i++) {
+				g.setColor(Color.BLACK);
+				g.fillRect(i*20+5+x,5+y,10,20);
+				g.setColor(Color.GRAY);
+				g.drawRect(i*20+5+x,15+y,10,10);
+			}
 		}
+		GraphicsUtil.switchToWidth(g, 1);
 		painter.drawLabel();
 		painter.drawPorts();
 	}
