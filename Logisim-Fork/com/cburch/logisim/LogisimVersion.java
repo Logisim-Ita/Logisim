@@ -40,15 +40,15 @@ public class LogisimVersion {
 		return (get(major, minor, release, FINAL_REVISION, variant));
 	}
 
-	public static boolean getVariantFromFile() {
+	public static String getVariantFromFile() {
 		try {
 			String s = Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 			if (s.endsWith(".exe"))
-				return false;
-			return true;
+				return "exe";
+			return "jar";
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-			return true;
+			return "jar";
 		}
 	}
 
