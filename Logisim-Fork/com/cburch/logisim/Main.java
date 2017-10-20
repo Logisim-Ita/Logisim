@@ -42,7 +42,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
-		if (startup != null && !Startup.autoUpdate(false)) {
+		if (startup != null && !startup.autoUpdate(true)) {
 			try {
 				startup.run();
 			} catch (Throwable e) {

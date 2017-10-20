@@ -13,7 +13,6 @@ import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
-import com.cburch.logisim.instance.InstanceDataSingleton;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
@@ -109,10 +108,10 @@ public class DipSwitch extends InstanceFactory {
 			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
 			pinValues obj = (pinValues) state.getData();
 			Value[] vals=getValues();
-			if(vals!=switches) {
+			//if(vals!=switches) {
 				
 				
-			}
+			//}
 		}
 		private pinValues(InstanceState state) {
 			vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];

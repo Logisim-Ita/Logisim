@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
@@ -18,39 +17,37 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JWindow;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.cburch.logisim.data.Value;
 import com.cburch.logisim.gui.generic.LFrame;
+import com.cburch.logisim.util.TableLayout;
 
-public class UpdateScreen extends JWindow {
+public class UpdateScreen extends JFrame {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5725103703896809899L;
 
-	boolean inClose = false; // for avoiding mutual recursion
-
-	JFrame f;
-	JButton cancel = new JButton(Strings.get("startupCancelButton"));
-	JProgressBar progress;
-	JLabel label;
-	int MAX = 0;
+	private JButton cancel = new JButton(Strings.get("startupCancelButton"));
+	private JProgressBar progress = null;
+	private JLabel label = null;
+	private int MAX = 0;
 
 	public UpdateScreen() {
-
-		ClassLoader loader = LFrame.class.getClassLoader();
-		URL url = loader.getResource("resources/logisim/img/update-icon.png");
+		URL url = LFrame.class.getClassLoader().getResource("resources/logisim/img/update-icon.png");
 		ImageIcon icon = null;
 		if (url != null)
 			icon = new ImageIcon(url);
-
-		f = new JFrame(Strings.get("Update"));
-		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		f.setResizable(false);
+		getContentPane().setLayout(new BorderLayout());
+		setTitle(Strings.get("Update"));
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setResizable(false);
+		setSize(new Dimension(350, 140));
+		setLocationRelativeTo(null);
 		if (icon != null)
-			f.setIconImage(icon.getImage());
+			setIconImage(icon.getImage());
 	}
 
 	public void addActionListener(ActionListener listener) {
@@ -58,16 +55,8 @@ public class UpdateScreen extends JWindow {
 	}
 
 	public void Clear() {
-		f.invalidate();
-		f.getContentPane().removeAll();
-	}
-
-	public void close() {
-		if (inClose)
-			return;
-		inClose = true;
-		f.setVisible(false);
-		inClose = false;
+		invalidate();
+		getContentPane().removeAll();
 	}
 
 	public void Downloading(int n) {
@@ -84,6 +73,7 @@ public class UpdateScreen extends JWindow {
 		progressPanel.setBorder(new EmptyBorder(0, 10, 8, 10));
 		progress = new JProgressBar(0, MAX);
 		progress.setStringPainted(true);
+		progress.setForeground(Value.TRUE_COLOR);
 		progressPanel.add(progress);
 		progressPanel.setBackground(Color.WHITE);
 
@@ -96,21 +86,21 @@ public class UpdateScreen extends JWindow {
 		updatePanel.add(progressPanel, BorderLayout.CENTER);
 		updatePanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		f.getContentPane().add(updatePanel, BorderLayout.CENTER);
+		getContentPane().add(updatePanel, BorderLayout.CENTER);
 	}
 
 	public void Message(String s) {
 		label = new JLabel(s);
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 13));
-		JPanel j = new JPanel(new GridBagLayout());
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+		JPanel j = new JPanel(new TableLayout(1));
+		j.setBackground(Color.WHITE);
 		j.add(label);
-		j.setPreferredSize(new Dimension(305, 105));
-		f.getContentPane().add(j, BorderLayout.CENTER);
+		getContentPane().add(j, BorderLayout.CENTER);
 	}
 
 	public void Repaint() {
-		f.validate();
-		f.getContentPane().repaint();
+		getContentPane().revalidate();
+		getContentPane().repaint();
 	}
 
 	public void setProgress(int n) {
@@ -118,14 +108,5 @@ public class UpdateScreen extends JWindow {
 		double MAXToMB = MAX / 1048576.0;
 		progress.setString(String.format("%.2fMB / %.2fMB", nToMB, MAXToMB));
 		progress.setValue(n);
-	}
-
-	@Override
-	public void setVisible(boolean value) {
-		if (value) {
-			f.pack();
-			f.setLocationRelativeTo(null);
-		}
-		f.setVisible(value);
 	}
 }

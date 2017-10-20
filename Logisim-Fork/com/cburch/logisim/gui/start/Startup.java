@@ -40,6 +40,7 @@ import com.cburch.logisim.util.ArgonXML;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.MacCompatibility;
 import com.cburch.logisim.util.StringUtil;
+import com.cburch.logisim.util.WindowMenu;
 
 public class Startup {
 	private static Startup startupTemp = null;
@@ -297,6 +298,7 @@ public class Startup {
 	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
 	private static boolean updatecanceled = false;
+	private UpdateScreen updatescreen = null;
 	private File loadFile;
 	private HashMap<File, File> substitutions = new HashMap<File, File>();
 
@@ -321,8 +323,9 @@ public class Startup {
 	 * @return true if the code has been updated, and therefore the execution has to
 	 *         be stopped, false otherwise
 	 */
-	public static boolean autoUpdate(boolean frommenu) {
-		if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) || !networkConnectionAvailable()) {
+	public boolean autoUpdate(boolean FromMain) {
+		if ((AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) && FromMain)
+				|| !networkConnectionAvailable()) {
 			// Auto-update disabled from command line or preference window, or network
 			// connection not
 			// available
@@ -355,7 +358,7 @@ public class Startup {
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
-			if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.ASKME)) {
+			if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.ASKME) || !FromMain) {
 				int answer = JOptionPane.showConfirmDialog(null,
 						StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
 								logisimData.child("changelog").content()),
@@ -367,14 +370,10 @@ public class Startup {
 					return (false);
 				}
 			}
-			UpdateScreen updatescreen = new UpdateScreen();
-			try {
-				updatescreen.Message(Strings.get("Connectioncheck") + "...");
-				updatescreen.setVisible(true);
-
-			} catch (Throwable t) {
-				updatescreen = null;
-			}
+			updatescreen = new UpdateScreen();
+			updatescreen.Message(Strings.get("Connectioncheck") + "...");
+			updatescreen.setVisible(true);
+			
 			// Obtain the base directory of the archive
 			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();
 			File jarFile = null;
@@ -391,8 +390,11 @@ public class Startup {
 			// Get the appropriate remote filename to download
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
-
-			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath(), updatescreen);
+			// if(!FromMain) {
+			// WindowMenu w = new WindowMenu(frame);
+			// w.doClose();
+			// }
+			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
 			if (updatemessage == "OK") {
 				return (true);
@@ -438,28 +440,27 @@ public class Startup {
 	 *         otherwise
 	 * @throws IOException
 	 */
-	private static String downloadInstallUpdatedVersion(String filePath, String destination,
-			UpdateScreen updatescreen) {
+	private String downloadInstallUpdatedVersion(String filePath, String destination) {
 
 		URL fileURL;
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "The URL of the requested update file is malformed.\nPlease report this error to the software maintainer";
 		}
 		URLConnection conn;
 		try {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -468,7 +469,7 @@ public class Startup {
 		try {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "Cannot get remote file stream.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -505,7 +506,7 @@ public class Startup {
 						break;
 
 				} else {
-					updatescreen.close();
+					updatescreen.setVisible(false);
 					return "CANCELLED";
 				}
 
@@ -516,21 +517,21 @@ public class Startup {
 			updatescreen.Repaint();
 
 		} catch (IOException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer";
 		}
 		// Close remote stream
 		try {
 			is.close();
 		} catch (IOException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			e.printStackTrace();
 			return "Error encountered while closing the remote stream!";
 		}
 
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -539,7 +540,7 @@ public class Startup {
 		try {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "An error occured while opening the local Jar file";
 		}
 		try {
@@ -547,10 +548,10 @@ public class Startup {
 			destinationFile.flush();
 			destinationFile.close();
 		} catch (IOException e) {
-			updatescreen.close();
+			updatescreen.setVisible(false);
 			return "An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim";
 		}
-		updatescreen.close();
+		updatescreen.setVisible(false);
 		return "OK";
 	}
 
@@ -594,7 +595,7 @@ public class Startup {
 	 * 
 	 * @return true if the connection is available, false otherwise
 	 */
-	private static boolean networkConnectionAvailable() {
+	private boolean networkConnectionAvailable() {
 		try {
 			URLConnection uC = new URL("http://www.google.com").openConnection();
 			uC.connect();

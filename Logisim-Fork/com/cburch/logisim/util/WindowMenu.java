@@ -153,7 +153,7 @@ public class WindowMenu extends JMenu {
 		close.setEnabled(currentManager != null);
 	}
 
-	void doClose() {
+	public void doClose() {
 		if (owner instanceof WindowClosable) {
 			((WindowClosable) owner).requestClose();
 		} else if (owner != null) {

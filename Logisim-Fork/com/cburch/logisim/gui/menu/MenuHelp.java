@@ -38,13 +38,12 @@ class MenuHelp extends JMenu implements ActionListener {
 
 	public MenuHelp(LogisimMenuBar menubar) {
 		this.menubar = menubar;
-
 		tutorial.addActionListener(this);
 		guide.addActionListener(this);
 		library.addActionListener(this);
 		about.addActionListener(this);
 		update.addActionListener(this);
-		
+
 		add(tutorial);
 		add(guide);
 		add(library);
@@ -67,7 +66,11 @@ class MenuHelp extends JMenu implements ActionListener {
 		} else if (src == about) {
 			About.showAboutDialog(menubar.getParentWindow());
 		} else if (src == update) {
-			Startup.autoUpdate(true);
+			Startup startup = new Startup(true);
+			if (startup.autoUpdate(false)) {
+				Startup.restart();
+				System.exit(0);
+			}
 		}
 	}
 
