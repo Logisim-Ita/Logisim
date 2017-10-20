@@ -108,10 +108,26 @@ public class DipSwitch extends InstanceFactory {
 			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
 			pinValues obj = (pinValues) state.getData();
 			Value[] vals=getValues();
-			//if(vals!=switches) {
-				
-				
-			//}
+			if(vals.length!=switches) {
+				if(vals.length<switches) {
+					Value[] oldvals=vals;
+					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
+					int i=0;
+					for( i=0;i<oldvals.length;i++) {
+						vals[i]=oldvals[i];
+					}
+					for(;i<vals.length;i++) {
+						vals[i]=Value.FALSE;
+					}
+				}
+				if(vals.length>switches) {
+					Value[] oldvals=vals;
+					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
+					for(int i=0;i<switches;i++) {
+						vals[i]=oldvals[i];
+					}
+				}
+			}
 		}
 		private pinValues(InstanceState state) {
 			vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
@@ -210,10 +226,12 @@ public class DipSwitch extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		pinValues obj=(pinValues) instance.getData();
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
 			instance.recomputeBounds();
 			computeTextField(instance);
 			updateports(instance);
+			obj.updateValues(obj.getValueState(instance));
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
 		}
