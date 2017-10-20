@@ -296,7 +296,7 @@ public class Startup {
 	private boolean templPlain = false;
 	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
-	private boolean updatecanceled = false;
+	private static boolean updatecanceled = false;
 	private File loadFile;
 	private HashMap<File, File> substitutions = new HashMap<File, File>();
 
@@ -304,7 +304,6 @@ public class Startup {
 	// from other sources
 	private boolean initialized = false;
 	private SplashScreen monitor = null;
-	UpdateScreen updatescreen = null;
 
 	private ArrayList<File> filesToPrint = new ArrayList<File>();
 
@@ -322,7 +321,7 @@ public class Startup {
 	 * @return true if the code has been updated, and therefore the execution has to
 	 *         be stopped, false otherwise
 	 */
-	public boolean autoUpdate() {
+	public static boolean autoUpdate(boolean frommenu) {
 		if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) || !networkConnectionAvailable()) {
 			// Auto-update disabled from command line or preference window, or network
 			// connection not
@@ -368,8 +367,8 @@ public class Startup {
 					return (false);
 				}
 			}
+			UpdateScreen updatescreen = new UpdateScreen();
 			try {
-				updatescreen = new UpdateScreen();
 				updatescreen.Message(Strings.get("Connectioncheck") + "...");
 				updatescreen.setVisible(true);
 
@@ -393,7 +392,7 @@ public class Startup {
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
 
-			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
+			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath(), updatescreen);
 
 			if (updatemessage == "OK") {
 				return (true);
@@ -439,7 +438,8 @@ public class Startup {
 	 *         otherwise
 	 * @throws IOException
 	 */
-	private String downloadInstallUpdatedVersion(String filePath, String destination) {
+	private static String downloadInstallUpdatedVersion(String filePath, String destination,
+			UpdateScreen updatescreen) {
 
 		URL fileURL;
 		try {
@@ -594,7 +594,7 @@ public class Startup {
 	 * 
 	 * @return true if the connection is available, false otherwise
 	 */
-	private boolean networkConnectionAvailable() {
+	private static boolean networkConnectionAvailable() {
 		try {
 			URLConnection uC = new URL("http://www.google.com").openConnection();
 			uC.connect();
@@ -610,7 +610,7 @@ public class Startup {
 		return (false);
 	}
 
-	public void restart() {
+	public static void restart() {
 		try {
 			String[] exexute = { "java", "-jar",
 					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
