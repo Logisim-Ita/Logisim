@@ -287,7 +287,7 @@ public class Keyboard extends InstanceFactory {
 		boolean showState = painter.getShowState();
 		Graphics g = painter.getGraphics();
 		painter.drawClock(CK, Direction.EAST);
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawPort(CLR);
 		painter.drawPort(RE);
 		painter.drawPort(AVL);

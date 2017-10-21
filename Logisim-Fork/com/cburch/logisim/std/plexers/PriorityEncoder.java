@@ -77,7 +77,7 @@ public class PriorityEncoder extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
 
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		Bounds bds = painter.getBounds();
 		g.setColor(Color.GRAY);
 		int x0;

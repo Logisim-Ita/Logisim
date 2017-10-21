@@ -34,7 +34,7 @@ class SimpleGrayCounter extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawClock(0, Direction.EAST); // draw a triangle on port 0
 		painter.drawPort(1); // draw port 1 as just a dot
 

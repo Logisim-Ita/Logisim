@@ -256,7 +256,7 @@ public class DisplayDecoder extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		Bounds bds = painter.getBounds();
 		int nports = 11 + (painter.getAttributeValue(MULTI_BIT) ? 1 : 4);
 		boolean multibit = painter.getAttributeValue(MULTI_BIT);

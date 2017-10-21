@@ -26,8 +26,12 @@ public class RoundRectangle extends Rectangular {
 	private int radius;
 
 	public RoundRectangle(int x, int y, int w, int h) {
+		this(x, y, w, h, 10);
+	}
+
+	public RoundRectangle(int x, int y, int w, int h, int radius) {
 		super(x, y, w, h);
-		this.radius = 10;
+		this.radius = radius;
 	}
 
 	@Override

@@ -81,6 +81,10 @@ public class InstancePainter implements InstanceState {
 		context.drawRectangle(x, y, width, height, label);
 	}
 
+	public void drawRoundBounds() {
+		context.drawRoundBounds(comp);
+	}
+
 	@Override
 	public void fireInvalidated() {
 		comp.fireInvalidated();

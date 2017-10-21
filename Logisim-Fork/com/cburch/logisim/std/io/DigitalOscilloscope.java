@@ -99,7 +99,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			ret = new DiagramState(inputs, length);
 			state.setData(ret);
 		} else {
-			ret.updateSize(inputs,length);
+			ret.updateSize(inputs, length);
 		}
 		return ret;
 	}

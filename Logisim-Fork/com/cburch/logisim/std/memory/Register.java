@@ -87,7 +87,7 @@ public class Register extends InstanceFactory {
 		}
 
 		// draw boundary, label
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawLabel();
 
 		// draw input and output ports

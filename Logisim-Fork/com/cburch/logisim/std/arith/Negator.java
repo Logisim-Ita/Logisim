@@ -36,7 +36,7 @@ public class Negator extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawPort(IN);
 		painter.drawPort(OUT, "-x", Direction.WEST);
 	}

@@ -128,7 +128,7 @@ public class Random extends InstanceFactory {
 		int width = widthVal == null ? 8 : widthVal.getWidth();
 
 		// draw boundary, label
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawLabel();
 
 		// draw input and output ports

@@ -128,7 +128,7 @@ public class ShiftRegister extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		// draw boundary, label
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawLabel();
 
 		// draw state

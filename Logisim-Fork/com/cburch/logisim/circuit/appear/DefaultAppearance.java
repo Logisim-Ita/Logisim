@@ -15,7 +15,7 @@ import java.util.Map;
 import com.cburch.draw.model.CanvasObject;
 import com.cburch.draw.shapes.Curve;
 import com.cburch.draw.shapes.DrawAttr;
-import com.cburch.draw.shapes.Rectangle;
+import com.cburch.draw.shapes.RoundRectangle;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
@@ -109,18 +109,20 @@ class DefaultAppearance {
 		int rx = OFFS + (9 - (ax + 9) % 10);
 		int ry = OFFS + (9 - (ay + 9) % 10);
 
-		Location e0 = Location.create(rx + (width - 8) / 2, ry + 1);
-		Location e1 = Location.create(rx + (width + 8) / 2, ry + 1);
+		Location e0 = Location.create(rx + (width - 8) / 2, ry + 2);
+		Location e1 = Location.create(rx + (width + 8) / 2, ry + 2);
 		Location ct = Location.create(rx + width / 2, ry + 11);
+
 		Curve notch = new Curve(e0, e1, ct);
 		notch.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
 		notch.setValue(DrawAttr.STROKE_COLOR, Color.GRAY);
-		Rectangle rect = new Rectangle(rx, ry, width, height);
-		rect.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
 
+		RoundRectangle rect = new RoundRectangle(rx, ry, width, height, 5);
+		rect.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
+		rect.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE_FILL);
 		List<CanvasObject> ret = new ArrayList<CanvasObject>();
-		ret.add(notch);
 		ret.add(rect);
+		ret.add(notch);
 		placePins(ret, edge.get(Direction.WEST), rx, ry + offsWest, 0, 10);
 		placePins(ret, edge.get(Direction.EAST), rx + width, ry + offsEast, 0, 10);
 		placePins(ret, edge.get(Direction.NORTH), rx + offsNorth, ry, 10, 0);
