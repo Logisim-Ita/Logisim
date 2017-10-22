@@ -280,6 +280,7 @@ public class Startup {
 					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
 							.getAbsolutePath() };
 			Runtime.getRuntime().exec(exexute);
+			System.exit(0);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

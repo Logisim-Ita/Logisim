@@ -3,8 +3,12 @@
 
 package com.cburch.logisim.gui.menu;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 
@@ -29,6 +33,8 @@ class MenuHelp extends JMenu implements ActionListener {
 	private JMenuItem tutorial = new JMenuItem();
 	private JMenuItem guide = new JMenuItem();
 	private JMenuItem library = new JMenuItem();
+	private JMenuItem bug = new JMenuItem();
+	private JMenuItem forum = new JMenuItem();
 	private JMenuItem update = new JMenuItem();
 	private JMenuItem about = new JMenuItem();
 	private HelpSet helpSet;
@@ -41,6 +47,8 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.addActionListener(this);
 		guide.addActionListener(this);
 		library.addActionListener(this);
+		bug.addActionListener(this);
+		forum.addActionListener(this);
 		update.addActionListener(this);
 		about.addActionListener(this);
 
@@ -48,6 +56,9 @@ class MenuHelp extends JMenu implements ActionListener {
 		add(guide);
 		add(library);
 		if (!MacCompatibility.isAboutAutomaticallyPresent()) {
+			addSeparator();
+			add(bug);
+			add(forum);
 			addSeparator();
 			add(update);
 			add(about);
@@ -63,12 +74,26 @@ class MenuHelp extends JMenu implements ActionListener {
 			showHelp("tutorial");
 		} else if (src == library) {
 			showHelp("libs");
+		} else if (src == bug) {
+			try {
+				Desktop.getDesktop().browse(new URI("https://github.com/LogisimIt/Logisim/issues"));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (URISyntaxException e1) {
+				e1.printStackTrace();
+			}
+		} else if (src == forum) {
+			try {
+				Desktop.getDesktop().browse(new URI("https://sourceforge.net/p/logisimit/discussion/"));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (URISyntaxException e1) {
+				e1.printStackTrace();
+			}
 		} else if (src == update) {
 			Startup startup = new Startup(true);
-			if (startup.autoUpdate(false, menubar.getProject().getFrame())) {
+			if (startup.autoUpdate(false, menubar.getProject().getFrame()))
 				Startup.restart();
-				System.exit(0);
-			}
 		} else if (src == about) {
 			About.showAboutDialog(menubar.getParentWindow());
 		}
@@ -125,6 +150,8 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.setText(Strings.get("helpTutorialItem"));
 		guide.setText(Strings.get("helpGuideItem"));
 		library.setText(Strings.get("helpLibraryItem"));
+		bug.setText(Strings.get("Report Bug"));
+		forum.setText(Strings.get("Forum"));
 		about.setText(Strings.get("helpAboutItem"));
 		update.setText(Strings.get("CheckUpdates"));
 		if (helpFrame != null) {
