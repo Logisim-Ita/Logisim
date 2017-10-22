@@ -81,7 +81,7 @@ public class Divider extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds();
 
 		g.setColor(Color.GRAY);
 		painter.drawPort(IN0);

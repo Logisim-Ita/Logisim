@@ -40,7 +40,7 @@ public class SplitterFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public Component createComponent(Location loc, AttributeSet attrs) {
+	public Component createComponent(Location loc, AttributeSet attrs) {			
 		return new Splitter(loc, attrs);
 	}
 

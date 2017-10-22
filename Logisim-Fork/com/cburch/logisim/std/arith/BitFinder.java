@@ -93,7 +93,7 @@ public class BitFinder extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawPorts();
 
 		String top = Strings.get("bitFinderFindLabel");

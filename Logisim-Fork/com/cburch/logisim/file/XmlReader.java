@@ -495,6 +495,36 @@ class XmlReader {
 				}
 			}
 		}
+		// compatibility for splitter new attributes value
+				if (version.compareTo(LogisimVersion.get(2, 11, 0, 0)) < 0) {
+					for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+						for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+							if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Splitter")) {
+								boolean defaultfanoutattribute = true;
+								boolean defaultincomingattribute = true;
+								// check if the attribute is already defined
+								for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+									if (attrElt.getAttribute("name").equals("fanout"))
+										defaultfanoutattribute = false;
+									if (attrElt.getAttribute("name").equals("incoming"))
+										defaultincomingattribute = false;
+								}
+								if (defaultfanoutattribute) {
+									Element sizeattribute = doc.createElement("a");
+									sizeattribute.setAttribute("name", "fanout");
+									sizeattribute.setAttribute("val", "2");
+									compElt.appendChild(sizeattribute);
+								}
+								if (defaultincomingattribute) {
+									Element inputsattribute = doc.createElement("a");
+									inputsattribute.setAttribute("name", "incoming");
+									inputsattribute.setAttribute("val", "2");
+									compElt.appendChild(inputsattribute);
+								}
+							}
+						}
+					}
+				}
 	}
 
 	private Document loadXmlFrom(InputStream is) throws SAXException, IOException {

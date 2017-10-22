@@ -138,7 +138,7 @@ abstract class Mem extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 
 		// draw boundary
-		painter.drawBounds();
+		painter.drawRoundBounds();
 
 		// draw contents
 		if (painter.getShowState()) {

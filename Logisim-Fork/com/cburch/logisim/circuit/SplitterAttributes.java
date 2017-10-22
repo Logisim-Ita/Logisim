@@ -182,8 +182,8 @@ class SplitterAttributes extends AbstractAttributeSet {
 	private SplitterParameters parameters;
 	AttributeOption appear = APPEAR_LEFT;
 	Direction facing = Direction.EAST;
-	byte fanout = 2; // number of ends this splits into
-	byte[] bit_end = new byte[2]; // how each bit maps to an end (0 if nowhere);
+	byte fanout = 4; // number of ends this splits into
+	byte[] bit_end = new byte[4]; // how each bit maps to an end (0 if nowhere);
 
 	// other values will be between 1 and fanout
 	BitOutOption[] options = null;
@@ -193,13 +193,13 @@ class SplitterAttributes extends AbstractAttributeSet {
 		configureDefaults();
 		parameters = new SplitterParameters(this);
 	}
-
+	
 	private void configureDefaults() {
 		int offs = INIT_ATTRIBUTES.size();
 		int curNum = attrs.size() - offs;
 
 		// compute default values
-		byte[] dflt = computeDistribution(fanout, bit_end.length, 1);
+		byte[] dflt = computeDistribution(fanout, bit_end.length,1);
 
 		boolean changed = curNum != bit_end.length;
 

@@ -103,7 +103,7 @@ public class BitAdder extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawPorts();
 
 		GraphicsUtil.switchToWidth(g, 2);

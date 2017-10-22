@@ -35,6 +35,82 @@ public class DipSwitch extends InstanceFactory {
 		}
 	}
 
+	private class pinValues implements InstanceData, Cloneable {
+		Value[] vals = null;
+
+		private pinValues(InstanceState state) {
+			vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
+			for (int i = 0; i < vals.length; i++)
+				vals[i] = Value.FALSE;
+			state.setData(this);
+		}
+
+		@Override
+		public Object clone() {
+			try {
+				return super.clone();
+			} catch (CloneNotSupportedException e) {
+				return null;
+			}
+		}
+
+		private Value getValue(int i) {
+			if (vals == null)
+				return Value.FALSE;
+			else
+				return vals[i];
+
+		}
+
+		private Value[] getValues() {
+			return vals;
+		}
+
+		private pinValues getValueState(InstanceState state) {
+			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
+			pinValues ret = (pinValues) state.getData();
+			if (ret == null) {
+				ret = new pinValues(state);
+				state.setData(ret);
+			} else {
+				ret.updateValues(state);
+			}
+			return ret;
+		}
+
+		private void setValue(InstanceState state, Value val, int port) {
+			vals[port] = val;
+			state.getInstance().fireInvalidated();
+		}
+
+		private void updateValues(InstanceState state) {
+			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
+			pinValues obj = (pinValues) state.getData();
+			Value[] vals = getValues();
+			if (vals.length != switches) {
+				if (vals.length < switches) {
+					Value[] oldvals = vals;
+					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
+					int i = 0;
+					for (i = 0; i < oldvals.length; i++) {
+						vals[i] = oldvals[i];
+					}
+					for (; i < vals.length; i++) {
+						vals[i] = Value.FALSE;
+					}
+				}
+				if (vals.length > switches) {
+					Value[] oldvals = vals;
+					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
+					for (int i = 0; i < switches; i++) {
+						vals[i] = oldvals[i];
+					}
+				}
+			}
+		}
+
+	}
+
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
@@ -79,79 +155,6 @@ public class DipSwitch extends InstanceFactory {
 				}
 			}
 		}
-	}
-
-	private class pinValues implements InstanceData, Cloneable {
-		@Override
-		public Object clone() {
-			try {
-				return super.clone();
-			} catch (CloneNotSupportedException e) {
-				return null;
-			}
-		}
-
-		Value[] vals = null;
-
-		private Value getValue(int i) {
-			if (vals == null)
-				return Value.FALSE;
-			else
-				return vals[i];
-
-		}
-
-		private Value[] getValues() {
-			return vals;
-		}
-		private void updateValues(InstanceState state) {
-			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
-			pinValues obj = (pinValues) state.getData();
-			Value[] vals=getValues();
-			if(vals.length!=switches) {
-				if(vals.length<switches) {
-					Value[] oldvals=vals;
-					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-					int i=0;
-					for( i=0;i<oldvals.length;i++) {
-						vals[i]=oldvals[i];
-					}
-					for(;i<vals.length;i++) {
-						vals[i]=Value.FALSE;
-					}
-				}
-				if(vals.length>switches) {
-					Value[] oldvals=vals;
-					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-					for(int i=0;i<switches;i++) {
-						vals[i]=oldvals[i];
-					}
-				}
-			}
-		}
-		private pinValues(InstanceState state) {
-			vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-			for (int i = 0; i < vals.length; i++)
-				vals[i] = Value.FALSE;
-			state.setData(this);
-		}
-
-		private void setValue(InstanceState state, Value val, int port) {
-			vals[port] = val;
-			state.getInstance().fireInvalidated();
-		}
-		private pinValues getValueState(InstanceState state) {
-			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue() ;
-			pinValues ret = (pinValues) state.getData();
-			if (ret == null) {
-				ret = new pinValues(state);
-				state.setData(ret);
-			} else {
-				ret.updateValues(state);
-			}
-			return ret;
-		}
-
 	}
 
 	private static final Attribute<Integer> ATTR_NSWITCHES = Attributes.forIntegerRange("NSwitches",
@@ -227,11 +230,13 @@ public class DipSwitch extends InstanceFactory {
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		//pinValues obj=(pinValues) instance.getData();
+		// pinValues obj=(pinValues) instance.getData();
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
 			instance.recomputeBounds();
 			computeTextField(instance);
 			updateports(instance);
 			//obj.updateValues(obj.getValueState(instance));
+			// obj.updateValues(obj.getValueState(instance));
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
 		}
@@ -242,7 +247,7 @@ public class DipSwitch extends InstanceFactory {
 		pinValues obj = (pinValues) painter.getData();
 		Bounds bds = painter.getBounds();
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
-		painter.drawBounds();
+		painter.drawRoundBounds();
 
 		int x = bds.getX();
 		int y = bds.getY();
@@ -299,7 +304,6 @@ public class DipSwitch extends InstanceFactory {
 				g.drawRect(i * 20 + 5 + x, 15 + y, 10, 10);
 			}
 		}
-		GraphicsUtil.switchToWidth(g, 1);
 		painter.drawLabel();
 		painter.drawPorts();
 	}

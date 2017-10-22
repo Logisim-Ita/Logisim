@@ -18,7 +18,7 @@ public class Value {
 	public static final int MAX_WIDTH = 32;
 
 	public static final Color NIL_COLOR = Color.GRAY;
-	public static final Color FALSE_COLOR = new Color(0, 100, 0);
+	public static final Color FALSE_COLOR = new Color(0, 110, 0);
 	public static final Color TRUE_COLOR = new Color(0, 210, 0);
 	public static final Color UNKNOWN_COLOR = new Color(40, 40, 255);
 	public static final Color ERROR_COLOR = new Color(192, 0, 0);

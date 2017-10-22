@@ -4,7 +4,7 @@
 package com.cburch.logisim.gui.prefs;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -36,7 +36,7 @@ class ExperimentalOptions extends OptionsPanel {
 		accelPanel.add(accel.getJComboBox(), BorderLayout.CENTER);
 		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		accelPanel.add(accelRestart, BorderLayout.PAGE_END);
-		accelRestart.setFont(accelRestart.getFont().deriveFont(Font.ITALIC));
+		accelRestart.setForeground(Color.GRAY);
 		JPanel accelPanel2 = new JPanel();
 		accelPanel2.add(accelPanel);
 

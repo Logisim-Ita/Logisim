@@ -29,8 +29,8 @@ class MenuHelp extends JMenu implements ActionListener {
 	private JMenuItem tutorial = new JMenuItem();
 	private JMenuItem guide = new JMenuItem();
 	private JMenuItem library = new JMenuItem();
-	private JMenuItem about = new JMenuItem();
 	private JMenuItem update = new JMenuItem();
+	private JMenuItem about = new JMenuItem();
 	private HelpSet helpSet;
 	private String helpSetUrl = "";
 	private JHelp helpComponent;
@@ -41,16 +41,16 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.addActionListener(this);
 		guide.addActionListener(this);
 		library.addActionListener(this);
-		about.addActionListener(this);
 		update.addActionListener(this);
+		about.addActionListener(this);
 
 		add(tutorial);
 		add(guide);
 		add(library);
 		if (!MacCompatibility.isAboutAutomaticallyPresent()) {
 			addSeparator();
-			add(about);
 			add(update);
+			add(about);
 		}
 	}
 
@@ -63,14 +63,14 @@ class MenuHelp extends JMenu implements ActionListener {
 			showHelp("tutorial");
 		} else if (src == library) {
 			showHelp("libs");
-		} else if (src == about) {
-			About.showAboutDialog(menubar.getParentWindow());
 		} else if (src == update) {
 			Startup startup = new Startup(true);
-			if (startup.autoUpdate(false)) {
+			if (startup.autoUpdate(false, menubar.getProject().getFrame())) {
 				Startup.restart();
 				System.exit(0);
 			}
+		} else if (src == about) {
+			About.showAboutDialog(menubar.getParentWindow());
 		}
 	}
 

@@ -210,10 +210,8 @@ public class Clock extends InstanceFactory {
 		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
+		painter.drawBounds();
 		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.BLACK);
-		g.drawRect(x, y, bds.getWidth(), bds.getHeight());
-
 		painter.drawLabel();
 
 		boolean drawUp;

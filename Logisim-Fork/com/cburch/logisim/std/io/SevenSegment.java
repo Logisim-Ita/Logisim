@@ -39,7 +39,7 @@ public class SevenSegment extends InstanceFactory {
 			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 			g.setColor(Color.BLACK);
 		}
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		g.setColor(Color.DARK_GRAY);
 		for (int i = 0; i <= 7; i++) {
 			if (painter.getShowState()) {

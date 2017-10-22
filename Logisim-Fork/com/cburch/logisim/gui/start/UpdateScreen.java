@@ -31,9 +31,8 @@ public class UpdateScreen extends JFrame {
 	private static final long serialVersionUID = -5725103703896809899L;
 
 	private JButton cancel = new JButton(Strings.get("startupCancelButton"));
-	private JProgressBar progress = null;
-	private JLabel label = null;
-	private int MAX = 0;
+	private JProgressBar progress;
+	private int MAX;
 
 	public UpdateScreen() {
 		URL url = LFrame.class.getClassLoader().getResource("resources/logisim/img/update-icon.png");
@@ -55,7 +54,7 @@ public class UpdateScreen extends JFrame {
 	}
 
 	public void Clear() {
-		invalidate();
+		getContentPane().invalidate();
 		getContentPane().removeAll();
 	}
 
@@ -63,18 +62,18 @@ public class UpdateScreen extends JFrame {
 		MAX = n;
 
 		JPanel labelPanel = new JPanel(new FlowLayout());
-		label = new JLabel("Downloading...");
-		label.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-		label.setBorder(new EmptyBorder(8, 0, 8, 0));
+		JLabel label = new JLabel("Downloading...");
+		label.setFont(new Font("Sans Serif", Font.PLAIN, 15));
 		labelPanel.add(label);
+		labelPanel.setBorder(new EmptyBorder(4, 0, 4, 0));
 		labelPanel.setBackground(Color.WHITE);
 
 		JPanel progressPanel = new JPanel(new BorderLayout());
-		progressPanel.setBorder(new EmptyBorder(0, 10, 8, 10));
 		progress = new JProgressBar(0, MAX);
 		progress.setStringPainted(true);
 		progress.setForeground(Value.TRUE_COLOR);
 		progressPanel.add(progress);
+		progressPanel.setBorder(new EmptyBorder(0, 10, 4, 10));
 		progressPanel.setBackground(Color.WHITE);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -86,21 +85,20 @@ public class UpdateScreen extends JFrame {
 		updatePanel.add(progressPanel, BorderLayout.CENTER);
 		updatePanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		getContentPane().add(updatePanel, BorderLayout.CENTER);
+		this.getContentPane().add(updatePanel, BorderLayout.CENTER);
 	}
 
 	public void Message(String s) {
-		label = new JLabel(s);
+		JLabel label = new JLabel(s);
 		label.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-		JPanel j = new JPanel(new TableLayout(1));
-		j.setBackground(Color.WHITE);
-		j.add(label);
-		getContentPane().add(j, BorderLayout.CENTER);
+		JPanel labelPanel = new JPanel(new TableLayout(1));
+		labelPanel.setBackground(Color.WHITE);
+		labelPanel.add(label);
+		this.getContentPane().add(labelPanel, BorderLayout.CENTER);
 	}
 
 	public void Repaint() {
-		getContentPane().revalidate();
-		getContentPane().repaint();
+		this.getContentPane().revalidate();
 	}
 
 	public void setProgress(int n) {

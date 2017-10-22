@@ -69,7 +69,7 @@ public class Comparator extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawPort(IN0);
 		painter.drawPort(IN1);
 		painter.drawPort(GT, ">", Direction.WEST);

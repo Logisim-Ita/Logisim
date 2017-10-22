@@ -93,7 +93,7 @@ public class BitExtender extends InstanceFactory {
 		FontMetrics fm = g.getFontMetrics();
 		int asc = fm.getAscent();
 
-		painter.drawBounds();
+		painter.drawRoundBounds();
 
 		String s0;
 		String type = getType(painter.getAttributeSet());

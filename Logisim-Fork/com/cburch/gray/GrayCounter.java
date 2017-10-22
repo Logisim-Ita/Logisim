@@ -67,7 +67,7 @@ class GrayCounter extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		// This is essentially the same as with SimpleGrayCounter, except for
 		// the invocation of painter.drawLabel to make the label be drawn.
-		painter.drawBounds();
+		painter.drawRoundBounds();
 		painter.drawClock(0, Direction.EAST);
 		painter.drawPort(1);
 		painter.drawLabel();
