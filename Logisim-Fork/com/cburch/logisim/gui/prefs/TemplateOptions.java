@@ -124,7 +124,7 @@ class TemplateOptions extends OptionsPanel {
 	private JButton templateButton = new JButton();
 
 	public TemplateOptions(PreferencesFrame window) {
-		super(window);				
+		super(window);
 		ButtonGroup bgroup = new ButtonGroup();
 		bgroup.add(plain);
 		bgroup.add(empty);

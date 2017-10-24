@@ -22,9 +22,9 @@ class ForkOptions extends OptionsPanel {
 				new PrefOption[] { new PrefOption(AppPreferences.ALWAYS, Strings.getter("Always")),
 						new PrefOption(AppPreferences.ASKME, Strings.getter("AskMe")), new PrefOption(AppPreferences.NO,
 								new LocaleManager("resources/logisim", "data").getter("booleanFalseOption")) });
-		
+
 		setLayout(new TableLayout(1));
-		
+
 		JPanel panel = new JPanel(new TableLayout(2));
 		for (int i = 0; i < checks.length; i++) {
 			add(checks[i]);

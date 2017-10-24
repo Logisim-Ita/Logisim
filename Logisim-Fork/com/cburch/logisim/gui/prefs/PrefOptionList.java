@@ -33,7 +33,7 @@ class PrefOptionList implements ActionListener, PropertyChangeListener {
 		}
 		combo.addActionListener(this);
 		pref.addPropertyChangeListener(this);
-		selectOption(pref.get());		
+		selectOption(pref.get());
 	}
 
 	@Override

@@ -229,13 +229,13 @@ public class DipSwitch extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		//pinValues obj=(pinValues) instance.getData();
+		// pinValues obj=(pinValues) instance.getData();
 		// pinValues obj=(pinValues) instance.getData();
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
 			instance.recomputeBounds();
 			computeTextField(instance);
 			updateports(instance);
-			//obj.updateValues(obj.getValueState(instance));
+			// obj.updateValues(obj.getValueState(instance));
 			// obj.updateValues(obj.getValueState(instance));
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);

@@ -3,6 +3,11 @@
 
 package com.cburch.logisim.gui.prefs;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -19,8 +24,8 @@ class WindowOptions extends OptionsPanel {
 	 */
 	private static final long serialVersionUID = 1043476425449770400L;
 	private PrefBoolean[] checks;
-	private PrefOptionList toolbarPlacement;
-	private PrefOptionList lookAndFeel;
+	private PrefOptionList toolbarPlacement, lookAndFeel;
+	private JLabel accelRestart = new JLabel();
 
 	public WindowOptions(PreferencesFrame window) {
 		super(window);
@@ -30,7 +35,7 @@ class WindowOptions extends OptionsPanel {
 						new PrefOption(UIManager.getSystemLookAndFeelClassName(), Strings.getter("systemLookAndFeel")),
 						new PrefOption(NimbusLookAndFeel.class.getName(), Strings.getter("nimbusLookAndFeel")),
 						new PrefOption(MotifLookAndFeel.class.getName(), Strings.getter("motifLookAndFeel")),
-						new PrefOption(MetalLookAndFeel.class.getName(), Strings.getter("metalLookAndFeel")), });
+						new PrefOption(MetalLookAndFeel.class.getName(), Strings.getter("metalLookAndFeel")) });
 
 		checks = new PrefBoolean[] {
 				new PrefBoolean(AppPreferences.SHOW_TICK_RATE, Strings.getter("windowTickRate")), };
@@ -56,6 +61,10 @@ class WindowOptions extends OptionsPanel {
 			add(checks[i]);
 		}
 		add(panel);
+
+		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		panel.add(accelRestart, BorderLayout.PAGE_END);
+		accelRestart.setForeground(Color.GRAY);
 	}
 
 	@Override
@@ -75,5 +84,6 @@ class WindowOptions extends OptionsPanel {
 		}
 		toolbarPlacement.localeChanged();
 		lookAndFeel.localeChanged();
+		accelRestart.setText(Strings.get("accelRestartLabel"));
 	}
 }

@@ -193,13 +193,13 @@ class SplitterAttributes extends AbstractAttributeSet {
 		configureDefaults();
 		parameters = new SplitterParameters(this);
 	}
-	
+
 	private void configureDefaults() {
 		int offs = INIT_ATTRIBUTES.size();
 		int curNum = attrs.size() - offs;
 
 		// compute default values
-		byte[] dflt = computeDistribution(fanout, bit_end.length,1);
+		byte[] dflt = computeDistribution(fanout, bit_end.length, 1);
 
 		boolean changed = curNum != bit_end.length;
 

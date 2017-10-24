@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -94,7 +95,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		@Override
 		public void keyPressed(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_F5) {
-				proj.getSimulator().requestPropagate();
+				SwingUtilities.updateComponentTreeUI(canvasPane);
 			} else {
 				Tool tool = proj.getTool();
 				if (tool != null)
