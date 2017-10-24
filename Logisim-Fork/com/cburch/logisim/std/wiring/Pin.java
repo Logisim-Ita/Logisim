@@ -166,13 +166,16 @@ public class Pin extends InstanceFactory {
 	public static final Attribute<AttributeOption> ATTR_PULL = Attributes.forOption("pull",
 			Strings.getter("pinPullAttr"), new AttributeOption[] { PULL_NONE, PULL_UP, PULL_DOWN });
 	public static final Pin FACTORY = new Pin();
+
 	private static final Icon ICON_IN = Icons.getIcon("pinInput.gif");
 
 	private static final Icon ICON_OUT = Icons.getIcon("pinOutput.gif");
 
-	private static final Font ICON_WIDTH_FONT = new Font("Sans Serif", Font.BOLD, 9);
+	private static final Icon ICON_IN_MULTI = Icons.getIcon("pinInputMulti.gif");
 
-	private static final Color ICON_WIDTH_COLOR = Value.WIDTH_ERROR_COLOR.darker();
+	private static final Icon ICON_OUT_MULTI = Icons.getIcon("pinOutputMulti.gif");
+
+	private static final Font ICON_WIDTH_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 8);
 
 	private static PinState getState(InstanceState state) {
 		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
@@ -319,66 +322,67 @@ public class Pin extends InstanceFactory {
 	//
 	@Override
 	public void paintIcon(InstancePainter painter) {
-		paintIconBase(painter);
 		BitWidth w = painter.getAttributeValue(StdAttr.WIDTH);
-		if (!w.equals(BitWidth.ONE)) {
-			Graphics g = painter.getGraphics();
-			g.setColor(ICON_WIDTH_COLOR);
-			g.setFont(ICON_WIDTH_FONT);
-			GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
-			g.setColor(Color.BLACK);
-		}
+		paintIconBase(painter, w);
 	}
 
-	private void paintIconBase(InstancePainter painter) {
+	private void paintIconBase(InstancePainter painter, BitWidth w) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Direction dir = attrs.facing;
 		boolean output = attrs.isOutput();
+		boolean iconprinted = false;
 		Graphics g = painter.getGraphics();
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 8));
+		g.setFont(ICON_WIDTH_FONT);
 		if (output) {
-			if (ICON_OUT != null) {
+			if (w.equals(BitWidth.ONE) && ICON_OUT != null) {
 				Icons.paintRotated(g, 2, 2, dir, ICON_OUT, painter.getDestination());
-				g.setColor(Color.WHITE);
-				GraphicsUtil.drawCenteredText(g, "1", 10, 9);
-				return;
+				iconprinted = true;
+			} else if (ICON_OUT_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_OUT_MULTI, painter.getDestination());
+				iconprinted = true;
 			}
 		} else {
-			if (ICON_IN != null) {
+			if (w.equals(BitWidth.ONE) && ICON_IN != null) {
 				Icons.paintRotated(g, 2, 2, dir, ICON_IN, painter.getDestination());
-				g.setColor(Color.WHITE);
-				GraphicsUtil.drawCenteredText(g, "1", 10, 9);
-				return;
+				iconprinted = true;
+			} else if (ICON_IN_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_IN_MULTI, painter.getDestination());
+				iconprinted = true;
 			}
 		}
-		int pinx = 16;
-		int piny = 9;
-		if (dir == Direction.EAST) { // keep defaults
-		} else if (dir == Direction.WEST) {
-			pinx = 4;
-		} else if (dir == Direction.NORTH) {
-			pinx = 9;
-			piny = 4;
-		} else if (dir == Direction.SOUTH) {
-			pinx = 9;
-			piny = 16;
-		}
-		g.setColor(Value.TRUE.getColor());
-		if (output) {
-			g.fillOval(4, 4, 13, 13);
-		} else {
-			g.fillRect(4, 4, 13, 13);
-		}
-		g.fillOval(pinx, piny, 3, 3);
+		if (!iconprinted) {
+			int pinx = 16;
+			int piny = 9;
+			if (dir == Direction.EAST) { // keep defaults
+			} else if (dir == Direction.WEST) {
+				pinx = 4;
+			} else if (dir == Direction.NORTH) {
+				pinx = 9;
+				piny = 4;
+			} else if (dir == Direction.SOUTH) {
+				pinx = 9;
+				piny = 16;
+			}
+			g.setColor(w.equals(BitWidth.ONE) ? Value.TRUE.getColor() : Color.WHITE);
+			if (output) {
+				g.fillOval(4, 4, 13, 13);
+			} else {
+				g.fillRect(4, 4, 13, 13);
+			}
+			g.fillOval(pinx, piny, 3, 3);
 
-		g.setColor(Color.black);
-		if (output) {
-			g.drawOval(4, 4, 13, 13);
-		} else {
-			g.drawRect(4, 4, 13, 13);
+			g.setColor(Color.black);
+			if (output) {
+				g.drawOval(4, 4, 13, 13);
+			} else {
+				g.drawRect(4, 4, 13, 13);
+			}
 		}
-		g.setColor(Color.WHITE);
-		GraphicsUtil.drawCenteredText(g, "1", 10, 9);
+		if (w.equals(BitWidth.ONE))
+			g.setColor(Color.WHITE);
+		else
+			g.setColor(Color.BLACK);
+		GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
 	}
 
 	@Override

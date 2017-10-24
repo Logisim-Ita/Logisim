@@ -16,6 +16,7 @@ import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 import com.cburch.logisim.Main;
 import com.cburch.logisim.circuit.RadixOption;
@@ -153,7 +154,8 @@ public class AppPreferences {
 			"toolbarPlacement", new String[] { Direction.NORTH.toString(), Direction.SOUTH.toString(),
 					Direction.EAST.toString(), Direction.WEST.toString(), TOOLBAR_DOWN_MIDDLE, TOOLBAR_HIDDEN },
 			Direction.NORTH.toString()));
-
+	public static final PrefMonitor<String> LOOK_AND_FEEL = create(new PrefMonitorString("lookAndFeel", UIManager.getSystemLookAndFeelClassName()));
+	
 	// Layout preferences
 	public static final String ADD_AFTER_UNCHANGED = "unchanged";
 	public static final String ADD_AFTER_EDIT = "edit";

@@ -40,7 +40,6 @@ class IntlOptions extends OptionsPanel {
 
 	public IntlOptions(PreferencesFrame window) {
 		super(window);
-
 		locale = Strings.createLocaleSelector();
 		replAccents = new PrefBoolean(AppPreferences.ACCENTS_REPLACE, Strings.getter("intlReplaceAccents"));
 		gateShape = new PrefOptionList(AppPreferences.GATE_SHAPE, Strings.getter("intlGateShape"),

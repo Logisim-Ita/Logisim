@@ -55,8 +55,9 @@ public class Startup {
 			startupTemp.doPrintFile(file);
 	}
 
-	public static Startup parseArgs(String[] args) {
+	public static Startup parseArgs(String[] args){
 		// see whether we'll be using any graphics
+		
 		boolean isTty = false;
 		boolean isClearPreferences = false;
 		for (int i = 0; i < args.length; i++) {
@@ -87,11 +88,15 @@ public class Startup {
 		if (isClearPreferences) {
 			AppPreferences.clear();
 		}
-
+		
 		try {
+			 UIManager.setLookAndFeel(AppPreferences.LOOK_AND_FEEL.get());
+        } catch (Exception ex) { }
+		
+		/*try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception ex) {
-		}
+		}*/
 
 		// parse arguments
 		for (int i = 0; i < args.length; i++) {
@@ -301,6 +306,7 @@ public class Startup {
 		}
 		System.exit(-1);
 	}
+
 	// based on command line
 	boolean isTty;
 	private File templFile = null;

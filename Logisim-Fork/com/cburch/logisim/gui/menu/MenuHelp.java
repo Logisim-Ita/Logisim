@@ -150,7 +150,7 @@ class MenuHelp extends JMenu implements ActionListener {
 		tutorial.setText(Strings.get("helpTutorialItem"));
 		guide.setText(Strings.get("helpGuideItem"));
 		library.setText(Strings.get("helpLibraryItem"));
-		bug.setText(Strings.get("Report Bug"));
+		bug.setText(Strings.get("ReportBug"));
 		forum.setText(Strings.get("Forum"));
 		about.setText(Strings.get("helpAboutItem"));
 		update.setText(Strings.get("CheckUpdates"));

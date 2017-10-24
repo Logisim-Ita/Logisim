@@ -88,7 +88,6 @@ public class PreferencesFrame extends LFrame {
 	private MyListener myListener = new MyListener();
 	private OptionsPanel[] panels;
 	private JTabbedPane tabbedPane;
-
 	private JButton close = new JButton();
 
 	private PreferencesFrame() {

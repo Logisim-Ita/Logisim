@@ -24,7 +24,6 @@ class ExperimentalOptions extends OptionsPanel {
 
 	public ExperimentalOptions(PreferencesFrame window) {
 		super(window);
-
 		accel = new PrefOptionList(AppPreferences.GRAPHICS_ACCELERATION, Strings.getter("accelLabel"),
 				new PrefOption[] { new PrefOption(AppPreferences.ACCEL_DEFAULT, Strings.getter("accelDefault")),
 						new PrefOption(AppPreferences.ACCEL_NONE, Strings.getter("accelNone")),
