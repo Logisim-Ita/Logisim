@@ -97,34 +97,34 @@ public class DipSwitch extends InstanceFactory {
 			int cy = loc.getY();
 			int switches = state.getAttributeValue(ATTR_NSWITCHES);
 			Direction dir = state.getAttributeValue(StdAttr.FACING);
-			int offset = switches * 10;
+			int offset = 0;
 			int gx = e.getX();
 			int gy = e.getY();
 			int x = gx - cx;
 			int y = gy - cy;
-			if ((y > 5 && y < 25) && (dir == Direction.SOUTH)) {
-				x += offset - 5;
+			if ((y <- 5 && y >- 25) && (dir == Direction.SOUTH)) {
+				x -=5;
 				x = x / 10;
 				if (x % 2 == 0) {
 					x = x / 2;
 					obj.setValue(state, obj.getValue(x).not(), x);// opposite value
 				}
-			} else if ((x > 5 && x < 25) && (dir == Direction.EAST)) {
-				y += offset - 5;
+			} else if ((x < -5 && x > -25) && (dir == Direction.EAST)) {
+				y -=5;
 				y = y / 10;
 				if (y % 2 == 0) {
 					y = y / 2;
 					obj.setValue(state, obj.getValue(y).not(), y);// opposite value
 				}
-			} else if ((y < -5 && y > -25) && (dir == Direction.NORTH)) {
-				x += offset - 5;
+			} else if ((y > 5 && y < 25) && (dir == Direction.NORTH)) {
+				x -= 5;
 				x = x / 10;
 				if (x % 2 == 0) {
 					x = x / 2;
 					obj.setValue(state, obj.getValue(x).not(), x);// opposite value
 				}
-			} else if ((x < -5 && x > -25) && (dir == Direction.WEST)) {
-				y += offset - 5;
+			} else if ((x > 5 && x < 25) && (dir == Direction.WEST)) {
+				y -= 5;
 				y /= 10;
 				if (y % 2 == 0) {
 					y /= 2;
@@ -142,9 +142,9 @@ public class DipSwitch extends InstanceFactory {
 	public DipSwitch() {
 		super("DipSwitch", Strings.getter("DipSwitchComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES, /*Io.ATTR_COLOR,*/ StdAttr.LABEL, Io.ATTR_LABEL_LOC,
 						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, 4, Color.WHITE, "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
+				new Object[] { Direction.EAST, 4, /*Color.WHITE,*/ "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("deepswitch.gif");
@@ -201,7 +201,10 @@ public class DipSwitch extends InstanceFactory {
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
 		int y = attrs.getValue(ATTR_NSWITCHES).intValue() * 20;
-		return Bounds.create(0, -y / 2, 30, y).rotate(Direction.EAST, facing, 0, 0);
+		if(facing==Direction.EAST)return Bounds.create(-30, 0, 30, y);
+		else if(facing==Direction.WEST)return Bounds.create(0, 0, 30, y);
+		else if(facing==Direction.NORTH)return Bounds.create(0, 0, y, 30);
+		else return Bounds.create(0, -30, y, 30);
 	}
 
 	private pinValues getValueState(InstanceState state) {
@@ -332,6 +335,7 @@ public class DipSwitch extends InstanceFactory {
 				}
 			}
 		}
+		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		painter.drawPorts();
 	}
@@ -356,22 +360,16 @@ public class DipSwitch extends InstanceFactory {
 	private void updateports(Instance instance) {
 		Bounds bds = instance.getBounds();
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
-		int offset = (dir == Direction.EAST || dir == Direction.WEST ? bds.getHeight() / 2 : bds.getWidth() / 2);
+		
 		int switches = instance.getAttributeValue(ATTR_NSWITCHES).intValue();
 		Port[] ports = new Port[switches];
 
-		if (dir == Direction.EAST) {
+		if (dir == Direction.EAST || dir==Direction.WEST) {
 			for (int i = 0; i < ports.length; i++)
-				ports[i] = new Port(30, 20 * i + 10 - offset, Port.OUTPUT, 1);
-		} else if (dir == Direction.WEST) {
+				ports[i] = new Port(0, 20 * i + 10 , Port.OUTPUT, 1);
+		} else {
 			for (int i = 0; i < ports.length; i++)
-				ports[i] = new Port(-30, 20 * i + 10 - offset, Port.OUTPUT, 1);
-		} else if (dir == Direction.NORTH) {
-			for (int i = 0; i < ports.length; i++)
-				ports[i] = new Port(20 * i + 10 - offset, -30, Port.OUTPUT, 1);
-		} else if (dir == Direction.SOUTH) {
-			for (int i = 0; i < ports.length; i++)
-				ports[i] = new Port(20 * i + 10 - offset, 30, Port.OUTPUT, 1);
+				ports[i] = new Port(20 * i + 10 , 0, Port.OUTPUT, 1);
 		}
 		instance.setPorts(ports);
 	}
