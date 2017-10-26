@@ -463,9 +463,9 @@ public class Probe extends InstanceFactory {
 		g.fillRect(x + 5, y + 5, bds.getWidth() - 10, bds.getHeight() - 10);
 		g.setColor(Color.GRAY);
 		if (value.getWidth() <= 1) {
-			g.drawOval(x + 1, y + 1, bds.getWidth() - 2, bds.getHeight() - 2);
+			g.drawOval(x, y, bds.getWidth(), bds.getHeight());
 		} else {
-			g.drawRoundRect(x + 1, y + 1, bds.getWidth() - 2, bds.getHeight() - 2, 6, 6);
+			g.drawRoundRect(x, y, bds.getWidth(), bds.getHeight(), 10, 10);
 		}
 
 		g.setColor(Color.BLACK);

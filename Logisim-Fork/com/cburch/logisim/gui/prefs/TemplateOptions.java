@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.gui.prefs;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -19,7 +18,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -127,7 +125,6 @@ class TemplateOptions extends OptionsPanel {
 
 	public TemplateOptions(PreferencesFrame window) {
 		super(window);
-
 		ButtonGroup bgroup = new ButtonGroup();
 		bgroup.add(plain);
 		bgroup.add(empty);
@@ -158,12 +155,6 @@ class TemplateOptions extends OptionsPanel {
 		gbc.gridwidth = 1;
 		gbc.gridy = 3;
 		gbc.gridx = GridBagConstraints.RELATIVE;
-		JPanel strut = new JPanel();
-		strut.setMinimumSize(new Dimension(50, 1));
-		strut.setPreferredSize(new Dimension(50, 1));
-		gbc.weightx = 0.0;
-		gridbag.setConstraints(strut, gbc);
-		add(strut);
 		gbc.weightx = 1.0;
 		gridbag.setConstraints(templateField, gbc);
 		add(templateField);

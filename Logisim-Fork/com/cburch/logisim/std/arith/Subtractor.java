@@ -51,7 +51,7 @@ public class Subtractor extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds(Color.WHITE);
 
 		g.setColor(Color.GRAY);
 		painter.drawPort(IN0);

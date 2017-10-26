@@ -2,6 +2,7 @@ package com.cburch.logisim.std.ttl;
 
 import java.awt.Graphics;
 
+import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Drawgates {
@@ -80,6 +81,19 @@ public class Drawgates {
 		else
 			yPoints = new int[] { youtput, youtput, y + AbstractTtlGate.pinheight };
 		g.drawPolyline(xPoints, yPoints, 3);
+	}
+
+	static void paintPortNames(InstancePainter painter, int x, int y, int height, String[] portnames) {
+		Graphics g = painter.getGraphics();
+		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, portnames.length * 10,
+				height - 2 * AbstractTtlGate.pinheight - 20);
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < portnames.length / 2; j++) {
+				GraphicsUtil.drawCenteredText(g, portnames[j + (i * 7)],
+						i == 0 ? x + 10 + j * 20 : x + 160 - j * 20 - 10,
+						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));
+			}
+		}
 	}
 
 	static void paintSingleInputgate(Graphics g, int xpin, int y, int xinput, int youtput, boolean up) {

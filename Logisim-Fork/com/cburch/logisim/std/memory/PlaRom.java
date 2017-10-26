@@ -188,7 +188,7 @@ public class PlaRom extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		PlaRomData data = getPlaRomData(painter);
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		Bounds bds = painter.getBounds();
 		g.setFont(new Font("sans serif", Font.BOLD, 11));
 		GraphicsUtil.drawCenteredText(g, Strings.getter("PlaRomComponent").toString(), bds.getX() + bds.getWidth() / 2,

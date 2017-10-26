@@ -1,5 +1,9 @@
 package com.cburch.logisim;
 
+import java.net.URISyntaxException;
+
+import com.cburch.logisim.gui.start.Startup;
+
 public class LogisimVersion {
 	public static final int FINAL_REVISION = Integer.MAX_VALUE / 4;
 
@@ -34,6 +38,18 @@ public class LogisimVersion {
 	 */
 	public static LogisimVersion get(int major, int minor, int release, String variant) {
 		return (get(major, minor, release, FINAL_REVISION, variant));
+	}
+
+	public static String getVariantFromFile() {
+		try {
+			String s = Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			if (s.endsWith(".exe"))
+				return "exe";
+			return "jar";
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return "jar";
+		}
 	}
 
 	/**
@@ -155,7 +171,9 @@ public class LogisimVersion {
 	 * identified by a variant equals to "jar"
 	 */
 	public boolean isJar() {
-		return (variant.equals("jar"));
+		if (this.variant == "jar")
+			return true;
+		return false;
 	}
 
 	public String mainVersion() {

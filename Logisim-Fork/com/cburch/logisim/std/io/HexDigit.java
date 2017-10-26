@@ -20,7 +20,12 @@ public class HexDigit extends InstanceFactory {
 		super("Hex Digit Display", Strings.getter("hexDigitComponent"));
 		setAttributes(new Attribute[] { Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_BACKGROUND },
 				new Object[] { new Color(240, 0, 0), SevenSegment.DEFAULT_OFF, Io.DEFAULT_BACKGROUND });
-		setPorts(new Port[] { new Port(0, 0, Port.INPUT, 4), new Port(10, 0, Port.INPUT, 1) });
+		Port[] ps = new Port[2];
+		ps[0] = new Port(0, 0, Port.INPUT, 4);
+		ps[0].setToolTip(Strings.getter("pinInputName"));
+		ps[1] = new Port(10, 0, Port.INPUT, 1);
+		ps[1].setToolTip(Strings.getter("dp"));// dot point
+		setPorts(ps);
 		setOffsetBounds(Bounds.create(-15, -60, 40, 60));
 		setIconName("hexdig.gif");
 	}

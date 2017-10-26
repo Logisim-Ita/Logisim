@@ -9,7 +9,7 @@ import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstanceData;
 
-class ShiftRegisterData extends ClockState implements InstanceData {
+public class ShiftRegisterData extends ClockState implements InstanceData {
 	private BitWidth width;
 	private Value[] vs;
 	private int vsPos;

@@ -28,7 +28,6 @@ public class About {
 		 * 
 		 */
 		private static final long serialVersionUID = 1104782885051596715L;
-		private final Color fadeColor = new Color(240, 240, 240);
 		private final Color headerColor = Value.TRUE_COLOR;
 		private final Font headerFont = new Font("Sans Serif", Font.BOLD, 55);
 		private final Font versionFont = new Font("Sans Serif", Font.BOLD, 25);
@@ -40,9 +39,7 @@ public class About {
 			setLayout(null);
 
 			setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
-			setBackground(Color.WHITE);
 			addAncestorListener(this);
-
 			credits = new AboutCredits();
 			credits.setBounds(0, 90, IMAGE_WIDTH, IMAGE_HEIGHT - 90);
 			add(credits);
@@ -91,13 +88,7 @@ public class About {
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			}
 			super.paintComponent(g);
-
-			try {
-				g.setColor(fadeColor);
-				g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-				drawText(g, 10, 20);
-			} catch (Throwable t) {
-			}
+			drawText(g, 10, 20);
 		}
 	}
 
@@ -136,7 +127,6 @@ public class About {
 		MyPanel imgPanel = getImagePanel();
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(imgPanel);
-
 		JOptionPane.showMessageDialog(owner, panel, "Logisim " + Main.VERSION_NAME, JOptionPane.PLAIN_MESSAGE);
 	}
 

@@ -33,6 +33,7 @@ public class Io extends Library {
 	private static FactoryDescription[] DESCRIPTIONS = {
 			new FactoryDescription("Button", Strings.getter("buttonComponent"), "button.gif", "Button"),
 			new FactoryDescription("Switch", Strings.getter("switchComponent"), "switch.gif", "Switch"),
+			new FactoryDescription("DipSwitch", Strings.getter("DipSwitchComponent"), "dipswitch.gif", "DipSwitch"),
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
 			new FactoryDescription("LED", Strings.getter("ledComponent"), "led.gif", "Led"),

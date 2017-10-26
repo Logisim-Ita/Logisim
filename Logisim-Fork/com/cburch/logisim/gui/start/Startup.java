@@ -30,6 +30,7 @@ import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.Main;
 import com.cburch.logisim.file.LoadFailedException;
 import com.cburch.logisim.file.Loader;
+import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.gui.main.Print;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.gui.menu.WindowManagers;
@@ -56,6 +57,7 @@ public class Startup {
 
 	public static Startup parseArgs(String[] args) {
 		// see whether we'll be using any graphics
+
 		boolean isTty = false;
 		boolean isClearPreferences = false;
 		for (int i = 0; i < args.length; i++) {
@@ -88,9 +90,14 @@ public class Startup {
 		}
 
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(AppPreferences.LOOK_AND_FEEL.get());
 		} catch (Exception ex) {
 		}
+
+		/*
+		 * try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+		 * catch (Exception ex) { }
+		 */
 
 		// parse arguments
 		for (int i = 0; i < args.length; i++) {
@@ -273,6 +280,18 @@ public class Startup {
 		}
 	}
 
+	public static void restart() {
+		try {
+			String[] exexute = { "java", "-jar",
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getAbsolutePath() };
+			Runtime.getRuntime().exec(exexute);
+			System.exit(0);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
 		for (int i = 0; i < opts.length; i++) {
@@ -297,14 +316,15 @@ public class Startup {
 	private ArrayList<File> filesToOpen = new ArrayList<File>();
 	private boolean showSplash;
 	private boolean updatecanceled = false;
+	private UpdateScreen updatescreen = null;
 	private File loadFile;
-	private HashMap<File, File> substitutions = new HashMap<File, File>();
 
+	private HashMap<File, File> substitutions = new HashMap<File, File>();
 	private int ttyFormat = 0;
 	// from other sources
 	private boolean initialized = false;
+
 	private SplashScreen monitor = null;
-	UpdateScreen updatescreen = null;
 
 	private ArrayList<File> filesToPrint = new ArrayList<File>();
 
@@ -322,8 +342,9 @@ public class Startup {
 	 * @return true if the code has been updated, and therefore the execution has to
 	 *         be stopped, false otherwise
 	 */
-	public boolean autoUpdate() {
-		if (!AppPreferences.AUTO_UPDATES.getBoolean() || !networkConnectionAvailable()) {
+	public boolean autoUpdate(boolean FromMain, Frame frame) {
+		if ((AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) && FromMain)
+				|| !networkConnectionAvailable()) {
 			// Auto-update disabled from command line or preference window, or network
 			// connection not
 			// available
@@ -356,23 +377,24 @@ public class Startup {
 
 		// If the remote version is newer, perform the update
 		if (remoteVersion.compareTo(Main.VERSION) > 0) {
-			int answer = JOptionPane.showConfirmDialog(null,
-					StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
-							logisimData.child("changelog").content()),
-					Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.ASKME) || !FromMain) {
+				int answer = JOptionPane.showConfirmDialog(null,
+						StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
+								logisimData.child("changelog").content()),
+						Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
-			if (answer != 0) {
-				// User refused to update -- we just hope he gets sufficiently
-				// annoyed by the message that he finally updates!
-				return (false);
+				if (answer != 0) {
+					// User refused to update -- we just hope he gets sufficiently
+					// annoyed by the message that he finally updates!
+					return (false);
+				}
 			}
-			try {
-				updatescreen = new UpdateScreen();
-				updatescreen.Message(Strings.get("Connectioncheck") + "...");
-				updatescreen.setVisible(true);
-
-			} catch (Throwable t) {
-				updatescreen = null;
+			if (FromMain) {
+				this.updatescreen = new UpdateScreen();
+				this.updatescreen.Message(Strings.get("Connectioncheck") + "...");
+				this.updatescreen.setVisible(true);
+			} else {
+				frame.confirmClose();
 			}
 			// Obtain the base directory of the archive
 			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();
@@ -390,7 +412,6 @@ public class Startup {
 			// Get the appropriate remote filename to download
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
-
 			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
 
 			if (updatemessage == "OK") {
@@ -401,6 +422,9 @@ public class Startup {
 				return (false);
 			}
 		}
+		if (!FromMain)
+			JOptionPane.showMessageDialog(null, Strings.get("NoUpdates"), Strings.get("Update"),
+					JOptionPane.INFORMATION_MESSAGE);
 		return (false);
 	}
 
@@ -443,21 +467,24 @@ public class Startup {
 		try {
 			fileURL = new URL(filePath);
 		} catch (MalformedURLException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "The URL of the requested update file is malformed.\nPlease report this error to the software maintainer";
 		}
 		URLConnection conn;
 		try {
 			conn = fileURL.openConnection();
 		} catch (IOException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "Although an Internet connection should be available, the system couldn't connect to the URL of the updated file requested by the auto-updater.\nIf the error persist, please contact the software maintainer";
 		}
 
 		// Get remote file size
 		int length = conn.getContentLength();
 		if (length == -1) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "Cannot retrieve the file containing the updated version.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -466,7 +493,8 @@ public class Startup {
 		try {
 			is = new BufferedInputStream(conn.getInputStream());
 		} catch (IOException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "Cannot get remote file stream.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -481,11 +509,11 @@ public class Startup {
 		// Download remote content
 
 		try {
-			if (updatescreen != null) {
-				updatescreen.Clear();
-				updatescreen.Downloading(length);
-				updatescreen.Repaint();
-				updatescreen.addActionListener(new ActionListener() {
+			if (this.updatescreen != null) {
+				this.updatescreen.Clear();
+				this.updatescreen.Downloading(length);
+				this.updatescreen.Repaint();
+				this.updatescreen.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent evt) {
 						updatecanceled = true;
@@ -493,8 +521,9 @@ public class Startup {
 				});
 			}
 			while (deplacement < length) {
-				if (!updatecanceled) {
-					updatescreen.setProgress(deplacement);
+				if (!this.updatecanceled) {
+					if (this.updatescreen != null)
+						this.updatescreen.setProgress(deplacement);
 
 					currentBit = is.read(data, deplacement, data.length - deplacement);
 
@@ -503,32 +532,38 @@ public class Startup {
 						break;
 
 				} else {
-					updatescreen.close();
+					if (this.updatescreen != null)
+						this.updatescreen.setVisible(false);
 					return "CANCELLED";
 				}
 
 				deplacement += currentBit;
 			}
-			updatescreen.Clear();
-			updatescreen.Message(Strings.get("Installing") + "...");
-			updatescreen.Repaint();
+			if (this.updatescreen != null) {
+				this.updatescreen.Clear();
+				this.updatescreen.Message(Strings.get("Installing") + "...");
+				this.updatescreen.Repaint();
+			}
 
 		} catch (IOException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "An error occured while retrieving remote file (remote peer hung up).\nIf the error persist, please contact the software maintainer";
 		}
 		// Close remote stream
 		try {
 			is.close();
 		} catch (IOException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			e.printStackTrace();
 			return "Error encountered while closing the remote stream!";
 		}
 
 		// If not all the bytes have been retrieved, abort update
 		if (deplacement != length) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer";
 		}
 
@@ -537,7 +572,8 @@ public class Startup {
 		try {
 			destinationFile = new FileOutputStream(destination);
 		} catch (FileNotFoundException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "An error occured while opening the local Jar file";
 		}
 		try {
@@ -545,10 +581,12 @@ public class Startup {
 			destinationFile.flush();
 			destinationFile.close();
 		} catch (IOException e) {
-			updatescreen.close();
+			if (this.updatescreen != null)
+				this.updatescreen.setVisible(false);
 			return "An error occured while writing to the local Jar file.\n-- AUTO-UPDATE ABORTED --\nThe local file might be corrupted. If this is the case, please download a new copy of Logisim";
 		}
-		updatescreen.close();
+		if (this.updatescreen != null)
+			this.updatescreen.setVisible(false);
 		return "OK";
 	}
 
@@ -606,17 +644,6 @@ public class Startup {
 			return (false);
 		}
 		return (false);
-	}
-
-	public void restart() {
-		try {
-			String[] exexute = { "java", "-jar",
-					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-							.getAbsolutePath() };
-			Runtime.getRuntime().exec(exexute);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	public void run() {

@@ -55,10 +55,14 @@ public class ComponentDrawContext {
 	//
 	// helper methods
 	//
-	public void drawBounds(Component comp) {
+	public void drawBounds(Component comp, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.BLACK);
 		Bounds bds = comp.getBounds();
+		if (color != null) {
+			g.setColor(color);
+			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
+		}
+		g.setColor(Color.BLACK);
 		g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 		GraphicsUtil.switchToWidth(g, 1);
 	}
@@ -216,6 +220,18 @@ public class ComponentDrawContext {
 				g.drawString(label, x + (width - lwid) / 2, y + (height + fm.getAscent()) / 2 - 1);
 			}
 		}
+	}
+
+	public void drawRoundBounds(Component comp, Color color) {
+		GraphicsUtil.switchToWidth(g, 2);
+		Bounds bds = comp.getBounds();
+		if (color != null) {
+			g.setColor(color);
+			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
+		}
+		g.setColor(Color.BLACK);
+		g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
+		GraphicsUtil.switchToWidth(g, 1);
 	}
 
 	public Circuit getCircuit() {

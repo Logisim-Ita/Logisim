@@ -166,13 +166,16 @@ public class Pin extends InstanceFactory {
 	public static final Attribute<AttributeOption> ATTR_PULL = Attributes.forOption("pull",
 			Strings.getter("pinPullAttr"), new AttributeOption[] { PULL_NONE, PULL_UP, PULL_DOWN });
 	public static final Pin FACTORY = new Pin();
+
 	private static final Icon ICON_IN = Icons.getIcon("pinInput.gif");
 
 	private static final Icon ICON_OUT = Icons.getIcon("pinOutput.gif");
 
-	private static final Font ICON_WIDTH_FONT = new Font("Sans Serif", Font.BOLD, 9);
+	private static final Icon ICON_IN_MULTI = Icons.getIcon("pinInputMulti.gif");
 
-	private static final Color ICON_WIDTH_COLOR = Value.WIDTH_ERROR_COLOR.darker();
+	private static final Icon ICON_OUT_MULTI = Icons.getIcon("pinOutputMulti.gif");
+
+	private static final Font ICON_WIDTH_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 8);
 
 	private static PinState getState(InstanceState state) {
 		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
@@ -282,6 +285,8 @@ public class Pin extends InstanceFactory {
 			instance.recomputeBounds();
 			PinAttributes attrs = (PinAttributes) instance.getAttributeSet();
 			Probe.configureLabel(instance, attrs.labelloc, attrs.facing);
+		} else if (attr == Pin.ATTR_TRISTATE || attr == Pin.ATTR_PULL) {
+			instance.fireInvalidated();
 		}
 	}
 
@@ -303,12 +308,12 @@ public class Pin extends InstanceFactory {
 		if (output) {
 			BitWidth width = attrs.getValue(StdAttr.WIDTH);
 			if (width == BitWidth.ONE) {
-				g.drawOval(x + bds.getX() + 1, y + bds.getY() + 1, bds.getWidth() - 1, bds.getHeight() - 1);
+				g.drawOval(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
 			} else {
-				g.drawRoundRect(x + bds.getX() + 1, y + bds.getY() + 1, bds.getWidth() - 1, bds.getHeight() - 1, 6, 6);
+				g.drawRoundRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 			}
 		} else {
-			g.drawRect(x + bds.getX() + 1, y + bds.getY() + 1, bds.getWidth() - 1, bds.getHeight() - 1);
+			g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
 		}
 	}
 
@@ -317,55 +322,67 @@ public class Pin extends InstanceFactory {
 	//
 	@Override
 	public void paintIcon(InstancePainter painter) {
-		paintIconBase(painter);
 		BitWidth w = painter.getAttributeValue(StdAttr.WIDTH);
-		if (!w.equals(BitWidth.ONE)) {
-			Graphics g = painter.getGraphics();
-			g.setColor(ICON_WIDTH_COLOR);
-			g.setFont(ICON_WIDTH_FONT);
-			GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
-			g.setColor(Color.BLACK);
-		}
+		paintIconBase(painter, w);
 	}
 
-	private void paintIconBase(InstancePainter painter) {
+	private void paintIconBase(InstancePainter painter, BitWidth w) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Direction dir = attrs.facing;
 		boolean output = attrs.isOutput();
+		boolean iconprinted = false;
 		Graphics g = painter.getGraphics();
+		g.setFont(ICON_WIDTH_FONT);
 		if (output) {
-			if (ICON_OUT != null) {
+			if (w.equals(BitWidth.ONE) && ICON_OUT != null) {
 				Icons.paintRotated(g, 2, 2, dir, ICON_OUT, painter.getDestination());
-				return;
+				iconprinted = true;
+			} else if (ICON_OUT_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_OUT_MULTI, painter.getDestination());
+				iconprinted = true;
 			}
 		} else {
-			if (ICON_IN != null) {
+			if (w.equals(BitWidth.ONE) && ICON_IN != null) {
 				Icons.paintRotated(g, 2, 2, dir, ICON_IN, painter.getDestination());
-				return;
+				iconprinted = true;
+			} else if (ICON_IN_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_IN_MULTI, painter.getDestination());
+				iconprinted = true;
 			}
 		}
-		int pinx = 16;
-		int piny = 9;
-		if (dir == Direction.EAST) { // keep defaults
-		} else if (dir == Direction.WEST) {
-			pinx = 4;
-		} else if (dir == Direction.NORTH) {
-			pinx = 9;
-			piny = 4;
-		} else if (dir == Direction.SOUTH) {
-			pinx = 9;
-			piny = 16;
-		}
+		if (!iconprinted) {
+			int pinx = 16;
+			int piny = 9;
+			if (dir == Direction.EAST) { // keep defaults
+			} else if (dir == Direction.WEST) {
+				pinx = 4;
+			} else if (dir == Direction.NORTH) {
+				pinx = 9;
+				piny = 4;
+			} else if (dir == Direction.SOUTH) {
+				pinx = 9;
+				piny = 16;
+			}
+			g.setColor(w.equals(BitWidth.ONE) ? Value.TRUE.getColor() : Color.WHITE);
+			if (output) {
+				g.fillOval(4, 4, 13, 13);
+			} else {
+				g.fillRect(4, 4, 13, 13);
+			}
+			g.fillOval(pinx, piny, 3, 3);
 
-		g.setColor(Color.black);
-		if (output) {
-			g.drawOval(4, 4, 13, 13);
-		} else {
-			g.drawRect(4, 4, 13, 13);
+			g.setColor(Color.black);
+			if (output) {
+				g.drawOval(4, 4, 13, 13);
+			} else {
+				g.drawRect(4, 4, 13, 13);
+			}
 		}
-		g.setColor(Value.TRUE.getColor());
-		g.fillOval(7, 7, 8, 8);
-		g.fillOval(pinx, piny, 3, 3);
+		if (w.equals(BitWidth.ONE))
+			g.setColor(Color.WHITE);
+		else
+			g.setColor(Color.BLACK);
+		GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
 	}
 
 	@Override
@@ -377,18 +394,16 @@ public class Pin extends InstanceFactory {
 		int x = bds.getX();
 		int y = bds.getY();
 		GraphicsUtil.switchToWidth(g, 2);
-		g.setColor(Color.black);
-		if (attrs.type == EndData.OUTPUT_ONLY) {
-			if (attrs.width.getWidth() == 1) {
-				g.drawOval(x + 1, y + 1, bds.getWidth() - 1, bds.getHeight() - 1);
-			} else {
-				g.drawRoundRect(x + 1, y + 1, bds.getWidth() - 1, bds.getHeight() - 1, 6, 6);
-			}
-		} else {
-			g.drawRect(x + 1, y + 1, bds.getWidth() - 1, bds.getHeight() - 1);
-		}
-
 		painter.drawLabel();
+		// if bitwidth is more that 1, first draw the bounds and then the number
+		if (attrs.width.getWidth() > 1) {
+			g.setColor(Color.black);
+			if (attrs.type == EndData.OUTPUT_ONLY) {
+				painter.drawRoundBounds(Color.WHITE);
+			} else {
+				painter.drawBounds(Color.WHITE);
+			}
+		}
 
 		if (!painter.getShowState()) {
 			g.setColor(Color.BLACK);
@@ -399,17 +414,28 @@ public class Pin extends InstanceFactory {
 			if (attrs.width.getWidth() <= 1) {
 				Value receiving = state.receiving;
 				g.setColor(receiving.getColor());
-				g.fillOval(x + 4, y + 4, 13, 13);
-
+				if (attrs.type == EndData.OUTPUT_ONLY)
+					g.fillOval(x, y, bds.getWidth(), bds.getHeight());
+				else
+					g.fillRect(x, y, bds.getWidth(), bds.getHeight());
 				if (attrs.width.getWidth() == 1) {
 					g.setColor(Color.WHITE);
-					GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 11, y + 9);
+					GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 11, y + 8);
 				}
 			} else {
 				Probe.paintValue(painter, state.sending);
 			}
 		}
-
+		// if bitwidth is equal to 1, first draw the colored base and value, then the
+		// bounds
+		if (attrs.width.getWidth() == 1) {
+			g.setColor(Color.black);
+			if (attrs.type == EndData.OUTPUT_ONLY) {
+				g.drawOval(x, y, bds.getWidth(), bds.getHeight());
+			} else {
+				g.drawRect(x, y, bds.getWidth(), bds.getHeight());
+			}
+		}
 		painter.drawPorts();
 	}
 

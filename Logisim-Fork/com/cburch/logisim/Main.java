@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import com.cburch.logisim.gui.start.Startup;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 10, 0, 0, "jar");
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 11, 0, 0, LogisimVersion.getVariantFromFile());
 
 	public static final String VERSION_NAME = VERSION.toString();
 
@@ -42,19 +42,19 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
-		if (startup != null && !startup.autoUpdate()) {
-			try {
-				startup.run();
-			} catch (Throwable e) {
-				Writer result = new StringWriter();
-				PrintWriter printWriter = new PrintWriter(result);
-				e.printStackTrace(printWriter);
-				JOptionPane.showMessageDialog(null, result.toString());
-				System.exit(-1);
-			}
-		} else {
-			startup.restart();
-			System.exit(0);
+		if (startup != null) {
+			if (!startup.autoUpdate(true, null)) {
+				try {
+					startup.run();
+				} catch (Throwable e) {
+					Writer result = new StringWriter();
+					PrintWriter printWriter = new PrintWriter(result);
+					e.printStackTrace(printWriter);
+					JOptionPane.showMessageDialog(null, result.toString());
+					System.exit(-1);
+				}
+			} else
+				Startup.restart();
 		}
 	}
 }

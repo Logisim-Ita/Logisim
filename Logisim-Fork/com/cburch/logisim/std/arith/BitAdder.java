@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.arith;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cburch.logisim.data.Attribute;
@@ -103,7 +104,7 @@ public class BitAdder extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawPorts();
 
 		GraphicsUtil.switchToWidth(g, 2);

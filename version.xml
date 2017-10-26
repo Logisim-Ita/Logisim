@@ -2,21 +2,20 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.10.0.0</jar_version>
+  <jar_version>2.11.0.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.10.0.0</exe_version>
+  <exe_version>2.11.0.0</exe_version>
   <changelog>
-* New Flip-Flops attributes and new layout (fully retro-compatible)
-* New TTL 7485: 4-bit magnitude comparator
-* New TTL 74283: 4-bit binary full adder
-* Solved every kind of retro-compatibility problem
-* Mouse wheel now will zoom where you're pointing at
-* Press ESC or DEL to cancel "add tool" action
-* Truth table is now displayed with a different color for each row
-* Press F5 to repaint
-* Fixed a bug in Digital Oscilloscope and in translations
-* All the menu windows now will open at the screen center
-* Display Decoder: multibit attribute changed into true by default
-* Solved empty template bug
+* New component: I/O -> DipSwitch!
+* New TTL 74165: 8-bit parallel-to-serial shift register
+* New options for autoupdates in the preference menu
+* Help menu: added "Forum", "Bug Report" and "Check Updates"
+* Major graphical changes: 
+	-Input and output pin
+	-Squared components now have a white background and rounded corners
+	-In Preference/Window you can select a different java look and feel
+* Splitter fanout and bitwidth attributes now are 4 from default
+* Hex Digit: added tooltips
+* Brought some fix from original Logisim 2.7.2 early
   </changelog>
 </logisim>

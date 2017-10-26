@@ -75,7 +75,9 @@ class AttrTableSelectionModel extends AttributeSetTableModel implements Selectio
 	@Override
 	public void selectionChanged(Event event) {
 		fireTitleChanged();
-		frame.setAttrTableModel(this);
+		if (frame.getEditorView().equals(Frame.EDIT_LAYOUT)) {
+			frame.setAttrTableModel(this);
+		}
 	}
 
 	@Override

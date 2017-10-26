@@ -31,3 +31,10 @@
 /TimingDiagram$DiagramState.class
 /DiagramState.class
 /DigitalOscilloscope.class
+/DeepSwitch.class
+/DeepSwitch$Logger.class
+/DeepSwitch$Poker.class
+/DipSwitch.class
+/DipSwitch$Logger.class
+/DipSwitch$Poker.class
+/DipSwitch$pinValues.class

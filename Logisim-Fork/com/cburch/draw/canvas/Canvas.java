@@ -37,7 +37,7 @@ public class Canvas extends JComponent {
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
 		addKeyListener(listener);
-		setPreferredSize(new Dimension(200, 200));
+		setPreferredSize(new Dimension(400, 400));
 	}
 
 	public void doAction(Action action) {

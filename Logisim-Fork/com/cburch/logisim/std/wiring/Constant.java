@@ -33,7 +33,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class Constant extends InstanceFactory {
 	private static class ConstantAttributes extends AbstractAttributeSet {
-		private Direction facing = Direction.EAST;;
+		private Direction facing = Direction.EAST;
 		private BitWidth width = BitWidth.ONE;
 		private Value value = Value.TRUE;
 
