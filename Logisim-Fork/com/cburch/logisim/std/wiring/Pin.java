@@ -399,9 +399,9 @@ public class Pin extends InstanceFactory {
 		if (attrs.width.getWidth() > 1) {
 			g.setColor(Color.black);
 			if (attrs.type == EndData.OUTPUT_ONLY) {
-				painter.drawRoundBounds();
+				painter.drawRoundBounds(Color.WHITE);
 			} else {
-				painter.drawBounds();
+				painter.drawBounds(Color.WHITE);
 			}
 		}
 

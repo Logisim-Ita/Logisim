@@ -110,7 +110,7 @@ public class Counter extends InstanceFactory {
 		}
 
 		// draw boundary, label
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawLabel();
 
 		// draw input and output ports

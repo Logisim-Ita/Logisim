@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.arith;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cburch.logisim.data.Attribute;
@@ -93,7 +94,7 @@ public class BitFinder extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawPorts();
 
 		String top = Strings.get("bitFinderFindLabel");

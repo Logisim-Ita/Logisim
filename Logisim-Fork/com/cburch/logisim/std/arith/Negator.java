@@ -3,6 +3,8 @@
 
 package com.cburch.logisim.std.arith;
 
+import java.awt.Color;
+
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
@@ -36,7 +38,7 @@ public class Negator extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawPort(IN);
 		painter.drawPort(OUT, "-x", Direction.WEST);
 	}

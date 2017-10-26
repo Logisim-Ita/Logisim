@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cburch.logisim.circuit.Circuit;
@@ -31,8 +32,8 @@ public class InstancePainter implements InstanceState {
 	//
 	// helper methods for drawing common elements in components
 	//
-	public void drawBounds() {
-		context.drawBounds(comp);
+	public void drawBounds(Color color) {
+		context.drawBounds(comp, color);
 	}
 
 	public void drawClock(int i, Direction dir) {
@@ -81,8 +82,8 @@ public class InstancePainter implements InstanceState {
 		context.drawRectangle(x, y, width, height, label);
 	}
 
-	public void drawRoundBounds() {
-		context.drawRoundBounds(comp);
+	public void drawRoundBounds(Color color) {
+		context.drawRoundBounds(comp, color);
 	}
 
 	@Override

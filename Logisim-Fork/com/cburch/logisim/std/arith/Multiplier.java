@@ -120,7 +120,7 @@ public class Multiplier extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 
 		g.setColor(Color.GRAY);
 		painter.drawPort(IN0);

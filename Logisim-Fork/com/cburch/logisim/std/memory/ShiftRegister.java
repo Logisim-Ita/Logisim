@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.memory;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cburch.logisim.data.Attribute;
@@ -128,7 +129,7 @@ public class ShiftRegister extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		// draw boundary, label
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawLabel();
 
 		// draw state

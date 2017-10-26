@@ -3,6 +3,8 @@
 
 package com.cburch.logisim.std.arith;
 
+import java.awt.Color;
+
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.Attributes;
@@ -69,7 +71,7 @@ public class Comparator extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 		painter.drawPort(IN0);
 		painter.drawPort(IN1);
 		painter.drawPort(GT, ">", Direction.WEST);

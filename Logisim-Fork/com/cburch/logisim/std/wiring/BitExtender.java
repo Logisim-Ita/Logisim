@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.wiring;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
@@ -93,7 +94,7 @@ public class BitExtender extends InstanceFactory {
 		FontMetrics fm = g.getFontMetrics();
 		int asc = fm.getAscent();
 
-		painter.drawRoundBounds();
+		painter.drawRoundBounds(Color.WHITE);
 
 		String s0;
 		String type = getType(painter.getAttributeSet());
