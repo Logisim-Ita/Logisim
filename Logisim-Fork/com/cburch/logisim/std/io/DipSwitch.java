@@ -40,11 +40,13 @@ public class DipSwitch extends InstanceFactory {
 
 		private pinValues(InstanceState state) {
 			vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-			for (int i = 0; i < vals.length; i++)
-				vals[i] = Value.FALSE;
+			Valfalse(vals);
 			state.setData(this);
 		}
-
+		private void Valfalse(Value[] vals) {
+			for (int i = 0; i < vals.length; i++)
+				vals[i] = Value.FALSE;
+		}
 		@Override
 		public Object clone() {
 			try {
@@ -66,45 +68,19 @@ public class DipSwitch extends InstanceFactory {
 			return vals;
 		}
 
-		private pinValues getValueState(InstanceState state) {
-			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
-			pinValues ret = (pinValues) state.getData();
-			if (ret == null) {
-				ret = new pinValues(state);
-				state.setData(ret);
-			} else {
-				ret.updateValues(state);
-			}
-			return ret;
-		}
-
 		private void setValue(InstanceState state, Value val, int port) {
 			vals[port] = val;
 			state.getInstance().fireInvalidated();
 		}
 
-		private void updateValues(InstanceState state) {
-			int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
-			pinValues obj = (pinValues) state.getData();
-			Value[] vals = getValues();
-			if (vals.length != switches) {
-				if (vals.length < switches) {
-					Value[] oldvals = vals;
-					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-					int i = 0;
-					for (i = 0; i < oldvals.length; i++) {
-						vals[i] = oldvals[i];
-					}
-					for (; i < vals.length; i++) {
-						vals[i] = Value.FALSE;
-					}
-				}
-				if (vals.length > switches) {
-					Value[] oldvals = vals;
-					vals = new Value[state.getAttributeValue(ATTR_NSWITCHES)];
-					for (int i = 0; i < switches; i++) {
-						vals[i] = oldvals[i];
-					}
+		private void updateValues(int switches) {
+			if (getValues().length != switches) {
+				Value[] oldvals = getValues();
+				vals = new Value[switches];
+				Valfalse(vals);
+				int min=oldvals.length<switches?oldvals.length :switches;
+				for ( int i = 0; i < min; i++) {
+					vals[i] = oldvals[i];
 				}
 			}
 		}
@@ -112,6 +88,7 @@ public class DipSwitch extends InstanceFactory {
 	}
 
 	public static class Poker extends InstancePoker {
+
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			pinValues obj = (pinValues) state.getData();
@@ -130,28 +107,28 @@ public class DipSwitch extends InstanceFactory {
 				x = x / 10;
 				if (x % 2 == 0) {
 					x = x / 2;
-					obj.setValue(state, state.getPort(x).not(), x);// opposite value
+					obj.setValue(state, obj.getValue(x).not(), x);// opposite value
 				}
 			} else if ((x > 5 && x < 25) && (dir == Direction.EAST)) {
 				y += offset - 5;
 				y = y / 10;
 				if (y % 2 == 0) {
 					y = y / 2;
-					obj.setValue(state, state.getPort(y).not(), y);// opposite value
+					obj.setValue(state, obj.getValue(y).not(), y);// opposite value
 				}
 			} else if ((y < -5 && y > -25) && (dir == Direction.NORTH)) {
 				x += offset - 5;
 				x = x / 10;
 				if (x % 2 == 0) {
 					x = x / 2;
-					obj.setValue(state, state.getPort(x).not(), x);// opposite value
+					obj.setValue(state, obj.getValue(x).not(), x);// opposite value
 				}
 			} else if ((x < -5 && x > -25) && (dir == Direction.WEST)) {
 				y += offset - 5;
 				y /= 10;
 				if (y % 2 == 0) {
 					y /= 2;
-					obj.setValue(state, state.getPort(y).not(), y);// opposite value
+					obj.setValue(state, obj.getValue(y).not(), y);// opposite value
 				}
 			}
 		}
@@ -227,16 +204,24 @@ public class DipSwitch extends InstanceFactory {
 		return Bounds.create(0, -y / 2, 30, y).rotate(Direction.EAST, facing, 0, 0);
 	}
 
+	private pinValues getValueState(InstanceState state) {
+		int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
+		pinValues ret = (pinValues) state.getData();
+		if (ret == null) {
+			ret = new pinValues(state);
+			state.setData(ret);
+		} else {
+			ret.updateValues(switches);
+		}
+		return ret;
+	}
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		// pinValues obj=(pinValues) instance.getData();
-		// pinValues obj=(pinValues) instance.getData();
 		if (attr == StdAttr.FACING || attr == ATTR_NSWITCHES) {
 			instance.recomputeBounds();
 			computeTextField(instance);
 			updateports(instance);
-			// obj.updateValues(obj.getValueState(instance));
-			// obj.updateValues(obj.getValueState(instance));
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
 		}
@@ -244,11 +229,11 @@ public class DipSwitch extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		pinValues obj = (pinValues) painter.getData();
+		pinValues obj =getValueState(painter);
 		Bounds bds = painter.getBounds();
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		painter.drawRoundBounds();
-
+		
 		int x = bds.getX();
 		int y = bds.getY();
 		int switches = painter.getAttributeValue(ATTR_NSWITCHES).intValue();
@@ -261,11 +246,21 @@ public class DipSwitch extends InstanceFactory {
 
 			}
 			for (int i = 0; i < switches; i++) {
-				// Value val=obj.getValue(i);
-				g.setColor(Color.BLACK);
-				g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
-				g.setColor(Color.GRAY);
-				g.drawRect(15 + x, i * 20 + 5 + y, 10, 10);
+				if(obj.getValue(i)!=Value.FALSE) {
+					g.setColor(Value.TRUE_COLOR);
+					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(15 + x, i * 20 + 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(15 + x, i * 20 + 5 + y, 10, 10);
+				}else if(obj.getValue(i)!=Value.TRUE) {
+					g.setColor(Value.FALSE_COLOR);
+					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(5 + x, i * 20 + 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(5 + x, i * 20 + 5 + y, 10, 10);
+				}
 			}
 		} else if (dir == Direction.WEST) {
 			g.setColor(Color.BLACK);
@@ -274,10 +269,21 @@ public class DipSwitch extends InstanceFactory {
 
 			}
 			for (int i = 0; i < switches; i++) {
-				g.setColor(Color.BLACK);
-				g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
-				g.setColor(Color.GRAY);
-				g.drawRect(15 + x, i * 20 + 5 + y, 10, 10);
+				if(obj.getValue(i)!=Value.FALSE) {
+					g.setColor(Value.TRUE_COLOR);
+					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(5 + x, i * 20 + 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(5 + x, i * 20 + 5 + y, 10, 10);
+				}else if(obj.getValue(i)!=Value.TRUE) {
+					g.setColor(Value.FALSE_COLOR);
+					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(15 + x, i * 20 + 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(15 + x, i * 20 + 5 + y, 10, 10);
+				}
 			}
 		} else if (dir == Direction.NORTH) {
 			g.setColor(Color.BLACK);
@@ -286,10 +292,21 @@ public class DipSwitch extends InstanceFactory {
 
 			}
 			for (int i = 0; i < switches; i++) {
-				g.setColor(Color.BLACK);
-				g.fillRect(i * 20 + 5 + x, 5 + y, 10, 20);
-				g.setColor(Color.GRAY);
-				g.drawRect(i * 20 + 5 + x, 15 + y, 10, 10);
+				if(obj.getValue(i)!=Value.FALSE) {
+					g.setColor(Value.TRUE_COLOR);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 20);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(i *20+5 + x, 5 + y, 10, 10);
+				}else if(obj.getValue(i)!=Value.TRUE) {
+					g.setColor(Value.FALSE_COLOR);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 20);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(i *20+5 + x, 15 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(i *20+5 + x, 15 + y, 10, 10);
+				}
 			}
 		} else if (dir == Direction.SOUTH) {
 			g.setColor(Color.BLACK);
@@ -298,10 +315,21 @@ public class DipSwitch extends InstanceFactory {
 
 			}
 			for (int i = 0; i < switches; i++) {
-				g.setColor(Color.BLACK);
-				g.fillRect(i * 20 + 5 + x, 5 + y, 10, 20);
-				g.setColor(Color.GRAY);
-				g.drawRect(i * 20 + 5 + x, 15 + y, 10, 10);
+				if(obj.getValue(i)!=Value.FALSE) {
+					g.setColor(Value.TRUE_COLOR);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 20);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(i *20+5 + x, 15 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(i *20+5 + x, 15 + y, 10, 10);
+				}else if(obj.getValue(i)!=Value.TRUE) {
+					g.setColor(Value.FALSE_COLOR);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 20);
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(i *20+5 + x, 5 + y, 10, 10);
+					g.setColor(Color.BLACK);
+					g.drawRect(i *20+5 + x, 5 + y, 10, 10);
+				}
 			}
 		}
 		painter.drawLabel();
@@ -310,16 +338,19 @@ public class DipSwitch extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		pinValues obj;
-		if (state.getData() != null)
-			obj = (pinValues) state.getData();
-		else
-			obj = new pinValues(state);
-		Value val = null;
+		pinValues obj=getValueState(state);
+		Value val;
 		for (int i = 0; i < state.getAttributeValue(ATTR_NSWITCHES); i++) {
 			val = obj.getValue(i);
 			state.setPort(i, val, 1);
 		}
+	}
+	 @Override
+	public void paintGhost(InstancePainter painter) {
+		 Bounds bds = painter.getBounds();
+			Graphics g = painter.getGraphics();
+			GraphicsUtil.switchToWidth(g, 2);
+			g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10,10);
 	}
 
 	private void updateports(Instance instance) {
