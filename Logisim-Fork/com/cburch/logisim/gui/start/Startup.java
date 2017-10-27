@@ -292,6 +292,10 @@ public class Startup {
 		}
 	}
 
+	public static void AsktoSave(Frame frame) {
+		frame.confirmClose();
+	}
+
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
 		for (int i = 0; i < opts.length; i++) {
@@ -383,18 +387,17 @@ public class Startup {
 								logisimData.child("changelog").content()),
 						Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
-				if (answer != 0) {
-					// User refused to update -- we just hope he gets sufficiently
-					// annoyed by the message that he finally updates!
+				if (answer != 0)
+					// User refused to update
 					return (false);
-				}
+
 			}
 			if (FromMain) {
 				this.updatescreen = new UpdateScreen();
 				this.updatescreen.Message(Strings.get("Connectioncheck") + "...");
 				this.updatescreen.setVisible(true);
 			} else {
-				frame.confirmClose();
+				AsktoSave(frame);
 			}
 			// Obtain the base directory of the archive
 			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();

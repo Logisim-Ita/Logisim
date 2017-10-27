@@ -1,5 +1,10 @@
 package com.cburch.logisim.gui.prefs;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.cburch.logisim.prefs.AppPreferences;
@@ -12,7 +17,8 @@ class ForkOptions extends OptionsPanel {
 	 */
 	private static final long serialVersionUID = 9163994176877542102L;
 	private PrefBoolean[] checks;
-	private PrefOptionList updates;
+	private PrefOptionList updates, lookAndFeel;
+	private JLabel accelRestart = new JLabel();
 
 	public ForkOptions(PreferencesFrame frame) {
 		super(frame);
@@ -22,6 +28,11 @@ class ForkOptions extends OptionsPanel {
 				new PrefOption[] { new PrefOption(AppPreferences.ALWAYS, Strings.getter("Always")),
 						new PrefOption(AppPreferences.ASKME, Strings.getter("AskMe")), new PrefOption(AppPreferences.NO,
 								new LocaleManager("resources/logisim", "data").getter("booleanFalseOption")) });
+		lookAndFeel = new PrefOptionList(AppPreferences.LOOK_AND_FEEL, Strings.getter("lookAndFeel"),
+				new PrefOption[] { new PrefOption(AppPreferences.SYSTEM, Strings.getter("systemLookAndFeel")),
+						new PrefOption(AppPreferences.NIMBUS, Strings.getter("nimbusLookAndFeel")),
+						new PrefOption(AppPreferences.MOTIF, Strings.getter("motifLookAndFeel")),
+						new PrefOption(AppPreferences.METAL, Strings.getter("metalLookAndFeel")) });
 
 		setLayout(new TableLayout(1));
 
@@ -31,6 +42,12 @@ class ForkOptions extends OptionsPanel {
 		}
 		panel.add(updates.getJLabel());
 		panel.add(updates.getJComboBox());
+
+		panel.add(lookAndFeel.getJLabel());
+		panel.add(lookAndFeel.getJComboBox());
+		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		panel.add(accelRestart, BorderLayout.PAGE_END);
+		accelRestart.setForeground(Color.GRAY);
 		add(panel);
 	}
 
@@ -51,6 +68,8 @@ class ForkOptions extends OptionsPanel {
 			checks[i].localeChanged();
 		}
 		updates.localeChanged();
+		lookAndFeel.localeChanged();
+		accelRestart.setText(Strings.get("accelRestartLabel"));
 	}
 
 }

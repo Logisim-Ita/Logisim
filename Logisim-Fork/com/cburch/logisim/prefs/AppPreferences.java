@@ -17,6 +17,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import com.cburch.logisim.Main;
 import com.cburch.logisim.circuit.RadixOption;
@@ -25,6 +27,7 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.PropertyChangeWeakSupport;
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 public class AppPreferences {
 	//
@@ -154,8 +157,6 @@ public class AppPreferences {
 			"toolbarPlacement", new String[] { Direction.NORTH.toString(), Direction.SOUTH.toString(),
 					Direction.EAST.toString(), Direction.WEST.toString(), TOOLBAR_DOWN_MIDDLE, TOOLBAR_HIDDEN },
 			Direction.NORTH.toString()));
-	public static final PrefMonitor<String> LOOK_AND_FEEL = create(
-			new PrefMonitorString("lookAndFeel", UIManager.getSystemLookAndFeelClassName()));
 
 	// Layout preferences
 	public static final String ADD_AFTER_UNCHANGED = "unchanged";
@@ -202,6 +203,12 @@ public class AppPreferences {
 	public static final String NO = "No";
 	public static final PrefMonitor<String> AUTO_UPDATES = create(
 			new PrefMonitorStringOpts("AutoUpdates", new String[] { ALWAYS, ASKME, NO }, ASKME));
+	public static final String SYSTEM = UIManager.getSystemLookAndFeelClassName();
+	public static final String NIMBUS = NimbusLookAndFeel.class.getName();
+	public static final String MOTIF = MotifLookAndFeel.class.getName();
+	public static final String METAL = MetalLookAndFeel.class.getName();
+	public static final PrefMonitor<String> LOOK_AND_FEEL = create(
+			new PrefMonitorStringOpts("lookAndFeel", new String[] { SYSTEM, NIMBUS, MOTIF, METAL }, SYSTEM));
 
 	// hidden window preferences - not part of the preferences dialog, changes
 	// to preference does not affect current windows, and the values are not

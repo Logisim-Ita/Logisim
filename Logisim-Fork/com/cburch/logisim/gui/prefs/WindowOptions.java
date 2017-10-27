@@ -3,20 +3,12 @@
 
 package com.cburch.logisim.gui.prefs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.TableLayout;
-import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 class WindowOptions extends OptionsPanel {
 	/**
@@ -24,18 +16,12 @@ class WindowOptions extends OptionsPanel {
 	 */
 	private static final long serialVersionUID = 1043476425449770400L;
 	private PrefBoolean[] checks;
-	private PrefOptionList toolbarPlacement, lookAndFeel;
-	private JLabel accelRestart = new JLabel();
+	private PrefOptionList toolbarPlacement;
 
 	public WindowOptions(PreferencesFrame window) {
 		super(window);
 
-		lookAndFeel = new PrefOptionList(AppPreferences.LOOK_AND_FEEL, Strings.getter("lookAndFeel"),
-				new PrefOption[] {
-						new PrefOption(UIManager.getSystemLookAndFeelClassName(), Strings.getter("systemLookAndFeel")),
-						new PrefOption(NimbusLookAndFeel.class.getName(), Strings.getter("nimbusLookAndFeel")),
-						new PrefOption(MotifLookAndFeel.class.getName(), Strings.getter("motifLookAndFeel")),
-						new PrefOption(MetalLookAndFeel.class.getName(), Strings.getter("metalLookAndFeel")) });
+		
 
 		checks = new PrefBoolean[] {
 				new PrefBoolean(AppPreferences.SHOW_TICK_RATE, Strings.getter("windowTickRate")), };
@@ -53,18 +39,11 @@ class WindowOptions extends OptionsPanel {
 		panel.add(toolbarPlacement.getJLabel());
 		panel.add(toolbarPlacement.getJComboBox());
 
-		panel.add(lookAndFeel.getJLabel());
-		panel.add(lookAndFeel.getJComboBox());
-
 		setLayout(new TableLayout(1));
 		for (int i = 0; i < checks.length; i++) {
 			add(checks[i]);
 		}
 		add(panel);
-
-		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		panel.add(accelRestart, BorderLayout.PAGE_END);
-		accelRestart.setForeground(Color.GRAY);
 	}
 
 	@Override
@@ -83,7 +62,5 @@ class WindowOptions extends OptionsPanel {
 			checks[i].localeChanged();
 		}
 		toolbarPlacement.localeChanged();
-		lookAndFeel.localeChanged();
-		accelRestart.setText(Strings.get("accelRestartLabel"));
 	}
 }

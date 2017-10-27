@@ -23,6 +23,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -59,6 +60,7 @@ import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
 import com.cburch.logisim.gui.generic.ZoomControl;
+import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectEvent;
@@ -234,6 +236,16 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			} else if (AppPreferences.COMPONENT_TIPS.isSource(event)) {
 				boolean showTips = AppPreferences.COMPONENT_TIPS.getBoolean();
 				setToolTipText(showTips ? "" : null);
+			} else if (AppPreferences.LOOK_AND_FEEL.isSource(event)
+					|| AppPreferences.GRAPHICS_ACCELERATION.isSource(event)) {
+				int answer = JOptionPane.showConfirmDialog(null,
+						new LocaleManager("resources/logisim", "prefs").getter("accelRestartLabel"),
+						Strings.get("RestartRequired"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+				if (answer != 0)
+					// User refused to update
+					return;
+				Startup.AsktoSave(proj.getFrame());
+				Startup.restart();
 			}
 		}
 	}
@@ -664,6 +676,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		AppPreferences.COMPONENT_TIPS.addPropertyChangeListener(myListener);
 		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
 		AppPreferences.SHOW_TICK_RATE.addPropertyChangeListener(myListener);
+		AppPreferences.LOOK_AND_FEEL.addPropertyChangeListener(myListener);
+		AppPreferences.GRAPHICS_ACCELERATION.addPropertyChangeListener(myListener);
 		loadOptions(options);
 		paintThread.start();
 	}
