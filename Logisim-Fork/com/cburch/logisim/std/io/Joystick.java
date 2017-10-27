@@ -11,14 +11,17 @@ import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 
@@ -126,11 +129,12 @@ public class Joystick extends InstanceFactory {
 
 	public Joystick() {
 		super("Joystick", Strings.getter("joystickComponent"));
-		setAttributes(new Attribute[] { ATTR_WIDTH, Io.ATTR_COLOR }, new Object[] { BitWidth.create(4), Color.RED });
-		setKeyConfigurator(new BitWidthConfigurator(ATTR_WIDTH, 2, 5));
+		setAttributes(new Attribute[] {StdAttr.FACING, ATTR_WIDTH, Io.ATTR_COLOR }, new Object[] { Direction.EAST,BitWidth.create(4), Color.RED });
+		//setKeyConfigurator(new BitWidthConfigurator(ATTR_WIDTH, 2, 5));
 		setOffsetBounds(Bounds.create(-30, -10, 30, 30));
 		setIconName("joystick.gif");
-		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, ATTR_WIDTH), new Port(0, 10, Port.OUTPUT, ATTR_WIDTH), });
+		setFacingAttribute(StdAttr.FACING);
+		//setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, ATTR_WIDTH), new Port(0, 10, Port.OUTPUT, ATTR_WIDTH), });
 		setInstancePoker(Poker.class);
 	}
 
@@ -152,6 +156,12 @@ public class Joystick extends InstanceFactory {
 		g.drawRoundRect(x - 28, y - 8, 26, 26, 4, 4);
 		drawBall(g, x - 15, y + 5, painter.getAttributeValue(Io.ATTR_COLOR), painter.shouldDrawColor());
 		painter.drawPorts();
+	}
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING || attr == ATTR_WIDTH) {
+			updateports(instance);
+		}
 	}
 
 	@Override
@@ -180,4 +190,30 @@ public class Joystick extends InstanceFactory {
 		state.setPort(0, Value.createKnown(bits, dx), 1);
 		state.setPort(1, Value.createKnown(bits, dy), 1);
 	}
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updateports(instance);
+	}
+	private void updateports(Instance instance) {
+		Direction dir = instance.getAttributeValue(StdAttr.FACING);
+		BitWidth bw=instance.getAttributeValue(ATTR_WIDTH);
+		Port[] ports=new Port[2];
+		if (dir == Direction.EAST) {
+			 ports[0]=new Port(0, 0, Port.OUTPUT, bw); 
+			 ports[1]=new Port(0, 10, Port.OUTPUT,bw);
+		}else if (dir == Direction.WEST) {
+			 ports[0]=new Port(-30, 0, Port.OUTPUT, bw);
+			 ports[1]=new Port(-30, 10, Port.OUTPUT, bw);
+		}else if (dir == Direction.NORTH) {
+			 ports[0]=new Port(-10, -10, Port.OUTPUT, bw); 
+			 ports[1]=new Port(-20, -10, Port.OUTPUT, bw);
+		}else if (dir == Direction.SOUTH) {
+			 ports[0]=new Port(-10, 20, Port.OUTPUT, bw); 
+			 ports[1]=new Port(-20, 20, Port.OUTPUT, bw);
+		}
+		instance.setPorts(ports);
+
+}
+
 }
