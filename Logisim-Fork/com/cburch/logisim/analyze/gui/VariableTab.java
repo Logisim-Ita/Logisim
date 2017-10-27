@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.analyze.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -222,6 +224,7 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		gc.gridy = GridBagConstraints.RELATIVE;
 		gc.fill = GridBagConstraints.HORIZONTAL;
 		gb.setConstraints(field, gc);
+		field.setBorder(BorderFactory.createLineBorder(new Color(130, 135, 144)));
 		add(field);
 
 		gc.insets = oldInsets;

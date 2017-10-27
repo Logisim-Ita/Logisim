@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.gui.prefs;
 
-
 import javax.swing.JPanel;
 
 import com.cburch.logisim.data.Direction;
@@ -20,8 +19,6 @@ class WindowOptions extends OptionsPanel {
 
 	public WindowOptions(PreferencesFrame window) {
 		super(window);
-
-		
 
 		checks = new PrefBoolean[] {
 				new PrefBoolean(AppPreferences.SHOW_TICK_RATE, Strings.getter("windowTickRate")), };

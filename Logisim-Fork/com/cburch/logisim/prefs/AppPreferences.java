@@ -420,6 +420,15 @@ public class AppPreferences {
 		propertySupport.removePropertyChangeListener(propertyName, listener);
 	}
 
+	public static void setLayout() {
+		String layout = LOOK_AND_FEEL.get();
+		try {
+			UIManager.setLookAndFeel(layout);
+		} catch (Exception ex) {
+			System.err.println("Layout error " + layout);
+		}
+	}
+
 	public static void setTemplateFile(File value) {
 		getPrefs();
 		setTemplateFile(value, null);

@@ -1,10 +1,5 @@
 package com.cburch.logisim.gui.prefs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.cburch.logisim.prefs.AppPreferences;
@@ -18,7 +13,6 @@ class ForkOptions extends OptionsPanel {
 	private static final long serialVersionUID = 9163994176877542102L;
 	private PrefBoolean[] checks;
 	private PrefOptionList updates, lookAndFeel;
-	private JLabel accelRestart = new JLabel();
 
 	public ForkOptions(PreferencesFrame frame) {
 		super(frame);
@@ -45,9 +39,6 @@ class ForkOptions extends OptionsPanel {
 
 		panel.add(lookAndFeel.getJLabel());
 		panel.add(lookAndFeel.getJComboBox());
-		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		panel.add(accelRestart, BorderLayout.PAGE_END);
-		accelRestart.setForeground(Color.GRAY);
 		add(panel);
 	}
 
@@ -64,12 +55,11 @@ class ForkOptions extends OptionsPanel {
 
 	@Override
 	public void localeChanged() {
+		updates.localeChanged();
+		lookAndFeel.localeChanged();
 		for (int i = 0; i < checks.length; i++) {
 			checks[i].localeChanged();
 		}
-		updates.localeChanged();
-		lookAndFeel.localeChanged();
-		accelRestart.setText(Strings.get("accelRestartLabel"));
 	}
 
 }

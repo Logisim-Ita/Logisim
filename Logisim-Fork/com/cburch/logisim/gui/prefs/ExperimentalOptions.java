@@ -4,12 +4,9 @@
 package com.cburch.logisim.gui.prefs;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.cburch.logisim.prefs.AppPreferences;
@@ -19,7 +16,6 @@ class ExperimentalOptions extends OptionsPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 3383815234719208494L;
-	private JLabel accelRestart = new JLabel();
 	private PrefOptionList accel;
 
 	public ExperimentalOptions(PreferencesFrame window) {
@@ -33,9 +29,6 @@ class ExperimentalOptions extends OptionsPanel {
 		JPanel accelPanel = new JPanel(new BorderLayout());
 		accelPanel.add(accel.getJLabel(), BorderLayout.LINE_START);
 		accelPanel.add(accel.getJComboBox(), BorderLayout.CENTER);
-		accelRestart.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		accelPanel.add(accelRestart, BorderLayout.PAGE_END);
-		accelRestart.setForeground(Color.GRAY);
 		JPanel accelPanel2 = new JPanel();
 		accelPanel2.add(accelPanel);
 
@@ -58,6 +51,5 @@ class ExperimentalOptions extends OptionsPanel {
 	@Override
 	public void localeChanged() {
 		accel.localeChanged();
-		accelRestart.setText(Strings.get("accelRestartLabel"));
 	}
 }

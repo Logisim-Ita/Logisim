@@ -2,20 +2,13 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.0.0</jar_version>
+  <jar_version>2.11.1.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.0.0</exe_version>
+  <exe_version>2.11.1.0</exe_version>
   <changelog>
-* New component: I/O -> DipSwitch!
-* New TTL 74165: 8-bit parallel-to-serial shift register
-* New options for autoupdates in the preference menu
-* Help menu: added "Forum", "Bug Report" and "Check Updates"
-* Major graphical changes: 
-	-Input and output pin
-	-Squared components now have a white background and rounded corners
-	-In Preference/Window you can select a different java look and feel
-* Splitter fanout and bitwidth attributes now are 4 from default
-* Hex Digit: added tooltips
-* Brought some fix from original Logisim 2.7.2 early
+* Logisim will ask you to restart if you change a preference that requires for it
+* Joystick can be rotated + graphic changes + tooltips
+* Fixed graphical bugs (Keyboard and JTextField border)
+* Fixed Experimental graphics acceleration code that wasn't changing anything
   </changelog>
 </logisim>

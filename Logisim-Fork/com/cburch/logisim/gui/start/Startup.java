@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.Main;
@@ -44,6 +43,10 @@ import com.cburch.logisim.util.StringUtil;
 
 public class Startup {
 	private static Startup startupTemp = null;
+
+	public static void AsktoSave(Frame frame) {
+		frame.confirmClose();
+	}
 
 	static void doOpen(File file) {
 		if (startupTemp != null)
@@ -74,9 +77,6 @@ public class Startup {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 			LocaleManager.setReplaceAccents(false);
-
-			// Initialize graphics acceleration if appropriate
-			AppPreferences.handleGraphicsAcceleration();
 		}
 
 		Startup ret = new Startup(isTty);
@@ -88,17 +88,6 @@ public class Startup {
 		if (isClearPreferences) {
 			AppPreferences.clear();
 		}
-
-		try {
-			UIManager.setLookAndFeel(AppPreferences.LOOK_AND_FEEL.get());
-		} catch (Exception ex) {
-		}
-
-		/*
-		 * try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-		 * catch (Exception ex) { }
-		 */
-
 		// parse arguments
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
@@ -292,10 +281,6 @@ public class Startup {
 		}
 	}
 
-	public static void AsktoSave(Frame frame) {
-		frame.confirmClose();
-	}
-
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
 		for (int i = 0; i < opts.length; i++) {
@@ -354,7 +339,6 @@ public class Startup {
 			// available
 			return (false);
 		}
-
 		// Get the remote XML file containing the current version
 		URL xmlURL;
 		URLConnection conn;
@@ -659,6 +643,9 @@ public class Startup {
 				System.exit(-1);
 				return;
 			}
+		} else {
+			AppPreferences.handleGraphicsAcceleration();
+			AppPreferences.setLayout();
 		}
 
 		// kick off the progress monitor

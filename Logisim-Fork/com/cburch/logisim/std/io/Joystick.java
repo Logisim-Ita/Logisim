@@ -8,11 +8,11 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
@@ -22,16 +22,15 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class Joystick extends InstanceFactory {
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseDragged(InstanceState state, MouseEvent e) {
-			Location loc = state.getInstance().getLocation();
-			int cx = loc.getX() - 15;
-			int cy = loc.getY() + 5;
+			Bounds bds = state.getInstance().getBounds();
+			int cx = bds.getX() + 15;
+			int cy = bds.getY() + 15;
 			updateState(state, e.getX() - cx, e.getY() - cy);
 		}
 
@@ -52,20 +51,19 @@ public class Joystick extends InstanceFactory {
 				state = new State(0, 0);
 				painter.setData(state);
 			}
-			Location loc = painter.getLocation();
-			int x = loc.getX();
-			int y = loc.getY();
+			Bounds bds = painter.getBounds();
+			int x = bds.getX() + 30;
+			int y = bds.getY() + 15;
 			Graphics g = painter.getGraphics();
-			g.setColor(Color.WHITE);
-			g.fillRect(x - 20, y, 10, 10);
-			GraphicsUtil.switchToWidth(g, 3);
 			g.setColor(Color.BLACK);
+			g.fillOval(x - 19, y - 4, 8, 8);
+			GraphicsUtil.switchToWidth(g, 3);
 			int dx = state.xPos;
 			int dy = state.yPos;
 			int x0 = x - 15 + (dx > 5 ? 1 : dx < -5 ? -1 : 0);
-			int y0 = y + 5 + (dy > 5 ? 1 : dy < 0 ? -1 : 0);
+			int y0 = y + (dy > 5 ? 1 : dy < 0 ? -1 : 0);
 			int x1 = x - 15 + dx;
-			int y1 = y + 5 + dy;
+			int y1 = y + dy;
 			g.drawLine(x0, y0, x1, y1);
 			Color ballColor = painter.getAttributeValue(Io.ATTR_COLOR);
 			Joystick.drawBall(g, x1, y1, ballColor, true);
@@ -129,39 +127,61 @@ public class Joystick extends InstanceFactory {
 
 	public Joystick() {
 		super("Joystick", Strings.getter("joystickComponent"));
-		setAttributes(new Attribute[] {StdAttr.FACING, ATTR_WIDTH, Io.ATTR_COLOR }, new Object[] { Direction.EAST,BitWidth.create(4), Color.RED });
-		//setKeyConfigurator(new BitWidthConfigurator(ATTR_WIDTH, 2, 5));
-		setOffsetBounds(Bounds.create(-30, -10, 30, 30));
+		setAttributes(new Attribute[] { StdAttr.FACING, ATTR_WIDTH, Io.ATTR_COLOR },
+				new Object[] { Direction.EAST, BitWidth.create(4), Color.RED });
+
 		setIconName("joystick.gif");
 		setFacingAttribute(StdAttr.FACING);
-		//setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, ATTR_WIDTH), new Port(0, 10, Port.OUTPUT, ATTR_WIDTH), });
 		setInstancePoker(Poker.class);
 	}
 
 	@Override
+	protected void configureNewInstance(Instance instance) {
+		instance.addAttributeListener();
+		updateports(instance);
+	}
+
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction dir = attrs.getValue(StdAttr.FACING);
+		if (dir == Direction.EAST || dir == Direction.WEST)
+			return Bounds.create(-30, -10, 30, 30).rotate(Direction.EAST, dir, 0, 5);
+		else if (dir == Direction.SOUTH)
+			return Bounds.create(-20, -30, 30, 30);
+		else
+			return Bounds.create(-20, 0, 30, 30);
+
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING || attr == ATTR_WIDTH) {
+			instance.recomputeBounds();
+			updateports(instance);
+		}
+	}
+
+	@Override
 	public void paintGhost(InstancePainter painter) {
+		Bounds bds = painter.getBounds();
+		int x = bds.getX();
+		int y = bds.getY();
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRoundRect(-30, -10, 30, 30, 8, 8);
+		g.drawRoundRect(x, y, 30, 30, 8, 8);
 	}
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
+		Bounds bds = painter.getBounds();
+		int x = bds.getX() + 30;
+		int y = bds.getY() + 15;
 
 		Graphics g = painter.getGraphics();
-		g.drawRoundRect(x - 30, y - 10, 30, 30, 8, 8);
-		g.drawRoundRect(x - 28, y - 8, 26, 26, 4, 4);
-		drawBall(g, x - 15, y + 5, painter.getAttributeValue(Io.ATTR_COLOR), painter.shouldDrawColor());
+		painter.drawRoundBounds(Color.WHITE);
+		g.drawRoundRect(x - 27, y - 12, 24, 24, 5, 5);
+		drawBall(g, x - 15, y, painter.getAttributeValue(Io.ATTR_COLOR), painter.shouldDrawColor());
 		painter.drawPorts();
-	}
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == StdAttr.FACING || attr == ATTR_WIDTH) {
-			updateports(instance);
-		}
 	}
 
 	@Override
@@ -190,30 +210,22 @@ public class Joystick extends InstanceFactory {
 		state.setPort(0, Value.createKnown(bits, dx), 1);
 		state.setPort(1, Value.createKnown(bits, dy), 1);
 	}
-	@Override
-	protected void configureNewInstance(Instance instance) {
-		instance.addAttributeListener();
-		updateports(instance);
-	}
+
 	private void updateports(Instance instance) {
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
-		BitWidth bw=instance.getAttributeValue(ATTR_WIDTH);
-		Port[] ports=new Port[2];
-		if (dir == Direction.EAST) {
-			 ports[0]=new Port(0, 0, Port.OUTPUT, bw); 
-			 ports[1]=new Port(0, 10, Port.OUTPUT,bw);
-		}else if (dir == Direction.WEST) {
-			 ports[0]=new Port(-30, 0, Port.OUTPUT, bw);
-			 ports[1]=new Port(-30, 10, Port.OUTPUT, bw);
-		}else if (dir == Direction.NORTH) {
-			 ports[0]=new Port(-10, -10, Port.OUTPUT, bw); 
-			 ports[1]=new Port(-20, -10, Port.OUTPUT, bw);
-		}else if (dir == Direction.SOUTH) {
-			 ports[0]=new Port(-10, 20, Port.OUTPUT, bw); 
-			 ports[1]=new Port(-20, 20, Port.OUTPUT, bw);
+		BitWidth bw = instance.getAttributeValue(ATTR_WIDTH);
+		Port[] ports = new Port[2];
+		if (dir == Direction.EAST || dir == Direction.WEST) {
+			ports[0] = new Port(0, 0, Port.OUTPUT, bw);
+			ports[1] = new Port(0, 10, Port.OUTPUT, bw);
+		} else {
+			ports[0] = new Port(0, 0, Port.OUTPUT, bw);
+			ports[1] = new Port(-10, 0, Port.OUTPUT, bw);
 		}
+		ports[0].setToolTip(Strings.getter("X"));
+		ports[1].setToolTip(Strings.getter("Y"));
 		instance.setPorts(ports);
 
-}
+	}
 
 }
