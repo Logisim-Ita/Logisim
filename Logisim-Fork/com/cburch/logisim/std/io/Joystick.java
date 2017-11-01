@@ -224,6 +224,7 @@ public class Joystick extends InstanceFactory {
 		}
 		ports[0].setToolTip(Strings.getter("X"));
 		ports[1].setToolTip(Strings.getter("Y"));
+
 		instance.setPorts(ports);
 
 	}

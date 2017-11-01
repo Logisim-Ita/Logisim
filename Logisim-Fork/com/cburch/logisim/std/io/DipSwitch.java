@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
+import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
@@ -26,12 +27,30 @@ public class DipSwitch extends InstanceFactory {
 	public static class Logger extends InstanceLogger {
 		@Override
 		public String getLogName(InstanceState state, Object option) {
-			return state.getAttributeValue(StdAttr.LABEL);
+			String inName = state.getAttributeValue(StdAttr.LABEL);
+			if (inName == null || inName.equals("")) {
+				inName = Strings.get("dipSwitchComponent") + state.getInstance().getLocation();
+			}
+			if (option instanceof Integer) {
+				return inName + "[" + option + "]";
+			} else {
+				return inName;
+			}
+		}
+
+		@Override
+		public Object[] getLogOptions(InstanceState state) {
+			Integer stages = state.getAttributeValue(ATTR_NSWITCHES);
+			Object[] ret = new Object[stages.intValue()];
+			for (int i = 0; i < ret.length; i++) {
+				ret[i] = Integer.valueOf(i);
+			}
+			return ret;
 		}
 
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
-			return state.getPort(0);
+			return state.getPort((Integer)option);
 		}
 	}
 
