@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
@@ -29,7 +28,7 @@ public class DipSwitch extends InstanceFactory {
 		public String getLogName(InstanceState state, Object option) {
 			String inName = state.getAttributeValue(StdAttr.LABEL);
 			if (inName == null || inName.equals("")) {
-				inName = Strings.get("dipSwitchComponent") + state.getInstance().getLocation();
+				inName = Strings.get("DipSwitchComponent") + state.getInstance().getLocation();
 			}
 			if (option instanceof Integer) {
 				return inName + "[" + option + "]";
