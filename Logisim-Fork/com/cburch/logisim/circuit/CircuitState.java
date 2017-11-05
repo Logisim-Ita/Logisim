@@ -25,6 +25,7 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Clock;
 import com.cburch.logisim.std.wiring.Pin;
+import com.cburch.logisim.std.wiring.ProgrammableGenerator;
 import com.cburch.logisim.util.ArraySet;
 import com.cburch.logisim.util.SmallSet;
 
@@ -468,7 +469,9 @@ public class CircuitState implements InstanceData {
 		for (Component clock : circuit.getClocks()) {
 			ret |= Clock.tick(this, ticks, clock);
 		}
-
+		for (Component clock : circuit.getProgrammableGenerators()) {
+			ret |= ProgrammableGenerator.tick(this, ticks, clock);
+		}
 		CircuitState[] subs = new CircuitState[substates.size()];
 		for (CircuitState substate : substates.toArray(subs)) {
 			ret |= substate.tick(ticks);

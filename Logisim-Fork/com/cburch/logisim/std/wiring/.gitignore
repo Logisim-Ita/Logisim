@@ -28,3 +28,8 @@
 /Wiring.class
 /Transistor$1.class
 /TransmissionGate$1.class
+/ProgrammableGenerator.class
+/ProgrammableGenerator$ClockLogger.class
+/ProgrammableGenerator$ClockPoker.class
+/ProgrammableGenerator$ClockState.class
+/ProgrammableGenerator$ProgrammableGeneratorState.class

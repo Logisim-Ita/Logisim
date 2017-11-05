@@ -7,8 +7,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
-import javax.swing.Icon;
-
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.circuit.RadixOption;
 import com.cburch.logisim.comp.Component;
@@ -28,7 +26,6 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
-import com.cburch.logisim.util.Icons;
 
 public class Clock extends InstanceFactory {
 	public static class ClockLogger extends InstanceLogger {
@@ -91,8 +88,6 @@ public class Clock extends InstanceFactory {
 
 	public static final Clock FACTORY = new Clock();
 
-	private static final Icon toolIcon = Icons.getIcon("clock.gif");
-
 	private static ClockState getState(InstanceState state) {
 		ClockState ret = (ClockState) state.getData();
 		if (ret == null) {
@@ -137,6 +132,7 @@ public class Clock extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);
+		setIconName("clock.gif");
 	}
 
 	//
@@ -173,40 +169,9 @@ public class Clock extends InstanceFactory {
 		}
 	}
 
-	//
-	// graphics methods
-	//
-	@Override
-	public void paintIcon(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
-		if (toolIcon != null) {
-			toolIcon.paintIcon(painter.getDestination(), g, 2, 2);
-		} else {
-			g.drawRect(4, 4, 13, 13);
-			g.setColor(Value.FALSE.getColor());
-			g.drawPolyline(new int[] { 6, 6, 10, 10, 14, 14 }, new int[] { 10, 6, 6, 14, 14, 10 }, 6);
-		}
-
-		Direction dir = painter.getAttributeValue(StdAttr.FACING);
-		int pinx = 15;
-		int piny = 8;
-		if (dir == Direction.EAST) { // keep defaults
-		} else if (dir == Direction.WEST) {
-			pinx = 3;
-		} else if (dir == Direction.NORTH) {
-			pinx = 8;
-			piny = 3;
-		} else if (dir == Direction.SOUTH) {
-			pinx = 8;
-			piny = 15;
-		}
-		g.setColor(Value.TRUE.getColor());
-		g.fillOval(pinx, piny, 3, 3);
-	}
-
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		java.awt.Graphics g = painter.getGraphics();
+		Graphics g = painter.getGraphics();
 		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();

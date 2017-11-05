@@ -49,7 +49,7 @@ public class DipSwitch extends InstanceFactory {
 
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
-			return state.getPort((Integer)option);
+			return state.getPort((Integer) option);
 		}
 	}
 
