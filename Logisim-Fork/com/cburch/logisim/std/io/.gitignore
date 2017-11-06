@@ -38,3 +38,7 @@
 /DipSwitch$Logger.class
 /DipSwitch$Poker.class
 /DipSwitch$pinValues.class
+/Buzzer.class
+/BuzzerFactory.class
+/Buzzer$Data$1.class
+/Buzzer$Data.class
