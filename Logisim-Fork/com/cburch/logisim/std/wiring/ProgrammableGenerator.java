@@ -5,8 +5,12 @@ package com.cburch.logisim.std.wiring;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.circuit.RadixOption;
@@ -19,7 +23,6 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
@@ -27,6 +30,8 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class ProgrammableGenerator extends InstanceFactory {
@@ -60,74 +65,67 @@ public class ProgrammableGenerator extends InstanceFactory {
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			if (isPressed && isInside(state, e)) {
 				ProgrammableGeneratorState myState = (ProgrammableGeneratorState) state.getData();
-
+				myState.editWindow();
 			}
 			isPressed = false;
 		}
 	}
 
-	private static class ProgrammableGeneratorState implements InstanceData, Cloneable {
-		Value sending = Value.FALSE;
-		private int[] durationHigh;
-		private int[] durationLow;
+	private static class ProgrammableGeneratorMenu implements ActionListener, MenuExtender {
+		private JMenuItem edit;
+		private JMenuItem reset;
+		private Instance instance;
+		private CircuitState circState;
 
-		public ProgrammableGeneratorState(int i) {
-			durationHigh = new int[i];
-			durationLow = new int[i];
-		}
-
-		public void clearValues() {
-			// set all the values to 1
-			for (int i = 0; i < durationHigh.length; i++) {
-				durationHigh[i] = 1;
-				durationLow[i] = 1;
-			}
+		public ProgrammableGeneratorMenu(Instance instance) {
+			this.instance = instance;
 		}
 
 		@Override
-		public ProgrammableGeneratorState clone() {
-			try {
-				return (ProgrammableGeneratorState) super.clone();
-			} catch (CloneNotSupportedException e) {
-				return null;
-			}
+		public void actionPerformed(ActionEvent evt) {
+			ProgrammableGeneratorState state = ProgrammableGenerator.getState(instance, circState);
+			if (evt.getSource() == edit)
+				state.editWindow();
+			else if (evt.getSource() == reset)
+				state.clearValues();
 		}
 
-		public int getdurationHigh(int i) {
-			return this.durationHigh[i];
+		@Override
+		public void configureMenu(JPopupMenu menu, Project proj) {
+			this.circState = proj.getCircuitState();
+			boolean enabled = circState != null;
+
+			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
+			this.reset = createItem(enabled, Strings.get("ramClearMenuItem"));
+			menu.addSeparator();
+			menu.add(this.edit);
+			menu.add(this.reset);
 		}
 
-		public int getdurationLow(int i) {
-			return this.durationLow[i];
-		}
-
-		public void setdurationHigh(int i, int value) {
-			this.durationHigh[i] = value;
-		}
-
-		public void setdurationLow(int i, int value) {
-			this.durationLow[i] = value;
-		}
-
-		public void updateSize(int newsize) {
-			// update arrays size maintaining values
-			int[] oldDurationHigh = Arrays.copyOf(durationHigh, durationHigh.length);
-			int[] oldDurationLow = Arrays.copyOf(durationLow, durationLow.length);
-			durationHigh = new int[newsize];
-			durationLow = new int[newsize];
-			clearValues();
-			int lowerlength = (oldDurationHigh.length < newsize) ? oldDurationHigh.length : newsize;
-			for (int i = 0; i < lowerlength; i++) {
-				durationHigh[i] = oldDurationHigh[i];
-				durationLow[i] = oldDurationLow[i];
-			}
+		private JMenuItem createItem(boolean enabled, String label) {
+			JMenuItem ret = new JMenuItem(label);
+			ret.setEnabled(enabled);
+			ret.addActionListener(this);
+			return ret;
 		}
 	}
 
 	private static final Attribute<Integer> ATTR_NSTATE = Attributes.forIntegerRange("nState",
-			Strings.getter("NStateAttr"), 2, 33);
+			Strings.getter("NStateAttr"), 1, 32);
 
 	public static final ProgrammableGenerator FACTORY = new ProgrammableGenerator();
+
+	private static ProgrammableGeneratorState getState(Instance state, CircuitState circ) {
+		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) state.getData(circ);
+		int nstate = state.getAttributeValue(ATTR_NSTATE);
+		if (ret == null) {
+			ret = new ProgrammableGeneratorState(nstate);
+			state.setData(circ, ret);
+		} else {
+			ret.updateSize(nstate);
+		}
+		return ret;
+	}
 
 	private static ProgrammableGeneratorState getState(InstanceState state) {
 		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) state.getData();
@@ -141,17 +139,26 @@ public class ProgrammableGenerator extends InstanceFactory {
 		return ret;
 	}
 
+	private static ProgrammableGeneratorState getState(Component comp, CircuitState circ) {
+		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) circ.getData(comp);
+		int nstate = comp.getAttributeSet().getValue(ATTR_NSTATE);
+		if (ret == null) {
+			ret = new ProgrammableGeneratorState(nstate);
+			circ.setData(comp, ret);
+		} else {
+			ret.updateSize(nstate);
+		}
+		return ret;
+	}
+
 	//
 	// package methods
 	//
 	public static boolean tick(CircuitState circState, int ticks, Component comp) {
-		int durationHigh = 1;
-		int durationLow = 1;
-		ProgrammableGeneratorState state = (ProgrammableGeneratorState) circState.getData(comp);
-		if (state == null) {
-			state = new ProgrammableGeneratorState(comp.getAttributeSet().getValue(ATTR_NSTATE));
-			circState.setData(comp, state);
-		}
+		ProgrammableGeneratorState state = getState(comp, circState);
+		state.incrementTicks();
+		int durationHigh = state.getdurationHighValue();
+		int durationLow = state.getdurationLowValue();
 		boolean curValue = ticks % (durationHigh + durationLow) < durationLow;
 		Value desired = (curValue ? Value.FALSE : Value.TRUE);
 		if (!state.sending.equals(desired)) {
@@ -167,7 +174,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 		super("ProgrammableGenerator", Strings.getter("ProgrammableGeneratorComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, ATTR_NSTATE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT },
-				new Object[] { Direction.EAST, Integer.valueOf(2), "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT });
+				new Object[] { Direction.EAST, Integer.valueOf(4), "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);
@@ -191,6 +198,14 @@ public class ProgrammableGenerator extends InstanceFactory {
 		instance.addAttributeListener();
 		instance.setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, BitWidth.ONE) });
 		configureLabel(instance);
+	}
+
+	@Override
+	protected Object getInstanceFeature(Instance instance, Object key) {
+		if (key == MenuExtender.class) {
+			return new ProgrammableGeneratorMenu(instance);
+		}
+		return super.getInstanceFeature(instance, key);
 	}
 
 	@Override
