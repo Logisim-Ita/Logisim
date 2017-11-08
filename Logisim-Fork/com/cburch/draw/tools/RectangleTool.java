@@ -42,6 +42,11 @@ public class RectangleTool extends RectangularTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeRect");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawrect.gif");
 	}

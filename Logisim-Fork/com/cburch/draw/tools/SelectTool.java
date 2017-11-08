@@ -31,6 +31,7 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
+import com.cburch.logisim.util.LocaleManager;
 
 public class SelectTool extends AbstractTool {
 	private static final int IDLE = 0;
@@ -54,6 +55,7 @@ public class SelectTool extends AbstractTool {
 	}
 
 	private int curAction;
+
 	private List<CanvasObject> beforePressSelection;
 	private Handle beforePressHandle;
 	private Location dragStart;
@@ -61,7 +63,6 @@ public class SelectTool extends AbstractTool {
 	private boolean dragEffective;
 	private int lastMouseX;
 	private int lastMouseY;
-
 	private HandleGesture curGesture;
 
 	public SelectTool() {
@@ -215,6 +216,11 @@ public class SelectTool extends AbstractTool {
 	@Override
 	public Cursor getCursor(Canvas canvas) {
 		return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+	}
+
+	@Override
+	public String getDescription() {
+		return new LocaleManager("resources/logisim", "tools").get("editTool");
 	}
 
 	private int getHandleSize(Canvas canvas) {

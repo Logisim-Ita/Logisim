@@ -115,6 +115,18 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 	public static final ProgrammableGenerator FACTORY = new ProgrammableGenerator();
 
+	private static ProgrammableGeneratorState getState(Component comp, CircuitState circ) {
+		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) circ.getData(comp);
+		int nstate = comp.getAttributeSet().getValue(ATTR_NSTATE);
+		if (ret == null) {
+			ret = new ProgrammableGeneratorState(nstate);
+			circ.setData(comp, ret);
+		} else {
+			ret.updateSize(nstate);
+		}
+		return ret;
+	}
+
 	private static ProgrammableGeneratorState getState(Instance state, CircuitState circ) {
 		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) state.getData(circ);
 		int nstate = state.getAttributeValue(ATTR_NSTATE);
@@ -133,18 +145,6 @@ public class ProgrammableGenerator extends InstanceFactory {
 		if (ret == null) {
 			ret = new ProgrammableGeneratorState(nstate);
 			state.setData(ret);
-		} else {
-			ret.updateSize(nstate);
-		}
-		return ret;
-	}
-
-	private static ProgrammableGeneratorState getState(Component comp, CircuitState circ) {
-		ProgrammableGeneratorState ret = (ProgrammableGeneratorState) circ.getData(comp);
-		int nstate = comp.getAttributeSet().getValue(ATTR_NSTATE);
-		if (ret == null) {
-			ret = new ProgrammableGeneratorState(nstate);
-			circ.setData(comp, ret);
 		} else {
 			ret.updateSize(nstate);
 		}

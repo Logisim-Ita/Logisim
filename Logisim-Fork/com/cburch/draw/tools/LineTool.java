@@ -73,6 +73,11 @@ public class LineTool extends AbstractTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeLine");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawline.gif");
 	}

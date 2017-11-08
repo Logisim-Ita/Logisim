@@ -146,6 +146,11 @@ public class TextTool extends AbstractTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeText");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("text.gif");
 	}

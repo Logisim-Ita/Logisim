@@ -36,6 +36,7 @@ public class Canvas extends JComponent {
 		selection = new Selection();
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
+		addMouseWheelListener(listener);
 		addKeyListener(listener);
 		setPreferredSize(new Dimension(400, 400));
 	}

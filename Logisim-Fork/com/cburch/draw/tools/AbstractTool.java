@@ -22,6 +22,16 @@ public abstract class AbstractTool extends CanvasTool {
 				new OvalTool(attrs), new PolyTool(true, attrs), };
 	}
 
+	private String CtrlIndex = "";
+
+	public void setCltrIndex(String s) {
+		this.CtrlIndex = s;
+	}
+
+	public String getCtrlIndex() {
+		return this.CtrlIndex;
+	}
+
 	/**
 	 * This is because a popup menu may result from the subsequent mouse release
 	 */

@@ -44,6 +44,11 @@ public class RoundRectangleTool extends RectangularTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeRoundRect");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawrrct.gif");
 	}
