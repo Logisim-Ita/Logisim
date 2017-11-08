@@ -249,9 +249,9 @@ abstract class AbstractGate extends InstanceFactory {
 				skipLowerEven = 30;
 			}
 		} else if (inputs == 4 && size >= 60) {
-			skipStart = -5;
+			skipStart = -10;
 			skipDist = 20;
-			skipLowerEven = 0;
+			skipLowerEven = 10;
 		} else {
 			skipStart = -5;
 			skipDist = 10;
@@ -263,7 +263,7 @@ abstract class AbstractGate extends InstanceFactory {
 			dy = skipStart * (inputs - 1) + skipDist * index;
 		} else {
 			dy = skipStart * inputs + skipDist * index;
-			if (index >= inputs / 2)
+			if (index >= inputs / 2 || inputs == 4 && size >= 60)
 				dy += skipLowerEven;
 		}
 

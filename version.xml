@@ -2,11 +2,11 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.1.1</jar_version>
+  <jar_version>2.11.1.2</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.1.1</exe_version>
+  <exe_version>2.11.1.2</exe_version>
   <changelog>
-* Dip Switch Logger
-* Tunnel default facing attribute: EAST
+* Fixed a bug of original Logisim with wrong input positions while using a gate with "Wide" and "4 Input" Attributes
+* Fixed italian translation
   </changelog>
 </logisim>
