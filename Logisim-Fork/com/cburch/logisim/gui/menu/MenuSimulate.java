@@ -141,16 +141,21 @@ class MenuSimulate extends Menu {
 			if (currentSim != null && !isChoice)
 				currentSim.setTickFrequency(freq);
 			if (isChoice) {
-				String Freq = JOptionPane.showInputDialog(null, Strings.get("EnterTickFrequency") + " (Hz)",
-						Strings.get("CustomFrequency"), JOptionPane.PLAIN_MESSAGE);
-				if (Freq != null) {// cancelled
+				String Freq = (String) JOptionPane.showInputDialog(null,
+						Strings.get("EnterTickFrequency") + " (0-8192 Hz)", Strings.get("CustomFrequency"),
+						JOptionPane.PLAIN_MESSAGE, null, null, (this.freq != -1 ? this.freq : ""));
+
+				if (Freq != null) {// not cancelled
 					try {
-						freq = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
-						if (freq > 0 && freq <= 8192) {
+						double convert = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
+						// save only if it's in the range
+						if (convert > 0 && convert <= 8192) {
+							this.freq = convert;
 							if (currentSim != null)
 								currentSim.setTickFrequency(freq);
 							localeChanged();
 						} else {
+							// error message
 							JOptionPane.showMessageDialog(null, Strings.get("FrequencyNumberNotAccepted"));
 						}
 					} catch (Exception ex) {

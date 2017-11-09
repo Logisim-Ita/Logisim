@@ -1,7 +1,11 @@
 # Logisim Fork ITA
-Logisim is a circuit simulator, [originally available here](http://www.cburch.com/logisim/).<br><br>
-This is an italian fork based on original Logisim 2.7.1 version.<br>
-<b>Contacts, tutorials, projects and download link are all in [this](https://logisim.altervista.org) website!</b>
+Logisim is a digital circuit simulator, [originally available here](http://www.cburch.com/logisim/).<br><br>
+This is an italian fork based on the original Logisim version.<br>
+<b>[DOWNLOAD BUTTON AND CHANGELOG](https://logisim.altervista.org)</b><br>
+<b>[CONTACT US](https://logisim.altervista.org/contacts.html)</b><br>
+<b>[PLUGINS](https://logisim.altervista.org/plugins.html)</b><br>
+<b>[USER TUTORIALS](https://logisim.altervista.org/userstutorial.html)</b><br>
+<b>[DEVS TUTORIALS](https://logisim.altervista.org/developerstutorial.html)</b><br>
 ## Changelog
 * Italian translation!
 * Possibility to use french translations already done (not very well)
@@ -31,12 +35,13 @@ This is an italian fork based on original Logisim 2.7.1 version.<br>
 ## Features we want to add
 * Move to Java 9
 * Solve propagation bugs not solved in the original Logisim
+* Programmable clock
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
 I should have solved every problem with new changes, contact us if you have any kind of problem
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile & use
-Watch our tutorials on "TUTORIAL" section of our [website](https://logisim.altervista.org)
+Watch our tutorials on "TUTORIAL" section of our [website](https://logisim.altervista.org/developerstutorial.html)
 ## Translation
 New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one, if you want so, contact me at logisimit@gmail.com

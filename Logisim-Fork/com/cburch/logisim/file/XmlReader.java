@@ -525,6 +525,27 @@ class XmlReader {
 				}
 			}
 		}
+		// compatibility for tunnel new direction value
+		if (version.compareTo(LogisimVersion.get(2, 11, 1, 1)) < 0) {
+			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Tunnel")) {
+						boolean defaultfacingattribute = true;
+						// check if the attribute is already defined
+						for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+							if (attrElt.getAttribute("name").equals("facing"))
+								defaultfacingattribute = false;
+						}
+						if (defaultfacingattribute) {
+							Element sizeattribute = doc.createElement("a");
+							sizeattribute.setAttribute("name", "facing");
+							sizeattribute.setAttribute("val", "west");
+							compElt.appendChild(sizeattribute);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private Document loadXmlFrom(InputStream is) throws SAXException, IOException {

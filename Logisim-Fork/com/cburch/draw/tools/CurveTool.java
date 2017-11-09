@@ -69,6 +69,11 @@ public class CurveTool extends AbstractTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeCurve");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawcurv.gif");
 	}

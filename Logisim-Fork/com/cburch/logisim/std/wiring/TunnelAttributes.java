@@ -30,7 +30,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	private int labelVAlign;
 
 	public TunnelAttributes() {
-		facing = Direction.WEST;
+		facing = Direction.EAST;
 		width = BitWidth.ONE;
 		label = "";
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;

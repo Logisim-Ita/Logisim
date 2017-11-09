@@ -28,7 +28,7 @@ public class DipSwitch extends InstanceFactory {
 		public String getLogName(InstanceState state, Object option) {
 			String inName = state.getAttributeValue(StdAttr.LABEL);
 			if (inName == null || inName.equals("")) {
-				inName = Strings.get("dipSwitchComponent") + state.getInstance().getLocation();
+				inName = Strings.get("DipSwitchComponent") + state.getInstance().getLocation();
 			}
 			if (option instanceof Integer) {
 				return inName + "[" + option + "]";
@@ -49,7 +49,7 @@ public class DipSwitch extends InstanceFactory {
 
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
-			return state.getPort((Integer)option);
+			return state.getPort((Integer) option);
 		}
 	}
 

@@ -42,6 +42,11 @@ public class OvalTool extends RectangularTool {
 	}
 
 	@Override
+	public String getDescription() {
+		return Strings.getTooltip("shapeOval");
+	}
+
+	@Override
 	public Icon getIcon() {
 		return Icons.getIcon("drawoval.gif");
 	}

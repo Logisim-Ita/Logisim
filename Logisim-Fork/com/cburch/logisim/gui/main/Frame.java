@@ -159,8 +159,8 @@ public class Frame extends LFrame implements LocaleListener {
 
 	public static final String VIEW_SIMULATION = "simulation";
 
-	private static final double[] ZOOM_OPTIONS = { 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350,
-			375, 400 };
+	private static final double[] ZOOM_OPTIONS = { 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+			200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400 };
 
 	private static Point getInitialLocation() {
 		String s = AppPreferences.WINDOW_LOCATION.get();

@@ -94,6 +94,14 @@ public class PolyTool extends AbstractTool {
 	}
 
 	@Override
+	public String getDescription() {
+		if (closed)
+			return Strings.getTooltip("shapePolygon");
+		else
+			return Strings.getTooltip("shapePolyline");
+	}
+
+	@Override
 	public Icon getIcon() {
 		if (closed) {
 			return Icons.getIcon("drawpoly.gif");

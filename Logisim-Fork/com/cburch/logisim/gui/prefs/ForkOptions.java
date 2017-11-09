@@ -44,7 +44,6 @@ class ForkOptions extends OptionsPanel {
 
 	@Override
 	public String getHelpText() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

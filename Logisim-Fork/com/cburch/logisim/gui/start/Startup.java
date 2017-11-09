@@ -77,6 +77,7 @@ public class Startup {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 			LocaleManager.setReplaceAccents(false);
+			AppPreferences.setLayout();
 		}
 
 		Startup ret = new Startup(isTty);

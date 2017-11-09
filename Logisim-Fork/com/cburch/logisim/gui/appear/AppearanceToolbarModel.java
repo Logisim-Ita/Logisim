@@ -22,6 +22,7 @@ import com.cburch.draw.tools.RectangleTool;
 import com.cburch.draw.tools.RoundRectangleTool;
 import com.cburch.draw.tools.TextTool;
 import com.cburch.draw.tools.ToolbarToolItem;
+import com.cburch.logisim.util.InputEventUtil;
 
 class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyChangeListener {
 	private Canvas canvas;
@@ -35,7 +36,10 @@ class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyCha
 				new OvalTool(attrs), new PolyTool(true, attrs), };
 
 		ArrayList<ToolbarItem> rawItems = new ArrayList<ToolbarItem>();
+		int i = 1;
 		for (AbstractTool tool : tools) {
+			tool.setCltrIndex(" (" + InputEventUtil.toKeyDisplayString(2) + "-" + i + ")");
+			i++;
 			rawItems.add(new ToolbarToolItem(tool));
 		}
 		items = Collections.unmodifiableList(rawItems);
