@@ -6,7 +6,8 @@
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
   <exe_version>2.11.1.2</exe_version>
   <changelog>
-* Fixed a bug of original Logisim with wrong input positions while using a gate with "Wide" and "4 Input" Attributes
-* Fixed italian translation
+* Edit Layout window zoom with mouse wheel
+* Edit Layout Toolbar tooltips
+* Moved toolbar separator between Edit and Label tools
   </changelog>
 </logisim>
