@@ -20,7 +20,7 @@ import com.cburch.logisim.util.StringGetter;
 
 public class Buzzer extends InstanceFactory
 {
-   public static final Attribute<Integer> FREQ_ATTR = Attributes.forIntegerRange("Frequency"    , 100,  5000);
+   //public static final Attribute<Integer> FREQ_ATTR = Attributes.forIntegerRange("Frequency"    , 100,  5000);
   
    public Buzzer()
    {
@@ -31,19 +31,25 @@ public class Buzzer extends InstanceFactory
 //               ,new Port(40, 0, Port.OUTPUT, StdAttr.WIDTH)
               });
 */          
-      Port port = new Port ( 0, 0, Port.INPUT, 1 );
-      String foo = "multiplexerEnableTip";
-      port.setToolTip(Strings.getter(foo));
+      Port[] p = new Port [4];
+      p[0] = new Port(0, 0, "input", 1);
+      p[1] = new Port(0, -10, "input", 16);
+      p[2] = new Port(0, 10, "input", 7);
       
-      setPorts(new Port[] { port });
+      //String foo = "multiplexerEnableTip";
+      p[0].setToolTip(Strings.getter("enable"));
+      p[1].setToolTip(Strings.getter("frequency"));
+      p[2].setToolTip(Strings.getter("volume"));
+      
+      setPorts(p);
 
-      setAttributes ( new Attribute[] { FREQ_ATTR, }, 
+      /*setAttributes ( new Attribute[] { FREQ_ATTR, }, 
                       new Object[]    { new Integer(500)
-                    });
+                    });*/
       
       setOffsetBounds ( Bounds.create(0, -20, 40, 40) );
    }
-
+  
 	@Override
 	@SuppressWarnings("unchecked")
    public void propagate(InstanceState state)
@@ -58,16 +64,18 @@ public class Buzzer extends InstanceFactory
       if ( d.is_on )
          d.still_alive = true;
      
-      int  freq = (state.getAttributeValue(FREQ_ATTR)).intValue();
+      //int  freq = (state.getAttributeValue(FREQ_ATTR)).intValue();
+      int freq = state.getPort(1).toIntValue();
+      int vol = state.getPort(2).toIntValue();
       
-      
-      if ( freq != d.freq)
+      if ( freq != d.freq || vol!=d.vol)
       {
          d.freq = freq;
+         d.vol  = (byte)vol;
          d.sound_changed = true;
       }
      
-      if ( ! d.thread.isAlive( ) && d.is_on && d.sound_changed )
+      if ( ! d.thread.isAlive( ) && d.is_on )
          d.StartThread( );
       
 //      Value out;
@@ -89,7 +97,8 @@ public class Buzzer extends InstanceFactory
          g.drawOval((x + 20) - k, (y + 20) - k, k * 2, k * 2);
    
       painter.drawPort(0);
-//      painter.drawPort(1);
+      painter.drawPort(1);
+      painter.drawPort(2);
 
       Data d = (Data) painter.getData( );
       if ( d != null && d.is_on )
@@ -107,13 +116,15 @@ public class Buzzer extends InstanceFactory
       g.setColor(Color.GRAY);
       g.drawOval(b.getX(), b.getY(), 40, 40);
    }
-   protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+   /*protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr ==FREQ_ATTR) {
-			instance.recomputeBounds();
+			//instance.recomputeBounds();
 			Data d=new Buzzer.Data(true);
+			d.freq= (instance.getAttributeValue(FREQ_ATTR)).intValue();
+			d.sound_changed=true;
 			d.StartThread();
 		}
-   }
+   }*/
    private static class Data
        implements InstanceData
    {
@@ -159,7 +170,7 @@ public class Buzzer extends InstanceFactory
                            sound_changed = false;
                            double step = 11025D / (double)freq;
                            double n = step;
-                           byte val = 127;
+                           byte val = vol;
                            
                            for (int k = 0; k < audioData.length; k++ )
                            {
@@ -184,7 +195,7 @@ public class Buzzer extends InstanceFactory
                         {
                             break;
                         }
-                        if(++i != 10)
+                        if(is_on)
                         {
                             continue;
                         }
@@ -209,7 +220,7 @@ public class Buzzer extends InstanceFactory
       {
          return new Data( is_on );
       }
-   
+      public volatile byte vol;
       public volatile boolean is_on;
       public volatile int     freq;
       public volatile boolean sound_changed;
@@ -219,7 +230,7 @@ public class Buzzer extends InstanceFactory
       public Data ( boolean b )
       {
          is_on = false;
-         freq  = 500;
+         freq  = 100;
          sound_changed = true;
          still_alive   = true;
          is_on = b;

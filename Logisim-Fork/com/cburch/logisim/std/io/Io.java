@@ -36,13 +36,14 @@ public class Io extends Library {
 			new FactoryDescription("DipSwitch", Strings.getter("DipSwitchComponent"), "dipswitch.gif", "DipSwitch"),
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
+			new FactoryDescription("Buzzer", Strings.getter("buzzerComponent"), "buzzer.gif","Buzzer"),
 			new FactoryDescription("LED", Strings.getter("ledComponent"), "led.gif", "Led"),
 			new FactoryDescription("RGBLed", Strings.getter("rgbledComponent"), "rgbled.gif", "RGBLed"),
 			new FactoryDescription("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"),
 					"digitaloscilloscope.gif", "DigitalOscilloscope"),
 			new FactoryDescription("7-Segment Display", Strings.getter("sevenSegmentComponent"), "7seg.gif",
 					"SevenSegment"),
-			new FactoryDescription("Buzzer", Strings.getter("buzzerComponent"), "buzzer.gif","Buzzer"),
+			
 			new FactoryDescription("Hex Digit Display", Strings.getter("hexDigitComponent"), "hexdig.gif", "HexDigit"),
 			new FactoryDescription("DotMatrix", Strings.getter("dotMatrixComponent"), "dotmat.gif", "DotMatrix"),
 			new FactoryDescription("TTY", Strings.getter("ttyComponent"), "tty.gif", "Tty"), };
