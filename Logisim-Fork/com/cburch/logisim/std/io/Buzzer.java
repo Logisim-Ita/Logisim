@@ -31,7 +31,7 @@ public class Buzzer extends InstanceFactory
 //               ,new Port(40, 0, Port.OUTPUT, StdAttr.WIDTH)
               });
 */          
-      Port[] p = new Port [4];
+      Port[] p = new Port [3];
       p[0] = new Port(0, 0, "input", 1);
       p[1] = new Port(0, -10, "input", 16);
       p[2] = new Port(0, 10, "input", 7);
@@ -51,7 +51,7 @@ public class Buzzer extends InstanceFactory
    }
   
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked"})
    public void propagate(InstanceState state)
    {
       Data d = (Data) state.getData( );
@@ -75,9 +75,9 @@ public class Buzzer extends InstanceFactory
          d.sound_changed = true;
       }
      
-      if ( ! d.thread.isAlive( ) && d.is_on )
+      if ( ! d.thread.isAlive( ) && d.is_on)
          d.StartThread( );
-      
+     
 //      Value out;
 //      out = Value.createKnown ( BitWidth.create(32), len );
 //      state.setPort(1, out, out.getWidth() + 1);
@@ -161,8 +161,6 @@ public class Buzzer extends InstanceFactory
                      byte audioData[] = new byte[1102];
                      sound_changed = true;
                   
-                     int i = 0;
-                  
                      do
                      {
                         if ( sound_changed )
@@ -204,7 +202,6 @@ public class Buzzer extends InstanceFactory
                             break;
                         }
                         still_alive = false;
-                        i = 0;
                      } 
                      while ( true );
                      line.stop ( );
