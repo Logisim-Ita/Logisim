@@ -25,7 +25,7 @@ class ForkOptions extends OptionsPanel {
 		lookAndFeel = new PrefOptionList(AppPreferences.LOOK_AND_FEEL, Strings.getter("lookAndFeel"),
 				new PrefOption[] { new PrefOption(AppPreferences.SYSTEM, Strings.getter("systemLookAndFeel")),
 						new PrefOption(AppPreferences.NIMBUS, Strings.getter("nimbusLookAndFeel")),
-						// new PrefOption(AppPreferences.MOTIF, Strings.getter("motifLookAndFeel")),
+						new PrefOption(AppPreferences.MOTIF, Strings.getter("motifLookAndFeel")),
 						new PrefOption(AppPreferences.METAL, Strings.getter("metalLookAndFeel")) });
 
 		setLayout(new TableLayout(1));
