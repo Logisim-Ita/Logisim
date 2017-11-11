@@ -24,14 +24,6 @@ public abstract class AbstractTool extends CanvasTool {
 
 	private String CtrlIndex = "";
 
-	public void setCltrIndex(String s) {
-		this.CtrlIndex = s;
-	}
-
-	public String getCtrlIndex() {
-		return this.CtrlIndex;
-	}
-
 	/**
 	 * This is because a popup menu may result from the subsequent mouse release
 	 */
@@ -44,6 +36,10 @@ public abstract class AbstractTool extends CanvasTool {
 	}
 
 	public abstract List<Attribute<?>> getAttributes();
+
+	public String getCtrlIndex() {
+		return this.CtrlIndex;
+	}
 
 	//
 	// CanvasTool methods
@@ -91,6 +87,10 @@ public abstract class AbstractTool extends CanvasTool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, MouseEvent e) {
+	}
+
+	public void setCltrIndex(String s) {
+		this.CtrlIndex = s;
 	}
 
 	@Override

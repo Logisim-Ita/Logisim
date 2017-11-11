@@ -36,7 +36,7 @@ public class ToolbarToolItem implements ToolbarItem {
 
 	@Override
 	public String getToolTip() {
-		return tool.getDescription()+tool.getCtrlIndex();
+		return tool.getDescription() + tool.getCtrlIndex();
 	}
 
 	@Override

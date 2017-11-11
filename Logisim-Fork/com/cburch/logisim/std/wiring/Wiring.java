@@ -25,8 +25,7 @@ public class Wiring extends Library {
 
 	private static Tool[] ADD_TOOLS = { new AddTool(SplitterFactory.instance), new AddTool(Pin.FACTORY),
 			new AddTool(Probe.FACTORY), new AddTool(Tunnel.FACTORY), new AddTool(PullResistor.FACTORY),
-			new AddTool(Clock.FACTORY),
-			/* new AddTool(ProgrammableGenerator.FACTORY), */ new AddTool(Constant.FACTORY), };
+			new AddTool(Clock.FACTORY), new AddTool(ProgrammableGenerator.FACTORY), new AddTool(Constant.FACTORY), };
 
 	private static FactoryDescription[] DESCRIPTIONS = {
 			new FactoryDescription("Power", Strings.getter("powerComponent"), "power.gif", "Power"),

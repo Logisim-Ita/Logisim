@@ -33,7 +33,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	}
 
 	public void clearValues() {
-		this.ticks = 1;
+		this.ticks = 0;
 		this.currentstate = 0;
 		// set all the values to 1
 		for (int i = 0; i < durationHigh.length; i++) {
@@ -134,11 +134,14 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		return this.durationLow[this.currentstate];
 	}
 
+	public int getStateTick() {
+		return this.ticks;
+	}
+
 	public void incrementCurrentState() {
 		this.ticks = 1;
-		if (this.currentstate < this.durationHigh.length - 1)
-			this.currentstate++;
-		else
+		this.currentstate++;
+		if (this.currentstate >= this.durationHigh.length)
 			this.currentstate = 0;
 	}
 

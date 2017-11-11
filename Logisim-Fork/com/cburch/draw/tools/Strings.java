@@ -10,6 +10,6 @@ class Strings {
 	private static LocaleManager source = new LocaleManager("resources/logisim", "draw");
 
 	public static String getTooltip(String key) {
-		return StringUtil.format(source.get("actionAdd"), source.get(key));//+ " (" + InputEventUtil.toKeyDisplayString(mask) + "-" + index + ")";
+		return StringUtil.format(source.get("actionAdd"), source.get(key));
 	}
 }
