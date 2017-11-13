@@ -287,19 +287,29 @@ public class DotMatrix extends InstanceFactory {
 			ps = new Port[cols];
 			for (int i = 0; i < cols; i++) {
 				ps[i] = new Port(10 * i, 0, Port.INPUT, rows);
+				ps[i].setToolTip(Strings.getter("Column", "" + String.valueOf(i + 1)));
 			}
 		} else if (input == INPUT_ROW) {
 			ps = new Port[rows];
 			for (int i = 0; i < rows; i++) {
 				ps[i] = new Port(0, 10 * i, Port.INPUT, cols);
+				ps[i].setToolTip(Strings.getter("Row", "" + String.valueOf(i + 1)));
 			}
 		} else {
 			if (rows <= 1) {
-				ps = new Port[] { new Port(0, 0, Port.INPUT, cols) };
+				ps = new Port[1];
+				ps[0] = new Port(0, 0, Port.INPUT, cols);
+				ps[0].setToolTip(Strings.getter("ioInputColumn"));
 			} else if (cols <= 1) {
-				ps = new Port[] { new Port(0, 0, Port.INPUT, rows) };
+				ps = new Port[1];
+				ps[0] = new Port(0, 0, Port.INPUT, rows);
+				ps[0].setToolTip(Strings.getter("ioInputRow"));
 			} else {
-				ps = new Port[] { new Port(0, 0, Port.INPUT, cols), new Port(0, 10, Port.INPUT, rows) };
+				ps = new Port[2];
+				ps[0] = new Port(0, 0, Port.INPUT, cols);
+				ps[0].setToolTip(Strings.getter("ioInputColumn"));
+				ps[1] = new Port(0, 10, Port.INPUT, rows);
+				ps[1].setToolTip(Strings.getter("ioInputRow"));
 			}
 		}
 		instance.setPorts(ps);

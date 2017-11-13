@@ -2,12 +2,10 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.2.0</jar_version>
+  <jar_version>2.11.2.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.2.0</exe_version>
+  <exe_version>2.11.2.1</exe_version>
   <changelog>
-* Edit Layout window zoom with mouse wheel
-* Edit Layout Toolbar tooltips
-* Moved toolbar separator between Edit and Label tools
+* Led Matrix tooltipd
   </changelog>
 </logisim>
