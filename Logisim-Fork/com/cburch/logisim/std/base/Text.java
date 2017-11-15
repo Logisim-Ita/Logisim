@@ -24,6 +24,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class Text extends InstanceFactory {
 	public static Attribute<String> ATTR_TEXT = Attributes.forString("text", Strings.getter("textTextAttr"));
 	public static Attribute<Font> ATTR_FONT = Attributes.forFont("font", Strings.getter("textFontAttr"));
+	public static Attribute<Color> ATTR_COLOR = Attributes.forColor("color", Strings.getter("ioColorAttr"));
 	public static Attribute<AttributeOption> ATTR_HALIGN = Attributes.forOption("halign",
 			Strings.getter("textHorzAlignAttr"),
 			new AttributeOption[] {
@@ -120,7 +121,7 @@ public class Text extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN) {
+		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN || attr == ATTR_COLOR) {
 			configureLabel(instance);
 		}
 	}
@@ -140,6 +141,7 @@ public class Text extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		Font old = g.getFont();
 		g.setFont(attrs.getFont());
+		g.setColor(painter.getAttributeValue(ATTR_COLOR));
 		GraphicsUtil.drawText(g, text, 0, 0, halign, valign);
 
 		String textTrim = text.endsWith(" ") ? text.substring(0, text.length() - 1) : text;
@@ -166,7 +168,6 @@ public class Text extends InstanceFactory {
 		int y = loc.getY();
 		Graphics g = painter.getGraphics();
 		g.translate(x, y);
-		g.setColor(Color.BLACK);
 		paintGhost(painter);
 		g.translate(-x, -y);
 	}

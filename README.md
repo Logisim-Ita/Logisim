@@ -38,7 +38,8 @@ This is an italian fork based on the original Logisim version.<br>
 * Programmable clock
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
-I should have solved every problem with new changes, contact us if you have any kind of problem
+Due to a bug in the original Logisim, wide gates with 4 inputs had a bad positioning of the ports.
+I fixed this problem but if you open an old file containig gates with those attributes, its inputs will be disconnected and a warning message will appear
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile & use

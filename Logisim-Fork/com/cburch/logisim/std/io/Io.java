@@ -24,7 +24,7 @@ public class Io extends Library {
 	static final Attribute<Color> ATTR_BACKGROUND = Attributes.forColor("bg", Strings.getter("ioBackgroundColor"));
 	static final Attribute<Object> ATTR_LABEL_LOC = Attributes.forOption("labelloc", Strings.getter("ioLabelLocAttr"),
 			new Object[] { LABEL_CENTER, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST });
-	static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
+	public static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
 			Strings.getter("ioLabelColorAttr"));
 	static final Attribute<Boolean> ATTR_ACTIVE = Attributes.forBoolean("active", Strings.getter("ioActiveAttr"));
 	static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
@@ -36,7 +36,8 @@ public class Io extends Library {
 			new FactoryDescription("DipSwitch", Strings.getter("DipSwitchComponent"), "dipswitch.gif", "DipSwitch"),
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
-			//new FactoryDescription("Buzzer", Strings.getter("buzzerComponent"), "buzzer.gif", "Buzzer"),
+			// new FactoryDescription("Buzzer", Strings.getter("buzzerComponent"),
+			// "buzzer.gif", "Buzzer"),
 			new FactoryDescription("LED", Strings.getter("ledComponent"), "led.gif", "Led"),
 			new FactoryDescription("RGBLed", Strings.getter("rgbledComponent"), "rgbled.gif", "RGBLed"),
 			new FactoryDescription("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"),

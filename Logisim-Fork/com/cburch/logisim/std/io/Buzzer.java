@@ -41,6 +41,7 @@ public class Buzzer extends InstanceFactory {
 		public volatile boolean sound_changed;
 		public volatile boolean still_alive;
 		public Thread thread;
+
 		public Data(boolean b) {
 			is_on = false;
 			freq = 100;
@@ -49,6 +50,7 @@ public class Buzzer extends InstanceFactory {
 			is_on = b;
 			StartThread();
 		}
+
 		@Override
 		public Object clone() {
 			return new Data(is_on);

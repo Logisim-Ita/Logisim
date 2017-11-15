@@ -147,7 +147,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		// draw border
 		painter.drawRoundBounds(painter.getAttributeValue(ATTR_COLOR));
-
+		// draw white space
 		g.setColor(new Color(250, 250, 250));
 		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
 

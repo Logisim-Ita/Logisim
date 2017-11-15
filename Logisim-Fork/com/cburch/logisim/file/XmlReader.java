@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -541,6 +542,35 @@ class XmlReader {
 							sizeattribute.setAttribute("name", "facing");
 							sizeattribute.setAttribute("val", "west");
 							compElt.appendChild(sizeattribute);
+						}
+					}
+				}
+			}
+		}
+		// compatibility message for gate inputs moved (only wide 4 inputs)
+		if (version.compareTo(LogisimVersion.get(2, 11, 1, 2)) < 0) {
+			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name").equals("AND Gate")
+							|| compElt.getAttribute("name").equals("NAND Gate")
+							|| compElt.getAttribute("name").equals("OR Gate")
+							|| compElt.getAttribute("name").equals("NOR Gate")
+							|| compElt.getAttribute("name").equals("XOR Gate")
+							|| compElt.getAttribute("name").equals("XNOR Gate")) {
+						boolean hasfourinputs = false;
+						boolean iswide = false;
+						// check if is wide and has 4 inputs
+						for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+							if (attrElt.getAttribute("name").equals("size") && attrElt.getAttribute("val").equals("70"))
+								hasfourinputs = true;
+							else if (attrElt.getAttribute("name").equals("inputs")
+									&& attrElt.getAttribute("val").equals("4"))
+								iswide = true;
+						}
+						if (hasfourinputs && iswide) {
+							JOptionPane.showMessageDialog(null,
+									"You could have to edit the position of all the gates that have 4 inputs and wide attribute\ndue to a bug in the input positions of the original Logisim",
+									"Compatibility problem", JOptionPane.WARNING_MESSAGE);
 						}
 					}
 				}

@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.base;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
@@ -14,11 +15,12 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.instance.StdAttr;
 
 class TextAttributes extends AbstractAttributeSet {
-	private static final List<Attribute<?>> ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_HALIGN, Text.ATTR_VALIGN });
+	private static final List<Attribute<?>> ATTRIBUTES = Arrays.asList(
+			new Attribute<?>[] { Text.ATTR_TEXT, Text.ATTR_FONT, Text.ATTR_COLOR, Text.ATTR_HALIGN, Text.ATTR_VALIGN });
 
 	private String text;
 	private Font font;
+	private Color color;
 	private AttributeOption halign;
 	private AttributeOption valign;
 	private Bounds offsetBounds;
@@ -26,6 +28,7 @@ class TextAttributes extends AbstractAttributeSet {
 	public TextAttributes() {
 		text = "";
 		font = StdAttr.DEFAULT_LABEL_FONT;
+		color = Color.BLACK;
 		halign = Text.ATTR_HALIGN.parse("center");
 		valign = Text.ATTR_VALIGN.parse("base");
 		offsetBounds = null;
@@ -49,6 +52,10 @@ class TextAttributes extends AbstractAttributeSet {
 		return ((Integer) halign.getValue()).intValue();
 	}
 
+	Color getLabelColor() {
+		return color;
+	}
+
 	Bounds getOffsetBounds() {
 		return offsetBounds;
 	}
@@ -63,6 +70,8 @@ class TextAttributes extends AbstractAttributeSet {
 			return (V) text;
 		if (attr == Text.ATTR_FONT)
 			return (V) font;
+		if (attr == Text.ATTR_COLOR)
+			return (V) color;
 		if (attr == Text.ATTR_HALIGN)
 			return (V) halign;
 		if (attr == Text.ATTR_VALIGN)
@@ -89,6 +98,8 @@ class TextAttributes extends AbstractAttributeSet {
 			text = (String) value;
 		} else if (attr == Text.ATTR_FONT) {
 			font = (Font) value;
+		} else if (attr == Text.ATTR_COLOR) {
+			color = (Color) value;
 		} else if (attr == Text.ATTR_HALIGN) {
 			halign = (AttributeOption) value;
 		} else if (attr == Text.ATTR_VALIGN) {
