@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Font;
 
 import com.cburch.logisim.data.Attribute;
@@ -10,6 +11,7 @@ import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.std.io.Strings;
 
 public interface StdAttr {
 	public static final Attribute<Direction> FACING = Attributes.forDirection("facing",
@@ -29,7 +31,8 @@ public interface StdAttr {
 			Strings.getter("stdTriggerAttr"), new AttributeOption[] { TRIG_RISING, TRIG_FALLING, TRIG_HIGH, TRIG_LOW });
 	public static final Attribute<AttributeOption> EDGE_TRIGGER = Attributes.forOption("trigger",
 			Strings.getter("stdTriggerAttr"), new AttributeOption[] { TRIG_RISING, TRIG_FALLING });
-
+	public static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
+			Strings.getter("ioLabelColorAttr"));
 	public static final Attribute<String> LABEL = Attributes.forString("label", Strings.getter("stdLabelAttr"));
 
 	public static final Attribute<Font> LABEL_FONT = Attributes.forFont("labelfont",

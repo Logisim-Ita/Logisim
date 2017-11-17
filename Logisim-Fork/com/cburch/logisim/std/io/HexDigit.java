@@ -14,12 +14,13 @@ import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 
 public class HexDigit extends InstanceFactory {
 	public HexDigit() {
 		super("Hex Digit Display", Strings.getter("hexDigitComponent"));
-		setAttributes(new Attribute[] { Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_BACKGROUND },
-				new Object[] { new Color(240, 0, 0), SevenSegment.DEFAULT_OFF, Io.DEFAULT_BACKGROUND });
+		setAttributes(new Attribute[] { Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_BACKGROUND,StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { new Color(240, 0, 0), SevenSegment.DEFAULT_OFF, Io.DEFAULT_BACKGROUND,Color.BLACK });
 		Port[] ps = new Port[2];
 		ps[0] = new Port(0, 0, Port.INPUT, 4);
 		ps[0].setToolTip(Strings.getter("pinInputName"));

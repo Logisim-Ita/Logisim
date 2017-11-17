@@ -19,6 +19,7 @@ import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.std.wiring.DurationAttribute;
 import com.cburch.logisim.util.GraphicsUtil;
 
@@ -156,9 +157,9 @@ public class DotMatrix extends InstanceFactory {
 		super("DotMatrix", Strings.getter("dotMatrixComponent"));
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUT_TYPE, ATTR_MATRIX_COLS, ATTR_MATRIX_ROWS, Io.ATTR_ON_COLOR,
-						Io.ATTR_OFF_COLOR, ATTR_PERSIST, ATTR_DOT_SHAPE },
+						Io.ATTR_OFF_COLOR, ATTR_PERSIST, ATTR_DOT_SHAPE,StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { INPUT_COLUMN, Integer.valueOf(5), Integer.valueOf(7), Color.GREEN, Color.DARK_GRAY,
-						Integer.valueOf(0), SHAPE_SQUARE });
+						Integer.valueOf(0), SHAPE_SQUARE,Color.BLACK });
 		setIconName("dotmat.gif");
 	}
 

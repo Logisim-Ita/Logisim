@@ -64,9 +64,9 @@ public class Tty extends InstanceFactory {
 		super("TTY", Strings.getter("ttyComponent"));
 		setAttributes(
 				new Attribute[] { CHAR_BITS, ATTR_ROWS, ATTR_COLUMNS, StdAttr.EDGE_TRIGGER, Io.ATTR_COLOR,
-						Io.ATTR_BACKGROUND },
+						Io.ATTR_BACKGROUND,StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { B7, Integer.valueOf(8), Integer.valueOf(32), StdAttr.TRIG_RISING, Color.BLACK,
-						DEFAULT_BACKGROUND });
+						DEFAULT_BACKGROUND ,Color.BLACK});
 		setIconName("tty.gif");
 	}
 

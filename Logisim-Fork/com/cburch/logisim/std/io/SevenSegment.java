@@ -14,6 +14,7 @@ import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 
 public class SevenSegment extends InstanceFactory {
 	static Bounds[] SEGMENTS = null;
@@ -65,8 +66,8 @@ public class SevenSegment extends InstanceFactory {
 
 	public SevenSegment() {
 		super("7-Segment Display", Strings.getter("sevenSegmentComponent"));
-		setAttributes(new Attribute[] { Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_BACKGROUND, Io.ATTR_ACTIVE },
-				new Object[] { new Color(240, 0, 0), DEFAULT_OFF, Io.DEFAULT_BACKGROUND, Boolean.TRUE });
+		setAttributes(new Attribute[] { Io.ATTR_ON_COLOR, Io.ATTR_OFF_COLOR, Io.ATTR_BACKGROUND, Io.ATTR_ACTIVE,StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { new Color(240, 0, 0), DEFAULT_OFF, Io.DEFAULT_BACKGROUND, Boolean.TRUE,Color.BLACK });
 		setOffsetBounds(Bounds.create(-5, 0, 40, 60));
 		setIconName("7seg.gif");
 		Port[] port = new Port[] { new Port(20, 0, Port.INPUT, 1), new Port(30, 0, Port.INPUT, 1),

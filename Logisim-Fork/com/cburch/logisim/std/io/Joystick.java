@@ -127,8 +127,8 @@ public class Joystick extends InstanceFactory {
 
 	public Joystick() {
 		super("Joystick", Strings.getter("joystickComponent"));
-		setAttributes(new Attribute[] { StdAttr.FACING, ATTR_WIDTH, Io.ATTR_COLOR },
-				new Object[] { Direction.EAST, BitWidth.create(4), Color.RED });
+		setAttributes(new Attribute[] { StdAttr.FACING, ATTR_WIDTH, Io.ATTR_COLOR,StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, BitWidth.create(4), Color.RED,Color.BLACK });
 
 		setIconName("joystick.gif");
 		setFacingAttribute(StdAttr.FACING);
