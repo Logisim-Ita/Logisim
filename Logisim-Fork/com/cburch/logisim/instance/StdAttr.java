@@ -11,7 +11,6 @@ import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.std.io.Strings;
 
 public interface StdAttr {
 	public static final Attribute<Direction> FACING = Attributes.forDirection("facing",

@@ -13,6 +13,7 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
+import com.sun.prism.paint.Color;
 
 class GateAttributes extends AbstractAttributeSet {
 	static final int MAX_INPUTS = 32;
@@ -50,6 +51,7 @@ class GateAttributes extends AbstractAttributeSet {
 	AttributeOption xorBehave;
 	String label = "";
 	Font labelFont = StdAttr.DEFAULT_LABEL_FONT;
+	Color labelColor=Color.BLACK;
 
 	GateAttributes(boolean isXor) {
 		xorBehave = isXor ? XOR_ONE : null;
@@ -83,11 +85,14 @@ class GateAttributes extends AbstractAttributeSet {
 			return (V) out;
 		if (attr == ATTR_XOR)
 			return (V) xorBehave;
+		if(attr==StdAttr.ATTR_LABEL_COLOR)
+			return(V)labelColor;
 		if (attr instanceof NegateAttribute) {
 			int index = ((NegateAttribute) attr).index;
 			int bit = (negated >> index) & 1;
 			return (V) Boolean.valueOf(bit == 1);
 		}
+		
 		return null;
 	}
 
@@ -113,14 +118,17 @@ class GateAttributes extends AbstractAttributeSet {
 			xorBehave = (AttributeOption) value;
 		} else if (attr == ATTR_OUTPUT) {
 			out = (AttributeOption) value;
-		} else if (attr instanceof NegateAttribute) {
+		} else if(attr==StdAttr.ATTR_LABEL_COLOR){
+			labelColor=(Color)value;
+		}
+		else if (attr instanceof NegateAttribute) {
 			int index = ((NegateAttribute) attr).index;
 			if (((Boolean) value).booleanValue()) {
 				negated |= 1 << index;
 			} else {
 				negated &= ~(1 << index);
 			}
-		} else {
+		} else{
 			throw new IllegalArgumentException("unrecognized argument");
 		}
 		fireAttributeValueChanged(attr, value);

@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.wiring;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,13 +17,13 @@ class PinAttributes extends ProbeAttributes {
 
 	private static final List<Attribute<?>> ATTRIBUTES = Arrays
 			.asList(new Attribute<?>[] { StdAttr.FACING, Pin.ATTR_TYPE, StdAttr.WIDTH, Pin.ATTR_TRISTATE, Pin.ATTR_PULL,
-					StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT });
+					StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,StdAttr. ATTR_LABEL_COLOR });
 
 	BitWidth width = BitWidth.ONE;
 	boolean threeState = true;
 	int type = EndData.INPUT_ONLY;
 	Object pull = Pin.PULL_NONE;
-
+	Color LabelColor=Color.BLACK;
 	public PinAttributes() {
 	}
 
@@ -41,6 +42,9 @@ class PinAttributes extends ProbeAttributes {
 			return (V) Boolean.valueOf(type == EndData.OUTPUT_ONLY);
 		if (attr == Pin.ATTR_PULL)
 			return (V) pull;
+		if(attr ==StdAttr. ATTR_LABEL_COLOR) {
+			return (V)LabelColor;	
+		}
 		return super.getValue(attr);
 	}
 
@@ -62,7 +66,9 @@ class PinAttributes extends ProbeAttributes {
 			type = ((Boolean) value).booleanValue() ? EndData.OUTPUT_ONLY : EndData.INPUT_ONLY;
 		} else if (attr == Pin.ATTR_PULL) {
 			pull = value;
-		} else {
+		} else if(attr == StdAttr. ATTR_LABEL_COLOR){
+			LabelColor=(Color)value;
+		}else{
 			super.setValue(attr, value);
 			return;
 		}

@@ -433,7 +433,7 @@ abstract class AbstractGate extends InstanceFactory {
 			((Graphics2D) g).rotate(-rotate);
 		}
 		g.translate(-loc.getX(), -loc.getY());
-
+		//g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 
