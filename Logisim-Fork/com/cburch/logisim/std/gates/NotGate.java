@@ -77,9 +77,9 @@ class NotGate extends InstanceFactory {
 		super("NOT Gate", Strings.getter("notGateComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, ATTR_SIZE, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, },
+						StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.EAST, BitWidth.ONE, SIZE_NARROW, GateAttributes.OUTPUT_01, "",
-						StdAttr.DEFAULT_LABEL_FONT, });
+						StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}
@@ -236,9 +236,11 @@ class NotGate extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
+		Graphics g = painter.getGraphics();
 		painter.getGraphics().setColor(Color.BLACK);
 		paintBase(painter);
 		painter.drawPorts();
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

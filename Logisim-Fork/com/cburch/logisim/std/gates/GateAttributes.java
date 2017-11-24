@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.gates;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
-import com.sun.prism.paint.Color;
 
 class GateAttributes extends AbstractAttributeSet {
 	static final int MAX_INPUTS = 32;

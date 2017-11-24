@@ -41,9 +41,9 @@ public class ShiftRegister extends InstanceFactory {
 		super("Shift Register", Strings.getter("shiftRegisterComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.WIDTH, ATTR_LENGTH, ATTR_LOAD, StdAttr.EDGE_TRIGGER, StdAttr.LABEL,
-						StdAttr.LABEL_FONT },
+						StdAttr.LABEL_FONT ,StdAttr.ATTR_LABEL_COLOR},
 				new Object[] { BitWidth.ONE, Integer.valueOf(8), Boolean.TRUE, StdAttr.TRIG_RISING, "",
-						StdAttr.DEFAULT_LABEL_FONT });
+						StdAttr.DEFAULT_LABEL_FONT ,Color.BLACK});
 		setKeyConfigurator(JoinedConfigurator.create(new IntegerConfigurator(ATTR_LENGTH, 1, 32, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 
@@ -130,7 +130,7 @@ public class ShiftRegister extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
-		painter.drawLabel();
+		
 
 		// draw state
 		boolean parallel = painter.getAttributeValue(ATTR_LOAD).booleanValue();
@@ -156,7 +156,10 @@ public class ShiftRegister extends InstanceFactory {
 						String s = data.get(len - 1 - i).toHexString();
 						GraphicsUtil.drawCenteredText(g, s, x, y);
 						x += 10;
+						
 					}
+					g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+					painter.drawLabel();
 				}
 			} else {
 				Bounds bds = painter.getBounds();
@@ -171,7 +174,10 @@ public class ShiftRegister extends InstanceFactory {
 				}
 				String b = Strings.get("shiftRegisterLabel2", "" + len, "" + wid);
 				GraphicsUtil.drawCenteredText(g, b, x, y + 3 * h / 4);
+				g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+				painter.drawLabel();
 			}
+			
 		}
 
 		// draw input and output ports
