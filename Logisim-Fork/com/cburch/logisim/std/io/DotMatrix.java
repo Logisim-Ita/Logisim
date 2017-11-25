@@ -157,9 +157,9 @@ public class DotMatrix extends InstanceFactory {
 		super("DotMatrix", Strings.getter("dotMatrixComponent"));
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUT_TYPE, ATTR_MATRIX_COLS, ATTR_MATRIX_ROWS, Io.ATTR_ON_COLOR,
-						Io.ATTR_OFF_COLOR, ATTR_PERSIST, ATTR_DOT_SHAPE,StdAttr.ATTR_LABEL_COLOR },
+						Io.ATTR_OFF_COLOR, ATTR_PERSIST, ATTR_DOT_SHAPE },
 				new Object[] { INPUT_COLUMN, Integer.valueOf(5), Integer.valueOf(7), Color.GREEN, Color.DARK_GRAY,
-						Integer.valueOf(0), SHAPE_SQUARE,Color.BLACK });
+						Integer.valueOf(0), SHAPE_SQUARE });
 		setIconName("dotmat.gif");
 	}
 
