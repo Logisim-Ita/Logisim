@@ -31,8 +31,10 @@ public class Register extends InstanceFactory {
 
 	public Register() {
 		super("Register", Strings.getter("registerComponent"));
-		setAttributes(new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT ,Color.BLACK});
+		setAttributes(
+				new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT,
+						StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 		setOffsetBounds(Bounds.create(-30, -20, 30, 40));
 		setIconName("register.gif");

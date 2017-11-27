@@ -31,8 +31,8 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		setIconName("ttl.gif");
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, TTL.VCC_GND, TTL.DRAW_INTERNAL_STRUCTURE, StdAttr.LABEL,
-						StdAttr.LABEL_FONT ,StdAttr.ATTR_LABEL_COLOR},
-				new Object[] { Direction.EAST, false, false, "", StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, false, false, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		this.name = name;
 		this.pinnumber = pins;
@@ -153,11 +153,12 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		painter.drawPorts();
-		
-		
+		Graphics2D g = (Graphics2D) painter.getGraphics();
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+		painter.drawLabel();
+		g.setColor(Color.BLACK);
 		if (!painter.getAttributeValue(TTL.DRAW_INTERNAL_STRUCTURE)) {
 			Direction dir = painter.getAttributeValue(StdAttr.FACING);
-			Graphics2D g = (Graphics2D) painter.getGraphics();
 			Bounds bds = painter.getBounds();
 			int x = bds.getX();
 			int y = bds.getY();
@@ -221,8 +222,6 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					g.setColor(Color.BLACK);
 					g.drawRect(xp, yp, pinheight, pinwidth);
 				}
-				g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
-				painter.drawLabel();
 			}
 
 			g.setColor(Color.LIGHT_GRAY.brighter());

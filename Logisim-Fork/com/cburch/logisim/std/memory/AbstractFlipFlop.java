@@ -101,9 +101,9 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		triggerAttribute = allowLevelTriggers ? StdAttr.FULL_TRIGGER : StdAttr.EDGE_TRIGGER;
 		setAttributes(
 				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, Plexers.ATTR_ENABLE,
-						NEW_FF_LAYOUT, StdAttr.LABEL, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
+						NEW_FF_LAYOUT, StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, "",
-						StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
 		this.inputs = numInputs;

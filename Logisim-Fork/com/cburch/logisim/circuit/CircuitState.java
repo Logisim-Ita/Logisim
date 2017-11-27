@@ -356,32 +356,32 @@ public class CircuitState implements InstanceData {
 	}
 
 	void processDirtyPoints() {
-			HashSet<Location> dirty = new HashSet<Location>(dirtyPoints);
-			dirtyPoints.clear();
-			if (circuit.wires.isMapVoided()) {
-				for (int i = 3; i >= 0; i--) {
+		HashSet<Location> dirty = new HashSet<Location>(dirtyPoints);
+		dirtyPoints.clear();
+		if (circuit.wires.isMapVoided()) {
+			for (int i = 3; i >= 0; i--) {
+				try {
+					dirty.addAll(circuit.wires.points.getSplitLocations());
+					break;
+				} catch (ConcurrentModificationException e) {
+					// try again...
 					try {
-						dirty.addAll(circuit.wires.points.getSplitLocations());
-						break;
-					} catch (ConcurrentModificationException e) {
-						// try again...
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e2) {
-						}
-						if (i == 0)
-							e.printStackTrace();
+						Thread.sleep(1);
+					} catch (InterruptedException e2) {
 					}
+					if (i == 0)
+						e.printStackTrace();
 				}
 			}
-			if (!dirty.isEmpty()) {
-				circuit.wires.propagate(this, dirty);
-			}
+		}
+		if (!dirty.isEmpty()) {
+			circuit.wires.propagate(this, dirty);
+		}
 
-			CircuitState[] subs = new CircuitState[substates.size()];
-			for (CircuitState substate : substates.toArray(subs)) {
-				substate.processDirtyPoints();
-			}
+		CircuitState[] subs = new CircuitState[substates.size()];
+		for (CircuitState substate : substates.toArray(subs)) {
+			substate.processDirtyPoints();
+		}
 	}
 
 	void reset() {

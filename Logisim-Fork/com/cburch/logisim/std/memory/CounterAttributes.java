@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.std.memory;
 
+import java.awt.Color;
 import java.util.List;
 
 import com.cburch.logisim.data.AbstractAttributeSet;
@@ -11,7 +12,6 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.AttributeSets;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.instance.StdAttr;
-import java.awt.Color;
 
 class CounterAttributes extends AbstractAttributeSet {
 	private AttributeSet base;
@@ -19,9 +19,9 @@ class CounterAttributes extends AbstractAttributeSet {
 	public CounterAttributes() {
 		base = AttributeSets.fixedSet(
 				new Attribute<?>[] { StdAttr.WIDTH, Counter.ATTR_MAX, Counter.ATTR_ON_GOAL, StdAttr.EDGE_TRIGGER,
-						StdAttr.LABEL, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
+						StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { BitWidth.create(8), Integer.valueOf(0xFF), Counter.ON_GOAL_WRAP, StdAttr.TRIG_RISING, "",
-						StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 	}
 
 	@Override

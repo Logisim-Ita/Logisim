@@ -11,7 +11,8 @@ import com.cburch.logisim.instance.StdAttr;
 
 class GateAttributeList extends AbstractList<Attribute<?>> {
 	private static final Attribute<?>[] BASE_ATTRIBUTES = { StdAttr.FACING, StdAttr.WIDTH, GateAttributes.ATTR_SIZE,
-			GateAttributes.ATTR_INPUTS, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR };
+			GateAttributes.ATTR_INPUTS, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL, StdAttr.LABEL_FONT,
+			StdAttr.ATTR_LABEL_COLOR };
 
 	private GateAttributes attrs;
 
