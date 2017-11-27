@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Font;
 
 import com.cburch.logisim.data.Attribute;
@@ -29,7 +30,8 @@ public interface StdAttr {
 			Strings.getter("stdTriggerAttr"), new AttributeOption[] { TRIG_RISING, TRIG_FALLING, TRIG_HIGH, TRIG_LOW });
 	public static final Attribute<AttributeOption> EDGE_TRIGGER = Attributes.forOption("trigger",
 			Strings.getter("stdTriggerAttr"), new AttributeOption[] { TRIG_RISING, TRIG_FALLING });
-
+	public static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
+			Strings.getter("ioLabelColorAttr"));
 	public static final Attribute<String> LABEL = Attributes.forString("label", Strings.getter("stdLabelAttr"));
 
 	public static final Attribute<Font> LABEL_FONT = Attributes.forFont("labelfont",

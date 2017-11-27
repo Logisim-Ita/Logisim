@@ -394,6 +394,7 @@ public class Pin extends InstanceFactory {
 		int x = bds.getX();
 		int y = bds.getY();
 		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		// if bitwidth is more that 1, first draw the bounds and then the number
 		if (attrs.width.getWidth() > 1) {

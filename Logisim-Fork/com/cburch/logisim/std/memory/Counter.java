@@ -111,6 +111,7 @@ public class Counter extends InstanceFactory {
 
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		// draw input and output ports

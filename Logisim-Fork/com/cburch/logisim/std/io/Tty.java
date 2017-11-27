@@ -66,7 +66,7 @@ public class Tty extends InstanceFactory {
 				new Attribute[] { CHAR_BITS, ATTR_ROWS, ATTR_COLUMNS, StdAttr.EDGE_TRIGGER, Io.ATTR_COLOR,
 						Io.ATTR_BACKGROUND },
 				new Object[] { B7, Integer.valueOf(8), Integer.valueOf(32), StdAttr.TRIG_RISING, Color.BLACK,
-						DEFAULT_BACKGROUND });
+						DEFAULT_BACKGROUND});
 		setIconName("tty.gif");
 	}
 

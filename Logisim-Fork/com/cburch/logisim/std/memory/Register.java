@@ -31,8 +31,8 @@ public class Register extends InstanceFactory {
 
 	public Register() {
 		super("Register", Strings.getter("registerComponent"));
-		setAttributes(new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT },
-				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT });
+		setAttributes(new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT ,Color.BLACK});
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 		setOffsetBounds(Bounds.create(-30, -20, 30, 40));
 		setIconName("register.gif");
@@ -88,6 +88,7 @@ public class Register extends InstanceFactory {
 
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		// draw input and output ports

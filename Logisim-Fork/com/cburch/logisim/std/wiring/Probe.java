@@ -468,7 +468,7 @@ public class Probe extends InstanceFactory {
 			g.drawRoundRect(x, y, bds.getWidth(), bds.getHeight(), 10, 10);
 		}
 
-		g.setColor(Color.BLACK);
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		if (!painter.getShowState()) {

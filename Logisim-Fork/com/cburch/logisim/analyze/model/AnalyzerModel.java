@@ -10,7 +10,7 @@ import com.cburch.logisim.proj.Project;
 
 public class AnalyzerModel {
 	public static final int MAX_INPUTS = 12;
-	public static final int MAX_OUTPUTS = 12;
+	public static final int MAX_OUTPUTS = 32;
 
 	public static final int FORMAT_SUM_OF_PRODUCTS = 0;
 	public static final int FORMAT_PRODUCT_OF_SUMS = 1;
