@@ -177,7 +177,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);
-		setIconName("clock.gif");
+		setIconName("programmablegenerator.gif");
 	}
 
 	//

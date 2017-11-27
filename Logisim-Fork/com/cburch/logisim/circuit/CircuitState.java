@@ -356,6 +356,8 @@ public class CircuitState implements InstanceData {
 	}
 
 	void processDirtyPoints() {
+		if(dirtyPoints==null)
+			System.out.println("nullo");
 		HashSet<Location> dirty = new HashSet<Location>(dirtyPoints);
 		dirtyPoints.clear();
 		if (circuit.wires.isMapVoided()) {

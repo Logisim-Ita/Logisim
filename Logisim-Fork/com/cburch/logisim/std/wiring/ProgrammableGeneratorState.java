@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.util.LocaleManager;
+import com.cburch.logisim.util.StringUtil;
 
 public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	Value sending = Value.FALSE;
@@ -66,8 +67,9 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 		// state number font
 		Font state = new Font(Font.SANS_SERIF, Font.BOLD, 18);
-		JLabel up, down, statenumber;
+		JLabel up, down, statenumber, clock;
 		for (int i = 0; i < inputs.length; i += 2) {
+
 			statenumber = new JLabel(String.valueOf(i / 2 + 1));
 			statenumber.setFont(state);
 			statenumber.setForeground(Color.DARK_GRAY);
@@ -80,6 +82,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			gbs.insets = empty;
 			gbs.fill = GridBagConstraints.VERTICAL;
 			panel.add(statenumber, gbs);
+
 			up = new JLabel("↑ ");
 			up.setFont(font);
 			gbs.gridx = 1;
@@ -87,23 +90,42 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			gbs.gridheight = 1;
 			gbs.ipadx = 0;
 			panel.add(up, gbs);
-			inputs[i] = new JTextField(String.valueOf(getdurationHigh(i / 2)), 20);
+
+			inputs[i] = new JTextField(String.valueOf(getdurationHigh(i / 2)), 5);
 			gbs.gridx = 2;
 			gbs.gridy = i;
 			gbs.gridheight = 1;
 			panel.add(inputs[i], gbs);
+
+			clock = new JLabel(StringUtil.format(
+					Strings.get((getdurationHigh(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
+			up.setFont(font);
+			gbs.gridx = 3;
+			gbs.gridy = i;
+			gbs.gridheight = 1;
+			panel.add(clock, gbs);
+
 			down = new JLabel("↓ ");
 			down.setFont(font);
 			gbs.gridx = 1;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
 			panel.add(down, gbs);
-			inputs[i + 1] = new JTextField(String.valueOf(getdurationLow(i / 2)), 20);
+
+			inputs[i + 1] = new JTextField(String.valueOf(getdurationLow(i / 2)), 5);
 			gbs.gridx = 2;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
 			gbs.insets = newstate;
 			panel.add(inputs[i + 1], gbs);
+
+			clock = new JLabel(StringUtil.format(
+					Strings.get((getdurationLow(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
+			up.setFont(font);
+			gbs.gridx = 3;
+			gbs.gridy = i + 1;
+			gbs.gridheight = 1;
+			panel.add(clock, gbs);
 		}
 		JScrollPane scrollable = new JScrollPane(panel);
 		scrollable.setPreferredSize(new Dimension(175, 300));

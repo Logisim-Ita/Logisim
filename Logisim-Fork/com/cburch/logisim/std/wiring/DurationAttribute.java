@@ -44,7 +44,7 @@ public class DurationAttribute extends Attribute<Integer> {
 	@Override
 	public String toDisplayString(Integer value) {
 		if (value.equals(Integer.valueOf(1))) {
-			return Strings.get("clockDurationOneValue");
+			return StringUtil.format(Strings.get("clockDurationOneValue"), value.toString());
 		} else {
 			return StringUtil.format(Strings.get("clockDurationValue"), value.toString());
 		}
