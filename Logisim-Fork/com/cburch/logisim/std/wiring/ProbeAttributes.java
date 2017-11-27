@@ -19,7 +19,7 @@ class ProbeAttributes extends AbstractAttributeSet {
 	public static ProbeAttributes instance = new ProbeAttributes();
 
 	private static final List<Attribute<?>> ATTRIBUTES = Arrays.asList(new Attribute<?>[] { StdAttr.FACING,
-			RadixOption.ATTRIBUTE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR });
+			RadixOption.ATTRIBUTE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR });
 
 	Direction facing = Direction.EAST;
 	String label = "";
@@ -27,8 +27,8 @@ class ProbeAttributes extends AbstractAttributeSet {
 	Font labelfont = StdAttr.DEFAULT_LABEL_FONT;
 	RadixOption radix = RadixOption.RADIX_2;
 	BitWidth width = BitWidth.ONE;
-	Color labelColor=Color.BLACK;
-	
+	Color labelColor = Color.BLACK;
+
 	public ProbeAttributes() {
 	}
 
@@ -71,9 +71,9 @@ class ProbeAttributes extends AbstractAttributeSet {
 			labelfont = (Font) value;
 		} else if (attr == RadixOption.ATTRIBUTE) {
 			radix = (RadixOption) value;
-		} else if(attr==StdAttr.ATTR_LABEL_COLOR){
-			labelColor=(Color)value;
-		}else{
+		} else if (attr == StdAttr.ATTR_LABEL_COLOR) {
+			labelColor = (Color) value;
+		} else {
 			throw new IllegalArgumentException("unknown attribute");
 		}
 		fireAttributeValueChanged(attr, value);

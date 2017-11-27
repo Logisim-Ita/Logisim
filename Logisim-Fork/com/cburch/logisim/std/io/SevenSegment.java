@@ -14,7 +14,6 @@ import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
-import com.cburch.logisim.instance.StdAttr;
 
 public class SevenSegment extends InstanceFactory {
 	static Bounds[] SEGMENTS = null;
