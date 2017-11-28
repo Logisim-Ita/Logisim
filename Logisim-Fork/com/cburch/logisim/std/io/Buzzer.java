@@ -132,9 +132,9 @@ public class Buzzer extends InstanceFactory {
 		p[2] = new Port(0, 10, "input", 7);
 
 		// String foo = "multiplexerEnableTip";
-		p[0].setToolTip(Strings.getter("enable"));
-		p[1].setToolTip(Strings.getter("frequency"));
-		p[2].setToolTip(Strings.getter("volume"));
+		p[0].setToolTip(Strings.getter("enableSound"));
+		p[1].setToolTip(Strings.getter("buzzerFrequecy"));
+		p[2].setToolTip(Strings.getter("buzzerVolume"));
 
 		setPorts(p);
 
@@ -187,7 +187,6 @@ public class Buzzer extends InstanceFactory {
 			state.setData(d = new Data(false));
 
 		d.is_on = state.getPort(0) == Value.TRUE;
-
 		if (d.is_on)
 			d.still_alive = true;
 
