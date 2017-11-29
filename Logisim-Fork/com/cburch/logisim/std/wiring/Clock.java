@@ -126,9 +126,9 @@ public class Clock extends InstanceFactory {
 		super("Clock", Strings.getter("clockComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, ATTR_HIGH, ATTR_LOW, StdAttr.LABEL, Pin.ATTR_LABEL_LOC,
-						StdAttr.LABEL_FONT },
+						StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.EAST, Integer.valueOf(1), Integer.valueOf(1), "", Direction.WEST,
-						StdAttr.DEFAULT_LABEL_FONT });
+						StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);
@@ -177,6 +177,7 @@ public class Clock extends InstanceFactory {
 		int y = bds.getY();
 		painter.drawBounds(Color.WHITE);
 		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		boolean drawUp;

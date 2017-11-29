@@ -160,8 +160,8 @@ public class Keyboard extends InstanceFactory {
 
 	public Keyboard() {
 		super("Keyboard", Strings.getter("keyboardComponent"));
-		setAttributes(new Attribute[] { CHAR_BITS, ATTR_BUFFER, StdAttr.EDGE_TRIGGER, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { B7, Integer.valueOf(32), StdAttr.TRIG_RISING, StdAttr.ATTR_LABEL_COLOR });
+		setAttributes(new Attribute[] { CHAR_BITS, ATTR_BUFFER, StdAttr.EDGE_TRIGGER, },
+				new Object[] { B7, Integer.valueOf(32), StdAttr.TRIG_RISING, });
 		setOffsetBounds(Bounds.create(0, -15, WIDTH, HEIGHT));
 		setIconName("keyboard.gif");
 		setInstancePoker(Poker.class);
