@@ -167,7 +167,7 @@ public class CurveTool extends AbstractTool {
 		lastMouseY = my;
 
 		boolean shiftDown = (mods & InputEvent.SHIFT_DOWN_MASK) != 0;
-		boolean ctrlDown = (mods & InputEvent.CTRL_DOWN_MASK) != 0;
+		boolean ctrlDown = (mods & InputEvent.CTRL_DOWN_MASK) == 0;
 		boolean altDown = (mods & InputEvent.ALT_DOWN_MASK) != 0;
 		Curve ret = null;
 		switch (state) {

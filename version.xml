@@ -2,11 +2,13 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.2.5</jar_version>
+  <jar_version>2.11.3.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.2.5</exe_version>
+  <exe_version>2.11.3.0</exe_version>
   <changelog>
-* Label and Text Tool -> Added color attribute
-* Added a warnin message if you open an old file with wide gates that have 4 inputs
+* Added Label Color attribute for each component with Label attribute
+* Analyze Circuit: max output pin limit increased to 32
+* In Edit Layout window snap for shapes is now by default and CTRL disables it
+* Maybe fixed some problem with Java 9
   </changelog>
 </logisim>

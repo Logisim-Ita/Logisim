@@ -9,6 +9,7 @@ This is an italian fork based on the original Logisim version.<br>
 ## Changelog
 * Italian translation!
 * Possibility to use french translations already done (not very well)
+* Autoupdates!
 * New components:
 	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7485, 7486, 74165, 74283, 747266)
 	* I/O->Digital Oscilloscope
@@ -22,20 +23,27 @@ This is an italian fork based on the original Logisim version.<br>
 * Controlled Buffer / Inverter: Negate Control Input
 * Press ESC or DEL to cancel "Add Tool" action
 * TTY and Keyboard components can use 16-bit values (UTF-16)
+* Clock custom frequency
 * Joystick facing attribute
-* Added 7-Segment Display input names
+* Added missing tooltips
 * Zoom in and out using mouse wheel where you're pointing at
-* Autoupdates!
 * Big fixes to Log menu and Log output file
+* Added Label Color attribute for each component with Label attribute
+* Increased output limit in Analyze Circuit to 32
 * Fixed empty template bug introduced in Logisim 2.7.0
-* Default gates attributes: narrow, 2 inputs
-* Anti Aliasing option
-* Look and Feel preference
+* Fixed input positions in wide gates with 4 inputs
+* Changed some default value
+* Anti Aliasing and Look and Feel preference
 * Graphical changes
+* Includes some fix from original early version 2.7.2.255
 ## Features we want to add
 * Move to Java 9
 * Solve propagation bugs not solved in the original Logisim
-* Programmable clock
+* Programmable Generator (95% done)
+* Buzzer (75% done)
+* Add a SEL input in some component
+* Add a new type of library
+* Draw also in circuits
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
 Due to a bug in the original Logisim, wide gates with 4 inputs had a bad positioning of the ports.

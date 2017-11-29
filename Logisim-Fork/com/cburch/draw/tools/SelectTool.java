@@ -442,7 +442,7 @@ public class SelectTool extends AbstractTool {
 		lastMouseX = mx;
 		lastMouseY = my;
 		boolean shift = (mods & InputEvent.SHIFT_DOWN_MASK) != 0;
-		boolean ctrl = (mods & InputEvent.CTRL_DOWN_MASK) != 0;
+		boolean ctrl = (mods & InputEvent.CTRL_DOWN_MASK) == 0;
 		Location newEnd = Location.create(mx, my);
 		dragEnd = newEnd;
 

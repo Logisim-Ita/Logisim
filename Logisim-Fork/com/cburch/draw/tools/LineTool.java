@@ -105,7 +105,7 @@ public class LineTool extends AbstractTool {
 		int x = e.getX();
 		int y = e.getY();
 		int mods = e.getModifiersEx();
-		if ((mods & InputEvent.CTRL_DOWN_MASK) != 0) {
+		if ((mods & InputEvent.CTRL_DOWN_MASK) == 0) {
 			x = canvas.snapX(x);
 			y = canvas.snapY(y);
 		}
@@ -159,7 +159,7 @@ public class LineTool extends AbstractTool {
 				newEnd = Location.create(mx, my);
 			}
 
-			if ((mods & InputEvent.CTRL_DOWN_MASK) != 0) {
+			if ((mods & InputEvent.CTRL_DOWN_MASK) == 0) {
 				int x = newEnd.getX();
 				int y = newEnd.getY();
 				x = canvas.snapX(x);
