@@ -26,6 +26,7 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.std.base.Text;
 import com.cburch.logisim.std.wiring.Pin;
 
 public class Analyze {
@@ -309,11 +310,12 @@ public class Analyze {
 				} catch (UnsupportedOperationException e) {
 					throw new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
 				}
-			} else if (comp.getFactory() instanceof Pin) {
+			} /*else if (comp.getFactory() instanceof Pin || comp.getFactory() instanceof Text) {
 				; // pins are handled elsewhere
-			} else {
+			}*/ else {
 				// pins are handled elsewhere
-				throw new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
+				//throw new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
+				;
 			}
 		}
 	}

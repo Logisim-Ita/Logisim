@@ -3,10 +3,18 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -17,6 +25,9 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.gui.hex.HexFile;
+import com.cburch.logisim.gui.hex.HexFrame;
+import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
@@ -29,6 +40,108 @@ import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class PlaRom extends InstanceFactory {
+	private static class PlaRomContentsAttr extends Attribute<MemContents> {
+		PlaRomContentsAttr() {
+			super("contents", Strings.getter("romContentsAttr"));
+		}
+
+		@Override
+		public java.awt.Component getCellEditor(Window source, MemContents value) {
+			if (source instanceof Frame) {
+				Project proj = ((Frame) source).getProject();
+				RomAttributes.register(value, proj);
+			}
+			PlaContentsCell ret = new PlaContentsCell(source, value);
+			ret.mouseClicked(null);
+			return ret;
+		}
+
+		@Override
+		public MemContents parse(String value) {
+			int lineBreak = value.indexOf('\n');
+			String first = lineBreak < 0 ? value : value.substring(0, lineBreak);
+			String rest = lineBreak < 0 ? "" : value.substring(lineBreak + 1);
+			StringTokenizer toks = new StringTokenizer(first);
+			try {
+				String header = toks.nextToken();
+				if (!header.equals("addr/data:"))
+					return null;
+				int addr = Integer.parseInt(toks.nextToken());
+				int data = Integer.parseInt(toks.nextToken());
+				MemContents ret = MemContents.create(addr, data);
+				HexFile.open(ret, new StringReader(rest));
+				return ret;
+			} catch (IOException e) {
+				return null;
+			} catch (NumberFormatException e) {
+				return null;
+			} catch (NoSuchElementException e) {
+				return null;
+			}
+		}
+
+		@Override
+		public String toDisplayString(MemContents value) {
+			return Strings.get("romContentsValue");
+		}
+
+		@Override
+		public String toStandardString(MemContents state) {
+			int addr = state.getLogLength();
+			int data = state.getWidth();
+			StringWriter ret = new StringWriter();
+			ret.write("addr/data: " + addr + " " + data + "\n");
+			try {
+				HexFile.save(ret, state);
+			} catch (IOException e) {
+			}
+			return ret.toString();
+		}
+	}
+
+	public static class PlaContentsCell extends JLabel implements MouseListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -53754819096800664L;
+		Window source;
+		MemContents contents;
+
+		PlaContentsCell(Window source, MemContents contents) {
+			super(Strings.get("romContentsValue"));
+			this.source = source;
+			this.contents = contents;
+			addMouseListener(this);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (contents == null)
+				return;
+			Project proj = source instanceof Frame ? ((Frame) source).getProject() : null;
+			HexFrame frame = RomAttributes.getHexFrame(contents, proj);
+			frame.setVisible(true);
+			frame.toFront();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		public static Attribute<MemContents> CONTENTS_ATTR = new PlaRomContentsAttr();
+	}
 
 	public static class Logger extends InstanceLogger {
 
@@ -127,6 +240,8 @@ public class PlaRom extends InstanceFactory {
 	private static final Attribute<Integer> ATTR_OUTPUTS = Attributes.forIntegerRange("outputs",
 			Strings.getter("PlaOutputsAttr"), 2, 32);
 
+	public static Attribute<MemContents> CONTENTS_ATTR = new PlaRomContentsAttr();
+
 	public static PlaRomData getPlaRomData(Instance instance, CircuitState state) {
 		int inputs = instance.getAttributeValue(ATTR_INPUTS);
 		int outputs = instance.getAttributeValue(ATTR_OUTPUTS);
@@ -158,7 +273,8 @@ public class PlaRom extends InstanceFactory {
 	public PlaRom() {
 		super("PlaRom", Strings.getter("PlaRomComponent"));
 		setIconName("plarom.gif");
-		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS }, new Object[] { 4, 4, 4 });
+		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS/*, CONTENTS_ATTR*/ },
+				new Object[] { 4, 4, 4/*, PlaRom.CONTENTS_ATTR*/ });
 		setOffsetBounds(Bounds.create(0, -40, 80, 80));
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
