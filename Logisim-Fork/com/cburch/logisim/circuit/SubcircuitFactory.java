@@ -177,6 +177,7 @@ public class SubcircuitFactory extends InstanceFactory {
 			int x = bds.getX() + bds.getWidth() / 2;
 			int y = bds.getY() + bds.getHeight() / 2;
 			Graphics g = painter.getGraphics().create();
+			g.setColor(staticAttrs.getValue(CircuitAttributes.CIRCUIT_LABEL_COLOR_ATTR));
 			double angle = Math.PI / 2 - (up.toRadians() - defaultFacing.toRadians()) - facing.toRadians();
 			if (g instanceof Graphics2D && Math.abs(angle) > 0.01) {
 				Graphics2D g2 = (Graphics2D) g;
@@ -279,6 +280,7 @@ public class SubcircuitFactory extends InstanceFactory {
 		source.getAppearance().paintSubcircuit(g, facing);
 		drawCircuitLabel(painter, getOffsetBounds(attrs), facing, defaultFacing);
 		g.translate(-loc.getX(), -loc.getY());
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 
