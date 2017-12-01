@@ -36,6 +36,8 @@ This is an italian fork based on the original Logisim version.<br>
 * Anti Aliasing and Look and Feel preference
 * Graphical changes
 * Includes some fix from original early version 2.7.2.255
+## Bugs
+* PLA ROM don't save configurations in .circ
 ## Features we want to add
 * Move to Java 9
 * Solve propagation bugs not solved in the original Logisim
