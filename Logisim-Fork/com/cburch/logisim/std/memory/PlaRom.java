@@ -169,8 +169,9 @@ public class PlaRom extends InstanceFactory {
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == edit) {
 				PlaRomData data = PlaRom.getPlaRomData(instance, circState);
-				PlaRomEditWindow window = data.getWindow();
-				window.setVisible(true);
+				if (data.editWindow() == 1)
+					data.ClearMatrixValues();
+				instance.fireInvalidated();
 			}
 		}
 
@@ -211,8 +212,9 @@ public class PlaRom extends InstanceFactory {
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			if (isPressed && isInside(state, e)) {
 				PlaRomData data = PlaRom.getPlaRomData(state);
-				PlaRomEditWindow window = data.getWindow();
-				window.setVisible(true);
+				if (data.editWindow() == 1)
+					data.ClearMatrixValues();
+				state.fireInvalidated();
 			}
 			isPressed = false;
 		}
@@ -223,7 +225,7 @@ public class PlaRom extends InstanceFactory {
 			Bounds bds = painter.getBounds();
 			g.setFont(new Font("sans serif", Font.BOLD, 11));
 			g.setColor((isPressed) ? Color.LIGHT_GRAY : Color.WHITE);
-			g.fillRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 11, 72, 16);
+			g.fillRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 12, 72, 16);
 			g.setColor(Color.BLACK);
 			g.drawRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 12, 72, 16);
 			GraphicsUtil.drawCenteredText(g, com.cburch.logisim.gui.menu.Strings.get("editMenu"),
@@ -248,7 +250,7 @@ public class PlaRom extends InstanceFactory {
 		int and = instance.getAttributeValue(ATTR_AND);
 		PlaRomData ret = (PlaRomData) instance.getData(state);
 		if (ret == null) {
-			ret = new PlaRomData(inputs, outputs, and, instance);
+			ret = new PlaRomData(inputs, outputs, and);
 			instance.setData(state, ret);
 		} else {
 			ret.updateSize(inputs, outputs, and);
@@ -262,7 +264,7 @@ public class PlaRom extends InstanceFactory {
 		int and = state.getAttributeValue(ATTR_AND);
 		PlaRomData ret = (PlaRomData) state.getData();
 		if (ret == null) {
-			ret = new PlaRomData(inputs, outputs, and, state);
+			ret = new PlaRomData(inputs, outputs, and);
 			state.setData(ret);
 		} else {
 			ret.updateSize(inputs, outputs, and);
@@ -273,8 +275,8 @@ public class PlaRom extends InstanceFactory {
 	public PlaRom() {
 		super("PlaRom", Strings.getter("PlaRomComponent"));
 		setIconName("plarom.gif");
-		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS/*, CONTENTS_ATTR*/ },
-				new Object[] { 4, 4, 4/*, PlaRom.CONTENTS_ATTR*/ });
+		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS/* , CONTENTS_ATTR */ },
+				new Object[] { 4, 4, 4/* , PlaRom.CONTENTS_ATTR */ });
 		setOffsetBounds(Bounds.create(0, -40, 80, 80));
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
@@ -321,17 +323,20 @@ public class PlaRom extends InstanceFactory {
 		painter.drawPort(1);
 		g.setColor(Color.GRAY);
 		painter.drawPort(2, Strings.get("ramClrLabel"), Direction.SOUTH);
-		painter.drawPort(3, Strings.get("memEnableLabel"), Direction.NORTH);
+		painter.drawPort(3, Strings.get("ramCSLabel"), Direction.NORTH);
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
 		PlaRomData data = getPlaRomData(state);
-		PlaRomEditWindow window = data.getWindow();
 		Value clear = state.getPort(2);
 		Value enable = state.getPort(3);
-		if (clear == Value.TRUE)
+		if (clear == Value.TRUE) {
+			data.setClear(true);
 			data.ClearMatrixValues();
+		} else
+			data.setClear(false);
+
 		if (enable != Value.FALSE) {
 			Value[] inputs = state.getPort(0).getAll();
 			for (int i = 0; i < inputs.length / 2; i++) {// reverse array
@@ -341,8 +346,6 @@ public class PlaRom extends InstanceFactory {
 			}
 			data.setInputsValue(inputs);
 		}
-		if (window.getVisible())
-			window.mp.repaint();
 		if (enable != Value.FALSE || clear == Value.TRUE)
 			// update the output port value if is enabled or if clear is true
 			state.setPort(1, Value.create(data.getOutputValues()), Mem.DELAY);
@@ -359,7 +362,7 @@ public class PlaRom extends InstanceFactory {
 		ps[0].setToolTip(Strings.getter("demultiplexerInTip"));
 		ps[1].setToolTip(Strings.getter("multiplexerOutTip"));
 		ps[2].setToolTip(Strings.getter("PlaRomCleartip"));
-		ps[3].setToolTip(Strings.getter("PlaRomEnabletip"));
+		ps[3].setToolTip(Strings.getter("memCSTip"));
 		instance.setPorts(ps);
 	}
 }

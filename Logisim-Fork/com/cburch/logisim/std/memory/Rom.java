@@ -30,7 +30,7 @@ import com.cburch.logisim.proj.Project;
 
 public class Rom extends Mem {
 	private static class ContentsAttribute extends Attribute<MemContents> {
-		ContentsAttribute() {
+		private ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
 		}
 

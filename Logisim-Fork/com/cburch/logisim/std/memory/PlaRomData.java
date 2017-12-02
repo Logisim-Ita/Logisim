@@ -1,43 +1,35 @@
 package com.cburch.logisim.std.memory;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.Arrays;
 
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+
 import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
-import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.util.LocaleManager;
 
 public class PlaRomData implements InstanceData {
 	private int inputs, outputs, and;
+	private boolean clear = false;
 	private boolean[][] InputAnd;
 	private boolean[][] AndOutput;
 	private Value[] InputValue;
 	private Value[] AndValue;
 	private Value[] OutputValue;
-	private PlaRomEditWindow window = null;
+	private String[] options = new String[] { new LocaleManager("resources/logisim", "gui").get("saveOption"),
+			Strings.get("ramClearMenuItem") };
+	private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	private JScrollPane panel;
+	private PlaRomPanel drawing;
 
-	public PlaRomData(int inputs, int outputs, int and, Instance state) {
+	public PlaRomData(int inputs, int outputs, int and) {
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.and = and;
-		if (window == null)
-			window = new PlaRomEditWindow(state, this);
-		InputAnd = new boolean[getAnd()][getInputs() * 2];
-		AndOutput = new boolean[getAnd()][getOutputs()];
-		InputValue = new Value[getInputs()];
-		AndValue = new Value[getAnd()];
-		OutputValue = new Value[getOutputs()];
-		InitializeInputValue();
-		setAndValue();
-		setOutputValue();
-	}
-
-	public PlaRomData(int inputs, int outputs, int and, InstanceState state) {
-		this.inputs = inputs;
-		this.outputs = outputs;
-		this.and = and;
-		if (window == null)
-			window = new PlaRomEditWindow(state, this);
 		InputAnd = new boolean[getAnd()][getInputs() * 2];
 		AndOutput = new boolean[getAnd()][getOutputs()];
 		InputValue = new Value[getInputs()];
@@ -77,6 +69,14 @@ public class PlaRomData implements InstanceData {
 		return this.AndOutput[row][column];
 	}
 
+	public void setClear(boolean b) {
+		this.clear = b;
+	}
+
+	public boolean getClear() {
+		return this.clear;
+	}
+
 	public Value getAndValue(int i) {
 		return AndValue[i];
 	}
@@ -112,8 +112,19 @@ public class PlaRomData implements InstanceData {
 		return this.getInputs() + "x" + this.getAnd() + "x" + this.getOutputs();
 	}
 
-	public PlaRomEditWindow getWindow() {
-		return this.window;
+	public Integer editWindow() {
+		this.drawing = new PlaRomPanel(this);
+		panel = new JScrollPane(this.drawing, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		panel.setBorder(null);
+		if (this.drawing.getPreferredSize().getWidth() >= (int) (screenSize.width * 0.75))
+			panel.setPreferredSize(
+					new Dimension((int) (screenSize.width * 0.75), (int) panel.getPreferredSize().getHeight()));
+		if (this.drawing.getPreferredSize().getHeight() >= (int) (screenSize.height * 0.75))
+			panel.setPreferredSize(
+					new Dimension((int) panel.getPreferredSize().getWidth(), (int) (screenSize.height * 0.75)));
+		return JOptionPane.showOptionDialog(null, panel, Strings.getter("ProgrammableGeneratorComponent").get(),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, this.options, null);
 	}
 
 	private void InitializeInputValue() {
@@ -215,7 +226,6 @@ public class PlaRomData implements InstanceData {
 			InitializeInputValue();
 			setAndValue();
 			setOutputValue();
-			window.UpdateWindow();
 		}
 	}
 }
