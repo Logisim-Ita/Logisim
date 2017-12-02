@@ -23,44 +23,34 @@ import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
 
 public class Analyze {
-	/*private static class ExpressionMap extends HashMap<Location, Expression> {
+	/*
+	 * private static class ExpressionMap extends HashMap<Location, Expression> {
+	 * 
+	 * private static final long serialVersionUID = 1947923788805279096L; private
+	 * Circuit circuit; private Set<Location> dirtyPoints = new HashSet<Location>();
+	 * private Map<Location, Component> causes = new HashMap<Location, Component>();
+	 * private Component currentCause = null;
+	 * 
+	 * ExpressionMap(Circuit circuit) { this.circuit = circuit; }
+	 * 
+	 * @Override public Expression put(Location point, Expression expression) {
+	 * Expression ret = super.put(point, expression); if (currentCause != null)
+	 * causes.put(point, currentCause); if (ret == null ? expression != null :
+	 * !ret.equals(expression)) { dirtyPoints.add(point); } return ret; } }
+	 */
 
-		private static final long serialVersionUID = 1947923788805279096L;
-		private Circuit circuit;
-		private Set<Location> dirtyPoints = new HashSet<Location>();
-		private Map<Location, Component> causes = new HashMap<Location, Component>();
-		private Component currentCause = null;
-
-		ExpressionMap(Circuit circuit) {
-			this.circuit = circuit;
-		}
-
-		@Override
-		public Expression put(Location point, Expression expression) {
-			Expression ret = super.put(point, expression);
-			if (currentCause != null)
-				causes.put(point, currentCause);
-			if (ret == null ? expression != null : !ret.equals(expression)) {
-				dirtyPoints.add(point);
-			}
-			return ret;
-		}
-	}*/
-
-	//private static final int MAX_ITERATIONS = 100;
+	// private static final int MAX_ITERATIONS = 100;
 
 	/**
 	 * Checks whether any of the recently placed expressions in the expression map
 	 * are self-referential; if so, return it.
 	 */
-	/*private static Expression checkForCircularExpressions(ExpressionMap expressionMap) throws AnalyzeException {
-		for (Location point : expressionMap.dirtyPoints) {
-			Expression expr = expressionMap.get(point);
-			if (expr.isCircular())
-				return expr;
-		}
-		return null;
-	}*/
+	/*
+	 * private static Expression checkForCircularExpressions(ExpressionMap
+	 * expressionMap) throws AnalyzeException { for (Location point :
+	 * expressionMap.dirtyPoints) { Expression expr = expressionMap.get(point); if
+	 * (expr.isCircular()) return expr; } return null; }
+	 */
 
 	//
 	// computeExpression
@@ -69,51 +59,41 @@ public class Analyze {
 	 * Computes the expression corresponding to the given circuit, or raises
 	 * ComputeException if difficulties arise.
 	 */
-	/*public static void computeExpression(AnalyzerModel model, Circuit circuit, Map<Instance, String> pinNames)
-			throws AnalyzeException {
-		ExpressionMap expressionMap = new ExpressionMap(circuit);
-
-		ArrayList<String> inputNames = new ArrayList<String>();
-		ArrayList<String> outputNames = new ArrayList<String>();
-		ArrayList<Instance> outputPins = new ArrayList<Instance>();
-		for (Map.Entry<Instance, String> entry : pinNames.entrySet()) {
-			Instance pin = entry.getKey();
-			String label = entry.getValue();
-			if (Pin.FACTORY.isInputPin(pin)) {
-				expressionMap.currentCause = Instance.getComponentFor(pin);
-				Expression e = Expressions.variable(label);
-				expressionMap.put(pin.getLocation(), e);
-				inputNames.add(label);
-			} else {
-				outputPins.add(pin);
-				outputNames.add(label);
-			}
-		}
-
-		propagateComponents(expressionMap, circuit.getNonWires());
-
-		for (int iterations = 0; !expressionMap.dirtyPoints.isEmpty(); iterations++) {
-			if (iterations > MAX_ITERATIONS) {
-				throw new AnalyzeException.Circular();
-			}
-
-			propagateWires(expressionMap, new HashSet<Location>(expressionMap.dirtyPoints));
-
-			HashSet<Component> dirtyComponents = getDirtyComponents(circuit, expressionMap.dirtyPoints);
-			expressionMap.dirtyPoints.clear();
-			propagateComponents(expressionMap, dirtyComponents);
-
-			Expression expr = checkForCircularExpressions(expressionMap);
-			if (expr != null)
-				throw new AnalyzeException.Circular();
-		}
-
-		model.setVariables(inputNames, outputNames);
-		for (int i = 0; i < outputPins.size(); i++) {
-			Instance pin = outputPins.get(i);
-			model.getOutputExpressions().setExpression(outputNames.get(i), expressionMap.get(pin.getLocation()));
-		}
-	}*/
+	/*
+	 * public static void computeExpression(AnalyzerModel model, Circuit circuit,
+	 * Map<Instance, String> pinNames) throws AnalyzeException { ExpressionMap
+	 * expressionMap = new ExpressionMap(circuit);
+	 * 
+	 * ArrayList<String> inputNames = new ArrayList<String>(); ArrayList<String>
+	 * outputNames = new ArrayList<String>(); ArrayList<Instance> outputPins = new
+	 * ArrayList<Instance>(); for (Map.Entry<Instance, String> entry :
+	 * pinNames.entrySet()) { Instance pin = entry.getKey(); String label =
+	 * entry.getValue(); if (Pin.FACTORY.isInputPin(pin)) {
+	 * expressionMap.currentCause = Instance.getComponentFor(pin); Expression e =
+	 * Expressions.variable(label); expressionMap.put(pin.getLocation(), e);
+	 * inputNames.add(label); } else { outputPins.add(pin); outputNames.add(label);
+	 * } }
+	 * 
+	 * propagateComponents(expressionMap, circuit.getNonWires());
+	 * 
+	 * for (int iterations = 0; !expressionMap.dirtyPoints.isEmpty(); iterations++)
+	 * { if (iterations > MAX_ITERATIONS) { throw new AnalyzeException.Circular(); }
+	 * 
+	 * propagateWires(expressionMap, new
+	 * HashSet<Location>(expressionMap.dirtyPoints));
+	 * 
+	 * HashSet<Component> dirtyComponents = getDirtyComponents(circuit,
+	 * expressionMap.dirtyPoints); expressionMap.dirtyPoints.clear();
+	 * propagateComponents(expressionMap, dirtyComponents);
+	 * 
+	 * Expression expr = checkForCircularExpressions(expressionMap); if (expr !=
+	 * null) throw new AnalyzeException.Circular(); }
+	 * 
+	 * model.setVariables(inputNames, outputNames); for (int i = 0; i <
+	 * outputPins.size(); i++) { Instance pin = outputPins.get(i);
+	 * model.getOutputExpressions().setExpression(outputNames.get(i),
+	 * expressionMap.get(pin.getLocation())); } }
+	 */
 
 	//
 	// ComputeTable
@@ -187,17 +167,13 @@ public class Analyze {
 	}
 
 	// computes outputs of affected components
-	/*private static HashSet<Component> getDirtyComponents(Circuit circuit, Set<Location> pointsToProcess)
-			throws AnalyzeException {
-		HashSet<Component> dirtyComponents = new HashSet<Component>();
-		for (Location point : pointsToProcess) {
-			for (Component comp : circuit.getNonWires(point)) {
-				dirtyComponents.add(comp);
-			}
-		}
-		return dirtyComponents;
-	}
-*/
+	/*
+	 * private static HashSet<Component> getDirtyComponents(Circuit circuit,
+	 * Set<Location> pointsToProcess) throws AnalyzeException { HashSet<Component>
+	 * dirtyComponents = new HashSet<Component>(); for (Location point :
+	 * pointsToProcess) { for (Component comp : circuit.getNonWires(point)) {
+	 * dirtyComponents.add(comp); } } return dirtyComponents; }
+	 */
 	//
 	// getPinLabels
 	//
@@ -290,51 +266,33 @@ public class Analyze {
 		return ret;
 	}
 
-	/*private static void propagateComponents(ExpressionMap expressionMap, Collection<Component> components)
-			throws AnalyzeException {
-		for (Component comp : components) {
-			ExpressionComputer computer = (ExpressionComputer) comp.getFeature(ExpressionComputer.class);
-			if (computer != null) {
-				try {
-					expressionMap.currentCause = comp;
-					computer.computeExpression(expressionMap);
-				} catch (UnsupportedOperationException e) {
-					throw new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
-				}
-			}else if (comp.getFactory() instanceof Pin || comp.getFactory() instanceof Text) {
-				; // pins are handled elsewhere
-			} else {
-				// pins are handled elsewhere
-				throw new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
-			}
-		}
-	}*/
+	/*
+	 * private static void propagateComponents(ExpressionMap expressionMap,
+	 * Collection<Component> components) throws AnalyzeException { for (Component
+	 * comp : components) { ExpressionComputer computer = (ExpressionComputer)
+	 * comp.getFeature(ExpressionComputer.class); if (computer != null) { try {
+	 * expressionMap.currentCause = comp; computer.computeExpression(expressionMap);
+	 * } catch (UnsupportedOperationException e) { throw new
+	 * AnalyzeException.CannotHandle(comp.getFactory().getDisplayName()); } }else if
+	 * (comp.getFactory() instanceof Pin || comp.getFactory() instanceof Text) { ;
+	 * // pins are handled elsewhere } else { // pins are handled elsewhere throw
+	 * new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName()); } } }
+	 */
 
 	// propagates expressions down wires
-	/*private static void propagateWires(ExpressionMap expressionMap, HashSet<Location> pointsToProcess)
-			throws AnalyzeException {
-		expressionMap.currentCause = null;
-		for (Location p : pointsToProcess) {
-			Expression e = expressionMap.get(p);
-			expressionMap.currentCause = expressionMap.causes.get(p);
-			WireBundle bundle = expressionMap.circuit.wires.getWireBundle(p);
-			if (e != null && bundle != null && bundle.points != null) {
-				for (Location p2 : bundle.points) {
-					if (p2.equals(p))
-						continue;
-					Expression old = expressionMap.get(p2);
-					if (old != null) {
-						Component eCause = expressionMap.currentCause;
-						Component oldCause = expressionMap.causes.get(p2);
-						if (eCause != oldCause && !old.equals(e)) {
-							throw new AnalyzeException.Conflict();
-						}
-					}
-					expressionMap.put(p2, e);
-				}
-			}
-		}
-	}*/
+	/*
+	 * private static void propagateWires(ExpressionMap expressionMap,
+	 * HashSet<Location> pointsToProcess) throws AnalyzeException {
+	 * expressionMap.currentCause = null; for (Location p : pointsToProcess) {
+	 * Expression e = expressionMap.get(p); expressionMap.currentCause =
+	 * expressionMap.causes.get(p); WireBundle bundle =
+	 * expressionMap.circuit.wires.getWireBundle(p); if (e != null && bundle != null
+	 * && bundle.points != null) { for (Location p2 : bundle.points) { if
+	 * (p2.equals(p)) continue; Expression old = expressionMap.get(p2); if (old !=
+	 * null) { Component eCause = expressionMap.currentCause; Component oldCause =
+	 * expressionMap.causes.get(p2); if (eCause != oldCause && !old.equals(e)) {
+	 * throw new AnalyzeException.Conflict(); } } expressionMap.put(p2, e); } } } }
+	 */
 
 	private static String toValidLabel(String label) {
 		if (label == null)

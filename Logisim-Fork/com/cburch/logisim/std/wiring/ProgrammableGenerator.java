@@ -172,8 +172,10 @@ public class ProgrammableGenerator extends InstanceFactory {
 	public ProgrammableGenerator() {
 		super("ProgrammableGenerator", Strings.getter("ProgrammableGeneratorComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, ATTR_NSTATE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, Integer.valueOf(4), "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
+				new Attribute[] { StdAttr.FACING, ATTR_NSTATE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
+						StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, Integer.valueOf(4), "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
+						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setInstancePoker(ClockPoker.class);

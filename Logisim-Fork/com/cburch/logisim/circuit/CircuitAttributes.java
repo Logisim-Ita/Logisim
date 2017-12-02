@@ -81,13 +81,14 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	public static final Attribute<Color> CIRCUIT_LABEL_COLOR_ATTR = Attributes.forColor("clabelcolor",
 			Strings.getter("circuitLabelColorAttr"));
 	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR,
-			CIRCUIT_LABEL_FONT_ATTR,CIRCUIT_LABEL_COLOR_ATTR };
+			CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR };
 
-	private static final Object[] STATIC_DEFAULTS = { "", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,Color.BLACK };
+	private static final Object[] STATIC_DEFAULTS = { "", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK };
 
-	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays.asList(new Attribute<?>[] { StdAttr.FACING,
-			StdAttr.LABEL, LABEL_LOCATION_ATTR, StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR, CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
-			CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR,CIRCUIT_LABEL_COLOR_ATTR });
+	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays
+			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR, StdAttr.LABEL_FONT,
+					StdAttr.ATTR_LABEL_COLOR, CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
+					CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR });
 
 	static AttributeSet createBaseAttrs(Circuit source, String name) {
 		AttributeSet ret = AttributeSets.fixedSet(STATIC_ATTRS, STATIC_DEFAULTS);
@@ -105,8 +106,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	private Color labelcolor;
 	private MyListener listener;
 	private Instance[] pinInstances;
-	
-	
+
 	public CircuitAttributes(Circuit source) {
 		this.source = source;
 		subcircInstance = null;
@@ -114,7 +114,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		label = "";
 		labelLocation = Direction.NORTH;
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
-		labelcolor= Color.BLACK;
+		labelcolor = Color.BLACK;
 		pinInstances = new Instance[0];
 	}
 
@@ -146,11 +146,11 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			return (E) label;
 		if (attr == StdAttr.LABEL_FONT)
 			return (E) labelFont;
-		if(attr == StdAttr.ATTR_LABEL_COLOR)
+		if (attr == StdAttr.ATTR_LABEL_COLOR)
 			return (E) labelcolor;
 		if (attr == LABEL_LOCATION_ATTR)
 			return (E) labelLocation;
-		
+
 		else
 			return source.getStaticAttributes().getValue(attr);
 	}
@@ -194,9 +194,9 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			Font val = (Font) value;
 			labelFont = val;
 			fireAttributeValueChanged(StdAttr.LABEL_FONT, val);
-		}else if(attr==StdAttr.ATTR_LABEL_COLOR) {
-			Color val=(Color)value;
-			labelcolor=val;
+		} else if (attr == StdAttr.ATTR_LABEL_COLOR) {
+			Color val = (Color) value;
+			labelcolor = val;
 			fireAttributeValueChanged(CIRCUIT_LABEL_COLOR_ATTR, val);
 		} else if (attr == LABEL_LOCATION_ATTR) {
 			Direction val = (Direction) value;

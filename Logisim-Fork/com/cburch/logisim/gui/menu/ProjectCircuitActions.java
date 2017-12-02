@@ -56,16 +56,14 @@ public class ProjectCircuitActions {
 		}
 
 		// Attempt to show the corresponding expression
-		/*try {
-			Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
-			analyzer.setSelectedTab(Analyzer.EXPRESSION_TAB);
-			return;
-		} catch (AnalyzeException ex) {
-			System.out.println(ex.getMessage());
-			//Why this? It always compute the expression
-			JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(), Strings.get("analyzeNoExpressionTitle"),
-					JOptionPane.INFORMATION_MESSAGE);
-		}*/
+		/*
+		 * try { Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
+		 * analyzer.setSelectedTab(Analyzer.EXPRESSION_TAB); return; } catch
+		 * (AnalyzeException ex) { System.out.println(ex.getMessage()); //Why this? It
+		 * always compute the expression JOptionPane.showMessageDialog(proj.getFrame(),
+		 * ex.getMessage(), Strings.get("analyzeNoExpressionTitle"),
+		 * JOptionPane.INFORMATION_MESSAGE); }
+		 */
 
 		// As a backup measure, we compute a truth table.
 		Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);

@@ -22,8 +22,8 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 7182231893518001053L;
-	private PlaRomData data;
 	private static final int IMAGE_BORDER = 20;
+	private PlaRomData data;
 
 	public PlaRomPanel(PlaRomData data) {
 		this.data = data;

@@ -63,9 +63,9 @@ class Buffer extends InstanceFactory {
 		super("Buffer", Strings.getter("bufferComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL,
-						StdAttr.LABEL_FONT,StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, BitWidth.ONE, GateAttributes.OUTPUT_01, "",
-						StdAttr.DEFAULT_LABEL_FONT,Color.BLACK });
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, BitWidth.ONE, GateAttributes.OUTPUT_01, "", StdAttr.DEFAULT_LABEL_FONT,
+						Color.BLACK });
 		setIcon(Icons.getIcon("bufferGate.gif"));
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));

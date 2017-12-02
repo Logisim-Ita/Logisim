@@ -40,6 +40,100 @@ import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class PlaRom extends InstanceFactory {
+	public static class Logger extends InstanceLogger {
+
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			return null;
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			return state.getPort(1);
+		}
+	}
+
+	public static class PlaContentsCell extends JLabel implements MouseListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -53754819096800664L;
+		public static Attribute<MemContents> CONTENTS_ATTR = new PlaRomContentsAttr();
+		Window source;
+
+		MemContents contents;
+
+		PlaContentsCell(Window source, MemContents contents) {
+			super(Strings.get("romContentsValue"));
+			this.source = source;
+			this.contents = contents;
+			addMouseListener(this);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (contents == null)
+				return;
+			Project proj = source instanceof Frame ? ((Frame) source).getProject() : null;
+			HexFrame frame = RomAttributes.getHexFrame(contents, proj);
+			frame.setVisible(true);
+			frame.toFront();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+	}
+
+	private static class PlaMenu implements ActionListener, MenuExtender {
+		private JMenuItem edit;
+		private Instance instance;
+		private CircuitState circState;
+
+		public PlaMenu(Instance instance) {
+			this.instance = instance;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == edit) {
+				PlaRomData data = PlaRom.getPlaRomData(instance, circState);
+				if (data.editWindow() == 1)
+					data.ClearMatrixValues();
+				instance.fireInvalidated();
+			}
+		}
+
+		@Override
+		public void configureMenu(JPopupMenu menu, Project proj) {
+			this.circState = proj.getCircuitState();
+			boolean enabled = circState != null;
+
+			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
+			menu.addSeparator();
+			menu.add(this.edit);
+		}
+
+		private JMenuItem createItem(boolean enabled, String label) {
+			JMenuItem ret = new JMenuItem(label);
+			ret.setEnabled(enabled);
+			ret.addActionListener(this);
+			return ret;
+		}
+	}
+
 	private static class PlaRomContentsAttr extends Attribute<MemContents> {
 		PlaRomContentsAttr() {
 			super("contents", Strings.getter("romContentsAttr"));
@@ -99,100 +193,6 @@ public class PlaRom extends InstanceFactory {
 		}
 	}
 
-	public static class PlaContentsCell extends JLabel implements MouseListener {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -53754819096800664L;
-		Window source;
-		MemContents contents;
-
-		PlaContentsCell(Window source, MemContents contents) {
-			super(Strings.get("romContentsValue"));
-			this.source = source;
-			this.contents = contents;
-			addMouseListener(this);
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if (contents == null)
-				return;
-			Project proj = source instanceof Frame ? ((Frame) source).getProject() : null;
-			HexFrame frame = RomAttributes.getHexFrame(contents, proj);
-			frame.setVisible(true);
-			frame.toFront();
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-		}
-
-		public static Attribute<MemContents> CONTENTS_ATTR = new PlaRomContentsAttr();
-	}
-
-	public static class Logger extends InstanceLogger {
-
-		@Override
-		public String getLogName(InstanceState state, Object option) {
-			return null;
-		}
-
-		@Override
-		public Value getLogValue(InstanceState state, Object option) {
-			return state.getPort(1);
-		}
-	}
-
-	private static class PlaMenu implements ActionListener, MenuExtender {
-		private JMenuItem edit;
-		private Instance instance;
-		private CircuitState circState;
-
-		public PlaMenu(Instance instance) {
-			this.instance = instance;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent evt) {
-			if (evt.getSource() == edit) {
-				PlaRomData data = PlaRom.getPlaRomData(instance, circState);
-				if (data.editWindow() == 1)
-					data.ClearMatrixValues();
-				instance.fireInvalidated();
-			}
-		}
-
-		@Override
-		public void configureMenu(JPopupMenu menu, Project proj) {
-			this.circState = proj.getCircuitState();
-			boolean enabled = circState != null;
-
-			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
-			menu.addSeparator();
-			menu.add(this.edit);
-		}
-
-		private JMenuItem createItem(boolean enabled, String label) {
-			JMenuItem ret = new JMenuItem(label);
-			ret.setEnabled(enabled);
-			ret.addActionListener(this);
-			return ret;
-		}
-	}
-
 	public static class Poker extends InstancePoker {
 		private boolean isPressed = true;
 
@@ -234,13 +234,13 @@ public class PlaRom extends InstanceFactory {
 	}
 
 	private static final Attribute<Integer> ATTR_INPUTS = Attributes.forIntegerRange("inputs",
-			Strings.getter("gateInputsAttr"), 2, 32);
+			Strings.getter("gateInputsAttr"), 1, 32);
 
 	private static final Attribute<Integer> ATTR_AND = Attributes.forIntegerRange("and", Strings.getter("PlaANDAttr"),
-			2, 32);
+			1, 32);
 
 	private static final Attribute<Integer> ATTR_OUTPUTS = Attributes.forIntegerRange("outputs",
-			Strings.getter("PlaOutputsAttr"), 2, 32);
+			Strings.getter("PlaOutputsAttr"), 1, 32);
 
 	public static Attribute<MemContents> CONTENTS_ATTR = new PlaRomContentsAttr();
 
@@ -345,10 +345,9 @@ public class PlaRom extends InstanceFactory {
 				inputs[inputs.length - i - 1] = temp;
 			}
 			data.setInputsValue(inputs);
-		}
-		if (enable != Value.FALSE || clear == Value.TRUE)
-			// update the output port value if is enabled or if clear is true
 			state.setPort(1, Value.create(data.getOutputValues()), Mem.DELAY);
+		}
+
 	}
 
 	private void updateports(Instance instance) {
