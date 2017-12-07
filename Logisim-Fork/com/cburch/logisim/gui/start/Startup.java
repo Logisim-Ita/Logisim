@@ -272,9 +272,13 @@ public class Startup {
 
 	public static void restart() {
 		try {
-			String[] exexute = { "java", "-jar",
-					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-							.getAbsolutePath() };
+			String[] exexute = new String[3 + Main.Args.length];
+			exexute[0] = "java";
+			exexute[1] = "-jar";
+			exexute[2] = new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+					.getAbsolutePath();
+			for (int i = 3; i < exexute.length; i++)
+				exexute[i] = Main.Args[i - 3];
 			Runtime.getRuntime().exec(exexute);
 			System.exit(0);
 		} catch (Exception ex) {

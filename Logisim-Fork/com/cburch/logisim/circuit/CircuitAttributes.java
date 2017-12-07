@@ -20,6 +20,7 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.util.LocaleManager;
 
 public class CircuitAttributes extends AbstractAttributeSet {
 	private class MyListener implements AttributeListener, CircuitAppearanceListener {
@@ -79,7 +80,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 	public static final Attribute<Font> CIRCUIT_LABEL_FONT_ATTR = Attributes.forFont("clabelfont",
 			Strings.getter("circuitLabelFontAttr"));
 	public static final Attribute<Color> CIRCUIT_LABEL_COLOR_ATTR = Attributes.forColor("clabelcolor",
-			Strings.getter("circuitLabelColorAttr"));
+			new LocaleManager("resources/logisim", "std").getter("ioLabelColorAttr"));
 	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR,
 			CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR };
 

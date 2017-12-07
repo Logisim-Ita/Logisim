@@ -160,9 +160,9 @@ public class DipSwitch extends InstanceFactory {
 	public DipSwitch() {
 		super("DipSwitch", Strings.getter("DipSwitchComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES, /* Io.ATTR_COLOR, */ StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES,  Io.ATTR_COLOR,  StdAttr.LABEL, Io.ATTR_LABEL_LOC,
 						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, 4, /* Color.WHITE, */ "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
+				new Object[] { Direction.EAST, 4,  Color.WHITE,  "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("dipswitch.gif");
@@ -265,7 +265,7 @@ public class DipSwitch extends InstanceFactory {
 		pinValues obj = getValueState(painter);
 		Bounds bds = painter.getBounds();
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
-		painter.drawRoundBounds(Color.WHITE);
+		painter.drawRoundBounds(painter.getAttributeValue(Io.ATTR_COLOR));
 
 		int x = bds.getX();
 		int y = bds.getY();

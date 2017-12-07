@@ -23,7 +23,7 @@ class ProbeAttributes extends AbstractAttributeSet {
 
 	Direction facing = Direction.EAST;
 	String label = "";
-	Direction labelloc = Direction.WEST;
+	Direction labelloc = Direction.NORTH;
 	Font labelfont = StdAttr.DEFAULT_LABEL_FONT;
 	RadixOption radix = RadixOption.RADIX_2;
 	BitWidth width = BitWidth.ONE;
