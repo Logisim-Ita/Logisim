@@ -10,6 +10,8 @@
 * Added Label Color Attribute for circuits
 * Added Color attribute for Dip Switch
 * Changed default Label Location Attribute to North
+* Big improvements to Pla Rom
+* Semplified Analyze Circuit code and it doesn't give any error with any component while computing
 * Fixes
   </changelog>
 </logisim>
