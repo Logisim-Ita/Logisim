@@ -2,16 +2,10 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.3.5</jar_version>
+  <jar_version>2.11.3.6</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.3.5</exe_version>
+  <exe_version>2.11.3.6</exe_version>
   <changelog>
-* If you open a file and then reboot for an update, Logisim will reopen that file
-* Added Label Color Attribute for circuits
-* Added Color attribute for Dip Switch
-* Changed default Label Location Attribute to North
-* Big improvements to Pla Rom
-* Semplified Analyze Circuit code and it doesn't give any error with any component while computing
-* Fixes
+* Bug fix
   </changelog>
 </logisim>

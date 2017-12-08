@@ -298,7 +298,7 @@ public class ProjectActions {
 			return false;
 
 		File f = chooser.getSelectedFile();
-		String circExt = chooser.getAcceptAllFileFilter()==Loader.LOGISIM_FILTER ? Loader.LOGISIM_EXTENSION : Loader.LLO_EXTENSION;
+		String circExt = iscirc ? Loader.LOGISIM_EXTENSION : Loader.LLO_EXTENSION;
 		if (!f.getName().endsWith(circExt)) {
 			String old = f.getName();
 			int ext0 = old.lastIndexOf('.');

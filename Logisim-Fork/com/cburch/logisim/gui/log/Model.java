@@ -83,6 +83,11 @@ class Model {
 		return ret;
 	}
 
+	public void clearValueLog(SelectionItem item) {
+		if (selection.indexOf(item) >= 0)
+			log.put(item, new ValueLog());
+	}
+
 	public boolean isFileEnabled() {
 		return fileEnabled;
 	}

@@ -25,6 +25,8 @@ import javax.swing.tree.TreePath;
 class SelectionPanel extends LogPanel {
 	private class Listener extends MouseAdapter
 			implements ActionListener, TreeSelectionListener, ListSelectionListener {
+
+		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
@@ -51,7 +53,6 @@ class SelectionPanel extends LogPanel {
 				doMove(1);
 			} else if (src == remove) {
 				Selection sel = getSelection();
-				@SuppressWarnings("deprecation")
 				Object[] toRemove = list.getSelectedValues();
 				boolean changed = false;
 				for (int i = 0; i < toRemove.length; i++) {
@@ -64,6 +65,10 @@ class SelectionPanel extends LogPanel {
 				if (changed) {
 					list.clearSelection();
 				}
+			} else if (src == clearValues) {
+				Object[] toRemove = list.getSelectedValues();
+				for (int i = 0; i < toRemove.length; i++)
+					doClear(toRemove[i]);
 			}
 		}
 
@@ -74,6 +79,11 @@ class SelectionPanel extends LogPanel {
 			moveUp.setEnabled(index > 0);
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
+			clearValues.setEnabled(index >= 0);
+		}
+
+		private void doClear(Object toClear) {
+			getModel().clearValueLog((SelectionItem) toClear);
 		}
 
 		private void doAdd(List<SelectionItem> selectedItems) {
@@ -131,6 +141,7 @@ class SelectionPanel extends LogPanel {
 	private JButton moveUp;
 	private JButton moveDown;
 	private JButton remove;
+	private JButton clearValues;
 	private SelectionList list;
 
 	public SelectionPanel(LogFrame window) {
@@ -141,21 +152,24 @@ class SelectionPanel extends LogPanel {
 		moveUp = new JButton();
 		moveDown = new JButton();
 		remove = new JButton();
+		clearValues = new JButton();
 		list = new SelectionList();
 		list.setSelection(getSelection());
 
-		JPanel buttons = new JPanel(new GridLayout(5, 1));
+		JPanel buttons = new JPanel(new GridLayout(7, 1));
 		buttons.add(addTool);
 		buttons.add(changeBase);
 		buttons.add(moveUp);
 		buttons.add(moveDown);
 		buttons.add(remove);
+		//buttons.add(clearValues);
 
 		addTool.addActionListener(listener);
 		changeBase.addActionListener(listener);
 		moveUp.addActionListener(listener);
 		moveDown.addActionListener(listener);
 		remove.addActionListener(listener);
+		//clearValues.addActionListener(listener);
 		selector.addMouseListener(listener);
 		selector.addTreeSelectionListener(listener);
 		list.addListSelectionListener(listener);
@@ -201,6 +215,7 @@ class SelectionPanel extends LogPanel {
 		moveUp.setText(Strings.get("selectionMoveUp"));
 		moveDown.setText(Strings.get("selectionMoveDown"));
 		remove.setText(Strings.get("selectionRemove"));
+		clearValues.setText(Strings.get("selectionClearValue"));
 		selector.localeChanged();
 		list.localeChanged();
 	}
