@@ -287,7 +287,7 @@ public class ProjectActions {
 		JFileChooser chooser = loader.createChooser();
 		if (iscirc) {
 			chooser.setFileFilter(Loader.LOGISIM_FILTER);
-			//chooser.addChoosableFileFilter(Loader.LLO_FILTER);
+			// chooser.addChoosableFileFilter(Loader.LLO_FILTER);
 		} else
 			chooser.setFileFilter(Loader.LLO_FILTER);
 		if (loader.getMainFile() != null) {

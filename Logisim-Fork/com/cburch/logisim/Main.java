@@ -37,8 +37,9 @@ public class Main {
 	public static final int COPYRIGHT_YEAR = 2017;
 
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
-	
-	//here will be saved the args so we can use them later in case of reboot when updating
+
+	// here will be saved the args so we can use them later in case of reboot when
+	// updating
 	public static String[] Args;
 	/* URL for the automatic updater */
 

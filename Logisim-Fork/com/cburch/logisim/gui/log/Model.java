@@ -33,6 +33,15 @@ class Model {
 		listeners.add(l);
 	}
 
+	public void clearAllLogs() {
+		log.clear();
+	}
+
+	public void clearValueLog(SelectionItem item) {
+		if (selection.indexOf(item) >= 0)
+			log.put(item, new ValueLog());
+	}
+
 	private void fireEntryAdded(ModelEvent e, Value[] values) {
 		for (ModelListener l : listeners) {
 			l.entryAdded(e, values);
@@ -81,11 +90,6 @@ class Model {
 			log.put(item, ret);
 		}
 		return ret;
-	}
-
-	public void clearValueLog(SelectionItem item) {
-		if (selection.indexOf(item) >= 0)
-			log.put(item, new ValueLog());
 	}
 
 	public boolean isFileEnabled() {

@@ -65,11 +65,13 @@ class SelectionPanel extends LogPanel {
 				if (changed) {
 					list.clearSelection();
 				}
-			} else if (src == clearValues) {
-				Object[] toRemove = list.getSelectedValues();
-				for (int i = 0; i < toRemove.length; i++)
-					doClear(toRemove[i]);
-			}
+			} else if (src == clearComponentLog) {
+				Object[] toClear = list.getSelectedValues();
+				for (int i = 0; i < toClear.length; i++)
+					getModel().clearValueLog((SelectionItem) toClear[i]);
+			} else if (src == clearLog)
+				getModel().clearAllLogs();
+
 		}
 
 		private void computeEnabled() {
@@ -79,11 +81,8 @@ class SelectionPanel extends LogPanel {
 			moveUp.setEnabled(index > 0);
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
-			clearValues.setEnabled(index >= 0);
-		}
-
-		private void doClear(Object toClear) {
-			getModel().clearValueLog((SelectionItem) toClear);
+			clearComponentLog.setEnabled(index >= 0);
+			clearLog.setEnabled(list.getModel().getSize() > 0);
 		}
 
 		private void doAdd(List<SelectionItem> selectedItems) {
@@ -141,7 +140,8 @@ class SelectionPanel extends LogPanel {
 	private JButton moveUp;
 	private JButton moveDown;
 	private JButton remove;
-	private JButton clearValues;
+	private JButton clearComponentLog;
+	private JButton clearLog;
 	private SelectionList list;
 
 	public SelectionPanel(LogFrame window) {
@@ -152,7 +152,8 @@ class SelectionPanel extends LogPanel {
 		moveUp = new JButton();
 		moveDown = new JButton();
 		remove = new JButton();
-		clearValues = new JButton();
+		clearComponentLog = new JButton();
+		clearLog = new JButton();
 		list = new SelectionList();
 		list.setSelection(getSelection());
 
@@ -162,14 +163,16 @@ class SelectionPanel extends LogPanel {
 		buttons.add(moveUp);
 		buttons.add(moveDown);
 		buttons.add(remove);
-		//buttons.add(clearValues);
+		buttons.add(clearComponentLog);
+		buttons.add(clearLog);
 
 		addTool.addActionListener(listener);
 		changeBase.addActionListener(listener);
 		moveUp.addActionListener(listener);
 		moveDown.addActionListener(listener);
 		remove.addActionListener(listener);
-		//clearValues.addActionListener(listener);
+		clearComponentLog.addActionListener(listener);
+		clearLog.addActionListener(listener);
 		selector.addMouseListener(listener);
 		selector.addTreeSelectionListener(listener);
 		list.addListSelectionListener(listener);
@@ -215,7 +218,8 @@ class SelectionPanel extends LogPanel {
 		moveUp.setText(Strings.get("selectionMoveUp"));
 		moveDown.setText(Strings.get("selectionMoveDown"));
 		remove.setText(Strings.get("selectionRemove"));
-		clearValues.setText(Strings.get("selectionClearValue"));
+		clearComponentLog.setText(Strings.get("selectionClearComponentLog"));
+		clearLog.setText(Strings.get("selectionClearLog"));
 		selector.localeChanged();
 		list.localeChanged();
 	}
