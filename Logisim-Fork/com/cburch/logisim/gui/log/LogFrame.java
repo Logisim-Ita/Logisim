@@ -8,7 +8,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,9 +38,10 @@ public class LogFrame extends LFrame {
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
-			if (src == close) {
-				WindowEvent e = new WindowEvent(LogFrame.this, WindowEvent.WINDOW_CLOSING);
-				LogFrame.this.processWindowEvent(e);
+			if (src == clearLog) {
+				getModel().clearAllLogs();
+			} else if (src == removeAll) {
+					getModel().getSelection().removeAll();
 			}
 		}
 
@@ -61,7 +61,8 @@ public class LogFrame extends LFrame {
 				tabbedPane.setToolTipTextAt(i, panels[i].getToolTipText());
 				panels[i].localeChanged();
 			}
-			close.setText(Strings.get("closeButton"));
+			clearLog.setText(Strings.get("clearLogButton"));
+			removeAll.setText(Strings.get("removeAllButton"));
 			windowManager.localeChanged();
 		}
 
@@ -145,7 +146,8 @@ public class LogFrame extends LFrame {
 	private LogPanel[] panels;
 	private JTabbedPane tabbedPane;
 
-	private JButton close = new JButton();
+	private JButton clearLog = new JButton();
+	private JButton removeAll = new JButton();
 
 	public LogFrame(Project project) {
 		this.project = project;
@@ -164,8 +166,10 @@ public class LogFrame extends LFrame {
 		}
 
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(close);
-		close.addActionListener(myListener);
+		buttonPanel.add(clearLog);
+		clearLog.addActionListener(myListener);
+		buttonPanel.add(removeAll);
+		removeAll.addActionListener(myListener);
 
 		Container contents = getContentPane();
 		tabbedPane.setPreferredSize(new Dimension(450, 300));

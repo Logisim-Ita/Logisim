@@ -69,8 +69,7 @@ class SelectionPanel extends LogPanel {
 				Object[] toClear = list.getSelectedValues();
 				for (int i = 0; i < toClear.length; i++)
 					getModel().clearValueLog((SelectionItem) toClear[i]);
-			} else if (src == clearLog)
-				getModel().clearAllLogs();
+			}
 
 		}
 
@@ -82,7 +81,6 @@ class SelectionPanel extends LogPanel {
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
 			clearComponentLog.setEnabled(index >= 0);
-			clearLog.setEnabled(list.getModel().getSize() > 0);
 		}
 
 		private void doAdd(List<SelectionItem> selectedItems) {
@@ -141,7 +139,6 @@ class SelectionPanel extends LogPanel {
 	private JButton moveDown;
 	private JButton remove;
 	private JButton clearComponentLog;
-	private JButton clearLog;
 	private SelectionList list;
 
 	public SelectionPanel(LogFrame window) {
@@ -153,7 +150,6 @@ class SelectionPanel extends LogPanel {
 		moveDown = new JButton();
 		remove = new JButton();
 		clearComponentLog = new JButton();
-		clearLog = new JButton();
 		list = new SelectionList();
 		list.setSelection(getSelection());
 
@@ -164,7 +160,6 @@ class SelectionPanel extends LogPanel {
 		buttons.add(moveDown);
 		buttons.add(remove);
 		buttons.add(clearComponentLog);
-		buttons.add(clearLog);
 
 		addTool.addActionListener(listener);
 		changeBase.addActionListener(listener);
@@ -172,7 +167,6 @@ class SelectionPanel extends LogPanel {
 		moveDown.addActionListener(listener);
 		remove.addActionListener(listener);
 		clearComponentLog.addActionListener(listener);
-		clearLog.addActionListener(listener);
 		selector.addMouseListener(listener);
 		selector.addTreeSelectionListener(listener);
 		list.addListSelectionListener(listener);
@@ -219,7 +213,6 @@ class SelectionPanel extends LogPanel {
 		moveDown.setText(Strings.get("selectionMoveDown"));
 		remove.setText(Strings.get("selectionRemove"));
 		clearComponentLog.setText(Strings.get("selectionClearComponentLog"));
-		clearLog.setText(Strings.get("selectionClearLog"));
 		selector.localeChanged();
 		list.localeChanged();
 	}
