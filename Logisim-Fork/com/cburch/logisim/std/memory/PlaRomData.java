@@ -61,7 +61,7 @@ public class PlaRomData implements InstanceData {
 		}
 	}
 
-	public Integer editWindow() {
+	public int editWindow() {
 		this.drawing = new PlaRomPanel(this);
 		panel = new JScrollPane(this.drawing, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);

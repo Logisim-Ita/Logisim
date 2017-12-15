@@ -48,7 +48,8 @@ class LogThread extends Thread implements ModelListener {
 				for (int i = 0; i < sel.size(); i++) {
 					if (i > 0) {
 						buf.append("  ");
-						int l = (sel.get(i - 1).toString() + "  ").length() - values[i - 1].toString().length();
+						int l = (sel.get(i - 1).toString() + "  ").length()
+								- values[i - 1].toDisplayString(sel.get(i - 1).getRadix()).length();
 						if (l < 2)
 							for (int j = 0; j < (-l + 2); j++)
 								buf.append(" ");
@@ -62,7 +63,8 @@ class LogThread extends Thread implements ModelListener {
 		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < values.length; i++) {
 			if (i > 0) {
-				int l = (sel.get(i - 1).toString() + "  ").length() - values[i - 1].toString().length();
+				int l = (sel.get(i - 1).toString() + "  ").length()
+						- values[i - 1].toDisplayString(sel.get(i - 1).getRadix()).length();
 				if (l > 2)
 					for (int j = 0; j < l; j++)
 						buf.append(" ");

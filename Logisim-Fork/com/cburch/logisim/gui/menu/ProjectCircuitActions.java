@@ -22,6 +22,7 @@ import com.cburch.logisim.analyze.gui.Analyzer;
 import com.cburch.logisim.analyze.gui.AnalyzerManager;
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.circuit.Analyze;
+import com.cburch.logisim.circuit.AnalyzeException;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.file.LogisimFileActions;
 import com.cburch.logisim.instance.Instance;
@@ -56,18 +57,22 @@ public class ProjectCircuitActions {
 		}
 
 		// Attempt to show the corresponding expression
-		/*
-		 * try { Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
-		 * analyzer.setSelectedTab(Analyzer.EXPRESSION_TAB); return; } catch
-		 * (AnalyzeException ex) { System.out.println(ex.getMessage()); //Why this? It
-		 * always compute the expression JOptionPane.showMessageDialog(proj.getFrame(),
-		 * ex.getMessage(), Strings.get("analyzeNoExpressionTitle"),
-		 * JOptionPane.INFORMATION_MESSAGE); }
-		 */
 
-		// As a backup measure, we compute a truth table.
-		Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
-		analyzer.setSelectedTab(Analyzer.TABLE_TAB);
+		try {
+			Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
+		} catch (AnalyzeException ex) {
+			// As a backup measure, we compute a truth table.
+			Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
+
+			/*
+			 * System.out.println(ex.getMessage());
+			 * JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(),
+			 * Strings.get("analyzeNoExpressionTitle"), JOptionPane.INFORMATION_MESSAGE);
+			 */
+		} finally {
+			analyzer.setSelectedTab(Analyzer.TABLE_TAB);
+		}
+
 	}
 
 	public static void doAddCircuit(Project proj) {
