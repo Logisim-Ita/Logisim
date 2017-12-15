@@ -65,6 +65,9 @@ class SelectionPanel extends LogPanel {
 				if (changed) {
 					list.clearSelection();
 				}
+			} else if (src == removeAll) {
+				getModel().getSelection().removeAll();
+				list.clearSelection();
 			} else if (src == clearComponentLog) {
 				Object[] toClear = list.getSelectedValues();
 				for (int i = 0; i < toClear.length; i++)
@@ -80,6 +83,7 @@ class SelectionPanel extends LogPanel {
 			moveUp.setEnabled(index > 0);
 			moveDown.setEnabled(index >= 0 && index < list.getModel().getSize() - 1);
 			remove.setEnabled(index >= 0);
+			removeAll.setEnabled(list.getModel().getSize() > 0);
 			clearComponentLog.setEnabled(index >= 0);
 		}
 
@@ -138,6 +142,7 @@ class SelectionPanel extends LogPanel {
 	private JButton moveUp;
 	private JButton moveDown;
 	private JButton remove;
+	private JButton removeAll;
 	private JButton clearComponentLog;
 	private SelectionList list;
 
@@ -149,6 +154,7 @@ class SelectionPanel extends LogPanel {
 		moveUp = new JButton();
 		moveDown = new JButton();
 		remove = new JButton();
+		removeAll = new JButton();
 		clearComponentLog = new JButton();
 		list = new SelectionList();
 		list.setSelection(getSelection());
@@ -159,6 +165,7 @@ class SelectionPanel extends LogPanel {
 		buttons.add(moveUp);
 		buttons.add(moveDown);
 		buttons.add(remove);
+		buttons.add(removeAll);
 		buttons.add(clearComponentLog);
 
 		addTool.addActionListener(listener);
@@ -166,6 +173,7 @@ class SelectionPanel extends LogPanel {
 		moveUp.addActionListener(listener);
 		moveDown.addActionListener(listener);
 		remove.addActionListener(listener);
+		removeAll.addActionListener(listener);
 		clearComponentLog.addActionListener(listener);
 		selector.addMouseListener(listener);
 		selector.addTreeSelectionListener(listener);
@@ -212,6 +220,7 @@ class SelectionPanel extends LogPanel {
 		moveUp.setText(Strings.get("selectionMoveUp"));
 		moveDown.setText(Strings.get("selectionMoveDown"));
 		remove.setText(Strings.get("selectionRemove"));
+		removeAll.setText(Strings.get("removeAllButton"));
 		clearComponentLog.setText(Strings.get("selectionClearComponentLog"));
 		selector.localeChanged();
 		list.localeChanged();

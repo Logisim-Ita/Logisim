@@ -159,7 +159,9 @@ class TablePanel extends LogPanel {
 			cellWidth = 24;
 			for (int i = 0; i < columns; i++) {
 				String header = sel.get(i).toShortString();
-				cellWidth = Math.max(cellWidth, fm.stringWidth(header));
+				Value value = model.getValueLog(sel.get(i)).get(0);
+				String s = value.toDisplayString(sel.get(i).getRadix());
+				cellWidth = Math.max(Math.max(cellWidth, fm.stringWidth(header)), fm.stringWidth(s));
 			}
 		}
 
