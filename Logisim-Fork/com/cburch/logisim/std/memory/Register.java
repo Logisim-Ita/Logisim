@@ -90,9 +90,6 @@ public class Register extends InstanceFactory {
 
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
-		painter.drawLabel();
-
 		// draw input and output ports
 		if (b == null) {
 			painter.drawPort(IN, "D", Direction.EAST);
@@ -114,6 +111,8 @@ public class Register extends InstanceFactory {
 			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
+		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+		painter.drawLabel();
 	}
 
 	@Override
