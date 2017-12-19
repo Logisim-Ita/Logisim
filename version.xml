@@ -2,10 +2,14 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.3.6</jar_version>
+  <jar_version>2.11.4.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.3.6</exe_version>
+  <exe_version>2.11.4.0</exe_version>
   <changelog>
-* Bug fix
+* Big changes to Log Panel:
+	* Added Remove All and Clear Log buttons
+	* Replaced "Close Window" with another button that cleans the table
+	* Fixed indentation in the table when using more than 5 bit
+	* Fixed indentation in log's file when using radix 10 or 16
   </changelog>
 </logisim>

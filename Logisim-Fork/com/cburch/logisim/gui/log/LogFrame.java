@@ -40,6 +40,7 @@ public class LogFrame extends LFrame {
 			Object src = event.getSource();
 			if (src == clearLog) {
 				getModel().clearAllLogs();
+				getModel().fireSelectionChanged(new ModelEvent());
 			}
 		}
 
@@ -59,7 +60,7 @@ public class LogFrame extends LFrame {
 				tabbedPane.setToolTipTextAt(i, panels[i].getToolTipText());
 				panels[i].localeChanged();
 			}
-			clearLog.setText(Strings.get("clearLogButton"));			
+			clearLog.setText(Strings.get("clearLogButton"));
 			windowManager.localeChanged();
 		}
 
@@ -163,7 +164,7 @@ public class LogFrame extends LFrame {
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(clearLog);
-		clearLog.addActionListener(myListener);				
+		clearLog.addActionListener(myListener);
 
 		Container contents = getContentPane();
 		tabbedPane.setPreferredSize(new Dimension(450, 300));

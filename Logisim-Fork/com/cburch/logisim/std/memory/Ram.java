@@ -148,16 +148,20 @@ public class Ram extends Mem {
 	static final AttributeOption BUS_SEPARATE = new AttributeOption("separate", Strings.getter("ramBusSeparate"));
 	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus", Strings.getter("ramBusAttr"),
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
-	
-	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("ramSelHigh"));
 
-	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("ramSelLow"));
-	
-	static final Attribute<AttributeOption> ATTR_SELECTION=Attributes.forOption("Select", Strings.getter("ramSelAttr"),
-			new AttributeOption[] { SEL_HIGH,SEL_LOW });
-			
-	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS,ATTR_SELECTION };
-	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED,SEL_LOW };
+	/*
+	 * static final AttributeOption SEL_HIGH = new AttributeOption("high",
+	 * Strings.getter("ramSelHigh"));
+	 * 
+	 * static final AttributeOption SEL_LOW = new AttributeOption("low",
+	 * Strings.getter("ramSelLow"));
+	 * 
+	 * static final Attribute<AttributeOption> ATTR_SELECTION =
+	 * Attributes.forOption("Select", Strings.getter("ramSelAttr"), new
+	 * AttributeOption[] { SEL_HIGH, SEL_LOW });
+	 */
+	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS/* , ATTR_SELECTION */ };
+	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED/* , SEL_LOW */ };
 	private static final int OE = MEM_INPUTS + 0;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;

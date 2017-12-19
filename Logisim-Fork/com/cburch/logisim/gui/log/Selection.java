@@ -54,7 +54,7 @@ class Selection {
 
 	public void removeAll() {
 		components.clear();
-		model.fireSelectionChanged(new ModelEvent());		
+		model.fireSelectionChanged(new ModelEvent());
 	}
 
 	public void removeModelListener(ModelListener l) {
