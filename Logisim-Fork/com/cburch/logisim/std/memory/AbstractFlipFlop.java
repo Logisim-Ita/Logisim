@@ -92,10 +92,10 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	// attribute use old ff layout
 	private static final Attribute<Boolean> NEW_FF_LAYOUT = Attributes.forBoolean("NewFFLayout",
 			Strings.getter("NewFFLayout"));
-	private int inputs;
+	private byte inputs;
 	private Attribute<AttributeOption> triggerAttribute;
 
-	protected AbstractFlipFlop(String name, String iconName, StringGetter desc, int numInputs,
+	protected AbstractFlipFlop(String name, String iconName, StringGetter desc, byte numInputs,
 			boolean allowLevelTriggers) {
 		super(name, desc);
 		setIconName(iconName);
@@ -352,11 +352,11 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	private void updateports(Instance instance) {
 		Bounds bds = instance.getBounds();
 		// 0=above/below,1=below/above,2=legacy
-		int prclrpos = instance.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
-				: instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2;
-		int enable = instance.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0;
-		int numInputs = this.inputs;
-		int withclock = instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1;
+		byte prclrpos = (byte) (instance.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
+				: instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2);
+		byte enable = (byte) (instance.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0);
+		byte numInputs =   this.inputs;
+		byte withclock = (byte) (instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1);
 		Boolean newlayout = instance.getAttributeValue(NEW_FF_LAYOUT);
 		Port[] ps = new Port[numInputs + STD_PORTS + withclock + enable];
 		if (numInputs == 1)
