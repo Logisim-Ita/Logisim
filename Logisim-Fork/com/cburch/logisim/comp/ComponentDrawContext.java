@@ -225,7 +225,7 @@ public class ComponentDrawContext {
 	public void drawRoundBounds(Component comp, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
 		Bounds bds = comp.getBounds();
-		if (color != null) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 			g.setColor(color);
 			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 		}

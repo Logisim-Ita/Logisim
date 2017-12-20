@@ -16,7 +16,8 @@ class ForkOptions extends OptionsPanel {
 
 	public ForkOptions(PreferencesFrame frame) {
 		super(frame);
-		checks = new PrefBoolean[] { new PrefBoolean(AppPreferences.ANTI_ALIASING, Strings.getter("AntiAliasing")) };
+		checks = new PrefBoolean[] { new PrefBoolean(AppPreferences.ANTI_ALIASING, Strings.getter("AntiAliasing")),
+				new PrefBoolean(AppPreferences.FILL_COMPONENT_BACKGROUND, Strings.getter("FillComponentBackground")) };
 
 		updates = new PrefOptionList(AppPreferences.AUTO_UPDATES, Strings.getter("AutoUpdates"),
 				new PrefOption[] { new PrefOption(AppPreferences.ALWAYS, Strings.getter("Always")),

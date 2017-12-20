@@ -24,6 +24,7 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.std.plexers.Plexers;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringGetter;
@@ -169,9 +170,14 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 			if (isGhost)
 				return;
-		} else
-			g.drawRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20);
-
+		} else {
+			if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() && !isGhost) {
+				g.setColor(Color.WHITE);
+				g.fillRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
+				g.setColor(Color.BLACK);
+			}
+			g.drawRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
+		}
 		if (!isGhost) {
 			g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
 			if (painter.getShowState()) {

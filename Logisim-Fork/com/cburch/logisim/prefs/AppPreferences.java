@@ -197,6 +197,7 @@ public class AppPreferences {
 					new String[] { ACCEL_DEFAULT, ACCEL_NONE, ACCEL_OPENGL, ACCEL_D3D }, ACCEL_DEFAULT));
 	// fork preferences
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
+	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(new PrefMonitorBoolean("FillComponentBackground", true));
 
 	public static final String ALWAYS = "Always";
 	public static final String ASKME = "Ask Me";

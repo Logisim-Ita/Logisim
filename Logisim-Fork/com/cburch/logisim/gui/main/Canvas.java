@@ -231,7 +231,9 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
-			if (AppPreferences.GATE_SHAPE.isSource(event) || AppPreferences.SHOW_TICK_RATE.isSource(event)) {
+			if (AppPreferences.GATE_SHAPE.isSource(event) || AppPreferences.SHOW_TICK_RATE.isSource(event)
+					|| AppPreferences.ANTI_ALIASING.isSource(event)
+					|| AppPreferences.FILL_COMPONENT_BACKGROUND.isSource(event)) {
 				paintThread.requestRepaint();
 			} else if (AppPreferences.COMPONENT_TIPS.isSource(event)) {
 				boolean showTips = AppPreferences.COMPONENT_TIPS.getBoolean();
@@ -675,6 +677,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		options.addAttributeListener(myProjectListener);
 		AppPreferences.COMPONENT_TIPS.addPropertyChangeListener(myListener);
 		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
+		AppPreferences.ANTI_ALIASING.addPropertyChangeListener(myListener);
+		AppPreferences.FILL_COMPONENT_BACKGROUND.addPropertyChangeListener(myListener);
 		AppPreferences.SHOW_TICK_RATE.addPropertyChangeListener(myListener);
 		AppPreferences.LOOK_AND_FEEL.addPropertyChangeListener(myListener);
 		AppPreferences.GRAPHICS_ACCELERATION.addPropertyChangeListener(myListener);
