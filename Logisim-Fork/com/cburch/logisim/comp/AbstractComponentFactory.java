@@ -46,7 +46,7 @@ public abstract class AbstractComponentFactory implements ComponentFactory {
 		Bounds bds = getOffsetBounds(attrs);
 		g.setColor(color);
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
+		g.drawRoundRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 	}
 
 	@Override

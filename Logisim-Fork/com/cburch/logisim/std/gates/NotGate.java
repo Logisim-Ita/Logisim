@@ -247,12 +247,24 @@ class NotGate extends InstanceFactory {
 	private void paintRectangularBase(Graphics g, InstancePainter painter) {
 		GraphicsUtil.switchToWidth(g, 2);
 		if (painter.getAttributeValue(ATTR_SIZE) == SIZE_NARROW) {
-			g.drawRect(-20, -9, 14, 18);
-			GraphicsUtil.drawCenteredText(g, RECT_LABEL, -13, 0);
+			if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRoundRect(-20, -9, 14, 18, 5, 5);
+				g.fillOval(-6, -3, 6, 6);
+				g.setColor(Color.BLACK);
+			}
+			g.drawRoundRect(-20, -9, 14, 18, 5, 5);
+			GraphicsUtil.drawCenteredText(g, RECT_LABEL, -13, -2);
 			g.drawOval(-6, -3, 6, 6);
 		} else {
-			g.drawRect(-30, -9, 20, 18);
-			GraphicsUtil.drawCenteredText(g, RECT_LABEL, -20, 0);
+			if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRoundRect(-30, -9, 20, 18, 10, 10);
+				g.fillOval(-10, -5, 9, 9);
+				g.setColor(Color.BLACK);
+			}
+			g.drawRoundRect(-30, -9, 20, 18, 10, 10);
+			GraphicsUtil.drawCenteredText(g, RECT_LABEL, -20, -2);
 			g.drawOval(-10, -5, 9, 9);
 		}
 		GraphicsUtil.switchToWidth(g, 1);

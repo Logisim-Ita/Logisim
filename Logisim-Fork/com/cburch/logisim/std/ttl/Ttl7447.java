@@ -13,7 +13,7 @@ public class Ttl7447 extends AbstractTtlGate {
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
-		super.paintBase(painter, true);
+		super.paintBase(painter, true, false);
 		Drawgates.paintPortNames(painter, x, y, height, super.portnames);
 	}
 

@@ -175,7 +175,7 @@ public class Clock extends InstanceFactory {
 		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
-		painter.drawBounds(Color.WHITE);
+		painter.drawRoundBounds(Color.WHITE);
 		GraphicsUtil.switchToWidth(g, 2);
 		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();

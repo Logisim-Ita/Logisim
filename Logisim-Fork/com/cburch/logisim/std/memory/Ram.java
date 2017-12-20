@@ -16,7 +16,6 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.AttributeSets;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
@@ -29,8 +28,6 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
-import com.cburch.logisim.std.io.Io;
-import com.cburch.logisim.std.plexers.Plexers;
 
 public class Ram extends Mem {
 	public static class Logger extends InstanceLogger {

@@ -15,6 +15,7 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public abstract class AbstractTtlGate extends InstanceFactory {
@@ -84,7 +85,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		}
 	}
 
-	protected void paintBase(InstancePainter painter, boolean drawname) {
+	protected void paintBase(InstancePainter painter, boolean drawname, boolean ghost) {
 		Direction dir = painter.getAttributeValue(StdAttr.FACING);
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		Bounds bds = painter.getBounds();
@@ -108,21 +109,58 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					xp = width + x - pinheight;
 				}
 			}
-			if (dir == Direction.WEST || dir == Direction.EAST)
+			if (dir == Direction.WEST || dir == Direction.EAST) {
+				//fill the background of white if selected from preferences
+				if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+					g.setColor(Color.WHITE);
+					g.fillRect(xp, yp, pinwidth, pinheight);
+					g.setColor(Color.BLACK);
+				}
 				g.drawRect(xp, yp, pinwidth, pinheight);
-			else
+			} else {
+				//fill the background of white if selected from preferences
+				if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+					g.setColor(Color.WHITE);
+					g.fillRect(xp, yp, pinwidth, pinheight);
+					g.setColor(Color.BLACK);
+				}
 				g.drawRect(xp, yp, pinheight, pinwidth);
+			}
 		}
 		if (dir == Direction.SOUTH) {
+			//fill the background of white if selected from preferences
+			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+				g.setColor(Color.BLACK);
+			}
 			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
 			g.drawArc(x + width / 2 - 7, y - 7, 14, 14, 180, 180);
 		} else if (dir == Direction.WEST) {
+			//fill the background of white if selected from preferences
+			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+				g.setColor(Color.BLACK);
+			}
 			g.drawRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
 			g.drawArc(x + width - 7, y + height / 2 - 7, 14, 14, 90, 180);
 		} else if (dir == Direction.NORTH) {
+			//fill the background of white if selected from preferences
+			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+				g.setColor(Color.BLACK);
+			}
 			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
 			g.drawArc(x + width / 2 - 7, y + height - 7, 14, 14, 0, 180);
 		} else {// east
+			//fill the background of white if selected from preferences
+			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+				g.setColor(Color.WHITE);
+				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+				g.setColor(Color.BLACK);
+			}
 			g.drawRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
 			g.drawArc(x - 7, y + height / 2 - 7, 14, 14, 270, 180);
 		}
@@ -147,7 +185,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 
 	@Override
 	public void paintGhost(InstancePainter painter) {
-		paintBase(painter, true);
+		paintBase(painter, true, true);
 	}
 
 	@Override
@@ -272,7 +310,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		if (this.ngatestodraw == 0)
 			paintInternal(painter, x, y, height, false);
 		else {
-			paintBase(painter, false);
+			paintBase(painter, false, false);
 			for (int i = 0; i < this.ngatestodraw; i++) {
 				paintInternal(painter,
 						x + (i < this.ngatestodraw / 2 ? i : i - this.ngatestodraw / 2)

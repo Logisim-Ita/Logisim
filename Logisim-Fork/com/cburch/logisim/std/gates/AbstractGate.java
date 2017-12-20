@@ -497,7 +497,7 @@ abstract class AbstractGate extends InstanceFactory {
 	protected void paintRectangular(InstancePainter painter, int width, int height) {
 		int don = negateOutput ? 10 : 0;
 		AttributeSet attrs = painter.getAttributeSet();
-		painter.drawRectangle(-width, -height / 2, width - don, height, getRectangularLabel(attrs));
+		painter.drawRoundRectangle(-width, -height / 2, width - don, height, getRectangularLabel(attrs), Color.WHITE);
 		if (negateOutput) {
 			painter.drawDongle(-5, 0);
 		}

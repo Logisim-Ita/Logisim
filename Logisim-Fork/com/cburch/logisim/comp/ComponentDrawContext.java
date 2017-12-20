@@ -186,17 +186,23 @@ public class ComponentDrawContext {
 
 	public void drawRectangle(Component comp, String label) {
 		Bounds bds = comp.getBounds(g);
-		drawRectangle(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), label);
+		drawRoundRectangle(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), label, Color.WHITE);
 	}
 
 	public void drawRectangle(ComponentFactory source, int x, int y, AttributeSet attrs, String label) {
 		Bounds bds = source.getOffsetBounds(attrs);
-		drawRectangle(source, x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), label);
+		drawRoundRectangle(source, x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), label, Color.WHITE);
 	}
 
-	public void drawRectangle(ComponentFactory source, int x, int y, int width, int height, String label) {
+	public void drawRoundRectangle(ComponentFactory source, int x, int y, int width, int height, String label,
+			Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(x + 1, y + 1, width - 1, height - 1);
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+			g.setColor(color);
+			g.fillRoundRect(x, y, width, height, 10, 10);
+		}
+		g.setColor(Color.BLACK);
+		g.drawRoundRect(x + 1, y + 1, width - 1, height - 1, 10, 10);
 		if (label != null && !label.equals("")) {
 			FontMetrics fm = base.getFontMetrics(g.getFont());
 			int lwid = fm.stringWidth(label);
@@ -208,9 +214,14 @@ public class ComponentDrawContext {
 		}
 	}
 
-	public void drawRectangle(int x, int y, int width, int height, String label) {
+	public void drawRoundRectangle(int x, int y, int width, int height, String label, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(x, y, width, height);
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
+			g.setColor(color);
+			g.fillRoundRect(x, y, width, height, 10, 10);
+		}
+		g.setColor(Color.BLACK);
+		g.drawRoundRect(x, y, width, height, 10, 10);
 		if (label != null && !label.equals("")) {
 			FontMetrics fm = base.getFontMetrics(g.getFont());
 			int lwid = fm.stringWidth(label);

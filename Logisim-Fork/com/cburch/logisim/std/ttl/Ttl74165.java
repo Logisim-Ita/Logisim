@@ -30,7 +30,7 @@ public class Ttl74165 extends AbstractTtlGate {
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
 		Graphics g = painter.getGraphics();
-		super.paintBase(painter, false);
+		super.paintBase(painter, false, false);
 		Drawgates.paintPortNames(painter, x, y, height, new String[] { "ShLd", "CK", "P4", "P5", "P6", "P7", "Q7n",
 				"Q7", "SER", "P0", "P1", "P2", "P3", "CkIh" });
 		ShiftRegisterData data = getData(painter);

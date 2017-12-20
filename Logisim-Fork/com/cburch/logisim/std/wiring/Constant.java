@@ -271,8 +271,8 @@ public class Constant extends InstanceFactory {
 
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
-		g.fillOval(-2, -2, 5, 5);
-		GraphicsUtil.drawCenteredText(g, vStr, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
+		g.fillOval(-2, -2, 4, 4);
+		GraphicsUtil.drawCenteredText(g, vStr, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2 - 2);
 	}
 
 	//
