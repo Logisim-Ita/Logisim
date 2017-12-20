@@ -16,6 +16,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.AttributeSets;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
+import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
@@ -28,6 +29,8 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.std.io.Io;
+import com.cburch.logisim.std.plexers.Plexers;
 
 public class Ram extends Mem {
 	public static class Logger extends InstanceLogger {
@@ -149,19 +152,15 @@ public class Ram extends Mem {
 	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus", Strings.getter("ramBusAttr"),
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
 
-	/*
-	 * static final AttributeOption SEL_HIGH = new AttributeOption("high",
-	 * Strings.getter("ramSelHigh"));
-	 * 
-	 * static final AttributeOption SEL_LOW = new AttributeOption("low",
-	 * Strings.getter("ramSelLow"));
-	 * 
-	 * static final Attribute<AttributeOption> ATTR_SELECTION =
-	 * Attributes.forOption("Select", Strings.getter("ramSelAttr"), new
-	 * AttributeOption[] { SEL_HIGH, SEL_LOW });
-	 */
-	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS/* , ATTR_SELECTION */ };
-	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED/* , SEL_LOW */ };
+	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("ramSelHigh"));
+
+	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("ramSelLow"));
+
+	static final Attribute<AttributeOption> ATTR_SELECTION = Attributes.forOption("Select",
+			Strings.getter("ramSelAttr"), new AttributeOption[] { SEL_HIGH, SEL_LOW });
+
+	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS, ATTR_SELECTION };
+	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED, SEL_LOW };
 	private static final int OE = MEM_INPUTS + 0;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;
@@ -200,8 +199,9 @@ public class Ram extends Mem {
 		else
 			portCount += 3;
 		Port[] ps = new Port[portCount];
-
 		configureStandardPorts(instance, ps);
+		if (instance.getAttributeValue(ATTR_SELECTION) == SEL_HIGH)
+			ps[CS].setToolTip(Strings.getter("selHighTip"));
 		ps[OE] = new Port(-50, 40, Port.INPUT, 1);
 		ps[OE].setToolTip(Strings.getter("ramOETip"));
 		ps[CLR] = new Port(-30, 40, Port.INPUT, 1);
@@ -269,6 +269,7 @@ public class Ram extends Mem {
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		super.instanceAttributeChanged(instance, attr);
 		configurePorts(instance);
+		instance.fireInvalidated();
 	}
 
 	@Override
@@ -299,7 +300,9 @@ public class Ram extends Mem {
 		boolean separate = busVal == null ? false : busVal.equals(BUS_SEPARATE);
 
 		Value addrValue = state.getPort(ADDR);
-		boolean chipSelect = state.getPort(CS) != Value.FALSE;
+		boolean selection = state.getAttributeValue(ATTR_SELECTION) == SEL_HIGH;
+		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
+				|| (state.getPort(CS) == Value.FALSE && selection == false);
 		boolean triggered = asynch || myState.setClock(state.getPort(CLK), StdAttr.TRIG_RISING);
 		boolean outputEnabled = state.getPort(OE) != Value.FALSE;
 		boolean shouldClear = state.getPort(CLR) == Value.TRUE;
