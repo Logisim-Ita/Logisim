@@ -1,4 +1,4 @@
-/* Copyright (c) 2010, Carl Burch. License information is located in the
+/* Copyright (c) 2017, Andrea Sanguineti. License information is located in the
  * com.cburch.logisim.Main source code and at www.cburch.com/logisim/. */
 
 package com.cburch.logisim.std.io;
@@ -36,7 +36,7 @@ public class Switch extends InstanceFactory {
 
 		@Override
 		public Value getLogValue(InstanceState state, Object option) {
-			return state.getPort(0);
+			return state.getPort(1);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class Switch extends InstanceFactory {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-			if (data != null && (boolean) data.getValue())
+			if (data != null && (Boolean) data.getValue())
 				setActive(state, false);
 			else
 				setActive(state, true);
@@ -151,11 +151,13 @@ public class Switch extends InstanceFactory {
 		int[] yp;
 		int[] xr;
 		int[] yr;
-		Object facing = painter.getAttributeValue(StdAttr.FACING);
+		Direction facing = painter.getAttributeValue(StdAttr.FACING);
+		// draw the first port here because it has to be under the drawing
+		painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 0 : 1));
 		boolean active;
 		if (painter.getShowState()) {
 			InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
-			active = data == null ? false : (boolean) data.getValue();
+			active = data == null ? false : (Boolean) data.getValue();
 		} else {
 			active = false;
 		}
@@ -261,13 +263,14 @@ public class Switch extends InstanceFactory {
 
 		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
-		painter.drawPorts();
+		painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 1 : 0));
+
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
 		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-		Value val = (data == null || (boolean)data.getValue()==false) ? Value.UNKNOWN : state.getPort(0);
+		Value val = (data == null || !(Boolean) data.getValue()) ? Value.UNKNOWN : state.getPort(0);
 		state.setPort(1, val, 1);
 	}
 

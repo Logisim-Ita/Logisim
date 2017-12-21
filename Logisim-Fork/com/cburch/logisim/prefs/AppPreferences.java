@@ -27,7 +27,6 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.util.LocaleListener;
 import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.PropertyChangeWeakSupport;
-import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 public class AppPreferences {
 	//
@@ -197,7 +196,8 @@ public class AppPreferences {
 					new String[] { ACCEL_DEFAULT, ACCEL_NONE, ACCEL_OPENGL, ACCEL_D3D }, ACCEL_DEFAULT));
 	// fork preferences
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
-	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(new PrefMonitorBoolean("FillComponentBackground", true));
+	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(
+			new PrefMonitorBoolean("FillComponentBackground", true));
 
 	public static final String ALWAYS = "Always";
 	public static final String ASKME = "Ask Me";
@@ -206,7 +206,6 @@ public class AppPreferences {
 			new PrefMonitorStringOpts("AutoUpdates", new String[] { ALWAYS, ASKME, NO }, ASKME));
 	public static final String SYSTEM = UIManager.getSystemLookAndFeelClassName();
 	public static final String NIMBUS = NimbusLookAndFeel.class.getName();
-	public static final String MOTIF = MotifLookAndFeel.class.getName();
 	public static final String METAL = MetalLookAndFeel.class.getName();
 	public static final PrefMonitor<String> LOOK_AND_FEEL = create(
 			new PrefMonitorStringOpts("lookAndFeel", new String[] { SYSTEM, NIMBUS, /* MOTIF, */ METAL }, SYSTEM));

@@ -17,9 +17,7 @@ import javax.swing.JLabel;
 
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.gui.hex.HexFile;
@@ -104,9 +102,7 @@ public class Rom extends Mem {
 			this.contents = contents;
 			addMouseListener(this);
 		}
-		
-		
-		
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (contents == null)
@@ -135,8 +131,7 @@ public class Rom extends Mem {
 	}
 
 	public static Attribute<MemContents> CONTENTS_ATTR = new ContentsAttribute();
-	
-	
+
 	// The following is so that instance's MemListeners aren't freed by the
 	// garbage collector until the instance itself is ready to be freed.
 	private WeakHashMap<Instance, MemListener> memListeners;
@@ -155,13 +150,14 @@ public class Rom extends Mem {
 		memListeners.put(instance, listener);
 		contents.addHexModelListener(listener);
 	}
+
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		super.instanceAttributeChanged(instance, attr);
 		configurePorts(instance);
 		instance.fireInvalidated();
 	}
-	
+
 	@Override
 	void configurePorts(Instance instance) {
 		Port[] ps = new Port[MEM_INPUTS];
@@ -169,7 +165,7 @@ public class Rom extends Mem {
 		if (instance.getAttributeValue(ATTR_SELECTION) == SEL_HIGH)
 			ps[CS].setToolTip(Strings.getter("selHighTip"));
 		instance.setPorts(ps);
-		
+
 	}
 
 	@Override
@@ -213,7 +209,7 @@ public class Rom extends Mem {
 	public void propagate(InstanceState state) {
 		MemState myState = getState(state);
 		BitWidth dataBits = state.getAttributeValue(DATA_ATTR);
-		
+
 		Value addrValue = state.getPort(ADDR);
 		boolean selection = state.getAttributeValue(ATTR_SELECTION) == SEL_HIGH;
 		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
