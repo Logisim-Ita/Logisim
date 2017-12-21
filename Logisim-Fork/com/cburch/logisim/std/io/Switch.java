@@ -138,8 +138,7 @@ public class Switch extends InstanceFactory {
 		}
 	}
 
-	@Override
-	public void paintInstance(InstancePainter painter) {
+	private void paint(InstancePainter painter, boolean ghost) {
 		// draw
 		Bounds bds = painter.getBounds();
 		int x = bds.getX(); // x position
@@ -152,14 +151,13 @@ public class Switch extends InstanceFactory {
 		int[] xr;
 		int[] yr;
 		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-		// draw the first port here because it has to be under the drawing
-		painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 0 : 1));
-		boolean active;
-		if (painter.getShowState()) {
+		if (!ghost)
+			// draw the first port here because it has to be under the drawing
+			painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 0 : 1));
+		boolean active = false;
+		if (painter.getShowState() && !ghost) {
 			InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
 			active = data == null ? false : (Boolean) data.getValue();
-		} else {
-			active = false;
 		}
 
 		Color color = painter.getAttributeValue(Io.ATTR_COLOR);
@@ -200,11 +198,13 @@ public class Switch extends InstanceFactory {
 				xr = new int[] { x, x + w - DEPTH, x + w, x + DEPTH };
 				yr = new int[] { y + DEPTH, y + DEPTH, y + h, y + h };
 			}
-			g.setColor(color.darker());
-			g.fillPolygon(xp, yp, xp.length);
-			g.setColor(color);
-			g.fillPolygon(xr, yr, xr.length);
-			g.setColor(Color.BLACK);
+			if (!ghost) {
+				g.setColor(color.darker());
+				g.fillPolygon(xp, yp, xp.length);
+				g.setColor(color);
+				g.fillPolygon(xr, yr, xr.length);
+				g.setColor(Color.BLACK);
+			}
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
@@ -235,11 +235,13 @@ public class Switch extends InstanceFactory {
 				xr = new int[] { x + DEPTH, x + w, x + w - DEPTH, x };
 				yr = new int[] { y, y, y + h - DEPTH, y + h - DEPTH };
 			}
-			g.setColor(color.darker());
-			g.fillPolygon(xp, yp, xp.length);
-			g.setColor(color);
-			g.fillPolygon(xr, yr, xr.length);
-			g.setColor(Color.BLACK);
+			if (!ghost) {
+				g.setColor(color.darker());
+				g.fillPolygon(xp, yp, xp.length);
+				g.setColor(color);
+				g.fillPolygon(xr, yr, xr.length);
+				g.setColor(Color.BLACK);
+			}
 			g.drawPolygon(xp, yp, xp.length);
 			g.drawPolygon(xr, yr, xr.length);
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
@@ -260,11 +262,21 @@ public class Switch extends InstanceFactory {
 						circle - 1, circle);
 			}
 		}
+		if (!ghost) {
+			g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
+			painter.drawLabel();
+			painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 1 : 0));
+		}
+	}
 
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
-		painter.drawLabel();
-		painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 1 : 0));
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paint(painter, true);
+	}
 
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		paint(painter, false);
 	}
 
 	@Override

@@ -4,6 +4,7 @@
 package com.cburch.logisim.file;
 
 import java.util.Collections;
+import java.util.List;
 
 class XmlReaderException extends Exception {
 	/**
