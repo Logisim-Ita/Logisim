@@ -167,9 +167,11 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		GraphicsUtil.switchToWidth(g, 2);
 
 		if (!newlayout) {
-			g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
-			if (isGhost)
+			if (isGhost) {
+				super.paintGhost(painter);
 				return;
+			} else
+				painter.drawRoundBounds(Color.WHITE);
 		} else {
 			if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() && !isGhost) {
 				g.setColor(Color.WHITE);
@@ -355,7 +357,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		byte prclrpos = (byte) (instance.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
 				: instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2);
 		byte enable = (byte) (instance.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0);
-		byte numInputs =   this.inputs;
+		byte numInputs = this.inputs;
 		byte withclock = (byte) (instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1);
 		Boolean newlayout = instance.getAttributeValue(NEW_FF_LAYOUT);
 		Port[] ps = new Port[numInputs + STD_PORTS + withclock + enable];

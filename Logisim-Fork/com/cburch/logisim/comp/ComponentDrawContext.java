@@ -58,7 +58,7 @@ public class ComponentDrawContext {
 	public void drawBounds(Component comp, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
 		Bounds bds = comp.getBounds();
-		if (color != null) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 			g.setColor(color);
 			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 		}

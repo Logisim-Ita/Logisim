@@ -146,11 +146,11 @@ public class DigitalOscilloscope extends InstanceFactory {
 		DiagramState diagramstate = getDiagramState(painter);
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		// draw border
-		painter.drawRoundBounds(painter.getAttributeValue(ATTR_COLOR));
+		g.setColor(painter.getAttributeValue(ATTR_COLOR));
+		g.fillRoundRect(x, y, width, height, border / 2, border / 2);
 		// draw white space
 		g.setColor(new Color(250, 250, 250));
 		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
-
 		// draw clock edge lines if not disabled
 		if (painter.getAttributeValue(VERT_LINE) != NO) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());

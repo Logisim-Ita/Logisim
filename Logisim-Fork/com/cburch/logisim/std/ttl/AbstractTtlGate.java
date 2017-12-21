@@ -110,7 +110,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				}
 			}
 			if (dir == Direction.WEST || dir == Direction.EAST) {
-				//fill the background of white if selected from preferences
+				// fill the background of white if selected from preferences
 				if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 					g.setColor(Color.WHITE);
 					g.fillRect(xp, yp, pinwidth, pinheight);
@@ -118,7 +118,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				}
 				g.drawRect(xp, yp, pinwidth, pinheight);
 			} else {
-				//fill the background of white if selected from preferences
+				// fill the background of white if selected from preferences
 				if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 					g.setColor(Color.WHITE);
 					g.fillRect(xp, yp, pinwidth, pinheight);
@@ -128,7 +128,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			}
 		}
 		if (dir == Direction.SOUTH) {
-			//fill the background of white if selected from preferences
+			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
 				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
@@ -137,7 +137,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
 			g.drawArc(x + width / 2 - 7, y - 7, 14, 14, 180, 180);
 		} else if (dir == Direction.WEST) {
-			//fill the background of white if selected from preferences
+			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
 				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
@@ -146,7 +146,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			g.drawRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
 			g.drawArc(x + width - 7, y + height / 2 - 7, 14, 14, 90, 180);
 		} else if (dir == Direction.NORTH) {
-			//fill the background of white if selected from preferences
+			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
 				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
@@ -155,7 +155,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
 			g.drawArc(x + width / 2 - 7, y + height - 7, 14, 14, 0, 180);
 		} else {// east
-			//fill the background of white if selected from preferences
+			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
 				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
@@ -207,24 +207,22 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				if (i == this.pinnumber / 2) {
 					xp = x;
 					yp = y;
-					g.setColor(Color.DARK_GRAY);
 					if (dir == Direction.WEST || dir == Direction.EAST) {
-						g.fillRect(xp, yp + pinheight, width, height - pinheight * 2 - 2);
+						g.setColor(Color.DARK_GRAY.darker());
+						g.fillRoundRect(xp, yp + pinheight, width, height - pinheight * 2 + 2, 10, 10);
+						g.setColor(Color.DARK_GRAY);
+						g.fillRoundRect(xp, yp + pinheight, width, height - pinheight * 2 - 2, 10, 10);
 						g.setColor(Color.BLACK);
-						g.drawRect(xp, yp + pinheight, width, height - pinheight * 2 - 2);
+						g.drawRoundRect(xp, yp + pinheight, width, height - pinheight * 2 - 2, 10, 10);
+						g.drawRoundRect(xp, yp + pinheight, width, height - pinheight * 2 + 2, 10, 10);
 					} else {
-						g.fillRect(xp + pinheight, yp, width - pinheight * 2, height - 4);
 						g.setColor(Color.DARK_GRAY.darker());
-						g.fillRect(xp + pinheight, yp + height - 4, width - pinheight * 2, 4);
+						g.fillRoundRect(xp + pinheight, yp, width - pinheight * 2, height, 10, 10);
+						g.setColor(Color.DARK_GRAY);
+						g.fillRoundRect(xp + pinheight, yp, width - pinheight * 2, height - 4, 10, 10);
 						g.setColor(Color.BLACK);
-						g.drawRect(xp + pinheight, yp, width - pinheight * 2, height - 4);
-						g.drawRect(xp + pinheight, yp + height - 4, width - pinheight * 2, 4);
-					}
-					if (dir == Direction.WEST || dir == Direction.EAST) {
-						g.setColor(Color.DARK_GRAY.darker());
-						g.fillRect(xp, yp + height - pinheight - 2, width, 4);
-						g.setColor(Color.BLACK);
-						g.drawRect(xp, yp + height - pinheight - 2, width, 4);
+						g.drawRoundRect(xp + pinheight, yp, width - pinheight * 2, height - 4, 10, 10);
+						g.drawRoundRect(xp + pinheight, yp, width - pinheight * 2, height, 10, 10);
 					}
 					if (dir == Direction.SOUTH)
 						g.fillArc(xp + width / 2 - 7, yp - 7, 14, 14, 180, 180);

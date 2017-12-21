@@ -43,15 +43,19 @@ public class Switch extends InstanceFactory {
 	public static class Poker extends InstancePoker {
 		@Override
 		public void mouseReleased(InstanceState state, MouseEvent e) {
-			setValue(state, state.getPort(0).not());// opposite value
+			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
+			if (data != null && (boolean) data.getValue())
+				setActive(state, false);
+			else
+				setActive(state, true);
 		}
 
-		private void setValue(InstanceState state, Value val) {
+		private void setActive(InstanceState state, boolean active) {
 			InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
 			if (data == null) {
-				state.setData(new InstanceDataSingleton(val));
+				state.setData(new InstanceDataSingleton(active));
 			} else {
-				data.setValue(val);
+				data.setValue(active);
 			}
 			state.getInstance().fireInvalidated();
 		}
@@ -68,7 +72,6 @@ public class Switch extends InstanceFactory {
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("switch.gif");
-		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
 	}
@@ -115,6 +118,7 @@ public class Switch extends InstanceFactory {
 	protected void configureNewInstance(Instance instance) {
 		instance.addAttributeListener();
 		computeTextField(instance);
+		updateports(instance);
 	}
 
 	@Override
@@ -128,6 +132,7 @@ public class Switch extends InstanceFactory {
 		if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			computeTextField(instance);
+			updateports(instance);
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
 		}
@@ -147,12 +152,12 @@ public class Switch extends InstanceFactory {
 		int[] xr;
 		int[] yr;
 		Object facing = painter.getAttributeValue(StdAttr.FACING);
-		Value val;
+		boolean active;
 		if (painter.getShowState()) {
 			InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
-			val = data == null ? Value.FALSE : (Value) data.getValue();
+			active = data == null ? false : (boolean) data.getValue();
 		} else {
-			val = Value.FALSE;
+			active = false;
 		}
 
 		Color color = painter.getAttributeValue(Io.ATTR_COLOR);
@@ -163,7 +168,7 @@ public class Switch extends InstanceFactory {
 
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		if (val == Value.TRUE) { // case true output
+		if (active) { // case true output
 			if (facing == Direction.NORTH || facing == Direction.WEST) {
 				Location p = painter.getLocation();
 				int px = p.getX();
@@ -262,7 +267,19 @@ public class Switch extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-		Value val = data == null ? Value.FALSE : (Value) data.getValue();
-		state.setPort(0, val, 1);
+		Value val = (data == null || (boolean)data.getValue()==false) ? Value.UNKNOWN : state.getPort(0);
+		state.setPort(1, val, 1);
+	}
+
+	private void updateports(Instance instance) {
+		Port[] ps = new Port[2];
+		Direction dir = instance.getAttributeValue(StdAttr.FACING);
+		ps[0] = dir == Direction.EAST ? new Port(-20, 0, Port.INPUT, 1)
+				: dir == Direction.WEST ? new Port(20, 0, Port.INPUT, 1)
+						: dir == Direction.NORTH ? new Port(0, 20, Port.INPUT, 1) : new Port(0, -20, Port.INPUT, 1);
+		ps[0].setToolTip(Strings.getter("pinInputName"));
+		ps[1] = new Port(0, 0, Port.OUTPUT, 1);
+		ps[1].setToolTip(Strings.getter("pinOutputName"));
+		instance.setPorts(ps);
 	}
 }

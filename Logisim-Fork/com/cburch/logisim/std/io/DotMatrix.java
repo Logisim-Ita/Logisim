@@ -249,7 +249,10 @@ public class DotMatrix extends InstanceFactory {
 		}
 		g.setColor(Color.BLACK);
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
+		if (drawSquare)
+			painter.drawBounds(null);
+		else
+			painter.drawRoundBounds(null);
 		GraphicsUtil.switchToWidth(g, 1);
 		painter.drawPorts();
 	}
