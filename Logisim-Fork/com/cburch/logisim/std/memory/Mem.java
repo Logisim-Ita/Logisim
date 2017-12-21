@@ -13,6 +13,7 @@ import com.cburch.hex.HexModel;
 import com.cburch.hex.HexModelListener;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
@@ -68,6 +69,12 @@ abstract class Mem extends InstanceFactory {
 
 	public static final Attribute<BitWidth> DATA_ATTR = Attributes.forBitWidth("dataWidth",
 			Strings.getter("ramDataWidthAttr"));
+	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("ramSelHigh"));
+
+	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("ramSelLow"));
+
+	static final Attribute<AttributeOption> ATTR_SELECTION = Attributes.forOption("Select",
+			Strings.getter("ramSelAttr"), new AttributeOption[] { SEL_HIGH, SEL_LOW });
 	// port-related constants
 	static final int DATA = 0;
 	static final int ADDR = 1;

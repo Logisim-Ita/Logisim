@@ -9,13 +9,16 @@ import java.util.WeakHashMap;
 
 import com.cburch.logisim.data.AbstractAttributeSet;
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
+import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.gui.hex.HexFrame;
 import com.cburch.logisim.proj.Project;
 
 class RomAttributes extends AbstractAttributeSet {
+	
 	private static List<Attribute<?>> ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { Mem.ADDR_ATTR, Mem.DATA_ATTR, Rom.CONTENTS_ATTR });
+			.asList(new Attribute<?>[] { Mem.ADDR_ATTR, Mem.DATA_ATTR, Rom.CONTENTS_ATTR, Mem.ATTR_SELECTION});
 
 	private static WeakHashMap<MemContents, RomContentsListener> listenerRegistry = new WeakHashMap<MemContents, RomContentsListener>();
 	private static WeakHashMap<MemContents, HexFrame> windowRegistry = new WeakHashMap<MemContents, HexFrame>();
@@ -42,6 +45,7 @@ class RomAttributes extends AbstractAttributeSet {
 	private BitWidth addrBits = BitWidth.create(8);
 	private BitWidth dataBits = BitWidth.create(8);
 	private MemContents contents;
+	AttributeOption sel=Mem.SEL_LOW;
 
 	RomAttributes() {
 		contents = MemContents.create(addrBits.getWidth(), dataBits.getWidth());
@@ -53,6 +57,7 @@ class RomAttributes extends AbstractAttributeSet {
 		d.addrBits = addrBits;
 		d.dataBits = dataBits;
 		d.contents = contents.clone();
+		d.sel=sel;
 	}
 
 	@Override
@@ -68,6 +73,8 @@ class RomAttributes extends AbstractAttributeSet {
 			return (V) dataBits;
 		if (attr == Rom.CONTENTS_ATTR)
 			return (V) contents;
+		if (attr == Mem.ATTR_SELECTION)
+			return (V) sel;
 		return null;
 	}
 
@@ -85,6 +92,8 @@ class RomAttributes extends AbstractAttributeSet {
 			contents.setDimensions(addrBits.getWidth(), dataBits.getWidth());
 		} else if (attr == Rom.CONTENTS_ATTR) {
 			contents = (MemContents) value;
+		} else if(attr==Mem.ATTR_SELECTION) {
+			sel=(AttributeOption)value;
 		}
 		fireAttributeValueChanged(attr, value);
 	}
