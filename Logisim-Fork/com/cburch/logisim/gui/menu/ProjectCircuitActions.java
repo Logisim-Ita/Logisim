@@ -22,7 +22,6 @@ import com.cburch.logisim.analyze.gui.Analyzer;
 import com.cburch.logisim.analyze.gui.AnalyzerManager;
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.circuit.Analyze;
-import com.cburch.logisim.circuit.AnalyzeException;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.file.LogisimFileActions;
 import com.cburch.logisim.instance.Instance;
@@ -57,8 +56,10 @@ public class ProjectCircuitActions {
 		}
 
 		// Attempt to show the corresponding expression
-
-		try {
+		Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
+		analyzer.setSelectedTab(Analyzer.TABLE_TAB);
+		// nothing to do, stupid useless code
+		/*try {
 			Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
 		} catch (AnalyzeException ex) {
 			// As a backup measure, we compute a truth table.
@@ -69,10 +70,10 @@ public class ProjectCircuitActions {
 			 * JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(),
 			 * Strings.get("analyzeNoExpressionTitle"), JOptionPane.INFORMATION_MESSAGE);
 			 */
-		} finally {
+		/*} finally {
 			analyzer.setSelectedTab(Analyzer.TABLE_TAB);
 		}
-
+*/
 	}
 
 	public static void doAddCircuit(Project proj) {

@@ -4,21 +4,15 @@
 package com.cburch.logisim.circuit;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.analyze.model.Entry;
-import com.cburch.logisim.analyze.model.Expression;
-import com.cburch.logisim.analyze.model.Expressions;
 import com.cburch.logisim.analyze.model.TruthTable;
-import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
@@ -26,12 +20,11 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
-import com.cburch.logisim.std.base.Text;
 import com.cburch.logisim.std.wiring.Pin;
 
 public class Analyze {
 
-	private static class ExpressionMap extends HashMap<Location, Expression> {
+	/*private static class ExpressionMap extends HashMap<Location, Expression> {
 
 		private static final long serialVersionUID = 1947923788805279096L;
 		private Circuit circuit;
@@ -55,21 +48,21 @@ public class Analyze {
 		}
 	}
 
-	private static final int MAX_ITERATIONS = 100;
+	//private static final int MAX_ITERATIONS = 100;
 
 	/**
 	 * Checks whether any of the recently placed expressions in the expression map
 	 * are self-referential; if so, return it.
 	 */
 
-	private static Expression checkForCircularExpressions(ExpressionMap expressionMap) throws AnalyzeException {
+	/*private static Expression checkForCircularExpressions(ExpressionMap expressionMap) throws AnalyzeException {
 		for (Location point : expressionMap.dirtyPoints) {
 			Expression expr = expressionMap.get(point);
 			if (expr.isCircular())
 				return expr;
 		}
 		return null;
-	}
+	}*/
 
 	//
 	// computeExpression
@@ -79,7 +72,7 @@ public class Analyze {
 	 * ComputeException if difficulties arise.
 	 */
 
-	public static void computeExpression(AnalyzerModel model, Circuit circuit, Map<Instance, String> pinNames)
+	/*public static void computeExpression(AnalyzerModel model, Circuit circuit, Map<Instance, String> pinNames)
 			throws AnalyzeException {
 		ExpressionMap expressionMap = new ExpressionMap(circuit);
 
@@ -123,7 +116,7 @@ public class Analyze {
 			Instance pin = outputPins.get(i);
 			model.getOutputExpressions().setExpression(outputNames.get(i), expressionMap.get(pin.getLocation()));
 		}
-	}
+	}*/
 
 	//
 	// ComputeTable
@@ -198,7 +191,7 @@ public class Analyze {
 
 	// computes outputs of affected components
 
-	private static HashSet<Component> getDirtyComponents(Circuit circuit, Set<Location> pointsToProcess)
+	/*private static HashSet<Component> getDirtyComponents(Circuit circuit, Set<Location> pointsToProcess)
 			throws AnalyzeException {
 		HashSet<Component> dirtyComponents = new HashSet<Component>();
 		for (Location point : pointsToProcess) {
@@ -207,7 +200,7 @@ public class Analyze {
 			}
 		}
 		return dirtyComponents;
-	}
+	}*/
 
 	//
 	// getPinLabels
@@ -301,7 +294,7 @@ public class Analyze {
 		return ret;
 	}
 
-	private static void propagateComponents(ExpressionMap expressionMap, Collection<Component> components)
+	/*private static void propagateComponents(ExpressionMap expressionMap, Collection<Component> components)
 			throws AnalyzeException {
 		for (Component comp : components) {
 			ExpressionComputer computer = (ExpressionComputer) comp.getFeature(ExpressionComputer.class);
@@ -318,11 +311,11 @@ public class Analyze {
 				new AnalyzeException.CannotHandle(comp.getFactory().getDisplayName());
 			}
 		}
-	}
+	}*/
 
 	// propagates expressions down wires
 
-	private static void propagateWires(ExpressionMap expressionMap, HashSet<Location> pointsToProcess)
+	/*private static void propagateWires(ExpressionMap expressionMap, HashSet<Location> pointsToProcess)
 			throws AnalyzeException {
 		expressionMap.currentCause = null;
 		for (Location p : pointsToProcess) {
@@ -345,7 +338,7 @@ public class Analyze {
 				}
 			}
 		}
-	}
+	}*/
 
 	private static String toValidLabel(String label) {
 		if (label == null)
