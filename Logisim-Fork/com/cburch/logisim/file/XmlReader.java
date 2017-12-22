@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.cburch.draw.model.AbstractCanvasObject;
@@ -409,22 +410,20 @@ class XmlReader {
 				}
 			}
 		}
-		if (version.compareTo(LogisimVersion.get(2, 6, 3)) < 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+		for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+			if (version.compareTo(LogisimVersion.get(2, 6, 3)) < 0) {
 				for (Element attrElt : XmlIterator.forChildElements(circElt, "a")) {
 					String name = attrElt.getAttribute("name");
 					if (name != null && name.startsWith("label")) {
 						attrElt.setAttribute("name", "c" + name);
 					}
 				}
-			}
 
-			repairForWiringLibrary(doc, root);
-			repairForLegacyLibrary(doc, root);
-		}
-		// compatibility for new gates attributes
-		if (version.compareTo(LogisimVersion.get(2, 7, 2, 255)) <= 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+				repairForWiringLibrary(doc, root);
+				repairForLegacyLibrary(doc, root);
+			}
+			// compatibility for new gates attributes
+			if (version.compareTo(LogisimVersion.get(2, 7, 2, 255)) <= 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null) {
 						if (compElt.getAttribute("name").equals("AND Gate")
@@ -472,10 +471,8 @@ class XmlReader {
 					}
 				}
 			}
-		}
-		// compatibility for new ff layout
-		if (version.compareTo(LogisimVersion.get(2, 10, 0, 0)) < 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+			// compatibility for new ff layout
+			if (version.compareTo(LogisimVersion.get(2, 10, 0, 0)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").endsWith("Flip-Flop")) {
 						// add the new attributes and set them to look like old flip-flops
@@ -491,14 +488,11 @@ class XmlReader {
 						newlayout.setAttribute("name", "NewFFLayout");
 						newlayout.setAttribute("val", "false");
 						compElt.appendChild(newlayout);
-
 					}
 				}
 			}
-		}
-		// compatibility for splitter new attributes value
-		if (version.compareTo(LogisimVersion.get(2, 11, 0, 0)) < 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+			// compatibility for splitter new attributes value
+			if (version.compareTo(LogisimVersion.get(2, 11, 0, 0)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Splitter")) {
 						boolean defaultfanoutattribute = true;
@@ -523,12 +517,11 @@ class XmlReader {
 							compElt.appendChild(inputsattribute);
 						}
 					}
+
 				}
 			}
-		}
-		// compatibility for tunnel new direction value
-		if (version.compareTo(LogisimVersion.get(2, 11, 1, 1)) < 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+			// compatibility for tunnel new direction value
+			if (version.compareTo(LogisimVersion.get(2, 11, 1, 1)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Tunnel")) {
 						boolean defaultfacingattribute = true;
@@ -544,12 +537,11 @@ class XmlReader {
 							compElt.appendChild(sizeattribute);
 						}
 					}
+
 				}
 			}
-		}
-		// compatibility message for gate inputs moved (only wide 4 inputs)
-		if (version.compareTo(LogisimVersion.get(2, 11, 1, 2)) < 0) {
-			for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
+			// compatibility message for gate inputs moved (only wide 4 inputs)
+			if (version.compareTo(LogisimVersion.get(2, 11, 1, 2)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name").equals("AND Gate")
 							|| compElt.getAttribute("name").equals("NAND Gate")
@@ -573,7 +565,28 @@ class XmlReader {
 									"Compatibility problem", JOptionPane.WARNING_MESSAGE);
 						}
 					}
+
 				}
+			} // compatibility message for gate inputs moved (only wide 4 inputs)
+			if (version.compareTo(LogisimVersion.get(2, 11, 5, 0)) < 0) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name").equals("Switch")) {
+						String location = compElt.getAttribute("loc");
+						NodeList attributes = compElt.getChildNodes();
+						Element dipswitch = doc.createElement("comp");
+						dipswitch.setAttribute("lib", "6");
+						dipswitch.setAttribute("loc", location);
+						dipswitch.setAttribute("name", "DipSwitch");
+						Element nswitches = doc.createElement("a");
+						nswitches.setAttribute("NSwitches", "1");
+						dipswitch.appendChild(nswitches);
+						for (int i = 0; i < attributes.getLength(); i++)
+							dipswitch.appendChild(attributes.item(i));
+						circElt.removeChild(compElt);
+						circElt.appendChild(dipswitch);
+					}
+				}
+
 			}
 		}
 	}
