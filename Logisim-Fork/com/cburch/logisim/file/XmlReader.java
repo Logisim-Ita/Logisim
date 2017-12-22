@@ -17,7 +17,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.cburch.draw.model.AbstractCanvasObject;
@@ -567,23 +566,32 @@ class XmlReader {
 					}
 
 				}
-			} // compatibility message for gate inputs moved (only wide 4 inputs)
+			} // switch has changed its behaviour in this version, so we'll replace it with a
+				// dipswitch with 1 switch
 			if (version.compareTo(LogisimVersion.get(2, 11, 5, 0)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
 					if (compElt.getAttribute("name").equals("Switch")) {
-						String location = compElt.getAttribute("loc");
-						NodeList attributes = compElt.getChildNodes();
-						Element dipswitch = doc.createElement("comp");
-						dipswitch.setAttribute("lib", "6");
-						dipswitch.setAttribute("loc", location);
-						dipswitch.setAttribute("name", "DipSwitch");
+						String facing = "east";
+						String[] coords = compElt.getAttribute("loc")
+								.substring(1, compElt.getAttribute("loc").length() - 1).split(",");
+						int locx = Integer.valueOf(coords[0]), locy = Integer.valueOf(coords[1]);
+						for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+							if (attrElt.getAttribute("name").equals("facing"))
+								facing = attrElt.getAttribute("val");
+						}
+						// set the new coordinates to palce dipswitch port in the same place
+						if (facing.equals("east") || facing.equals("west"))
+							locy -= 10;
+						else
+							locx -= 10;
+						compElt.setAttribute("loc", "(" + locx + "," + locy + ")");
+						
+						compElt.removeAttribute("name");
+						compElt.setAttribute("name", "DipSwitch");
 						Element nswitches = doc.createElement("a");
-						nswitches.setAttribute("NSwitches", "1");
-						dipswitch.appendChild(nswitches);
-						for (int i = 0; i < attributes.getLength(); i++)
-							dipswitch.appendChild(attributes.item(i));
-						circElt.removeChild(compElt);
-						circElt.appendChild(dipswitch);
+						nswitches.setAttribute("name", "NSwitches");
+						nswitches.setAttribute("val", "1");
+						compElt.appendChild(nswitches);
 					}
 				}
 
