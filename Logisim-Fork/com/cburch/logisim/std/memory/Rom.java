@@ -145,6 +145,7 @@ public class Rom extends Mem {
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		super.configureNewInstance(instance);
+		instance.addAttributeListener();
 		MemContents contents = getMemContents(instance);
 		MemListener listener = new MemListener(instance);
 		memListeners.put(instance, listener);
@@ -165,7 +166,7 @@ public class Rom extends Mem {
 		if (instance.getAttributeValue(ATTR_SELECTION) == SEL_HIGH)
 			ps[CS].setToolTip(Strings.getter("selHighTip"));
 		instance.setPorts(ps);
-
+		
 	}
 
 	@Override

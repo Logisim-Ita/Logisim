@@ -28,39 +28,54 @@ public class Register extends InstanceFactory {
 	private static final int CK = 2;
 	private static final int CLR = 3;
 	private static final int EN = 4;
-
+	private static final int CS=5;
 	public Register() {
 		super("Register", Strings.getter("registerComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT,
-						StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+						StdAttr.ATTR_LABEL_COLOR, Mem.ATTR_SELECTION },
+				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,Mem.SEL_LOW });
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 		setOffsetBounds(Bounds.create(-30, -20, 30, 40));
 		setIconName("register.gif");
 		setInstancePoker(RegisterPoker.class);
 		setInstanceLogger(RegisterLogger.class);
-
-		Port[] ps = new Port[5];
+		
+	}
+	
+	void configurePorts(Instance instance) {
+		Port[] ps = new Port[6];
 		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
 		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
 		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
 		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
 		ps[EN] = new Port(-30, 10, Port.INPUT, 1);
+		ps[CS]= new Port(-30,-10,Port.INPUT,1);
 		ps[OUT].setToolTip(Strings.getter("registerQTip"));
 		ps[IN].setToolTip(Strings.getter("registerDTip"));
 		ps[CK].setToolTip(Strings.getter("registerClkTip"));
 		ps[CLR].setToolTip(Strings.getter("registerClrTip"));
 		ps[EN].setToolTip(Strings.getter("registerEnableTip"));
+		ps[CS].setToolTip(Strings.getter("memCSTip"));
+		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
+			ps[CS].setToolTip(Strings.getter("selHighTip"));
 		setPorts(ps);
 	}
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		Bounds bds = instance.getBounds();
+		instance.addAttributeListener();
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
 				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+		configurePorts(instance);
 	}
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		super.instanceAttributeChanged(instance, attr);
+		configurePorts(instance);
+		instance.fireInvalidated();
+	}
+
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
@@ -101,6 +116,7 @@ public class Register extends InstanceFactory {
 		g.setColor(Color.GRAY);
 		painter.drawPort(CLR, "0", Direction.SOUTH);
 		painter.drawPort(EN, Strings.get("memEnableLabel"), Direction.EAST);
+		painter.drawPort(CS);
 		g.setColor(Color.BLACK);
 		painter.drawClock(CK, Direction.NORTH);
 
@@ -126,7 +142,15 @@ public class Register extends InstanceFactory {
 		BitWidth dataWidth = state.getAttributeValue(StdAttr.WIDTH);
 		Object triggerType = state.getAttributeValue(StdAttr.TRIGGER);
 		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
-
+		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
+		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
+				|| (state.getPort(CS) == Value.FALSE && selection == false);
+		
+		if (!chipSelect) {
+			//myState.setCurrent(-1);
+			state.setPort(OUT, Value.createUnknown(dataWidth), DELAY);
+			return;
+		}
 		if (state.getPort(CLR) == Value.TRUE) {
 			data.value = 0;
 		} else if (triggered && state.getPort(EN) != Value.FALSE) {
@@ -134,7 +158,7 @@ public class Register extends InstanceFactory {
 			if (in.isFullyDefined())
 				data.value = in.toIntValue();
 		}
-
+		
 		state.setPort(OUT, Value.createKnown(dataWidth, data.value), DELAY);
 	}
 }

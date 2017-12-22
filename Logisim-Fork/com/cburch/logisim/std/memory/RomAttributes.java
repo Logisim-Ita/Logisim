@@ -44,7 +44,7 @@ class RomAttributes extends AbstractAttributeSet {
 	private BitWidth addrBits = BitWidth.create(8);
 	private BitWidth dataBits = BitWidth.create(8);
 	private MemContents contents;
-	AttributeOption sel = Mem.SEL_LOW;
+	AttributeOption sel= Mem.SEL_LOW;
 
 	RomAttributes() {
 		contents = MemContents.create(addrBits.getWidth(), dataBits.getWidth());

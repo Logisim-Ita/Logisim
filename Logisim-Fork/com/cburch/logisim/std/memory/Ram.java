@@ -149,15 +149,9 @@ public class Ram extends Mem {
 	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus", Strings.getter("ramBusAttr"),
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
 
-	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("ramSelHigh"));
 
-	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("ramSelLow"));
-
-	static final Attribute<AttributeOption> ATTR_SELECTION = Attributes.forOption("Select",
-			Strings.getter("ramSelAttr"), new AttributeOption[] { SEL_HIGH, SEL_LOW });
-
-	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS, ATTR_SELECTION };
-	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED, SEL_LOW };
+	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS, Mem.ATTR_SELECTION };
+	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED, Mem.SEL_LOW };
 	private static final int OE = MEM_INPUTS + 0;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;
@@ -197,7 +191,7 @@ public class Ram extends Mem {
 			portCount += 3;
 		Port[] ps = new Port[portCount];
 		configureStandardPorts(instance, ps);
-		if (instance.getAttributeValue(ATTR_SELECTION) == SEL_HIGH)
+		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
 			ps[CS].setToolTip(Strings.getter("selHighTip"));
 		ps[OE] = new Port(-50, 40, Port.INPUT, 1);
 		ps[OE].setToolTip(Strings.getter("ramOETip"));
@@ -297,7 +291,7 @@ public class Ram extends Mem {
 		boolean separate = busVal == null ? false : busVal.equals(BUS_SEPARATE);
 
 		Value addrValue = state.getPort(ADDR);
-		boolean selection = state.getAttributeValue(ATTR_SELECTION) == SEL_HIGH;
+		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
 		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
 				|| (state.getPort(CS) == Value.FALSE && selection == false);
 		boolean triggered = asynch || myState.setClock(state.getPort(CLK), StdAttr.TRIG_RISING);
