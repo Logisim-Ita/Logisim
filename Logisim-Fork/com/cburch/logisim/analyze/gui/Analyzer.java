@@ -190,8 +190,8 @@ public class Analyzer extends LFrame {
 	}
 
 	private void addTab(int index, final JComponent comp) {
-		final JScrollPane pane = new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		final JScrollPane pane = new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		if (comp instanceof TableTab) {
 			pane.setVerticalScrollBar(((TableTab) comp).getVerticalScrollBar());
 		}

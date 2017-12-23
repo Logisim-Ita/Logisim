@@ -40,11 +40,9 @@ This is an italian fork based on the original Logisim version.<br>
 * PLA ROM doesn't save configurations in .circ
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
-* Move to Java 9
 * Solve propagation bugs not solved in the original Logisim
 * Programmable Generator (95% done)
 * Buzzer (75% done)
-* Add a SEL input in some component
 * Add a new type of library
 * Draw also in circuits
 * Suggest us everything at logisimit@gmail.com

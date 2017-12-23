@@ -204,9 +204,8 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		GridBagLayout gb = new GridBagLayout();
 		GridBagConstraints gc = new GridBagConstraints();
 		setLayout(gb);
-		Insets oldInsets = gc.insets;
 
-		gc.insets = new Insets(10, 10, 0, 0);
+		gc.insets = new Insets(10, 10, 0, 10);
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1.0;
 		gb.setConstraints(listPane, gc);
@@ -218,7 +217,6 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		gb.setConstraints(topPanel, gc);
 		add(topPanel);
 
-		gc.insets = new Insets(10, 10, 0, 10);
 		gc.gridwidth = GridBagConstraints.REMAINDER;
 		gc.gridx = 0;
 		gc.gridy = GridBagConstraints.RELATIVE;
@@ -227,9 +225,6 @@ class VariableTab extends AnalyzerTab implements TabInterface {
 		field.setBorder(BorderFactory.createLineBorder(new Color(130, 135, 144)));
 		add(field);
 
-		gc.insets = oldInsets;
-		gc.fill = GridBagConstraints.NONE;
-		gc.anchor = GridBagConstraints.LINE_END;
 		gb.setConstraints(fieldPanel, gc);
 		add(fieldPanel);
 

@@ -173,15 +173,11 @@ class ExpressionTab extends AnalyzerTab implements TabInterface {
 		add(selectorPanel);
 		gb.setConstraints(prettyView, gc);
 		add(prettyView);
-		Insets oldInsets = gc.insets;
 		gc.insets = new Insets(10, 10, 0, 10);
 		JScrollPane fieldPane = new JScrollPane(field, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		gb.setConstraints(fieldPane, gc);
 		add(fieldPane);
-		gc.insets = oldInsets;
-		gc.fill = GridBagConstraints.NONE;
-		gc.anchor = GridBagConstraints.LINE_END;
 		gb.setConstraints(buttons, gc);
 		add(buttons);
 		gc.fill = GridBagConstraints.BOTH;
