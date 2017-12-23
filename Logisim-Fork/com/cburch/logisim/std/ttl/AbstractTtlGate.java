@@ -131,37 +131,37 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
-				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+				g.fillRoundRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight(), 10, 10);
 				g.setColor(Color.BLACK);
 			}
-			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+			g.drawRoundRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight(), 10, 10);
 			g.drawArc(x + width / 2 - 7, y - 7, 14, 14, 180, 180);
 		} else if (dir == Direction.WEST) {
 			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
-				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+				g.fillRoundRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2, 10, 10);
 				g.setColor(Color.BLACK);
 			}
-			g.drawRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+			g.drawRoundRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2, 10, 10);
 			g.drawArc(x + width - 7, y + height / 2 - 7, 14, 14, 90, 180);
 		} else if (dir == Direction.NORTH) {
 			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
-				g.fillRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+				g.fillRoundRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight(), 10, 10);
 				g.setColor(Color.BLACK);
 			}
-			g.drawRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight());
+			g.drawRoundRect(x + pinheight, y, bds.getWidth() - pinheight * 2, bds.getHeight(), 10, 10);
 			g.drawArc(x + width / 2 - 7, y + height - 7, 14, 14, 0, 180);
 		} else {// east
 			// fill the background of white if selected from preferences
 			if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 				g.setColor(Color.WHITE);
-				g.fillRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+				g.fillRoundRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2, 10, 10);
 				g.setColor(Color.BLACK);
 			}
-			g.drawRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2);
+			g.drawRoundRect(x, y + pinheight, bds.getWidth(), bds.getHeight() - pinheight * 2, 10, 10);
 			g.drawArc(x - 7, y + height / 2 - 7, 14, 14, 270, 180);
 		}
 		g.rotate(Math.toRadians(-dir.toDegrees()), x + width / 2, y + height / 2);
