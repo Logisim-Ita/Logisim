@@ -69,9 +69,9 @@ abstract class Mem extends InstanceFactory {
 
 	public static final Attribute<BitWidth> DATA_ATTR = Attributes.forBitWidth("dataWidth",
 			Strings.getter("ramDataWidthAttr"));
-	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("ramSelHigh"));
+	static final AttributeOption SEL_HIGH = new AttributeOption("high", Strings.getter("stdTriggerHigh"));
 
-	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("ramSelLow"));
+	static final AttributeOption SEL_LOW = new AttributeOption("low", Strings.getter("stdTriggerLow"));
 
 	static final Attribute<AttributeOption> ATTR_SELECTION = Attributes.forOption("Select",
 			Strings.getter("ramSelAttr"), new AttributeOption[] { SEL_HIGH, SEL_LOW });
@@ -110,7 +110,6 @@ abstract class Mem extends InstanceFactory {
 		ps[CS] = new Port(-90, 40, Port.INPUT, 1);
 		ps[DATA].setToolTip(Strings.getter("memDataTip"));
 		ps[ADDR].setToolTip(Strings.getter("memAddrTip"));
-		ps[CS].setToolTip(Strings.getter("memCSTip"));
 	}
 
 	@Override

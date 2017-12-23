@@ -149,7 +149,6 @@ public class Ram extends Mem {
 	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus", Strings.getter("ramBusAttr"),
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
 
-
 	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS, Mem.ATTR_SELECTION };
 	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED, Mem.SEL_LOW };
 	private static final int OE = MEM_INPUTS + 0;
@@ -192,7 +191,9 @@ public class Ram extends Mem {
 		Port[] ps = new Port[portCount];
 		configureStandardPorts(instance, ps);
 		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
-			ps[CS].setToolTip(Strings.getter("selHighTip"));
+			ps[CS].setToolTip(Strings.getter("memCSTip", "0"));
+		else
+			ps[CS].setToolTip(Strings.getter("memCSTip", "1"));
 		ps[OE] = new Port(-50, 40, Port.INPUT, 1);
 		ps[OE].setToolTip(Strings.getter("ramOETip"));
 		ps[CLR] = new Port(-30, 40, Port.INPUT, 1);
@@ -292,8 +293,8 @@ public class Ram extends Mem {
 
 		Value addrValue = state.getPort(ADDR);
 		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
-		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
-				|| (state.getPort(CS) == Value.FALSE && selection == false);
+		boolean chipSelect = !(state.getPort(CS) == Value.FALSE && selection
+				|| state.getPort(CS) == Value.TRUE && !selection);
 		boolean triggered = asynch || myState.setClock(state.getPort(CLK), StdAttr.TRIG_RISING);
 		boolean outputEnabled = state.getPort(OE) != Value.FALSE;
 		boolean shouldClear = state.getPort(CLR) == Value.TRUE;

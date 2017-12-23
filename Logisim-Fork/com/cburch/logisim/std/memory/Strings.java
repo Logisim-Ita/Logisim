@@ -25,4 +25,8 @@ class Strings {
 	public static StringGetter getter(String key) {
 		return source.getter(key);
 	}
+
+	public static StringGetter getter(String key, String arg0) {
+		return source.getter(key, arg0);
+	}
 }

@@ -74,16 +74,16 @@ public class InstancePainter implements InstanceState {
 		context.drawPins(comp);
 	}
 
+	public void drawRoundBounds(Color color) {
+		context.drawRoundBounds(comp, color);
+	}
+
 	public void drawRoundRectangle(Bounds bds, String label) {
 		context.drawRoundRectangle(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), label, Color.WHITE);
 	}
 
 	public void drawRoundRectangle(int x, int y, int width, int height, String label, Color color) {
 		context.drawRoundRectangle(x, y, width, height, label, color);
-	}
-
-	public void drawRoundBounds(Color color) {
-		context.drawRoundBounds(comp, color);
 	}
 
 	@Override

@@ -585,7 +585,7 @@ class XmlReader {
 						else
 							locx -= 10;
 						compElt.setAttribute("loc", "(" + locx + "," + locy + ")");
-						
+
 						compElt.removeAttribute("name");
 						compElt.setAttribute("name", "DipSwitch");
 						Element nswitches = doc.createElement("a");

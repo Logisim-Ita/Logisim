@@ -21,6 +21,7 @@ import javax.swing.JPopupMenu;
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.Attributes;
+import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
@@ -275,8 +276,8 @@ public class PlaRom extends InstanceFactory {
 	public PlaRom() {
 		super("PlaRom", Strings.getter("PlaRomComponent"));
 		setIconName("plarom.gif");
-		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS/* , CONTENTS_ATTR */ },
-				new Object[] { 4, 4, 4/* , PlaRom.CONTENTS_ATTR */ });
+		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS, Mem.ATTR_SELECTION/* , CONTENTS_ATTR */ },
+				new Object[] { 4, 4, 4, Mem.SEL_LOW/* , PlaRom.CONTENTS_ATTR */ });
 		setOffsetBounds(Bounds.create(0, -40, 80, 80));
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
@@ -300,6 +301,8 @@ public class PlaRom extends InstanceFactory {
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS)
 			updateports(instance);
+		else
+			instance.fireInvalidated();
 	}
 
 	@Override
@@ -330,23 +333,27 @@ public class PlaRom extends InstanceFactory {
 	public void propagate(InstanceState state) {
 		PlaRomData data = getPlaRomData(state);
 		Value clear = state.getPort(2);
-		Value enable = state.getPort(3);
+		Value cs = state.getPort(3);
+		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
+		boolean ComponentActive = !(cs == Value.FALSE && selection || cs == Value.TRUE && !selection);
+		if (!ComponentActive) {
+			state.setPort(1, Value.createUnknown(BitWidth.create(data.getOutputs())), Mem.DELAY);
+			return;
+		}
 		if (clear == Value.TRUE) {
 			data.setClear(true);
 			data.ClearMatrixValues();
 		} else
 			data.setClear(false);
 
-		if (enable != Value.FALSE) {
-			Value[] inputs = state.getPort(0).getAll();
-			for (int i = 0; i < inputs.length / 2; i++) {// reverse array
-				Value temp = inputs[i];
-				inputs[i] = inputs[inputs.length - i - 1];
-				inputs[inputs.length - i - 1] = temp;
-			}
-			data.setInputsValue(inputs);
-			state.setPort(1, Value.create(data.getOutputValues()), Mem.DELAY);
+		Value[] inputs = state.getPort(0).getAll();
+		for (int i = 0; i < inputs.length / 2; i++) {// reverse array
+			Value temp = inputs[i];
+			inputs[i] = inputs[inputs.length - i - 1];
+			inputs[inputs.length - i - 1] = temp;
 		}
+		data.setInputsValue(inputs);
+		state.setPort(1, Value.create(data.getOutputValues()), Mem.DELAY);
 
 	}
 
@@ -361,7 +368,10 @@ public class PlaRom extends InstanceFactory {
 		ps[0].setToolTip(Strings.getter("demultiplexerInTip"));
 		ps[1].setToolTip(Strings.getter("multiplexerOutTip"));
 		ps[2].setToolTip(Strings.getter("PlaRomCleartip"));
-		ps[3].setToolTip(Strings.getter("memCSTip"));
+		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
+			ps[3].setToolTip(Strings.getter("memCSTip", "0"));
+		else
+			ps[3].setToolTip(Strings.getter("memCSTip", "1"));
 		instance.setPorts(ps);
 	}
 }

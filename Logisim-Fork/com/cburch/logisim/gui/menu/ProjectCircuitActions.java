@@ -59,21 +59,18 @@ public class ProjectCircuitActions {
 		Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
 		analyzer.setSelectedTab(Analyzer.TABLE_TAB);
 		// nothing to do, stupid useless code
-		/*try {
-			Analyze.computeExpression(analyzer.getModel(), circuit, pinNames);
-		} catch (AnalyzeException ex) {
-			// As a backup measure, we compute a truth table.
-			Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
-
-			/*
-			 * System.out.println(ex.getMessage());
-			 * JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(),
-			 * Strings.get("analyzeNoExpressionTitle"), JOptionPane.INFORMATION_MESSAGE);
-			 */
-		/*} finally {
-			analyzer.setSelectedTab(Analyzer.TABLE_TAB);
-		}
-*/
+		/*
+		 * try { Analyze.computeExpression(analyzer.getModel(), circuit, pinNames); }
+		 * catch (AnalyzeException ex) { // As a backup measure, we compute a truth
+		 * table. Analyze.computeTable(analyzer.getModel(), proj, circuit, pinNames);
+		 * 
+		 * /* System.out.println(ex.getMessage());
+		 * JOptionPane.showMessageDialog(proj.getFrame(), ex.getMessage(),
+		 * Strings.get("analyzeNoExpressionTitle"), JOptionPane.INFORMATION_MESSAGE);
+		 */
+		/*
+		 * } finally { analyzer.setSelectedTab(Analyzer.TABLE_TAB); }
+		 */
 	}
 
 	public static void doAddCircuit(Project proj) {

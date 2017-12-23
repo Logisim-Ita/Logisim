@@ -153,20 +153,15 @@ public class Rom extends Mem {
 	}
 
 	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		super.instanceAttributeChanged(instance, attr);
-		configurePorts(instance);
-		instance.fireInvalidated();
-	}
-
-	@Override
 	void configurePorts(Instance instance) {
 		Port[] ps = new Port[MEM_INPUTS];
 		configureStandardPorts(instance, ps);
-		if (instance.getAttributeValue(ATTR_SELECTION) == SEL_HIGH)
-			ps[CS].setToolTip(Strings.getter("selHighTip"));
+		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
+			ps[CS].setToolTip(Strings.getter("memCSTip", "0"));
+		else
+			ps[CS].setToolTip(Strings.getter("memCSTip", "1"));
 		instance.setPorts(ps);
-		
+
 	}
 
 	@Override
@@ -207,14 +202,21 @@ public class Rom extends Mem {
 	}
 
 	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		super.instanceAttributeChanged(instance, attr);
+		configurePorts(instance);
+		instance.fireInvalidated();
+	}
+
+	@Override
 	public void propagate(InstanceState state) {
 		MemState myState = getState(state);
 		BitWidth dataBits = state.getAttributeValue(DATA_ATTR);
 
 		Value addrValue = state.getPort(ADDR);
 		boolean selection = state.getAttributeValue(ATTR_SELECTION) == SEL_HIGH;
-		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
-				|| (state.getPort(CS) == Value.FALSE && selection == false);
+		boolean chipSelect = !(state.getPort(CS) == Value.FALSE && selection
+				|| state.getPort(CS) == Value.TRUE && !selection);
 
 		if (!chipSelect) {
 			myState.setCurrent(-1);

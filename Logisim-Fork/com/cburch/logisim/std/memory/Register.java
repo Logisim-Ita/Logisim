@@ -28,38 +28,21 @@ public class Register extends InstanceFactory {
 	private static final int CK = 2;
 	private static final int CLR = 3;
 	private static final int EN = 4;
-	private static final int CS=5;
+	private static final int CS = 5;
+
 	public Register() {
 		super("Register", Strings.getter("registerComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.WIDTH, StdAttr.TRIGGER, StdAttr.LABEL, StdAttr.LABEL_FONT,
 						StdAttr.ATTR_LABEL_COLOR, Mem.ATTR_SELECTION },
-				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,Mem.SEL_LOW });
+				new Object[] { BitWidth.create(8), StdAttr.TRIG_RISING, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,
+						Mem.SEL_LOW });
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 		setOffsetBounds(Bounds.create(-30, -20, 30, 40));
 		setIconName("register.gif");
 		setInstancePoker(RegisterPoker.class);
 		setInstanceLogger(RegisterLogger.class);
-		
-	}
-	
-	void configurePorts(Instance instance) {
-		Port[] ps = new Port[6];
-		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
-		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
-		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
-		ps[EN] = new Port(-30, 10, Port.INPUT, 1);
-		ps[CS]= new Port(-30,-10,Port.INPUT,1);
-		ps[OUT].setToolTip(Strings.getter("registerQTip"));
-		ps[IN].setToolTip(Strings.getter("registerDTip"));
-		ps[CK].setToolTip(Strings.getter("registerClkTip"));
-		ps[CLR].setToolTip(Strings.getter("registerClrTip"));
-		ps[EN].setToolTip(Strings.getter("registerEnableTip"));
-		ps[CS].setToolTip(Strings.getter("memCSTip"));
-		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
-			ps[CS].setToolTip(Strings.getter("selHighTip"));
-		setPorts(ps);
+
 	}
 
 	@Override
@@ -70,12 +53,33 @@ public class Register extends InstanceFactory {
 				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 		configurePorts(instance);
 	}
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		super.instanceAttributeChanged(instance, attr);
-		configurePorts(instance);
-		instance.fireInvalidated();
+
+	void configurePorts(Instance instance) {
+		Port[] ps = new Port[6];
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
+		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
+		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
+		ps[EN] = new Port(-30, 10, Port.INPUT, 1);
+		ps[CS] = new Port(-30, -10, Port.INPUT, 1);
+		ps[OUT].setToolTip(Strings.getter("registerQTip"));
+		ps[IN].setToolTip(Strings.getter("registerDTip"));
+		ps[CK].setToolTip(Strings.getter("registerClkTip"));
+		ps[CLR].setToolTip(Strings.getter("registerClrTip"));
+		ps[EN].setToolTip(Strings.getter("registerEnableTip"));
+		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
+			ps[CS].setToolTip(Strings.getter("memCSTip", "0"));
+		else
+			ps[CS].setToolTip(Strings.getter("memCSTip", "1"));
+		instance.setPorts(ps);
 	}
 
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		super.instanceAttributeChanged(instance, attr);
+		if (attr == Mem.ATTR_SELECTION)
+			configurePorts(instance);
+		instance.fireInvalidated();
+	}
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
@@ -143,11 +147,10 @@ public class Register extends InstanceFactory {
 		Object triggerType = state.getAttributeValue(StdAttr.TRIGGER);
 		boolean triggered = data.updateClock(state.getPort(CK), triggerType);
 		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
-		boolean chipSelect = (state.getPort(CS) != Value.FALSE && selection == true)
-				|| (state.getPort(CS) == Value.FALSE && selection == false);
-		
+		boolean chipSelect = !(state.getPort(CS) == Value.FALSE && selection
+				|| state.getPort(CS) == Value.TRUE && !selection);
 		if (!chipSelect) {
-			//myState.setCurrent(-1);
+			// myState.setCurrent(-1);
 			state.setPort(OUT, Value.createUnknown(dataWidth), DELAY);
 			return;
 		}
@@ -158,7 +161,7 @@ public class Register extends InstanceFactory {
 			if (in.isFullyDefined())
 				data.value = in.toIntValue();
 		}
-		
+
 		state.setPort(OUT, Value.createKnown(dataWidth, data.value), DELAY);
 	}
 }
