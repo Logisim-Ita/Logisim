@@ -10,6 +10,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Italian translation!
 * Possibility to use french translations already done (not very well)
 * Autoupdates!
+* Compiled with Java 9
 * New components:
 	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7485, 7486, 74165, 74283, 747266)
 	* I/O->Digital Oscilloscope
@@ -20,24 +21,27 @@ This is an italian fork based on the original Logisim version.<br>
 	* Plexers->7-Segment Display Decoder
 * New FF layout and attributes
 * FF D, S-R: Latch option in trigger list
-* Controlled Buffer / Inverter: Negate Control Input
-* Press ESC or DEL to cancel "Add Tool" action
+* Controlled Buffer / Inverter: Negate Control Input attribute
+* Added Sel pin in Register component
+* Added Sel Active Level attribute in components with Sel pin
+* Press ESC or DEL to cancel "Add Tool" action, F1 opens Library Reference
 * TTY and Keyboard components can use 16-bit values (UTF-16)
 * Clock custom frequency
 * Joystick facing attribute
 * Added missing tooltips
 * Zoom in and out using mouse wheel where you're pointing at
-* Big fixes to Log menu and Log output file
+* Big fixes to Log menu and Log output file, added buttons to clear Log Table
 * Added Label Color attribute for each component with Label attribute
 * Increased output limit in Analyze Circuit to 32
+* Analyze Circuit should calculate table/expression with any kind of component
 * Fixed empty template bug introduced in Logisim 2.7.0
 * Fixed input positions in wide gates with 4 inputs
 * Changed some default value
-* Anti Aliasing and Look and Feel preference
+* Anti Aliasing, Look and Feel and Fill Component's Background preference
 * Graphical changes
 * Includes some fix from original early version 2.7.2.255
 ## Bugs
-* PLA ROM doesn't save configurations in .circ
+* PLA ROM doesn't save configurations in .circ and its logic is not calculated in Analyze Circuit
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
 * Solve propagation bugs not solved in the original Logisim

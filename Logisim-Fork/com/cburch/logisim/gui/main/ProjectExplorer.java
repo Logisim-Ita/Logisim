@@ -573,7 +573,7 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 			// draw halo if appropriate
 			if (tool == haloedTool && AppPreferences.ATTRIBUTE_HALO.getBoolean()) {
 				g.setColor(Canvas.HALO_COLOR);
-				g.fillRoundRect(x, y, 20, 20, 5, 5);
+				g.fillRoundRect(x, y, getIconWidth(), getIconHeight(), 5, 5);
 				g.setColor(Color.BLACK);
 			}
 

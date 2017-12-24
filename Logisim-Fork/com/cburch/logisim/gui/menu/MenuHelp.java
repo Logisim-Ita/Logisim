@@ -6,6 +6,7 @@ package com.cburch.logisim.gui.menu;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,6 +18,7 @@ import javax.help.JHelp;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import com.cburch.logisim.gui.generic.LFrame;
@@ -44,6 +46,10 @@ class MenuHelp extends JMenu implements ActionListener {
 
 	public MenuHelp(LogisimMenuBar menubar) {
 		this.menubar = menubar;
+
+		// f1 key open library reference
+		library.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+
 		tutorial.addActionListener(this);
 		guide.addActionListener(this);
 		library.addActionListener(this);

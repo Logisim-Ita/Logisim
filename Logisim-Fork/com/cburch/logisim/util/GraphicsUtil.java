@@ -114,4 +114,8 @@ public class GraphicsUtil {
 			g2.setStroke(new BasicStroke(width));
 		}
 	}
+
+	static public void switchToWidth(Graphics g, int width) {
+		switchToWidth(g, (float) width);
+	}
 }
