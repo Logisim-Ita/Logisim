@@ -566,10 +566,11 @@ class XmlReader {
 					}
 
 				}
-			} // switch has changed its behaviour in this version, so we'll replace it with a
-				// dipswitch with 1 switch
+			}
 			if (version.compareTo(LogisimVersion.get(2, 11, 5, 0)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					// switch has changed its behaviour in this version, so we'll replace it with a
+					// dipswitch with 1 switch
 					if (compElt.getAttribute("name").equals("Switch")) {
 						String facing = "east";
 						String[] coords = compElt.getAttribute("loc")
@@ -592,6 +593,14 @@ class XmlReader {
 						nswitches.setAttribute("name", "NSwitches");
 						nswitches.setAttribute("val", "1");
 						compElt.appendChild(nswitches);
+					}
+					// set sel active on high level as it was before
+					else if (compElt.getAttribute("name").equals("RAM") || compElt.getAttribute("name").equals("ROM")
+							|| compElt.getAttribute("name").equals("PlaRom")) {
+						Element SelectAttribute = doc.createElement("a");
+						SelectAttribute.setAttribute("name", "Select");
+						SelectAttribute.setAttribute("val", "high");
+						compElt.appendChild(SelectAttribute);
 					}
 				}
 
