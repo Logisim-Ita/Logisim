@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
@@ -66,10 +67,10 @@ public class Switch extends InstanceFactory {
 	public Switch() {
 		super("Switch", Strings.getter("switchComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-						Io.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, Color.WHITE, "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT,
-						Color.BLACK });
+				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, BitWidth.ONE, Color.WHITE, "", Direction.NORTH,
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("switch.gif");
 		setInstancePoker(Poker.class);
@@ -132,6 +133,8 @@ public class Switch extends InstanceFactory {
 		if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			computeTextField(instance);
+			updateports(instance);
+		} else if (attr == StdAttr.WIDTH) {
 			updateports(instance);
 		} else if (attr == Io.ATTR_LABEL_LOC) {
 			computeTextField(instance);
@@ -282,18 +285,21 @@ public class Switch extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		InstanceDataSingleton data = (InstanceDataSingleton) state.getData();
-		Value val = (data == null || !(Boolean) data.getValue()) ? Value.UNKNOWN : state.getPort(0);
+		Value val = (data == null || !(Boolean) data.getValue())
+				? Value.createUnknown(state.getAttributeValue(StdAttr.WIDTH))
+				: state.getPort(0);
 		state.setPort(1, val, 1);
 	}
 
 	private void updateports(Instance instance) {
 		Port[] ps = new Port[2];
+		BitWidth b = instance.getAttributeValue(StdAttr.WIDTH);
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
-		ps[0] = dir == Direction.EAST ? new Port(-20, 0, Port.INPUT, 1)
-				: dir == Direction.WEST ? new Port(20, 0, Port.INPUT, 1)
-						: dir == Direction.NORTH ? new Port(0, 20, Port.INPUT, 1) : new Port(0, -20, Port.INPUT, 1);
+		ps[0] = dir == Direction.EAST ? new Port(-20, 0, Port.INPUT, b)
+				: dir == Direction.WEST ? new Port(20, 0, Port.INPUT, b)
+						: dir == Direction.NORTH ? new Port(0, 20, Port.INPUT, b) : new Port(0, -20, Port.INPUT, b);
 		ps[0].setToolTip(Strings.getter("pinInputName"));
-		ps[1] = new Port(0, 0, Port.OUTPUT, 1);
+		ps[1] = new Port(0, 0, Port.OUTPUT, b);
 		ps[1].setToolTip(Strings.getter("pinOutputName"));
 		instance.setPorts(ps);
 	}

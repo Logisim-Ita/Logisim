@@ -2,20 +2,10 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.5.0</jar_version>
+  <jar_version>2.11.5.1/jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.5.0</exe_version>
+  <exe_version>2.11.5.1</exe_version>
   <changelog>
-* Compiled with Java 9
-* Changed Switch behavior because it was equal to DipSwitch with 1 switch
-	(Now it's like a controlled buffer and it won't give retro-compatibility problems because it will be replaced with a DipSwitch if used in old files)
-* Added Sel on register and changed PLA ROM enable to Sel pin
-* Added Sel Level attribute on ROM, RAM, register and PLA ROM
-* Added checkbox in Preference -> Fork to choose if fill component's background or keep it transparent
-* Fixed again Analyze Circuit logic and added horizontal scroll bar in table if needed
-* F1 key will open Library Reference
-* Anti-aliasing and Fill Background in Preference will repaint all when clicked
-* Graphical changes
-* Maybe fixed some "blue wire" error
-  </changelog>
+* Retro-compatibility for .circ and libraries older than 2.11.5.0
+* Switch -> BitWidth attribute
 </logisim>
