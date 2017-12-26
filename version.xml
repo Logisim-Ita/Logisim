@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.5.1/<jar_version>
+  <jar_version>2.11.5.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
   <exe_version>2.11.5.1</exe_version>
   <changelog>
