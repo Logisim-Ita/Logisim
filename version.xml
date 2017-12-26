@@ -8,4 +8,5 @@
   <changelog>
 * Retro-compatibility for .circ and libraries older than 2.11.5.0
 * Switch -> BitWidth attribute
+  </changelog>
 </logisim>
