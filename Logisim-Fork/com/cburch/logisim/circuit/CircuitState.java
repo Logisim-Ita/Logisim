@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.circuit.Propagator.SetData;
 import com.cburch.logisim.comp.Component;
@@ -27,7 +28,6 @@ import com.cburch.logisim.std.wiring.Clock;
 import com.cburch.logisim.std.wiring.Pin;
 import com.cburch.logisim.std.wiring.ProgrammableGenerator;
 import com.cburch.logisim.util.ArraySet;
-import com.cburch.logisim.util.SmallSet;
 
 public class CircuitState implements InstanceData {
 	private class MyCircuitListener implements CircuitListener {
@@ -134,8 +134,8 @@ public class CircuitState implements InstanceData {
 	private CircuitWires.State wireData = null;
 	private HashMap<Component, Object> componentData = new HashMap<Component, Object>();
 	private Map<Location, Value> values = new HashMap<Location, Value>();
-	private SmallSet<Component> dirtyComponents = new SmallSet<Component>();
-	private SmallSet<Location> dirtyPoints = new SmallSet<Location>();
+	private CopyOnWriteArrayList<Component> dirtyComponents = new CopyOnWriteArrayList<Component>();
+	private CopyOnWriteArrayList<Location> dirtyPoints = new CopyOnWriteArrayList<Location>();
 
 	HashMap<Location, SetData> causes = new HashMap<Location, SetData>();
 	private int id = lastId++;
@@ -302,7 +302,7 @@ public class CircuitState implements InstanceData {
 		try {
 			dirtyComponents.add(comp);
 		} catch (RuntimeException e) {
-			SmallSet<Component> set = new SmallSet<Component>();
+			CopyOnWriteArrayList<Component> set = new CopyOnWriteArrayList<Component>();
 			set.add(comp);
 			dirtyComponents = set;
 		}
@@ -331,7 +331,7 @@ public class CircuitState implements InstanceData {
 						firstException = e;
 					if (tries == 0) {
 						toProcess = new Object[0];
-						dirtyComponents = new SmallSet<Component>();
+						dirtyComponents = new CopyOnWriteArrayList<Component>();
 						throw firstException;
 					}
 				}
