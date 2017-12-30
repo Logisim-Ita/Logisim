@@ -69,6 +69,9 @@ public class CircuitAttributes extends AbstractAttributeSet {
 
 	public static final Attribute<String> NAME_ATTR = Attributes.forString("circuit", Strings.getter("circuitName"));
 
+	public static final Attribute<Boolean> VISIBLE_WHEN_LIBRARY = Attributes.forBoolean("libVisible",
+			Strings.getter("libVisible"));
+
 	public static final Attribute<Direction> LABEL_LOCATION_ATTR = Attributes.forDirection("labelloc",
 			Strings.getter("circuitLabelLocAttr"));
 
@@ -81,14 +84,15 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			Strings.getter("circuitLabelFontAttr"));
 	public static final Attribute<Color> CIRCUIT_LABEL_COLOR_ATTR = Attributes.forColor("clabelcolor",
 			new LocaleManager("resources/logisim", "std").getter("ioLabelColorAttr"));
-	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR,
+	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR,VISIBLE_WHEN_LIBRARY, CIRCUIT_LABEL_ATTR, CIRCUIT_LABEL_FACING_ATTR,
 			CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR };
 
-	private static final Object[] STATIC_DEFAULTS = { "", "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK };
+	private static final Object[] STATIC_DEFAULTS = { "", true, "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
+			Color.BLACK };
 
 	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays
-			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR, StdAttr.LABEL_FONT,
-					StdAttr.ATTR_LABEL_COLOR, CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
+			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR,
+					StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, CircuitAttributes.NAME_ATTR, CIRCUIT_LABEL_ATTR,
 					CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR });
 
 	static AttributeSet createBaseAttrs(Circuit source, String name) {

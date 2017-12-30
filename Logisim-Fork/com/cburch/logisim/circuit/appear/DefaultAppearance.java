@@ -20,6 +20,7 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.prefs.AppPreferences;
 
 class DefaultAppearance {
 	private static class CompareLocations implements Comparator<Instance> {
@@ -119,7 +120,9 @@ class DefaultAppearance {
 
 		RoundRectangle rect = new RoundRectangle(rx, ry, width, height, 5);
 		rect.setValue(DrawAttr.STROKE_WIDTH, Integer.valueOf(2));
-		rect.setValue(DrawAttr.PAINT_TYPE, DrawAttr.PAINT_STROKE_FILL);
+		rect.setValue(DrawAttr.PAINT_TYPE,
+				AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() ? DrawAttr.PAINT_STROKE_FILL
+						: DrawAttr.PAINT_STROKE);
 		List<CanvasObject> ret = new ArrayList<CanvasObject>();
 		ret.add(rect);
 		ret.add(notch);
