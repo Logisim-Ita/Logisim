@@ -142,14 +142,14 @@ class MenuSimulate extends Menu {
 				currentSim.setTickFrequency(freq);
 			if (isChoice) {
 				String Freq = (String) JOptionPane.showInputDialog(null,
-						Strings.get("EnterTickFrequency") + " (0-8192 Hz)", Strings.get("CustomFrequency"),
+						Strings.get("EnterTickFrequency") + " (0-4096 Hz)", Strings.get("CustomFrequency"),
 						JOptionPane.PLAIN_MESSAGE, null, null, (this.freq != -1 ? this.freq : ""));
 
 				if (Freq != null) {// not cancelled
 					try {
 						double convert = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
 						// save only if it's in the range
-						if (convert > 0 && convert <= 8192) {
+						if (convert > 0 && convert <= 4096) {
 							this.freq = convert;
 							if (currentSim != null)
 								currentSim.setTickFrequency(freq);
@@ -214,13 +214,12 @@ class MenuSimulate extends Menu {
 	private MenuItemCheckImpl ticksEnabled;
 	private MenuItemImpl tickOnce;
 	private JMenu tickFreq = new JMenu();
-	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(8192, false),
-			new TickFrequencyChoice(4096, false), new TickFrequencyChoice(2048, false),
-			new TickFrequencyChoice(1024, false), new TickFrequencyChoice(512, false),
-			new TickFrequencyChoice(256, false), new TickFrequencyChoice(128, false),
-			new TickFrequencyChoice(64, false), new TickFrequencyChoice(32, false), new TickFrequencyChoice(16, false),
-			new TickFrequencyChoice(8, false), new TickFrequencyChoice(4, false), new TickFrequencyChoice(2, false),
-			new TickFrequencyChoice(1, false), new TickFrequencyChoice(0.5, false),
+	private TickFrequencyChoice[] tickFreqs = { new TickFrequencyChoice(4096, false),
+			new TickFrequencyChoice(2048, false), new TickFrequencyChoice(1024, false),
+			new TickFrequencyChoice(512, false), new TickFrequencyChoice(256, false),
+			new TickFrequencyChoice(128, false), new TickFrequencyChoice(64, false), new TickFrequencyChoice(32, false),
+			new TickFrequencyChoice(16, false), new TickFrequencyChoice(8, false), new TickFrequencyChoice(4, false),
+			new TickFrequencyChoice(2, false), new TickFrequencyChoice(1, false), new TickFrequencyChoice(0.5, false),
 			new TickFrequencyChoice(0.25, false), new TickFrequencyChoice(0, true) };
 	private JMenu downStateMenu = new JMenu();
 	private ArrayList<CircuitStateMenuItem> downStateItems = new ArrayList<CircuitStateMenuItem>();

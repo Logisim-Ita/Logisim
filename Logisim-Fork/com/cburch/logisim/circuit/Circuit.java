@@ -4,7 +4,6 @@
 package com.cburch.logisim.circuit;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.circuit.appear.CircuitAppearance;
 import com.cburch.logisim.comp.Component;
@@ -112,13 +112,13 @@ public class Circuit {
 	private AttributeSet staticAttrs;
 	private SubcircuitFactory subcircuitFactory;
 	private EventSourceWeakSupport<CircuitListener> listeners = new EventSourceWeakSupport<CircuitListener>();
-	private HashSet<Component> comps = new HashSet<Component>(); // doesn't
+	private CopyOnWriteArrayList<Component> comps = new CopyOnWriteArrayList<Component>(); // doesn't
 	// include
 	// wires
 	CircuitWires wires = new CircuitWires();
 	// wires is package-protected for CircuitState and Analyze only.
-	private ArrayList<Component> clocks = new ArrayList<Component>();
-	private ArrayList<Component> programmablegenerators = new ArrayList<Component>();
+	private CopyOnWriteArrayList<Component> clocks = new CopyOnWriteArrayList<Component>();
+	private CopyOnWriteArrayList<Component> programmablegenerators = new CopyOnWriteArrayList<Component>();
 	private CircuitLocker locker;
 
 	private WeakHashMap<Component, Circuit> circuitsUsingThis;
@@ -305,12 +305,13 @@ public class Circuit {
 		return circuitsUsingThis.values();
 	}
 
-	ArrayList<Component> getClocks() {
+	CopyOnWriteArrayList<Component> getClocks() {
 		return clocks;
 	}
 
 	private Set<Component> getComponents() {
-		return CollectionUtil.createUnmodifiableSetUnion(comps, wires.getWires());
+		return CollectionUtil.createUnmodifiableSetUnion(new HashSet<Component>(comps),
+				new HashSet<Wire>(wires.getWires()));
 	}
 
 	public Collection<? extends Component> getComponents(Location loc) {
@@ -333,14 +334,14 @@ public class Circuit {
 	}
 
 	public Set<Component> getNonWires() {
-		return comps;
+		return new HashSet<Component>(comps);
 	}
 
 	public Collection<? extends Component> getNonWires(Location loc) {
 		return wires.points.getNonWires(loc);
 	}
 
-	ArrayList<Component> getProgrammableGenerators() {
+	CopyOnWriteArrayList<Component> getProgrammableGenerators() {
 		return programmablegenerators;
 	}
 
@@ -372,7 +373,7 @@ public class Circuit {
 		return wires.getWidthIncompatibilityData();
 	}
 
-	public Set<Wire> getWires() {
+	public CopyOnWriteArrayList<Wire> getWires() {
 		return wires.getWires();
 	}
 
@@ -430,8 +431,8 @@ public class Circuit {
 	public void mutatorClear() {
 		locker.checkForWritePermission("clear");
 
-		Set<Component> oldComps = comps;
-		comps = new HashSet<Component>();
+		Set<Component> oldComps = new HashSet<Component>(comps);
+		comps = new CopyOnWriteArrayList<Component>();
 		wires = new CircuitWires();
 		clocks.clear();
 		programmablegenerators.clear();

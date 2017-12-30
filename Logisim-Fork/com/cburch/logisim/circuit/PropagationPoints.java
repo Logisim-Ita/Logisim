@@ -5,7 +5,7 @@ package com.cburch.logisim.circuit;
 
 import java.awt.Graphics;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
@@ -37,10 +37,10 @@ class PropagationPoints {
 		}
 	}
 
-	private HashSet<Entry> data;
+	private CopyOnWriteArrayList<Entry> data;
 
 	PropagationPoints() {
-		this.data = new HashSet<Entry>();
+		this.data = new CopyOnWriteArrayList<Entry>();
 	}
 
 	void add(CircuitState state, Location loc) {

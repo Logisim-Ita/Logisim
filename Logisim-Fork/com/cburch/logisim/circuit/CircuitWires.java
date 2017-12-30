@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
@@ -169,9 +170,9 @@ class CircuitWires {
 	}
 
 	// user-given data
-	private HashSet<Wire> wires = new HashSet<Wire>();
-	private HashSet<Splitter> splitters = new HashSet<Splitter>();
-	private HashSet<Component> tunnels = new HashSet<Component>(); // of
+	private CopyOnWriteArrayList<Wire> wires = new CopyOnWriteArrayList<Wire>();
+	private CopyOnWriteArrayList<Splitter> splitters = new CopyOnWriteArrayList<Splitter>();
+	private CopyOnWriteArrayList<Component> tunnels = new CopyOnWriteArrayList<Component>(); // of
 	// Components
 	// with
 	// Tunnel
@@ -411,6 +412,7 @@ class CircuitWires {
 
 	private void connectWires(BundleMap ret) {
 		// make a WireBundle object for each tree of connected wires
+		CopyOnWriteArrayList<Wire> wires = this.wires;
 		for (Wire w : wires) {
 			WireBundle b0 = ret.getBundleAt(w.e0);
 			if (b0 == null) {
@@ -657,7 +659,7 @@ class CircuitWires {
 		return bmap.getBundleAt(query);
 	}
 
-	Set<Wire> getWires() {
+	CopyOnWriteArrayList<Wire> getWires() {
 		return wires;
 	}
 
