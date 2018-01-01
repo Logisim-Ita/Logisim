@@ -11,11 +11,13 @@ public interface ZoomModel {
 
 	public void addPropertyChangeListener(String prop, PropertyChangeListener l);
 
+	public double getMaxZoom();
+
+	public double getMinZoom();
+
 	public boolean getShowGrid();
 
 	public double getZoomFactor();
-
-	public double[] getZoomOptions();
 
 	public void removePropertyChangeListener(String prop, PropertyChangeListener l);
 

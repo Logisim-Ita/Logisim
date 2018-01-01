@@ -9,14 +9,15 @@ import java.beans.PropertyChangeSupport;
 import com.cburch.logisim.prefs.PrefMonitor;
 
 public class BasicZoomModel implements ZoomModel {
-	private double[] zoomOptions;
+	private double zoomFactor;
 
 	private PropertyChangeSupport support;
-	private double zoomFactor;
+	private double MinZoom, MaxZoom;
 	private boolean showGrid;
 
-	public BasicZoomModel(PrefMonitor<Boolean> gridPref, PrefMonitor<Double> zoomPref, double[] zoomOpts) {
-		zoomOptions = zoomOpts;
+	public BasicZoomModel(PrefMonitor<Boolean> gridPref, PrefMonitor<Double> zoomPref, double MinZoom, double MaxZoom) {
+		this.MinZoom = MinZoom;
+		this.MaxZoom = MaxZoom;
 		support = new PropertyChangeSupport(this);
 		zoomFactor = 1.0;
 		showGrid = true;
@@ -31,6 +32,16 @@ public class BasicZoomModel implements ZoomModel {
 	}
 
 	@Override
+	public double getMaxZoom() {
+		return MaxZoom;
+	}
+
+	@Override
+	public double getMinZoom() {
+		return MinZoom;
+	}
+
+	@Override
 	public boolean getShowGrid() {
 		return showGrid;
 	}
@@ -38,11 +49,6 @@ public class BasicZoomModel implements ZoomModel {
 	@Override
 	public double getZoomFactor() {
 		return zoomFactor;
-	}
-
-	@Override
-	public double[] getZoomOptions() {
-		return zoomOptions;
 	}
 
 	@Override

@@ -50,8 +50,9 @@ class SearchNode implements Comparable<SearchNode> {
 	public boolean equals(Object other) {
 		if (other instanceof SearchNode) {
 			SearchNode o = (SearchNode) other;
-			return this.loc.equals(o.loc) && (this.dir == null ? o.dir == null : this.dir.equals(o.dir))
-					&& this.dest.equals(o.dest);
+			return (this.loc.equals(o.loc)
+					&& (this.dir == null ? o.dir == null : (o.dir == null ? false : this.dir.equals(o.dir)))
+					&& this.dest.equals(o.dest));
 		} else {
 			return false;
 		}

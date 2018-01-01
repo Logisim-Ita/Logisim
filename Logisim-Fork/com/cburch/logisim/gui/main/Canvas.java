@@ -819,6 +819,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		return painter.getHaloedComponent();
 	}
 
+	public int getHorizzontalScrollBar() {
+		return canvasPane.getHorizontalScrollBar().getValue();
+	}
+
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -877,10 +881,14 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		return null;
 	}
 
+	public int getVerticalScrollBar() {
+		return canvasPane.getVerticalScrollBar().getValue();
+	}
+
 	//
 	// graphics methods
 	//
-	double getZoomFactor() {
+	public double getZoomFactor() {
 		CanvasPane pane = canvasPane;
 		return pane == null ? 1.0 : pane.getZoomFactor();
 	}
@@ -1020,6 +1028,11 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	public void setHighlightedWires(WireSet value) {
 		painter.setHighlightedWires(value);
+	}
+
+	public void setScrollBar(int X, int Y) {
+		canvasPane.getHorizontalScrollBar().setValue(X);
+		canvasPane.getVerticalScrollBar().setValue(Y);
 	}
 
 	public void showPopupMenu(JPopupMenu menu, int x, int y) {

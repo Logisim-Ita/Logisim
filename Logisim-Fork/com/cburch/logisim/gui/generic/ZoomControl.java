@@ -104,26 +104,18 @@ public class ZoomControl extends JPanel {
 
 		@Override
 		public Object getNextValue() {
-			double zoom = model.getZoomFactor();
-			double[] choices = model.getZoomOptions();
-			double factor = zoom * 100.0 * 1.001;
-			for (int i = 0; i < choices.length; i++) {
-				if (choices[i] > factor)
-					return toString(choices[i]);
-			}
-			return null;
+			double zoom = model.getZoomFactor() * 100.0;
+			if (zoom >= model.getMaxZoom())
+				return toString(model.getMaxZoom());
+			return toString(zoom + 10);
 		}
 
 		@Override
 		public Object getPreviousValue() {
-			double zoom = model.getZoomFactor();
-			double[] choices = model.getZoomOptions();
-			double factor = zoom * 100.0 * 0.999;
-			for (int i = choices.length - 1; i >= 0; i--) {
-				if (choices[i] < factor)
-					return toString(choices[i]);
-			}
-			return null;
+			double zoom = model.getZoomFactor() * 100.0;
+			if (zoom <= model.getMinZoom())
+				return toString(model.getMinZoom());
+			return toString(zoom - 10);
 		}
 
 		@Override

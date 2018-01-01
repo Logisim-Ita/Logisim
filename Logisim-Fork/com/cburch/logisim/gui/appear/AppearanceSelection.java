@@ -11,6 +11,15 @@ import com.cburch.draw.model.CanvasObject;
 import com.cburch.logisim.circuit.appear.AppearanceElement;
 
 public class AppearanceSelection extends Selection {
+	public static boolean shouldSnap(Collection<? extends CanvasObject> shapes) {
+		for (CanvasObject o : shapes) {
+			if (o instanceof AppearanceElement) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void setMovingDelta(int dx, int dy) {
 		if (shouldSnap(getSelected())) {
@@ -27,14 +36,5 @@ public class AppearanceSelection extends Selection {
 			dy = Canvas.Snap(dy);
 		}
 		super.setMovingShapes(shapes, dx, dy);
-	}
-
-	public static boolean shouldSnap(Collection<? extends CanvasObject> shapes) {
-		for (CanvasObject o : shapes) {
-			if (o instanceof AppearanceElement) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

@@ -25,9 +25,16 @@ public class Canvas extends JComponent {
 	public static final String TOOL_PROPERTY = "tool";
 	public static final String MODEL_PROPERTY = "model";
 
+	public static int Snap(int p) {
+		if (p < 0)
+			return -((-p + 5) / 10 * 10);
+		else
+			return (p + 5) / 10 * 10;
+	}
 	private CanvasModel model;
 	private ActionDispatcher dispatcher;
 	private CanvasListener listener;
+
 	private Selection selection;
 
 	public Canvas() {
@@ -130,13 +137,6 @@ public class Canvas extends JComponent {
 
 	protected JPopupMenu showPopupMenu(MouseEvent e, CanvasObject clicked) {
 		return null; // subclass will override if it supports popup menus
-	}
-
-	public static int Snap(int p) {
-		if (p < 0)
-			return -((-p + 5) / 10 * 10);
-		else
-			return (p + 5) / 10 * 10;
 	}
 
 	public int snapX(int x) {

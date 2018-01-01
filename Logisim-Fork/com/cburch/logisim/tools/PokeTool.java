@@ -86,6 +86,7 @@ public class PokeTool extends Tool {
 	private Circuit pokedCircuit;
 	private Component pokedComponent;
 	private Caret pokeCaret;
+	private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
 
 	public PokeTool() {
 		this.listener = new Listener();
@@ -163,12 +164,23 @@ public class PokeTool extends Tool {
 			pokeCaret.mouseDragged(e);
 			canvas.getProject().repaintCanvas();
 		}
+		//avoid to change values if you move after click
+		pokeCaret = null;
+		//move scrollpane dragging hand
+		canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		int x = Math.round(this.ScrollBarX + ((this.x * (float) canvas.getZoomFactor() - this.ScrollBarX)
+				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar())));
+		int y = Math.round(this.ScrollBarY + ((this.y * (float) canvas.getZoomFactor() - this.ScrollBarY)
+				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar())));
+		canvas.setScrollBar(x, y);
 	}
 
 	@Override
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
+		this.x = e.getX();
+		this.y = e.getY();
+		this.ScrollBarX = canvas.getHorizzontalScrollBar();
+		this.ScrollBarY = canvas.getVerticalScrollBar();
 		Location loc = Location.create(x, y);
 		boolean dirty = false;
 		canvas.setHighlightedWires(WireSet.EMPTY);
@@ -212,6 +224,7 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
+		canvas.setCursor(cursor);
 		if (pokeCaret != null) {
 			pokeCaret.mouseReleased(e);
 			canvas.getProject().repaintCanvas();

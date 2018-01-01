@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
@@ -15,8 +16,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-
-import com.cburch.logisim.util.MacCompatibility;
 
 public class CanvasPane extends JScrollPane {
 	private class Listener implements ComponentListener, PropertyChangeListener {
@@ -86,19 +85,24 @@ public class CanvasPane extends JScrollPane {
 		this.contents = contents;
 		this.listener = new Listener();
 		this.zoomModel = null;
-		if (MacCompatibility.mrjVersion >= 0.0) {
-			setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-			setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		}
+		// if (MacCompatibility.mrjVersion >= 0.0) {
+		//i don't want the scrollabar you'll move the pane by dragging with poke tool
+		setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		// }
 
 		addComponentListener(listener);
 		contents.setCanvasPane(this);
 	}
 
 	public Dimension getViewportSize() {
-		Dimension size = new Dimension();
-		getViewport().getSize(size);
-		return size;
+		// set size equal to viewport + screensize (the max distance you can drag to
+		// move) + scrollbar value, in this way you can move since Integer.MAX_VALUE
+		int width = (int) (getViewport().getSize().getWidth() + Toolkit.getDefaultToolkit().getScreenSize().getWidth()
+				+ getHorizontalScrollBar().getValue());
+		int height = (int) (getViewport().getSize().getHeight()
+				+ Toolkit.getDefaultToolkit().getScreenSize().getHeight() + getVerticalScrollBar().getValue());
+		return new Dimension(width, height);
 	}
 
 	public double getZoomFactor() {
