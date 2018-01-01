@@ -341,24 +341,6 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	}
 
 	@Override
-	public int snapX(int x) {
-		if (x < 0) {
-			return -((-x + 5) / 10 * 10);
-		} else {
-			return (x + 5) / 10 * 10;
-		}
-	}
-
-	@Override
-	public int snapY(int y) {
-		if (y < 0) {
-			return -((-y + 5) / 10 * 10);
-		} else {
-			return (y + 5) / 10 * 10;
-		}
-	}
-
-	@Override
 	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
 		if (tool == getTool() && tool != selectTool) {
 			setTool(selectTool);

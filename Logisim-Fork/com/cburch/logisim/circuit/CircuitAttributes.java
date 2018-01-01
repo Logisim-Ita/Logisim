@@ -84,10 +84,10 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			Strings.getter("circuitLabelFontAttr"));
 	public static final Attribute<Color> CIRCUIT_LABEL_COLOR_ATTR = Attributes.forColor("clabelcolor",
 			new LocaleManager("resources/logisim", "std").getter("ioLabelColorAttr"));
-	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, VISIBLE_WHEN_LIBRARY, CIRCUIT_LABEL_ATTR,
+	private static final Attribute<?>[] STATIC_ATTRS = { NAME_ATTR, /* VISIBLE_WHEN_LIBRARY, */ CIRCUIT_LABEL_ATTR,
 			CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR };
 
-	private static final Object[] STATIC_DEFAULTS = { "", true, "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
+	private static final Object[] STATIC_DEFAULTS = { "", /* true, */ "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
 			Color.BLACK };
 
 	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays

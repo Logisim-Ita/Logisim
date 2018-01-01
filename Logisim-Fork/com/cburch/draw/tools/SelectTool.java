@@ -29,6 +29,7 @@ import com.cburch.draw.model.HandleGesture;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
+import com.cburch.logisim.gui.appear.AppearanceSelection;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
 import com.cburch.logisim.util.LocaleManager;
@@ -469,7 +470,7 @@ public class SelectTool extends AbstractTool {
 			canvas.getSelection().setHandleGesture(curGesture);
 			break;
 		case MOVE_ALL:
-			if (ctrl) {
+			if (ctrl && !AppearanceSelection.shouldSnap(canvas.getSelection().getSelected())) {
 				int minX = Integer.MAX_VALUE;
 				int minY = Integer.MAX_VALUE;
 				for (CanvasObject o : canvas.getSelection().getSelected()) {

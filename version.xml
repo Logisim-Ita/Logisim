@@ -2,11 +2,12 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.11.5.1</jar_version>
+  <jar_version>2.11.5.2</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.11.5.1</exe_version>
+  <exe_version>2.11.5.2</exe_version>
   <changelog>
-* Retro-compatibility for .circ and libraries older than 2.11.5.0
-* Switch -> BitWidth attribute
+* Mouse wheel click draws wires
+* Minor bugs instead of total crash when recomputing connections with high frequency clock active
+* Fixed bad snap for pins in edit appearance canvas
   </changelog>
 </logisim>

@@ -153,7 +153,7 @@ public class DipSwitch extends InstanceFactory {
 	}
 
 	private static final Attribute<Integer> ATTR_NSWITCHES = Attributes.forIntegerRange("NSwitches",
-			Strings.getter("NumberOfSwitch"), 1, 64);
+			Strings.getter("NumberOfSwitch"), 1, 32);
 
 	private static final int DEPTH = 3;
 

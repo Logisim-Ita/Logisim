@@ -132,12 +132,19 @@ public class Canvas extends JComponent {
 		return null; // subclass will override if it supports popup menus
 	}
 
+	public static int Snap(int p) {
+		if (p < 0)
+			return -((-p + 5) / 10 * 10);
+		else
+			return (p + 5) / 10 * 10;
+	}
+
 	public int snapX(int x) {
-		return x; // subclass will have to override this
+		return Snap(x); // subclass will have to override this
 	}
 
 	public int snapY(int y) {
-		return y; // subclass will have to override this
+		return Snap(y); // subclass will have to override this
 	}
 
 	public void toolGestureComplete(CanvasTool tool, CanvasObject created) {
