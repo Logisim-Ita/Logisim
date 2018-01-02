@@ -165,9 +165,9 @@ public class PokeTool extends Tool {
 			pokeCaret.mouseDragged(e);
 			canvas.getProject().repaintCanvas();
 		}
-		//avoid to change values if you move after click
+		// avoid to change values if you move after click
 		pokeCaret = null;
-		//move scrollpane dragging hand
+		// move scrollpane dragging hand
 		canvas.setCursor(move);
 		int x = Math.round(this.ScrollBarX + ((this.x * (float) canvas.getZoomFactor() - this.ScrollBarX)
 				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar())));

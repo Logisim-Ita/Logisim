@@ -142,7 +142,7 @@ public class Frame extends LFrame implements LocaleListener {
 
 		@Override
 		public void windowOpened(WindowEvent e) {
-			layoutCanvas.computeSize(true);
+			// layoutCanvas.computeSize(true);
 		}
 	}
 
@@ -161,7 +161,7 @@ public class Frame extends LFrame implements LocaleListener {
 
 	public static final double MIN_ZOOM = 50;
 
-	public static final double STEP_ZOOM = 10;
+	public static final double STEP_ZOOM = 25;
 
 	public static final double MAX_ZOOM = 500;
 

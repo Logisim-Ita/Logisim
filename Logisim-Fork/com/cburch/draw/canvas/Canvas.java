@@ -31,6 +31,7 @@ public class Canvas extends JComponent {
 		else
 			return (p + 5) / 10 * 10;
 	}
+
 	private CanvasModel model;
 	private ActionDispatcher dispatcher;
 	private CanvasListener listener;
@@ -43,7 +44,6 @@ public class Canvas extends JComponent {
 		selection = new Selection();
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
-		addMouseWheelListener(listener);
 		addKeyListener(listener);
 		setPreferredSize(new Dimension(400, 400));
 	}

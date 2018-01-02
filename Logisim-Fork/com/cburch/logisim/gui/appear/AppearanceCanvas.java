@@ -3,11 +3,18 @@
 
 package com.cburch.logisim.gui.appear;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -33,13 +40,119 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
+import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.proj.Project;
 
 public class AppearanceCanvas extends Canvas implements CanvasPaneContents, ActionDispatcher {
-	private class Listener implements CanvasModelListener, PropertyChangeListener {
+	private class Listener implements CanvasModelListener, PropertyChangeListener, KeyListener, MouseListener,
+			MouseMotionListener, MouseWheelListener {
+		private final Cursor cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		private final Cursor move = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+		private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
+		private boolean mooving = false;
+
+		@Override
+		public void keyPressed(KeyEvent arg0) {
+			if ((arg0.getKeyCode() == KeyEvent.VK_0 || arg0.getKeyCode() == KeyEvent.VK_NUMPAD0)
+					&& arg0.isControlDown()) {
+				CircuitState circState = circuitState;
+				Bounds bounds;
+				if (circState == null)
+					bounds = Bounds.create(0, 0, 50, 50);
+				else
+					bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
+				if (bounds.getHeight() == 0 || bounds.getWidth() == 0)
+					return;
+				// the white space around
+				int padding = 50;
+				// set autozoom
+				double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
+				double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
+				double autozoom = getZoomFactor();
+				if (canvasPane.getViewport().getSize().getWidth()
+						/ width < canvasPane.getViewport().getSize().getHeight() / height) {
+					autozoom *= canvasPane.getViewport().getSize().getWidth() / width;
+				} else
+					autozoom *= canvasPane.getViewport().getSize().getHeight() / height;
+				if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
+					ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
+				// align at the center
+				canvasPane.getHorizontalScrollBar().setValue((int) (Math.round(bounds.getX() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)));
+				canvasPane.getVerticalScrollBar().setValue((int) (Math.round(bounds.getY() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
+								/ 2)));
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) {
+		}
+
+		@Override
+		public void keyTyped(KeyEvent arg0) {
+		}
+
 		@Override
 		public void modelChanged(CanvasModelEvent event) {
-			computeSize(false);
+			// computeSize(false);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			if (mooving) {
+				setCursor(move);
+				int x = Math.round(this.ScrollBarX + ((this.x * (float) getZoomFactor() - this.ScrollBarX)
+						- (arg0.getX() * (float) getZoomFactor() - getHorizzontalScrollBar())));
+				int y = Math.round(this.ScrollBarY + ((this.y * (float) getZoomFactor() - this.ScrollBarY)
+						- (arg0.getY() * (float) getZoomFactor() - getVerticalScrollBar())));
+				setScrollBar(x, y);
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			if (arg0.getButton() == MouseEvent.BUTTON2) {
+				this.x = arg0.getX();
+				this.y = arg0.getY();
+				this.ScrollBarX = getHorizzontalScrollBar();
+				this.ScrollBarY = getVerticalScrollBar();
+				this.mooving = true;
+			}
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			if (arg0.getButton() == MouseEvent.BUTTON2) {
+				setCursor(cursor);
+				this.mooving = false;
+			}
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent arg0) {// zoom mouse wheel
+			if (arg0.getPreciseWheelRotation() < 0) {
+				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getNextValue());
+			} else if (arg0.getPreciseWheelRotation() > 0) {
+				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getPreviousValue());
+			}
 		}
 
 		@Override
@@ -58,10 +171,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	 * 
 	 */
 	private static final long serialVersionUID = -2997341273503780021L;
-	private static final int BOUNDS_BUFFER = 70;
+	// private static final int BOUNDS_BUFFER = 70;
 
 	// pixels shown in canvas beyond outermost boundaries
-	private static final int THRESH_SIZE_UPDATE = 10;
+	// private static final int THRESH_SIZE_UPDATE = 10;
 	// don't bother to update the size if it hasn't changed more than this
 
 	static int getMaxIndex(CanvasModel model) {
@@ -80,7 +193,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	private Listener listener;
 	private GridPainter grid;
 	private CanvasPane canvasPane;
-	private Bounds oldPreferredSize;
+	// private Bounds oldPreferredSize;
 
 	private LayoutPopupManager popupManager;
 
@@ -88,7 +201,12 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		this.selectTool = selectTool;
 		this.grid = new GridPainter(this);
 		this.listener = new Listener();
-		this.oldPreferredSize = null;
+		// this.oldPreferredSize = null;
+		addKeyListener(listener);
+		addMouseListener(listener);
+		addMouseMotionListener(listener);
+		addMouseWheelListener(listener);
+		setPreferredSize(new Dimension(Integer.MAX_VALUE / 100, Integer.MAX_VALUE / 100));
 		setSelection(new AppearanceSelection());
 		setTool(selectTool);
 
@@ -98,34 +216,20 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		grid.addPropertyChangeListener(GridPainter.ZOOM_PROPERTY, listener);
 	}
 
-	private void computeSize(boolean immediate) {
-		hidePopup();
-		Bounds bounds;
-		CircuitState circState = circuitState;
-		if (circState == null) {
-			bounds = Bounds.create(0, 0, 50, 50);
-		} else {
-			bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
-		}
-		int width = bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER;
-		int height = bounds.getY() + bounds.getHeight() + BOUNDS_BUFFER;
-		Dimension dim;
-		if (canvasPane == null) {
-			dim = new Dimension(width, height);
-		} else {
-			dim = canvasPane.supportPreferredSize(width, height);
-		}
-		if (!immediate) {
-			Bounds old = oldPreferredSize;
-			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
-					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
-				return;
-			}
-		}
-		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
-		setPreferredSize(dim);
-		revalidate();
-	}
+	/*
+	 * private void computeSize(boolean immediate) { hidePopup(); Bounds bounds;
+	 * CircuitState circState = circuitState; if (circState == null) { bounds =
+	 * Bounds.create(0, 0, 50, 50); } else { bounds =
+	 * circState.getCircuit().getAppearance().getAbsoluteBounds(); } int width =
+	 * bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER; int height = bounds.getY()
+	 * + bounds.getHeight() + BOUNDS_BUFFER; Dimension dim; if (canvasPane == null)
+	 * { dim = new Dimension(width, height); } else { dim =
+	 * canvasPane.supportPreferredSize(width, height); } if (!immediate) { Bounds
+	 * old = oldPreferredSize; if (old != null && Math.abs(old.getWidth() -
+	 * dim.width) < THRESH_SIZE_UPDATE && Math.abs(old.getHeight() - dim.height) <
+	 * THRESH_SIZE_UPDATE) { return; } } oldPreferredSize = Bounds.create(0, 0,
+	 * dim.width, dim.height); setPreferredSize(dim); revalidate(); }
+	 */
 
 	@Override
 	public void doAction(Action canvasAction) {
@@ -194,6 +298,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		return grid;
 	}
 
+	public int getHorizzontalScrollBar() {
+		return canvasPane.getHorizontalScrollBar().getValue();
+	}
+
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -221,6 +329,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
 		return canvasPane.supportScrollableUnitIncrement(visibleRect, orientation, direction);
+	}
+
+	public int getVerticalScrollBar() {
+		return canvasPane.getVerticalScrollBar().getValue();
 	}
 
 	@Override
@@ -266,7 +378,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 
 	@Override
 	public void recomputeSize() {
-		computeSize(true);
+		// computeSize(true);
 		repaint();
 	}
 
@@ -298,7 +410,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	@Override
 	public void setCanvasPane(CanvasPane value) {
 		canvasPane = value;
-		computeSize(true);
+		// computeSize(true);
 		popupManager = new LayoutPopupManager(value, this);
 	}
 
@@ -319,6 +431,11 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		if (value != null) {
 			value.addCanvasModelListener(listener);
 		}
+	}
+
+	public void setScrollBar(int X, int Y) {
+		canvasPane.getHorizontalScrollBar().setValue(X);
+		canvasPane.getVerticalScrollBar().setValue(Y);
 	}
 
 	@Override

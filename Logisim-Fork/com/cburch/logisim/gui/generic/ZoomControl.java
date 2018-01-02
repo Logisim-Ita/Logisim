@@ -103,20 +103,26 @@ public class ZoomControl extends JPanel {
 		 */
 		private static final long serialVersionUID = -2283318939208459104L;
 
+		private double checkZoom(double zoom) {
+			if (zoom < Frame.MIN_ZOOM)
+				return Frame.MIN_ZOOM;
+			else if (zoom > Frame.MAX_ZOOM)
+				return Frame.MAX_ZOOM;
+			return zoom;
+		}
+
 		@Override
 		public Object getNextValue() {
-			double zoom = model.getZoomFactor() * 100.0 + Frame.STEP_ZOOM;
-			if (zoom > Frame.MAX_ZOOM)
-				return toString(Frame.MAX_ZOOM);
-			return toString(zoom);
+			double zoom = Math.round((model.getZoomFactor() * 100.0 + Frame.STEP_ZOOM) / Frame.STEP_ZOOM)
+					* Frame.STEP_ZOOM;
+			return toString(checkZoom(zoom));
 		}
 
 		@Override
 		public Object getPreviousValue() {
-			double zoom = model.getZoomFactor() * 100.0 - Frame.STEP_ZOOM;
-			if (zoom < Frame.MIN_ZOOM)
-				return toString(Frame.MIN_ZOOM);
-			return toString(zoom);
+			double zoom = Math.round((model.getZoomFactor() * 100.0 - Frame.STEP_ZOOM) / Frame.STEP_ZOOM)
+					* Frame.STEP_ZOOM;
+			return toString(checkZoom(zoom));
 		}
 
 		@Override
@@ -138,8 +144,8 @@ public class ZoomControl extends JPanel {
 					s = s.substring(6, s.length() - 1);
 				s = s.trim();
 				try {
-					double zoom = Double.parseDouble(s) / 100.0;
-					model.setZoomFactor(zoom);
+					double zoom = Double.parseDouble(s);
+					model.setZoomFactor(checkZoom(zoom) / 100.0);
 				} catch (NumberFormatException e) {
 				}
 			}
