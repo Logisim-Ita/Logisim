@@ -12,12 +12,9 @@ public class BasicZoomModel implements ZoomModel {
 	private double zoomFactor;
 
 	private PropertyChangeSupport support;
-	private double MinZoom, MaxZoom;
 	private boolean showGrid;
 
-	public BasicZoomModel(PrefMonitor<Boolean> gridPref, PrefMonitor<Double> zoomPref, double MinZoom, double MaxZoom) {
-		this.MinZoom = MinZoom;
-		this.MaxZoom = MaxZoom;
+	public BasicZoomModel(PrefMonitor<Boolean> gridPref, PrefMonitor<Double> zoomPref) {
 		support = new PropertyChangeSupport(this);
 		zoomFactor = 1.0;
 		showGrid = true;
@@ -29,16 +26,6 @@ public class BasicZoomModel implements ZoomModel {
 	@Override
 	public void addPropertyChangeListener(String prop, PropertyChangeListener l) {
 		support.addPropertyChangeListener(prop, l);
-	}
-
-	@Override
-	public double getMaxZoom() {
-		return MaxZoom;
-	}
-
-	@Override
-	public double getMinZoom() {
-		return MinZoom;
 	}
 
 	@Override

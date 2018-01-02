@@ -161,6 +161,8 @@ public class Frame extends LFrame implements LocaleListener {
 
 	public static final double MIN_ZOOM = 50;
 
+	public static final double STEP_ZOOM = 10;
+
 	public static final double MAX_ZOOM = 500;
 
 	private static Point getInitialLocation() {
@@ -267,8 +269,7 @@ public class Frame extends LFrame implements LocaleListener {
 		// set up elements for the Layout view
 		layoutToolbarModel = new LayoutToolbarModel(this, proj);
 		layoutCanvas = new Canvas(proj);
-		layoutZoomModel = new BasicZoomModel(AppPreferences.LAYOUT_SHOW_GRID, AppPreferences.LAYOUT_ZOOM, MIN_ZOOM,
-				MAX_ZOOM);
+		layoutZoomModel = new BasicZoomModel(AppPreferences.LAYOUT_SHOW_GRID, AppPreferences.LAYOUT_ZOOM);
 
 		layoutCanvas.getGridPainter().setZoomModel(layoutZoomModel);
 		layoutEditHandler = new LayoutEditHandler(this);

@@ -197,6 +197,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			Tool tool = proj.getTool();
 			if (tool != null) {
 				tool.mouseMoved(Canvas.this, getGraphics(), e);
+				setCursor(tool.getCursor());
 			}
 
 			completeAction();

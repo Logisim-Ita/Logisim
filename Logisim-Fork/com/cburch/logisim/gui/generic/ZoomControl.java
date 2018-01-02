@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.prefs.AppPreferences;
 
 public class ZoomControl extends JPanel {
@@ -104,18 +105,18 @@ public class ZoomControl extends JPanel {
 
 		@Override
 		public Object getNextValue() {
-			double zoom = model.getZoomFactor() * 100.0;
-			if (zoom >= model.getMaxZoom())
-				return toString(model.getMaxZoom());
-			return toString(zoom + 10);
+			double zoom = model.getZoomFactor() * 100.0 + Frame.STEP_ZOOM;
+			if (zoom > Frame.MAX_ZOOM)
+				return toString(Frame.MAX_ZOOM);
+			return toString(zoom);
 		}
 
 		@Override
 		public Object getPreviousValue() {
-			double zoom = model.getZoomFactor() * 100.0;
-			if (zoom <= model.getMinZoom())
-				return toString(model.getMinZoom());
-			return toString(zoom - 10);
+			double zoom = model.getZoomFactor() * 100.0 - Frame.STEP_ZOOM;
+			if (zoom < Frame.MIN_ZOOM)
+				return toString(Frame.MIN_ZOOM);
+			return toString(zoom);
 		}
 
 		@Override

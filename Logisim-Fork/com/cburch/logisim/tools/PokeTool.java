@@ -80,7 +80,8 @@ public class PokeTool extends Tool {
 
 	private static final Color caretColor = new Color(255, 255, 150);
 
-	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+	private static final Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+	private static final Cursor move = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
 
 	private Listener listener;
 	private Circuit pokedCircuit;
@@ -167,7 +168,7 @@ public class PokeTool extends Tool {
 		//avoid to change values if you move after click
 		pokeCaret = null;
 		//move scrollpane dragging hand
-		canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		canvas.setCursor(move);
 		int x = Math.round(this.ScrollBarX + ((this.x * (float) canvas.getZoomFactor() - this.ScrollBarX)
 				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar())));
 		int y = Math.round(this.ScrollBarY + ((this.y * (float) canvas.getZoomFactor() - this.ScrollBarY)
@@ -181,6 +182,7 @@ public class PokeTool extends Tool {
 		this.y = e.getY();
 		this.ScrollBarX = canvas.getHorizzontalScrollBar();
 		this.ScrollBarY = canvas.getVerticalScrollBar();
+		canvas.setCursor(cursor);
 		Location loc = Location.create(x, y);
 		boolean dirty = false;
 		canvas.setHighlightedWires(WireSet.EMPTY);
@@ -224,7 +226,6 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
-		canvas.setCursor(cursor);
 		if (pokeCaret != null) {
 			pokeCaret.mouseReleased(e);
 			canvas.getProject().repaintCanvas();

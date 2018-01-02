@@ -15,7 +15,6 @@ import com.cburch.logisim.gui.generic.BasicZoomModel;
 import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.ZoomModel;
 import com.cburch.logisim.gui.main.EditHandler;
-import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 
@@ -34,8 +33,7 @@ public class AppearanceView {
 		SelectTool selectTool = new SelectTool();
 		canvas = new AppearanceCanvas(selectTool);
 		toolbarModel = new AppearanceToolbarModel(selectTool, canvas, attrs);
-		zoomModel = new BasicZoomModel(AppPreferences.APPEARANCE_SHOW_GRID, AppPreferences.APPEARANCE_ZOOM,
-				Frame.MIN_ZOOM, Frame.MAX_ZOOM);
+		zoomModel = new BasicZoomModel(AppPreferences.APPEARANCE_SHOW_GRID, AppPreferences.APPEARANCE_ZOOM);
 		canvas.getGridPainter().setZoomModel(zoomModel);
 		attrTableManager = null;
 		canvasPane = new CanvasPane(canvas);
