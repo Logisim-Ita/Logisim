@@ -101,8 +101,11 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			} else if ((e.getKeyCode() == KeyEvent.VK_0 || e.getKeyCode() == KeyEvent.VK_NUMPAD0)
 					&& e.isControlDown()) {
 				Bounds bounds = proj.getCurrentCircuit().getBounds();
-				if (bounds.getHeight() == 0 || bounds.getWidth() == 0)
+				if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
+					setScrollBar(0, 0);
+					ZoomControl.spinnerModel.setValue(String.valueOf(100.0));
 					return;
+				}
 				// the white space around
 				int padding = 75;
 				// set autozoom
@@ -117,11 +120,11 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
 					ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
 				// align at the center
-				canvasPane.getHorizontalScrollBar().setValue((int) (Math.round(bounds.getX() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)));
-				canvasPane.getVerticalScrollBar().setValue((int) (Math.round(bounds.getY() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
-								/ 2)));
+				setScrollBar((int) (Math.round(bounds.getX() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)),
+						(int) (Math
+								.round(bounds.getY() * getZoomFactor() - (canvasPane.getViewport().getSize().getHeight()
+										- bounds.getHeight() * getZoomFactor()) / 2)));
 			} else {
 				Tool tool = proj.getTool();
 				if (tool != null)
@@ -613,9 +616,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	 */
 	private static final long serialVersionUID = -4680658517189289645L;
 	static final Color HALO_COLOR = new Color(200, 250, 255);
-	// private static final int BOUNDS_BUFFER = 70;
 	// pixels shown in canvas beyond outermost boundaries
-	// private static final int THRESH_SIZE_UPDATE = 10;
+	private static final int THRESH_SIZE_UPDATE = 10;
 
 	// don't bother to update the size if it hasn't changed more than this
 	static final double SQRT_2 = Math.sqrt(2.0);
@@ -660,7 +662,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	private Selection selection;
 	private MouseMappings mappings;
 	private CanvasPane canvasPane;
-	// private Bounds oldPreferredSize;
+	private Bounds oldPreferredSize;
 	private MyListener myListener = new MyListener();
 
 	private MyViewport viewport = new MyViewport();
@@ -679,7 +681,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		this.proj = proj;
 		this.selection = new Selection(proj, this);
 		this.painter = new CanvasPainter(this);
-		// this.oldPreferredSize = null;
+		this.oldPreferredSize = null;
 		this.paintThread = new CanvasPaintThread(this);
 		this.mappings = proj.getOptions().getMouseMappings();
 		this.canvasPane = null;
@@ -717,24 +719,33 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	private void completeAction() {
-		// computeSize(false);
+		computeSize(false);
 		// TODO for SimulatorPrototype: proj.getSimulator().releaseUserEvents();
 		proj.getSimulator().requestPropagate();
 		// repaint will occur after propagation completes
 	}
 
-	/*
-	 * public void computeSize(boolean immediate) { Bounds bounds =
-	 * proj.getCurrentCircuit().getBounds(); int width = bounds.getX() +
-	 * bounds.getWidth() + BOUNDS_BUFFER; int height = bounds.getY() +
-	 * bounds.getHeight() + BOUNDS_BUFFER; Dimension dim; if (canvasPane == null) {
-	 * dim = new Dimension(width, height); } else { dim =
-	 * canvasPane.supportPreferredSize(width, height); } if (!immediate) { Bounds
-	 * old = oldPreferredSize; if (old != null && Math.abs(old.getWidth() -
-	 * dim.width) < THRESH_SIZE_UPDATE && Math.abs(old.getHeight() - dim.height) <
-	 * THRESH_SIZE_UPDATE) { return; } } oldPreferredSize = Bounds.create(0, 0,
-	 * dim.width, dim.height); setPreferredSize(dim); revalidate(); }
-	 */
+	public void computeSize(boolean immediate) {
+		Bounds bounds = proj.getCurrentCircuit().getBounds();
+		int width = bounds.getX() + bounds.getWidth() + viewport.getWidth();
+		int height = bounds.getY() + bounds.getHeight() + viewport.getHeight();
+		Dimension dim;
+		if (canvasPane == null) {
+			dim = new Dimension(width, height);
+		} else {
+			dim = canvasPane.supportPreferredSize(width, height);
+		}
+		if (!immediate) {
+			Bounds old = oldPreferredSize;
+			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
+					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
+				return;
+			}
+		}
+		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
+		setPreferredSize(dim);
+		revalidate();
+	}
 
 	private void computeViewportContents() {
 		Set<WidthIncompatibilityData> exceptions = proj.getCurrentCircuit().getWidthIncompatibilityData();
@@ -973,7 +984,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	@Override
 	public void recomputeSize() {
-		// computeSize(true);
+		computeSize(true);
 	}
 
 	@Override
@@ -1028,7 +1039,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		canvasPane.setViewport(viewport);
 		viewport.setView(this);
 		setOpaque(false);
-		// computeSize(true);
+		computeSize(true);
 	}
 
 	public void setErrorMessage(StringGetter message) {

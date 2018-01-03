@@ -61,8 +61,11 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 					bounds = Bounds.create(0, 0, 50, 50);
 				else
 					bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
-				if (bounds.getHeight() == 0 || bounds.getWidth() == 0)
+				if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
+					setScrollBar(0, 0);
+					ZoomControl.spinnerModel.setValue(String.valueOf(100.0));
 					return;
+				}
 				// the white space around
 				int padding = 50;
 				// set autozoom
@@ -77,11 +80,11 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
 					ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
 				// align at the center
-				canvasPane.getHorizontalScrollBar().setValue((int) (Math.round(bounds.getX() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)));
-				canvasPane.getVerticalScrollBar().setValue((int) (Math.round(bounds.getY() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
-								/ 2)));
+				setScrollBar((int) (Math.round(bounds.getX() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)),
+						(int) (Math
+								.round(bounds.getY() * getZoomFactor() - (canvasPane.getViewport().getSize().getHeight()
+										- bounds.getHeight() * getZoomFactor()) / 2)));
 			}
 		}
 
@@ -95,7 +98,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 
 		@Override
 		public void modelChanged(CanvasModelEvent event) {
-			// computeSize(false);
+			computeSize(false);
 		}
 
 		@Override
@@ -171,10 +174,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	 * 
 	 */
 	private static final long serialVersionUID = -2997341273503780021L;
-	// private static final int BOUNDS_BUFFER = 70;
+	private static final int BOUNDS_BUFFER = 70;
 
 	// pixels shown in canvas beyond outermost boundaries
-	// private static final int THRESH_SIZE_UPDATE = 10;
+	private static final int THRESH_SIZE_UPDATE = 10;
 	// don't bother to update the size if it hasn't changed more than this
 
 	static int getMaxIndex(CanvasModel model) {
@@ -193,7 +196,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	private Listener listener;
 	private GridPainter grid;
 	private CanvasPane canvasPane;
-	// private Bounds oldPreferredSize;
+	private Bounds oldPreferredSize;
 
 	private LayoutPopupManager popupManager;
 
@@ -201,7 +204,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		this.selectTool = selectTool;
 		this.grid = new GridPainter(this);
 		this.listener = new Listener();
-		// this.oldPreferredSize = null;
+		this.oldPreferredSize = null;
 		addKeyListener(listener);
 		addMouseListener(listener);
 		addMouseMotionListener(listener);
@@ -216,20 +219,34 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		grid.addPropertyChangeListener(GridPainter.ZOOM_PROPERTY, listener);
 	}
 
-	/*
-	 * private void computeSize(boolean immediate) { hidePopup(); Bounds bounds;
-	 * CircuitState circState = circuitState; if (circState == null) { bounds =
-	 * Bounds.create(0, 0, 50, 50); } else { bounds =
-	 * circState.getCircuit().getAppearance().getAbsoluteBounds(); } int width =
-	 * bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER; int height = bounds.getY()
-	 * + bounds.getHeight() + BOUNDS_BUFFER; Dimension dim; if (canvasPane == null)
-	 * { dim = new Dimension(width, height); } else { dim =
-	 * canvasPane.supportPreferredSize(width, height); } if (!immediate) { Bounds
-	 * old = oldPreferredSize; if (old != null && Math.abs(old.getWidth() -
-	 * dim.width) < THRESH_SIZE_UPDATE && Math.abs(old.getHeight() - dim.height) <
-	 * THRESH_SIZE_UPDATE) { return; } } oldPreferredSize = Bounds.create(0, 0,
-	 * dim.width, dim.height); setPreferredSize(dim); revalidate(); }
-	 */
+	private void computeSize(boolean immediate) {
+		hidePopup();
+		Bounds bounds;
+		CircuitState circState = circuitState;
+		if (circState == null) {
+			bounds = Bounds.create(0, 0, 50, 50);
+		} else {
+			bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
+		}
+		int width = bounds.getX() + bounds.getWidth() + BOUNDS_BUFFER;
+		int height = bounds.getY() + bounds.getHeight() + BOUNDS_BUFFER;
+		Dimension dim;
+		if (canvasPane == null) {
+			dim = new Dimension(width, height);
+		} else {
+			dim = canvasPane.supportPreferredSize(width, height);
+		}
+		if (!immediate) {
+			Bounds old = oldPreferredSize;
+			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
+					&& Math.abs(old.getHeight() - dim.height) < THRESH_SIZE_UPDATE) {
+				return;
+			}
+		}
+		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
+		setPreferredSize(dim);
+		revalidate();
+	}
 
 	@Override
 	public void doAction(Action canvasAction) {
@@ -378,7 +395,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 
 	@Override
 	public void recomputeSize() {
-		// computeSize(true);
+		computeSize(true);
 		repaint();
 	}
 
@@ -410,7 +427,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	@Override
 	public void setCanvasPane(CanvasPane value) {
 		canvasPane = value;
-		// computeSize(true);
+		computeSize(true);
 		popupManager = new LayoutPopupManager(value, this);
 	}
 

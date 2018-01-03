@@ -4,8 +4,10 @@
 package com.cburch.logisim.gui.generic;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
@@ -14,6 +16,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+
+import com.cburch.logisim.gui.main.Frame;
 
 public class CanvasPane extends JScrollPane {
 	private class Listener implements ComponentListener, PropertyChangeListener {
@@ -93,17 +97,14 @@ public class CanvasPane extends JScrollPane {
 		contents.setCanvasPane(this);
 	}
 
-	/*
-	 * public Dimension getViewportSize() { // set size equal to viewport +
-	 * screensize (the max distance you can drag to // move) + scrollbar value, in
-	 * this way you can move since Integer.MAX_VALUE int width = (int)
-	 * (getViewport().getSize().getWidth() +
-	 * Toolkit.getDefaultToolkit().getScreenSize().getWidth() +
-	 * getHorizontalScrollBar().getValue()); int height = (int)
-	 * (getViewport().getSize().getHeight() +
-	 * Toolkit.getDefaultToolkit().getScreenSize().getHeight() +
-	 * getVerticalScrollBar().getValue()); return new Dimension(width, height); }
-	 */
+	public Dimension getViewportSize() { // set size equal to viewport + screensize (the max distance you can drag to //
+											// move) + scrollbar value, in this way you can move since Integer.MAX_VALUE
+		int width = (int) (getViewport().getSize().getWidth() + Toolkit.getDefaultToolkit().getScreenSize().getWidth()
+				+ getHorizontalScrollBar().getValue());
+		int height = (int) (getViewport().getSize().getHeight()
+				+ Toolkit.getDefaultToolkit().getScreenSize().getHeight() + getVerticalScrollBar().getValue());
+		return new Dimension(width, height);
+	}
 
 	public double getZoomFactor() {
 		ZoomModel model = zoomModel;
@@ -121,14 +122,16 @@ public class CanvasPane extends JScrollPane {
 		}
 	}
 
-	/*
-	 * public Dimension supportPreferredSize(int width, int height) { double zoom =
-	 * getZoomFactor(); if (zoom != 1.0) { width = (int) Math.ceil(width * zoom);
-	 * height = (int) Math.ceil(height * zoom); } Dimension minSize =
-	 * getViewportSize(); if (minSize.width > width) width = minSize.width; if
-	 * (minSize.height > height) height = minSize.height; return new
-	 * Dimension(width, height); }
-	 */
+	public Dimension supportPreferredSize(int width, int height) {
+		width *= Frame.MAX_ZOOM;
+		height *= Frame.MAX_ZOOM;
+		Dimension minSize = getViewportSize();
+		if (minSize.width > width)
+			width = minSize.width;
+		if (minSize.height > height)
+			height = minSize.height;
+		return new Dimension(width, height);
+	}
 
 	public int supportScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
 		int unit = supportScrollableUnitIncrement(visibleRect, orientation, direction);

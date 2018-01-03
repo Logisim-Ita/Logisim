@@ -142,7 +142,7 @@ public class Frame extends LFrame implements LocaleListener {
 
 		@Override
 		public void windowOpened(WindowEvent e) {
-			// layoutCanvas.computeSize(true);
+			layoutCanvas.computeSize(true);
 		}
 	}
 
