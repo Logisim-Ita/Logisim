@@ -91,6 +91,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 						(int) (Math
 								.round(bounds.getY() * getZoomFactor() - (canvasPane.getViewport().getSize().getHeight()
 										- bounds.getHeight() * getZoomFactor()) / 2)));
+				setArrows();
 			}
 		}
 

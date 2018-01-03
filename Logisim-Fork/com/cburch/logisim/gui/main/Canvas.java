@@ -100,31 +100,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				proj.getSimulator().setIsRunning(true);
 			} else if ((e.getKeyCode() == KeyEvent.VK_0 || e.getKeyCode() == KeyEvent.VK_NUMPAD0)
 					&& e.isControlDown()) {
-				Bounds bounds = proj.getCurrentCircuit().getBounds();
-				if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
-					setScrollBar(0, 0);
-					ZoomControl.spinnerModel.setValue(String.valueOf(100.0));
-					return;
-				}
-				// the white space around
-				int padding = 75;
-				// set autozoom
-				double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
-				double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
-				double autozoom = getZoomFactor();
-				if (canvasPane.getViewport().getSize().getWidth()
-						/ width < canvasPane.getViewport().getSize().getHeight() / height) {
-					autozoom *= canvasPane.getViewport().getSize().getWidth() / width;
-				} else
-					autozoom *= canvasPane.getViewport().getSize().getHeight() / height;
-				if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
-					ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
-				// align at the center
-				setScrollBar((int) (Math.round(bounds.getX() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)),
-						(int) (Math
-								.round(bounds.getY() * getZoomFactor() - (canvasPane.getViewport().getSize().getHeight()
-										- bounds.getHeight() * getZoomFactor()) / 2)));
+				autoZoomCenter();
 			} else {
 				Tool tool = proj.getTool();
 				if (tool != null)
@@ -204,7 +180,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		@Override
 		public void mousePressed(MouseEvent e) {
 			viewport.setErrorMessage(null, null);
-			proj.setStartupScreen(false);
+			if (proj.isStartupScreen()) {
+				Bounds bounds = proj.getCurrentCircuit().getBounds();
+				// set the project as dirty only if it contains something
+				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
+					proj.setStartupScreen(false);
+			}
 			Canvas.this.requestFocus();
 			drag_tool = getToolFor(e);
 			if (drag_tool != null) {
@@ -732,10 +713,42 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		// repaint will occur after propagation completes
 	}
 
+	public void autoZoomCenter() {
+		Bounds bounds = proj.getCurrentCircuit().getBounds();
+		if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
+			setScrollBar(0, 0);
+			return;
+		}
+		// the white space around
+		int padding = 75;
+		// set autozoom
+		double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
+		double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
+		double autozoom = getZoomFactor();
+		if (canvasPane.getViewport().getSize().getWidth() / width < canvasPane.getViewport().getSize().getHeight()
+				/ height) {
+			autozoom *= canvasPane.getViewport().getSize().getWidth() / width;
+		} else
+			autozoom *= canvasPane.getViewport().getSize().getHeight() / height;
+		if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
+			ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
+		// align at the center
+		setScrollBar(
+				(int) (Math.round(bounds.getX() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)),
+				(int) (Math.round(bounds.getY() * getZoomFactor()
+						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
+								/ 2)));
+		setArrows(null, null, null, null);
+	}
+
 	public void computeSize(boolean immediate) {
 		Bounds bounds = proj.getCurrentCircuit().getBounds();
-		int width = bounds.getX() + bounds.getWidth() + canvasPane.getViewport().getWidth();
-		int height = bounds.getY() + bounds.getHeight() + canvasPane.getViewport().getHeight();
+		int height = 0, width = 0;
+		if (bounds != null && viewport != null) {
+			width = bounds.getX() + bounds.getWidth() + viewport.getWidth();
+			height = bounds.getY() + bounds.getHeight() + viewport.getHeight();
+		}
 		Dimension dim;
 		if (canvasPane == null) {
 			dim = new Dimension(width, height);

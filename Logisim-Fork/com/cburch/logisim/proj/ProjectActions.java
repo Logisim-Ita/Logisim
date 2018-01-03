@@ -44,6 +44,7 @@ public class ProjectActions {
 			frame.setVisible(true);
 			frame.toFront();
 			frame.getCanvas().requestFocus();
+			frame.getCanvas().autoZoomCenter();
 			loader.setParent(frame);
 			if (isStartupScreen)
 				proj.setStartupScreen(true);
@@ -234,6 +235,7 @@ public class ProjectActions {
 		frame.toFront();
 		frame.getCanvas().requestFocus();
 		proj.getLogisimFile().getLoader().setParent(frame);
+		frame.getCanvas().autoZoomCenter();
 		return proj;
 	}
 
