@@ -47,7 +47,6 @@ import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.GraphicsUtil;
-import com.cburch.logisim.util.StringGetter;
 
 public class AppearanceCanvas extends Canvas implements CanvasPaneContents, ActionDispatcher {
 	private class Listener implements CanvasModelListener, PropertyChangeListener, KeyListener, MouseListener,
@@ -178,13 +177,11 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		}
 	}
 
-	public class MyViewport extends JViewport {
+	private class MyViewport extends JViewport {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = -7658870263931307849L;
-		StringGetter errorMessage = null;
-		Color errorColor = com.cburch.logisim.gui.main.Canvas.DEFAULT_ERROR_COLOR;
 		boolean isNorth = false;
 		boolean isSouth = false;
 		boolean isWest = false;

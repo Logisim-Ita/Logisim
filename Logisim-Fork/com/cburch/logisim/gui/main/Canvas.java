@@ -422,7 +422,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		}
 	}
 
-	public class MyViewport extends JViewport {
+	private class MyViewport extends JViewport {
 		/**
 		 * 
 		 */

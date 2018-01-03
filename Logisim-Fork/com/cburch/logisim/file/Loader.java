@@ -388,9 +388,6 @@ public class Loader implements LibraryLoader {
 		parent = value;
 	}
 
-	public Component getParent() {
-		return this.parent;
-	}
 	@Override
 	public void showError(String description) {
 		if (!filesOpening.empty()) {
