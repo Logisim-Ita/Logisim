@@ -74,6 +74,7 @@ public class Register extends InstanceFactory {
 		instance.setPorts(ps);
 	}
 
+	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		super.instanceAttributeChanged(instance, attr);
 		if (attr == Mem.ATTR_SELECTION)

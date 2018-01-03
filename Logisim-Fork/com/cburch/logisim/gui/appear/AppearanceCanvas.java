@@ -3,11 +3,13 @@
 
 package com.cburch.logisim.gui.appear;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 
 import com.cburch.draw.actions.ModelAddAction;
 import com.cburch.draw.actions.ModelReorderAction;
@@ -41,7 +44,10 @@ import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
 import com.cburch.logisim.gui.generic.ZoomControl;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.util.GraphicsUtil;
+import com.cburch.logisim.util.StringGetter;
 
 public class AppearanceCanvas extends Canvas implements CanvasPaneContents, ActionDispatcher {
 	private class Listener implements CanvasModelListener, PropertyChangeListener, KeyListener, MouseListener,
@@ -58,7 +64,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				CircuitState circState = circuitState;
 				Bounds bounds;
 				if (circState == null)
-					bounds = Bounds.create(0, 0, 50, 50);
+					bounds = Bounds.create(0, 0, 0, 0);
 				else
 					bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
 				if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
@@ -114,6 +120,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				int y = Math.round(this.ScrollBarY + ((this.y * (float) getZoomFactor() - this.ScrollBarY)
 						- (arg0.getY() * (float) getZoomFactor() - getVerticalScrollBar())));
 				setScrollBar(x, y);
+				setArrows();
 			}
 		}
 
@@ -170,6 +177,123 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		}
 	}
 
+	public class MyViewport extends JViewport {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7658870263931307849L;
+		StringGetter errorMessage = null;
+		Color errorColor = com.cburch.logisim.gui.main.Canvas.DEFAULT_ERROR_COLOR;
+		boolean isNorth = false;
+		boolean isSouth = false;
+		boolean isWest = false;
+		boolean isEast = false;
+		boolean isNortheast = false;
+		boolean isNorthwest = false;
+		boolean isSoutheast = false;
+		boolean isSouthwest = false;
+
+		public MyViewport() {
+		}
+
+		void clearArrows() {
+			isNorth = false;
+			isSouth = false;
+			isWest = false;
+			isEast = false;
+			isNortheast = false;
+			isNorthwest = false;
+			isSoutheast = false;
+			isSouthwest = false;
+		}
+
+		@Override
+		public Color getBackground() {
+			return null;
+		}
+
+		@Override
+		public void paintChildren(Graphics g) {
+			super.paintChildren(g);
+			paintContents(g);
+		}
+
+		void paintContents(Graphics g) {
+			/*
+			 * TODO this is for the SimulatorPrototype class int speed =
+			 * proj.getSimulator().getSimulationSpeed(); String speedStr; if (speed >=
+			 * 10000000) { speedStr = (speed / 1000000) + " MHz"; } else if (speed >=
+			 * 1000000) { speedStr = (speed / 100000) / 10.0 + " MHz"; } else if (speed >=
+			 * 10000) { speedStr = (speed / 1000) + " KHz"; } else if (speed >= 10000) {
+			 * speedStr = (speed / 100) / 10.0 + " KHz"; } else { speedStr = speed + " Hz";
+			 * } FontMetrics fm = g.getFontMetrics(); g.drawString(speedStr, getWidth() - 10
+			 * - fm.stringWidth(speedStr), getHeight() - 10);
+			 */
+			if (AppPreferences.ANTI_ALIASING.getBoolean()) {
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			}
+			Dimension sz = getSize();
+
+			g.setColor(com.cburch.logisim.gui.main.Canvas.TICK_RATE_COLOR);
+			if (isNorth)
+				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, 15, sz.width / 2, 5, sz.width / 2 + 20, 15);
+			if (isSouth)
+				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, sz.height - 15, sz.width / 2, sz.height - 5,
+						sz.width / 2 + 20, sz.height - 15);
+			if (isEast)
+				GraphicsUtil.drawArrow2(g, sz.width - 15, sz.height / 2 + 20, sz.width - 5, sz.height / 2,
+						sz.width - 15, sz.height / 2 - 20);
+			if (isWest)
+				GraphicsUtil.drawArrow2(g, 15, sz.height / 2 + 20, 5, sz.height / 2, 15, sz.height / 2 + -20);
+			if (isNortheast)
+				GraphicsUtil.drawArrow2(g, sz.width - 30, 5, sz.width - 5, 5, sz.width - 5, 30);
+			if (isNorthwest)
+				GraphicsUtil.drawArrow2(g, 30, 5, 5, 5, 5, 30);
+			if (isSoutheast)
+				GraphicsUtil.drawArrow2(g, sz.width - 30, sz.height - 5, sz.width - 5, sz.height - 5, sz.width - 5,
+						sz.height - 30);
+			if (isSouthwest)
+				GraphicsUtil.drawArrow2(g, 30, sz.height - 5, 5, sz.height - 5, 5, sz.height - 30);
+
+			g.setColor(Color.BLACK);
+
+		}
+
+		void setEast(boolean value) {
+			isEast = value;
+		}
+
+		void setNorth(boolean value) {
+			isNorth = value;
+		}
+
+		void setNortheast(boolean value) {
+			isNortheast = value;
+		}
+
+		void setNorthwest(boolean value) {
+			isNorthwest = value;
+		}
+
+		void setSouth(boolean value) {
+			isSouth = value;
+		}
+
+		void setSoutheast(boolean value) {
+			isSoutheast = value;
+		}
+
+		void setSouthwest(boolean value) {
+			isSouthwest = value;
+		}
+
+		void setWest(boolean value) {
+			isWest = value;
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -190,6 +314,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		return -1;
 	}
 
+	private MyViewport viewport = new MyViewport();
 	private CanvasTool selectTool;
 	private Project proj;
 	private CircuitState circuitState;
@@ -243,6 +368,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				return;
 			}
 		}
+		setArrows();
 		oldPreferredSize = Bounds.create(0, 0, dim.width, dim.height);
 		setPreferredSize(dim);
 		revalidate();
@@ -421,12 +547,71 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		}
 	}
 
+	public void setArrows() {
+		viewport.clearArrows();
+		// no circuit
+		Bounds bounds;
+		if (circuitState == null)
+			bounds = Bounds.create(0, 0, 0, 0);
+		else
+			bounds = circuitState.getCircuit().getAppearance().getAbsoluteBounds();
+		if (bounds.getHeight() == 0 || bounds.getWidth() == 0)
+			return;
+		// get circuit coords if null
+
+		int x0 = bounds.getX();
+		int x1 = bounds.getX() + bounds.getWidth();
+		int y0 = bounds.getY();
+		int y1 = bounds.getY() + bounds.getHeight();
+		Rectangle viewableBase;
+		Rectangle viewable;
+		if (canvasPane != null) {
+			viewableBase = canvasPane.getViewport().getViewRect();
+		} else {
+			viewableBase = new Rectangle(0, 0, bounds.getWidth(), bounds.getHeight());
+		}
+		double zoom = getZoomFactor();
+		if (zoom == 1.0) {
+			viewable = viewableBase;
+		} else {
+			viewable = new Rectangle((int) (viewableBase.x / zoom), (int) (viewableBase.y / zoom),
+					(int) (viewableBase.width / zoom), (int) (viewableBase.height / zoom));
+		}
+		boolean isWest = x0 < viewable.x;
+		boolean isEast = x1 >= viewable.x + viewable.width;
+		boolean isNorth = y0 < viewable.y;
+		boolean isSouth = y1 >= viewable.y + viewable.height;
+
+		if (isNorth) {
+			if (isEast)
+				viewport.setNortheast(true);
+			if (isWest)
+				viewport.setNorthwest(true);
+			if (!isWest && !isEast)
+				viewport.setNorth(true);
+		}
+		if (isSouth) {
+			if (isEast)
+				viewport.setSoutheast(true);
+			if (isWest)
+				viewport.setSouthwest(true);
+			if (!isWest && !isEast)
+				viewport.setSouth(true);
+		}
+		if (isEast && !viewport.isSoutheast && !viewport.isNortheast)
+			viewport.setEast(true);
+		if (isWest && !viewport.isSouthwest && !viewport.isNorthwest)
+			viewport.setWest(true);
+	}
+
 	//
 	// CanvasPaneContents methods
 	//
 	@Override
 	public void setCanvasPane(CanvasPane value) {
 		canvasPane = value;
+		canvasPane.setViewport(viewport);
+		viewport.setView(this);
 		computeSize(true);
 		popupManager = new LayoutPopupManager(value, this);
 	}

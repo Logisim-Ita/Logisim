@@ -174,6 +174,8 @@ public class PokeTool extends Tool {
 		int y = Math.round(this.ScrollBarY + ((this.y * (float) canvas.getZoomFactor() - this.ScrollBarY)
 				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar())));
 		canvas.setScrollBar(x, y);
+		// setting null get the position of the circuit
+		canvas.setArrows(null, null, null, null);
 	}
 
 	@Override
