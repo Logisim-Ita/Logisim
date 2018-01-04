@@ -58,7 +58,6 @@ import com.cburch.logisim.file.Options;
 import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
-import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
@@ -207,16 +206,17 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				tool.mouseMoved(Canvas.this, getGraphics(), e);
 				setCursor(tool.getCursor());
 			}
-
 			completeAction();
 		}
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent arg0) {// zoom mouse wheel
 			if (arg0.getPreciseWheelRotation() < 0) {
-				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getNextValue());
+				proj.getFrame().getZoomControl().spinnerModel
+						.setValue(proj.getFrame().getZoomControl().spinnerModel.getNextValue());
 			} else if (arg0.getPreciseWheelRotation() > 0) {
-				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getPreviousValue());
+				proj.getFrame().getZoomControl().spinnerModel
+						.setValue(proj.getFrame().getZoomControl().spinnerModel.getPreviousValue());
 			}
 
 		}
@@ -702,17 +702,6 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		paintThread.start();
 	}
 
-	public void closeCanvas() {
-		paintThread.requestStop();
-	}
-
-	private void completeAction() {
-		computeSize(false);
-		// TODO for SimulatorPrototype: proj.getSimulator().releaseUserEvents();
-		proj.getSimulator().requestPropagate();
-		// repaint will occur after propagation completes
-	}
-
 	public void autoZoomCenter() {
 		Bounds bounds = proj.getCurrentCircuit().getBounds();
 		if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
@@ -731,7 +720,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		} else
 			autozoom *= canvasPane.getViewport().getSize().getHeight() / height;
 		if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
-			ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
+			proj.getFrame().getZoomControl().spinnerModel.setValue(String.valueOf(autozoom * 100.0));
 		// align at the center
 		setScrollBar(
 				(int) (Math.round(bounds.getX() * getZoomFactor()
@@ -740,6 +729,17 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
 								/ 2)));
 		setArrows(null, null, null, null);
+	}
+
+	public void closeCanvas() {
+		paintThread.requestStop();
+	}
+
+	private void completeAction() {
+		computeSize(false);
+		// TODO for SimulatorPrototype: proj.getSimulator().releaseUserEvents();
+		proj.getSimulator().requestPropagate();
+		// repaint will occur after propagation completes
 	}
 
 	public void computeSize(boolean immediate) {

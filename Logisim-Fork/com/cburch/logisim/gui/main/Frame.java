@@ -36,6 +36,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.file.LibraryEvent;
 import com.cburch.logisim.file.LibraryListener;
+import com.cburch.logisim.gui.appear.AppearanceCanvas;
 import com.cburch.logisim.gui.appear.AppearanceView;
 import com.cburch.logisim.gui.generic.AttrTable;
 import com.cburch.logisim.gui.generic.AttrTableModel;
@@ -159,11 +160,11 @@ public class Frame extends LFrame implements LocaleListener {
 
 	public static final String VIEW_SIMULATION = "simulation";
 
-	public static final double MIN_ZOOM = 50;
+	public static final double MIN_ZOOM = 20;
 
 	public static final double STEP_ZOOM = 10;
 
-	public static final double MAX_ZOOM = 500;
+	public static final double MAX_ZOOM = 400;
 
 	private static Point getInitialLocation() {
 		String s = AppPreferences.WINDOW_LOCATION.get();
@@ -402,6 +403,10 @@ public class Frame extends LFrame implements LocaleListener {
 		return proj;
 	}
 
+	public ZoomControl getZoomControl() {
+		return this.zoom;
+	}
+
 	@Override
 	public void localeChanged() {
 		computeTitle();
@@ -505,6 +510,7 @@ public class Frame extends LFrame implements LocaleListener {
 			menuListener.setEditHandler(app.getEditHandler());
 			mainPanel.setView(view);
 			app.getCanvas().requestFocus();
+			((AppearanceCanvas) app.getCanvas()).autoZoomCenter();
 		} else { // layout view
 			toolbar.setToolbarModel(layoutToolbarModel);
 			zoom.setZoomModel(layoutZoomModel);
@@ -512,6 +518,7 @@ public class Frame extends LFrame implements LocaleListener {
 			viewAttributes(proj.getTool(), true);
 			mainPanel.setView(view);
 			layoutCanvas.requestFocus();
+			getCanvas().autoZoomCenter();
 		}
 	}
 

@@ -384,6 +384,15 @@ class XmlReader {
 
 	private void considerRepairs(Document doc, Element root) {
 		LogisimVersion version = LogisimVersion.parse(root.getAttribute("source"));
+		// so you won't lose moving whith mouse wheel click if you open old files
+		if (version.compareTo(LogisimVersion.get(2, 12, 0, 0)) < 0) {
+			for (Element mappings : XmlIterator.forChildElements(root, "mappings")) {
+				for (Element elt : XmlIterator.forChildElements(mappings, "tool")) {
+					if (elt.getAttribute("map").equals("Button2"))
+						elt.setAttribute("name", "Poke Tool");
+				}
+			}
+		}
 		if (version.compareTo(LogisimVersion.get(2, 3, 0)) < 0) {
 			// This file was saved before an Edit tool existed. Most likely
 			// we should replace the Select and Wiring tools in the toolbar

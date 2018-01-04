@@ -150,6 +150,7 @@ class ToolboxManip implements ProjectExplorer.Listener {
 				SubcircuitFactory circFact = (SubcircuitFactory) source;
 				proj.setCurrentCircuit(circFact.getSubcircuit());
 				proj.getFrame().setEditorView(Frame.EDIT_LAYOUT);
+				proj.getFrame().getCanvas().autoZoomCenter();
 				if (lastSelected != null)
 					proj.setTool(lastSelected);
 			}

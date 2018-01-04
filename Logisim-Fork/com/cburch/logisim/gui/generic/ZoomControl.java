@@ -167,7 +167,7 @@ public class ZoomControl extends JPanel {
 	 */
 	private static final long serialVersionUID = 7823904346559070108L;
 
-	public static SpinnerModel spinnerModel;
+	public SpinnerModel spinnerModel;
 	private ZoomModel model;
 	private JSpinner spinner;
 	private GridIcon grid;

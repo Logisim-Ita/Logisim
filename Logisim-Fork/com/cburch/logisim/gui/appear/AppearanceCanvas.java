@@ -43,7 +43,6 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.gui.generic.CanvasPane;
 import com.cburch.logisim.gui.generic.CanvasPaneContents;
 import com.cburch.logisim.gui.generic.GridPainter;
-import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.GraphicsUtil;
@@ -60,37 +59,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		public void keyPressed(KeyEvent arg0) {
 			if ((arg0.getKeyCode() == KeyEvent.VK_0 || arg0.getKeyCode() == KeyEvent.VK_NUMPAD0)
 					&& arg0.isControlDown()) {
-				CircuitState circState = circuitState;
-				Bounds bounds;
-				if (circState == null)
-					bounds = Bounds.create(0, 0, 0, 0);
-				else
-					bounds = circState.getCircuit().getAppearance().getAbsoluteBounds();
-				if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
-					setScrollBar(0, 0);
-					ZoomControl.spinnerModel.setValue(String.valueOf(100.0));
-					return;
-				}
-				// the white space around
-				int padding = 50;
-				// set autozoom
-				double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
-				double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
-				double autozoom = getZoomFactor();
-				if (canvasPane.getViewport().getSize().getWidth()
-						/ width < canvasPane.getViewport().getSize().getHeight() / height) {
-					autozoom *= canvasPane.getViewport().getSize().getWidth() / width;
-				} else
-					autozoom *= canvasPane.getViewport().getSize().getHeight() / height;
-				if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
-					ZoomControl.spinnerModel.setValue(String.valueOf(autozoom * 100.0));
-				// align at the center
-				setScrollBar((int) (Math.round(bounds.getX() * getZoomFactor()
-						- (canvasPane.getViewport().getSize().getWidth() - bounds.getWidth() * getZoomFactor()) / 2)),
-						(int) (Math
-								.round(bounds.getY() * getZoomFactor() - (canvasPane.getViewport().getSize().getHeight()
-										- bounds.getHeight() * getZoomFactor()) / 2)));
-				setArrows();
+				autoZoomCenter();
 			}
 		}
 
@@ -159,9 +128,11 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent arg0) {// zoom mouse wheel
 			if (arg0.getPreciseWheelRotation() < 0) {
-				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getNextValue());
+				proj.getFrame().getZoomControl().spinnerModel
+						.setValue(proj.getFrame().getZoomControl().spinnerModel.getNextValue());
 			} else if (arg0.getPreciseWheelRotation() > 0) {
-				ZoomControl.spinnerModel.setValue(ZoomControl.spinnerModel.getPreviousValue());
+				proj.getFrame().getZoomControl().spinnerModel
+						.setValue(proj.getFrame().getZoomControl().spinnerModel.getPreviousValue());
 			}
 		}
 
@@ -340,6 +311,39 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		if (model != null)
 			model.addCanvasModelListener(listener);
 		grid.addPropertyChangeListener(GridPainter.ZOOM_PROPERTY, listener);
+	}
+
+	public void autoZoomCenter() {
+		Bounds bounds;
+		if (circuitState == null)
+			bounds = Bounds.create(0, 0, 0, 0);
+		else
+			bounds = circuitState.getCircuit().getAppearance().getAbsoluteBounds();
+		if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
+			setScrollBar(0, 0);
+			return;
+		}
+		// the white space around
+		int padding = 50;
+		// set autozoom
+		double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
+		double viewporHeight = canvasPane.getViewport().getSize().getHeight();
+		double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
+		double viewporWidth = canvasPane.getViewport().getSize().getWidth();
+		double autozoom = getZoomFactor();
+		if (viewporWidth / width < viewporHeight / height) {
+			autozoom *= viewporWidth / width;
+		} else
+			autozoom *= viewporHeight / height;
+		if (Math.abs(autozoom - getZoomFactor()) >= 0.01)
+			proj.getFrame().getZoomControl().spinnerModel.setValue(String.valueOf(autozoom * 100.0));
+		// align at the center
+		setScrollBar(
+				(int) (Math.round(
+						bounds.getX() * getZoomFactor() - (viewporWidth - bounds.getWidth() * getZoomFactor()) / 2)),
+				(int) (Math.round(
+						bounds.getY() * getZoomFactor() - (viewporHeight - bounds.getHeight() * getZoomFactor()) / 2)));
+		setArrows();
 	}
 
 	private void computeSize(boolean immediate) {
