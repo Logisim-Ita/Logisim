@@ -345,6 +345,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 						getProject().setCircuitState(last.cloneState());
 					}
 				}
+				autoZoomCenter();
 			}
 		}
 
