@@ -1053,7 +1053,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		// no circuit
 		if (circBds == null || circBds.getHeight() == 0 || circBds.getWidth() == 0)
 			return;
-		setArrows(circBds.getX(), circBds.getX() + circBds.getWidth(), circBds.getY(),
+		setArrows(circBds.getX(), circBds.getY(), circBds.getX() + circBds.getWidth(),
 				circBds.getY() + circBds.getHeight());
 	}
 
