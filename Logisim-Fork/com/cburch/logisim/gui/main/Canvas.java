@@ -18,7 +18,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -640,37 +639,31 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 
-	public static int zoomButtonSize = 48;
+	private static final Font ZOOM_BUTTON_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+
+	public static int zoomButtonHeight = 35, zoomButtonWidth = 0, zoomButtonMargin = 30;
 
 	public static Color defaultzoomButtonColor = Color.WHITE;
 
 	public static boolean AutoZoomButtonClicked(Dimension sz, double x, double y) {
-		return Point2D.distance(x, y, sz.width - zoomButtonSize / 2 - 30,
-				sz.height - 30 - zoomButtonSize / 2) <= zoomButtonSize / 2;
+		return (x < sz.width - zoomButtonMargin && x > sz.width - zoomButtonMargin - zoomButtonWidth
+				&& y < sz.height - zoomButtonMargin && y > sz.height - zoomButtonMargin - zoomButtonHeight);
 	}
 
 	public static void paintAutoZoomButton(Graphics g, Dimension sz, Color zoomButtonColor) {
 		Color oldcolor = g.getColor();
-		g.setColor(TICK_RATE_COLOR);
-		g.fillOval(sz.width - zoomButtonSize - 33, sz.height - zoomButtonSize - 33, zoomButtonSize + 6,
-				zoomButtonSize + 6);
+		g.setFont(ZOOM_BUTTON_FONT);
+		FontMetrics fm = g.getFontMetrics();
+		String zoomButtonString = Strings.get("Reposition").toUpperCase();
+		zoomButtonWidth = fm.stringWidth(zoomButtonString) + 20;
+		g.fillRect(sz.width - zoomButtonMargin - 2 - zoomButtonWidth,
+				sz.height - zoomButtonMargin - 2 - zoomButtonHeight, zoomButtonWidth + 4, zoomButtonHeight + 4);
 		g.setColor(zoomButtonColor);
-		g.fillOval(sz.width - zoomButtonSize - 30, sz.height - zoomButtonSize - 30, zoomButtonSize, zoomButtonSize);
+		g.fillRect(sz.width - zoomButtonMargin - zoomButtonWidth, sz.height - zoomButtonMargin - zoomButtonHeight,
+				zoomButtonWidth, zoomButtonHeight);
 		g.setColor(Value.UNKNOWN_COLOR);
-		GraphicsUtil.switchToWidth(g, 3);
-		g.drawOval(sz.width - zoomButtonSize * 3 / 4 - 30, sz.height - zoomButtonSize * 3 / 4 - 30, zoomButtonSize / 2,
-				zoomButtonSize / 2);
-		g.fillOval(sz.width - zoomButtonSize * 5 / 8 - 30, sz.height - zoomButtonSize * 5 / 8 - 30,
-				zoomButtonSize / 4 + 1, zoomButtonSize / 4 + 1);
-		g.drawLine(sz.width - zoomButtonSize * 13 / 16 - 30, sz.height - zoomButtonSize / 2 - 30,
-				sz.width - zoomButtonSize * 3 / 4 - 30, sz.height - zoomButtonSize / 2 - 30);
-		g.drawLine(sz.width - zoomButtonSize / 4 - 30, sz.height - zoomButtonSize / 2 - 30,
-				sz.width - zoomButtonSize * 3 / 16 - 30, sz.height - zoomButtonSize / 2 - 30);
-
-		g.drawLine(sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 13 / 16 - 30,
-				sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 3 / 4 - 30);
-		g.drawLine(sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize / 4 - 30,
-				sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 3 / 16 - 30);
+		GraphicsUtil.drawCenteredText(g, zoomButtonString, sz.width - zoomButtonMargin - zoomButtonWidth / 2,
+				sz.height - zoomButtonMargin - zoomButtonHeight / 2 - 3);
 		g.setColor(oldcolor);
 	}
 

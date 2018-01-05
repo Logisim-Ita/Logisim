@@ -3,8 +3,8 @@
 
 package com.cburch.logisim.proj;
 
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JFileChooser;
 
@@ -76,7 +76,7 @@ public class Project {
 	private Simulator simulator = new Simulator();
 	private LogisimFile file;
 	private CircuitState circuitState;
-	private HashMap<Circuit, CircuitState> stateMap = new HashMap<Circuit, CircuitState>();
+	private ConcurrentHashMap<Circuit, CircuitState> stateMap = new ConcurrentHashMap<Circuit, CircuitState>();
 	private Frame frame = null;
 	private OptionsFrame optionsFrame = null;
 	private LogFrame logFrame = null;

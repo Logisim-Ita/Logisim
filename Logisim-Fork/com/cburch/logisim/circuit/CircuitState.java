@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.circuit.Propagator.SetData;
@@ -132,12 +133,12 @@ public class CircuitState implements InstanceData {
 	// state
 	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();
 	private CircuitWires.State wireData = null;
-	private HashMap<Component, Object> componentData = new HashMap<Component, Object>();
+	private ConcurrentHashMap<Component, Object> componentData = new ConcurrentHashMap<Component, Object>();
 	private Map<Location, Value> values = new HashMap<Location, Value>();
 	private CopyOnWriteArrayList<Component> dirtyComponents = new CopyOnWriteArrayList<Component>();
 	private CopyOnWriteArrayList<Location> dirtyPoints = new CopyOnWriteArrayList<Location>();
 
-	HashMap<Location, SetData> causes = new HashMap<Location, SetData>();
+	ConcurrentHashMap<Location, SetData> causes = new ConcurrentHashMap<Location, SetData>();
 	private int id = lastId++;
 
 	public CircuitState(Project proj, Circuit circuit) {

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.cburch.logisim.comp.Component;
@@ -35,7 +36,7 @@ import com.cburch.logisim.util.SmallSet;
 class CircuitWires {
 	static class BundleMap {
 		boolean computed = false;
-		HashMap<Location, WireBundle> pointBundles = new HashMap<Location, WireBundle>();
+		ConcurrentHashMap<Location, WireBundle> pointBundles = new ConcurrentHashMap<Location, WireBundle>();
 		HashSet<WireBundle> bundles = new HashSet<WireBundle>();
 		boolean isValid = true;
 		// NOTE: It would make things more efficient if we also had

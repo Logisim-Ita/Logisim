@@ -7,9 +7,9 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.cburch.draw.model.CanvasModelEvent;
 import com.cburch.draw.model.CanvasObject;
@@ -25,7 +25,7 @@ public class Selection {
 	private ArrayList<SelectionListener> listeners;
 	private HashSet<CanvasObject> selected;
 	private Set<CanvasObject> selectedView;
-	private HashMap<CanvasObject, String> suppressed;
+	private ConcurrentHashMap<CanvasObject, String> suppressed;
 	private Set<CanvasObject> suppressedView;
 	private Handle selectedHandle;
 	private HandleGesture curHandleGesture;
@@ -35,7 +35,7 @@ public class Selection {
 	protected Selection() {
 		listeners = new ArrayList<SelectionListener>();
 		selected = new HashSet<CanvasObject>();
-		suppressed = new HashMap<CanvasObject, String>();
+		suppressed = new ConcurrentHashMap<CanvasObject, String>();
 		selectedView = Collections.unmodifiableSet(selected);
 		suppressedView = Collections.unmodifiableSet(suppressed.keySet());
 	}

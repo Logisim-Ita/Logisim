@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.EndData;
@@ -22,9 +22,8 @@ class CircuitPoints {
 		ArrayList<EndData> ends = new ArrayList<EndData>(4);
 		// these lists are parallel - ends corresponding to wires are null
 	}
-
-	private HashMap<Location, LocationData> map = new HashMap<Location, LocationData>();
-	private HashMap<Location, WidthIncompatibilityData> incompatibilityData = new HashMap<Location, WidthIncompatibilityData>();
+	private ConcurrentHashMap<Location, LocationData> map = new ConcurrentHashMap<Location, LocationData>();
+	private ConcurrentHashMap<Location, WidthIncompatibilityData> incompatibilityData = new ConcurrentHashMap<Location, WidthIncompatibilityData>();
 
 	public CircuitPoints() {
 	}

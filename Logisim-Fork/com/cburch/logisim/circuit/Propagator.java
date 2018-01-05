@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
@@ -162,7 +163,7 @@ public class Propagator {
 			return removeCause(state, head, data.loc, data.cause);
 		}
 
-		HashMap<Location, SetData> causes = state.causes;
+		ConcurrentHashMap<Location, SetData> causes = state.causes;
 
 		// first check whether this is change of previous info.
 		boolean replaced = false;
@@ -300,7 +301,7 @@ public class Propagator {
 	}
 
 	private SetData removeCause(CircuitState state, SetData head, Location loc, Component cause) {
-		HashMap<Location, SetData> causes = state.causes;
+		ConcurrentHashMap<Location, SetData> causes = state.causes;
 		if (head == null) {
 			;
 		} else if (head.cause == cause) {

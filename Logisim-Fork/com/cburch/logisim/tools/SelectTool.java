@@ -11,10 +11,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.Icon;
 
@@ -94,9 +94,9 @@ public class SelectTool extends Tool {
 
 	private static final Color COLOR_COMPUTING = new Color(96, 192, 96);
 
-	private static final Color COLOR_RECT_SELECT = new Color(0, 64, 128, 255);
+	private static final Color COLOR_RECT_SELECT = Color.GRAY;
 
-	private static final Color BACKGROUND_RECT_SELECT = new Color(192, 192, 255, 192);
+	private static final Color BACKGROUND_RECT_SELECT = new Color(0, 0, 0, 32);
 
 	private static void clearCanvasMessage(Canvas canvas, int dx, int dy) {
 		Object getter = canvas.getErrorMessage();
@@ -115,7 +115,7 @@ public class SelectTool extends Tool {
 	private int curDy;
 	private boolean drawConnections;
 	private MoveGesture moveGesture;
-	private HashMap<Component, KeyConfigurator> keyHandlers;
+	private ConcurrentHashMap<Component, KeyConfigurator> keyHandlers;
 
 	private HashSet<Selection> selectionsAdded;
 
@@ -203,11 +203,11 @@ public class SelectTool extends Tool {
 			}
 
 			Graphics gBase = context.getGraphics();
-			int w = right - left - 1;
-			int h = bot - top - 1;
-			if (w > 2 && h > 2) {
+			int w = right - left;
+			int h = bot - top;
+			if (w > 1 && h > 1) {
 				gBase.setColor(BACKGROUND_RECT_SELECT);
-				gBase.fillRect(left + 1, top + 1, w - 1, h - 1);
+				gBase.fillRect(left, top, w, h);
 			}
 
 			Circuit circ = canvas.getCircuit();
@@ -221,7 +221,6 @@ public class SelectTool extends Tool {
 			}
 
 			gBase.setColor(COLOR_RECT_SELECT);
-			GraphicsUtil.switchToWidth(gBase, 2);
 			if (w < 0)
 				w = 0;
 			if (h < 0)
@@ -502,9 +501,9 @@ public class SelectTool extends Tool {
 	}
 
 	private void processKeyEvent(Canvas canvas, KeyEvent e, int type) {
-		HashMap<Component, KeyConfigurator> handlers = keyHandlers;
+		ConcurrentHashMap<Component, KeyConfigurator> handlers = keyHandlers;
 		if (handlers == null) {
-			handlers = new HashMap<Component, KeyConfigurator>();
+			handlers = new ConcurrentHashMap<Component, KeyConfigurator>();
 			Selection sel = canvas.getSelection();
 			for (Component comp : sel.getComponents()) {
 				ComponentFactory factory = comp.getFactory();
