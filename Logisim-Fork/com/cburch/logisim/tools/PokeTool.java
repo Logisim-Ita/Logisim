@@ -87,6 +87,7 @@ public class PokeTool extends Tool {
 	private Circuit pokedCircuit;
 	private Component pokedComponent;
 	private Caret pokeCaret;
+	private float x0 = 0, y0 = 0;
 	private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
 
 	public PokeTool() {
@@ -165,21 +166,24 @@ public class PokeTool extends Tool {
 			pokeCaret.mouseDragged(e);
 			canvas.getProject().repaintCanvas();
 		}
-		// avoid to change values if you move after click
-		pokeCaret = null;
 		// move scrollpane dragging hand
-		canvas.setCursor(move);
-		int x = Math.round(this.ScrollBarX + ((this.x * (float) canvas.getZoomFactor() - this.ScrollBarX)
-				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar())));
-		int y = Math.round(this.ScrollBarY + ((this.y * (float) canvas.getZoomFactor() - this.ScrollBarY)
-				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar())));
-		canvas.setScrollBar(x, y);
-		// setting null get the position of the circuit
-		canvas.setArrows(null, null, null, null);
+		int x = Math.round(this.x0 - this.ScrollBarX
+				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar()));
+		int y = Math.round(this.y0 - this.ScrollBarY
+				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar()));
+		// avoid to change values if you move after click
+		if (Math.abs(x) > 3 || Math.abs(y) > 3) {
+			canvas.setCursor(move);
+			pokeCaret = null;
+			canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
+			canvas.setArrows();
+		}
 	}
 
 	@Override
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
+		this.x0 = e.getX() * (float) canvas.getZoomFactor();
+		this.y0 = e.getY() * (float) canvas.getZoomFactor();
 		this.x = e.getX();
 		this.y = e.getY();
 		this.ScrollBarX = canvas.getHorizzontalScrollBar();

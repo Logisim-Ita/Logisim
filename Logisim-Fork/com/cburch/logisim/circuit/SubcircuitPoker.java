@@ -52,6 +52,7 @@ public class SubcircuitPoker extends InstancePoker {
 			Object sub = state.getData();
 			if (e.getClickCount() == 2 && isWithin(state, e) && sub instanceof CircuitState) {
 				state.getProject().setCircuitState((CircuitState) sub);
+				state.getProject().getFrame().getCanvas().autoZoomCenter();
 			} else {
 				state.getInstance().fireInvalidated();
 			}

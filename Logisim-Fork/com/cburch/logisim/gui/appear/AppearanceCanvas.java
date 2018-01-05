@@ -54,6 +54,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		private final Cursor move = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
 		private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
 		private boolean mooving = false;
+		private CanvasTool tempTool = null;
 
 		@Override
 		public void keyPressed(KeyEvent arg0) {
@@ -113,6 +114,14 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				this.ScrollBarX = getHorizzontalScrollBar();
 				this.ScrollBarY = getVerticalScrollBar();
 				this.mooving = true;
+			} else if (viewport.zoomButtonVisible && com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(
+					viewport.getSize(), arg0.getX() * getZoomFactor() - getHorizzontalScrollBar(),
+					arg0.getY() * getZoomFactor() - getVerticalScrollBar())) {
+				viewport.zoomButtonColor = com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor.darker();
+				viewport.repaint();
+				// avoid actions under the button
+				tempTool = getTool();
+				setTool(null);
 			}
 
 		}
@@ -122,7 +131,16 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			if (arg0.getButton() == MouseEvent.BUTTON2) {
 				setCursor(cursor);
 				this.mooving = false;
+			} else if (viewport.zoomButtonVisible
+					&& com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(viewport.getSize(),
+							arg0.getX() * getZoomFactor() - getHorizzontalScrollBar(),
+							arg0.getY() * getZoomFactor() - getVerticalScrollBar())
+					&& viewport.zoomButtonColor != com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor) {
+				autoZoomCenter();
 			}
+			if (getTool() == null)
+				setTool(tempTool);
+			viewport.zoomButtonColor = com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor;
 		}
 
 		@Override
@@ -161,6 +179,8 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		boolean isNorthwest = false;
 		boolean isSoutheast = false;
 		boolean isSouthwest = false;
+		boolean zoomButtonVisible = false;
+		Color zoomButtonColor = com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor;
 
 		public MyViewport() {
 		}
@@ -188,16 +208,6 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		}
 
 		void paintContents(Graphics g) {
-			/*
-			 * TODO this is for the SimulatorPrototype class int speed =
-			 * proj.getSimulator().getSimulationSpeed(); String speedStr; if (speed >=
-			 * 10000000) { speedStr = (speed / 1000000) + " MHz"; } else if (speed >=
-			 * 1000000) { speedStr = (speed / 100000) / 10.0 + " MHz"; } else if (speed >=
-			 * 10000) { speedStr = (speed / 1000) + " KHz"; } else if (speed >= 10000) {
-			 * speedStr = (speed / 100) / 10.0 + " KHz"; } else { speedStr = speed + " Hz";
-			 * } FontMetrics fm = g.getFontMetrics(); g.drawString(speedStr, getWidth() - 10
-			 * - fm.stringWidth(speedStr), getHeight() - 10);
-			 */
 			if (AppPreferences.ANTI_ALIASING.getBoolean()) {
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -205,27 +215,30 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			}
 			Dimension sz = getSize();
 
-			g.setColor(com.cburch.logisim.gui.main.Canvas.TICK_RATE_COLOR);
-			if (isNorth)
-				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, 15, sz.width / 2, 5, sz.width / 2 + 20, 15);
-			if (isSouth)
-				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, sz.height - 15, sz.width / 2, sz.height - 5,
-						sz.width / 2 + 20, sz.height - 15);
-			if (isEast)
-				GraphicsUtil.drawArrow2(g, sz.width - 15, sz.height / 2 + 20, sz.width - 5, sz.height / 2,
-						sz.width - 15, sz.height / 2 - 20);
-			if (isWest)
-				GraphicsUtil.drawArrow2(g, 15, sz.height / 2 + 20, 5, sz.height / 2, 15, sz.height / 2 + -20);
-			if (isNortheast)
-				GraphicsUtil.drawArrow2(g, sz.width - 30, 5, sz.width - 5, 5, sz.width - 5, 30);
-			if (isNorthwest)
-				GraphicsUtil.drawArrow2(g, 30, 5, 5, 5, 5, 30);
-			if (isSoutheast)
-				GraphicsUtil.drawArrow2(g, sz.width - 30, sz.height - 5, sz.width - 5, sz.height - 5, sz.width - 5,
-						sz.height - 30);
-			if (isSouthwest)
-				GraphicsUtil.drawArrow2(g, 30, sz.height - 5, 5, sz.height - 5, 5, sz.height - 30);
-
+			if (isNorth || isSouth || isEast || isWest || isNortheast || isNorthwest || isSoutheast || isSouthwest) {
+				g.setColor(com.cburch.logisim.gui.main.Canvas.TICK_RATE_COLOR);
+				zoomButtonVisible = true;
+				com.cburch.logisim.gui.main.Canvas.paintAutoZoomButton(g, getSize(), zoomButtonColor);
+				if (isNorth)
+					GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, 15, sz.width / 2, 5, sz.width / 2 + 20, 15);
+				if (isSouth)
+					GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, sz.height - 15, sz.width / 2, sz.height - 5,
+							sz.width / 2 + 20, sz.height - 15);
+				if (isEast)
+					GraphicsUtil.drawArrow2(g, sz.width - 15, sz.height / 2 + 20, sz.width - 5, sz.height / 2,
+							sz.width - 15, sz.height / 2 - 20);
+				if (isWest)
+					GraphicsUtil.drawArrow2(g, 15, sz.height / 2 + 20, 5, sz.height / 2, 15, sz.height / 2 + -20);
+				if (isNortheast)
+					GraphicsUtil.drawArrow2(g, sz.width - 30, 5, sz.width - 5, 5, sz.width - 5, 30);
+				if (isNorthwest)
+					GraphicsUtil.drawArrow2(g, 30, 5, 5, 5, 5, 30);
+				if (isSoutheast)
+					GraphicsUtil.drawArrow2(g, sz.width - 30, sz.height - 5, sz.width - 5, sz.height - 5, sz.width - 5,
+							sz.height - 30);
+				if (isSouthwest)
+					GraphicsUtil.drawArrow2(g, 30, sz.height - 5, 5, sz.height - 5, 5, sz.height - 30);
+			}
 			g.setColor(Color.BLACK);
 
 		}
@@ -551,15 +564,14 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 
 	public void setArrows() {
 		viewport.clearArrows();
-		// no circuit
 		Bounds bounds;
 		if (circuitState == null)
 			bounds = Bounds.create(0, 0, 0, 0);
 		else
 			bounds = circuitState.getCircuit().getAppearance().getAbsoluteBounds();
+		// no circuit
 		if (bounds.getHeight() == 0 || bounds.getWidth() == 0)
 			return;
-		// get circuit coords if null
 
 		int x0 = bounds.getX();
 		int x1 = bounds.getX() + bounds.getWidth();

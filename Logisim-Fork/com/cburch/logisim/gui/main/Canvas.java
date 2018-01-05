@@ -18,6 +18,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -185,28 +186,42 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
 					proj.setStartupScreen(false);
 			}
-			Canvas.this.requestFocus();
-			drag_tool = getToolFor(e);
-			if (drag_tool != null) {
-				drag_tool.mousePressed(Canvas.this, getGraphics(), e);
+			if (viewport.zoomButtonVisible
+					&& AutoZoomButtonClicked(viewport.getSize(), e.getX() * getZoomFactor() - getHorizzontalScrollBar(),
+							e.getY() * getZoomFactor() - getVerticalScrollBar())) {
+				viewport.zoomButtonColor = defaultzoomButtonColor.darker();
+				viewport.repaint();
+			} else {
+				Canvas.this.requestFocus();
+				drag_tool = getToolFor(e);
+				if (drag_tool != null) {
+					drag_tool.mousePressed(Canvas.this, getGraphics(), e);
+				}
+				completeAction();
 			}
-
-			completeAction();
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (drag_tool != null) {
-				drag_tool.mouseReleased(Canvas.this, getGraphics(), e);
-				drag_tool = null;
-			}
+			if (viewport.zoomButtonVisible
+					&& AutoZoomButtonClicked(viewport.getSize(), e.getX() * getZoomFactor() - getHorizzontalScrollBar(),
+							e.getY() * getZoomFactor() - getVerticalScrollBar())
+					&& viewport.zoomButtonColor != defaultzoomButtonColor) {
+				autoZoomCenter();
+			} else {
+				if (drag_tool != null) {
+					drag_tool.mouseReleased(Canvas.this, getGraphics(), e);
+					drag_tool = null;
+				}
 
-			Tool tool = proj.getTool();
-			if (tool != null) {
-				tool.mouseMoved(Canvas.this, getGraphics(), e);
-				setCursor(tool.getCursor());
+				Tool tool = proj.getTool();
+				if (tool != null) {
+					tool.mouseMoved(Canvas.this, getGraphics(), e);
+					setCursor(tool.getCursor());
+				}
+				completeAction();
 			}
-			completeAction();
+			viewport.zoomButtonColor = defaultzoomButtonColor;
 		}
 
 		@Override
@@ -439,6 +454,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		boolean isNorthwest = false;
 		boolean isSoutheast = false;
 		boolean isSouthwest = false;
+		boolean zoomButtonVisible = false;
+		Color zoomButtonColor = defaultzoomButtonColor;
 
 		public MyViewport() {
 		}
@@ -509,26 +526,30 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				paintString(g, widthMessage);
 			} else
 				g.setColor(TICK_RATE_COLOR);
-			if (isNorth)
-				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, 15, sz.width / 2, 5, sz.width / 2 + 20, 15);
-			if (isSouth)
-				GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, sz.height - 15, sz.width / 2, sz.height - 5,
-						sz.width / 2 + 20, sz.height - 15);
-			if (isEast)
-				GraphicsUtil.drawArrow2(g, sz.width - 15, sz.height / 2 + 20, sz.width - 5, sz.height / 2,
-						sz.width - 15, sz.height / 2 - 20);
-			if (isWest)
-				GraphicsUtil.drawArrow2(g, 15, sz.height / 2 + 20, 5, sz.height / 2, 15, sz.height / 2 + -20);
-			if (isNortheast)
-				GraphicsUtil.drawArrow2(g, sz.width - 30, 5, sz.width - 5, 5, sz.width - 5, 30);
-			if (isNorthwest)
-				GraphicsUtil.drawArrow2(g, 30, 5, 5, 5, 5, 30);
-			if (isSoutheast)
-				GraphicsUtil.drawArrow2(g, sz.width - 30, sz.height - 5, sz.width - 5, sz.height - 5, sz.width - 5,
-						sz.height - 30);
-			if (isSouthwest)
-				GraphicsUtil.drawArrow2(g, 30, sz.height - 5, 5, sz.height - 5, 5, sz.height - 30);
-
+			if (isNorth || isSouth || isEast || isWest || isNortheast || isNorthwest || isSoutheast || isSouthwest) {
+				zoomButtonVisible = true;
+				paintAutoZoomButton(g, getSize(), zoomButtonColor);
+				if (isNorth)
+					GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, 15, sz.width / 2, 5, sz.width / 2 + 20, 15);
+				if (isSouth)
+					GraphicsUtil.drawArrow2(g, sz.width / 2 - 20, sz.height - 15, sz.width / 2, sz.height - 5,
+							sz.width / 2 + 20, sz.height - 15);
+				if (isEast)
+					GraphicsUtil.drawArrow2(g, sz.width - 15, sz.height / 2 + 20, sz.width - 5, sz.height / 2,
+							sz.width - 15, sz.height / 2 - 20);
+				if (isWest)
+					GraphicsUtil.drawArrow2(g, 15, sz.height / 2 + 20, 5, sz.height / 2, 15, sz.height / 2 + -20);
+				if (isNortheast)
+					GraphicsUtil.drawArrow2(g, sz.width - 30, 5, sz.width - 5, 5, sz.width - 5, 30);
+				if (isNorthwest)
+					GraphicsUtil.drawArrow2(g, 30, 5, 5, 5, 5, 30);
+				if (isSoutheast)
+					GraphicsUtil.drawArrow2(g, sz.width - 30, sz.height - 5, sz.width - 5, sz.height - 5, sz.width - 5,
+							sz.height - 30);
+				if (isSouthwest)
+					GraphicsUtil.drawArrow2(g, 30, sz.height - 5, 5, sz.height - 5, 5, sz.height - 30);
+			} else
+				zoomButtonVisible = false;
 			if (AppPreferences.SHOW_TICK_RATE.getBoolean()) {
 				String hz = tickCounter.getTickRate();
 				if (hz != null && !hz.equals("")) {
@@ -618,6 +639,40 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	public static final Color TICK_RATE_COLOR = Color.GRAY;
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+
+	public static int zoomButtonSize = 48;
+
+	public static Color defaultzoomButtonColor = Color.WHITE;
+
+	public static boolean AutoZoomButtonClicked(Dimension sz, double x, double y) {
+		return Point2D.distance(x, y, sz.width - zoomButtonSize / 2 - 30,
+				sz.height - 30 - zoomButtonSize / 2) <= zoomButtonSize / 2;
+	}
+
+	public static void paintAutoZoomButton(Graphics g, Dimension sz, Color zoomButtonColor) {
+		Color oldcolor = g.getColor();
+		g.setColor(TICK_RATE_COLOR);
+		g.fillOval(sz.width - zoomButtonSize - 33, sz.height - zoomButtonSize - 33, zoomButtonSize + 6,
+				zoomButtonSize + 6);
+		g.setColor(zoomButtonColor);
+		g.fillOval(sz.width - zoomButtonSize - 30, sz.height - zoomButtonSize - 30, zoomButtonSize, zoomButtonSize);
+		g.setColor(Value.UNKNOWN_COLOR);
+		GraphicsUtil.switchToWidth(g, 3);
+		g.drawOval(sz.width - zoomButtonSize * 3 / 4 - 30, sz.height - zoomButtonSize * 3 / 4 - 30, zoomButtonSize / 2,
+				zoomButtonSize / 2);
+		g.fillOval(sz.width - zoomButtonSize * 5 / 8 - 30, sz.height - zoomButtonSize * 5 / 8 - 30,
+				zoomButtonSize / 4 + 1, zoomButtonSize / 4 + 1);
+		g.drawLine(sz.width - zoomButtonSize * 13 / 16 - 30, sz.height - zoomButtonSize / 2 - 30,
+				sz.width - zoomButtonSize * 3 / 4 - 30, sz.height - zoomButtonSize / 2 - 30);
+		g.drawLine(sz.width - zoomButtonSize / 4 - 30, sz.height - zoomButtonSize / 2 - 30,
+				sz.width - zoomButtonSize * 3 / 16 - 30, sz.height - zoomButtonSize / 2 - 30);
+
+		g.drawLine(sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 13 / 16 - 30,
+				sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 3 / 4 - 30);
+		g.drawLine(sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize / 4 - 30,
+				sz.width - zoomButtonSize / 2 - 30, sz.height - zoomButtonSize * 3 / 16 - 30);
+		g.setColor(oldcolor);
+	}
 
 	public static void snapToGrid(MouseEvent e) {
 		int old_x = e.getX();
@@ -729,7 +784,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				(int) (Math.round(bounds.getY() * getZoomFactor()
 						- (canvasPane.getViewport().getSize().getHeight() - bounds.getHeight() * getZoomFactor())
 								/ 2)));
-		setArrows(null, null, null, null);
+		setArrows();
 	}
 
 	public void closeCanvas() {
@@ -756,7 +811,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		} else {
 			dim = canvasPane.supportPreferredSize(width, height);
 		}
-		setArrows(null, null, null, null);
+		setArrows();
 		if (!immediate) {
 			Bounds old = oldPreferredSize;
 			if (old != null && Math.abs(old.getWidth() - dim.width) < THRESH_SIZE_UPDATE
@@ -993,23 +1048,18 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			zoomEvent(e, zoom);
 	}
 
+	public void setArrows() {
+		Bounds circBds = proj.getCurrentCircuit().getBounds();
+		// no circuit
+		if (circBds == null || circBds.getHeight() == 0 || circBds.getWidth() == 0)
+			return;
+		setArrows(circBds.getX(), circBds.getX() + circBds.getWidth(), circBds.getY(),
+				circBds.getY() + circBds.getHeight());
+	}
+
 	public void setArrows(Integer x0, Integer y0, Integer x1, Integer y1) {
 		viewport.clearArrows();
-		// no circuit
-		if (proj.getCurrentCircuit().getBounds().getHeight() == 0
-				|| proj.getCurrentCircuit().getBounds().getWidth() == 0)
-			return;
-		// get circuit coords if null
-		if (x0 == null)
-			x0 = proj.getCurrentCircuit().getBounds().getX();
-		if (x1 == null)
-			x1 = proj.getCurrentCircuit().getBounds().getX() + proj.getCurrentCircuit().getBounds().getWidth();
-		if (y0 == null)
-			y0 = proj.getCurrentCircuit().getBounds().getY();
-		if (y1 == null)
-			y1 = proj.getCurrentCircuit().getBounds().getY() + proj.getCurrentCircuit().getBounds().getHeight();
-		Rectangle viewableBase;
-		Rectangle viewable;
+		Rectangle viewableBase, viewable;
 		if (canvasPane != null) {
 			viewableBase = canvasPane.getViewport().getViewRect();
 		} else {
