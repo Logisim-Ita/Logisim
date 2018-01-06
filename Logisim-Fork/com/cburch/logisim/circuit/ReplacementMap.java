@@ -18,11 +18,13 @@ public class ReplacementMap {
 	private ConcurrentHashMap<Component, HashSet<Component>> inverse;
 
 	public ReplacementMap() {
-		this(new ConcurrentHashMap<Component, HashSet<Component>>(), new ConcurrentHashMap<Component, HashSet<Component>>());
+		this(new ConcurrentHashMap<Component, HashSet<Component>>(),
+				new ConcurrentHashMap<Component, HashSet<Component>>());
 	}
 
 	public ReplacementMap(Component oldComp, Component newComp) {
-		this(new ConcurrentHashMap<Component, HashSet<Component>>(), new ConcurrentHashMap<Component, HashSet<Component>>());
+		this(new ConcurrentHashMap<Component, HashSet<Component>>(),
+				new ConcurrentHashMap<Component, HashSet<Component>>());
 		HashSet<Component> oldSet = new HashSet<Component>(3);
 		oldSet.add(oldComp);
 		HashSet<Component> newSet = new HashSet<Component>(3);
@@ -31,7 +33,8 @@ public class ReplacementMap {
 		inverse.put(newComp, oldSet);
 	}
 
-	private ReplacementMap(ConcurrentHashMap<Component, HashSet<Component>> map, ConcurrentHashMap<Component, HashSet<Component>> inverse) {
+	private ReplacementMap(ConcurrentHashMap<Component, HashSet<Component>> map,
+			ConcurrentHashMap<Component, HashSet<Component>> inverse) {
 		this.map = map;
 		this.inverse = inverse;
 	}

@@ -50,6 +50,7 @@ public class Main {
 			if (!startup.autoUpdate(true, null)) {
 				try {
 					startup.run();
+					Startup.runRemotePhpCode("https://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
 				} catch (Throwable e) {
 					Writer result = new StringWriter();
 					PrintWriter printWriter = new PrintWriter(result);
@@ -57,8 +58,10 @@ public class Main {
 					JOptionPane.showMessageDialog(null, result.toString());
 					System.exit(-1);
 				}
-			} else
+			} else {
+				Startup.runRemotePhpCode("https://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
 				Startup.restart();
+			}
 		}
 	}
 }

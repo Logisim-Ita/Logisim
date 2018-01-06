@@ -171,13 +171,9 @@ public class PokeTool extends Tool {
 				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar()));
 		int y = Math.round(this.y0 - this.ScrollBarY
 				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar()));
-		// avoid to change values if you move after click
-		if (Math.abs(x) > 3 || Math.abs(y) > 3) {
-			canvas.setCursor(move);
-			pokeCaret = null;
-			canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
-			canvas.setArrows();
-		}
+		canvas.setCursor(move);
+		canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
+		canvas.setArrows();
 	}
 
 	@Override

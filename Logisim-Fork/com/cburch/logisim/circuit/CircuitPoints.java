@@ -22,6 +22,7 @@ class CircuitPoints {
 		ArrayList<EndData> ends = new ArrayList<EndData>(4);
 		// these lists are parallel - ends corresponding to wires are null
 	}
+
 	private ConcurrentHashMap<Location, LocationData> map = new ConcurrentHashMap<Location, LocationData>();
 	private ConcurrentHashMap<Location, WidthIncompatibilityData> incompatibilityData = new ConcurrentHashMap<Location, WidthIncompatibilityData>();
 

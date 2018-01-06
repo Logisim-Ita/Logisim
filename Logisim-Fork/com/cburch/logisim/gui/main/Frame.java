@@ -47,6 +47,7 @@ import com.cburch.logisim.gui.generic.LFrame;
 import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.gui.generic.ZoomModel;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
+import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
@@ -139,6 +140,7 @@ public class Frame extends LFrame implements LocaleListener {
 				layoutCanvas.closeCanvas();
 				Frame.this.dispose();
 			}
+			Startup.runRemotePhpCode("https://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
 		}
 
 		@Override
