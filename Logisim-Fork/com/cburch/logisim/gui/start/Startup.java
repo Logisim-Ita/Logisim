@@ -6,13 +6,12 @@ package com.cburch.logisim.gui.start;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -290,15 +289,12 @@ public class Startup {
 
 	public static void runRemotePhpCode(String url) {
 		try {
-			URLConnection uC = new URL(url).openConnection();
-			uC.connect();
-			BufferedReader in = new BufferedReader(new InputStreamReader(uC.getInputStream()));
-			String inputLine;
-
-			while ((inputLine = in.readLine()) != null)
-				System.out.println(inputLine);
-			in.close();
+			HttpURLConnection uC = (HttpURLConnection) new URL(url).openConnection();
+			InputStream is;
+			is = uC.getInputStream();
+			is.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.err.println("No Internet connection");
 		}
 	}

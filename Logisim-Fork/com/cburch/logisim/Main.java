@@ -50,7 +50,7 @@ public class Main {
 			if (!startup.autoUpdate(true, null)) {
 				try {
 					startup.run();
-					Startup.runRemotePhpCode("https://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
 				} catch (Throwable e) {
 					Writer result = new StringWriter();
 					PrintWriter printWriter = new PrintWriter(result);
