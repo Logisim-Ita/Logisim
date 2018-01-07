@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
@@ -185,7 +186,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
 					proj.setStartupScreen(false);
 			}
-			if (e.getButton() == MouseEvent.BUTTON1 &&viewport.zoomButtonVisible
+			if (e.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
 					&& AutoZoomButtonClicked(viewport.getSize(), e.getX() * getZoomFactor() - getHorizzontalScrollBar(),
 							e.getY() * getZoomFactor() - getVerticalScrollBar())) {
 				viewport.zoomButtonColor = defaultzoomButtonColor.darker();
@@ -861,6 +862,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	public int getHorizzontalScrollBar() {
 		return canvasPane.getHorizontalScrollBar().getValue();
+	}
+
+	public Point getMousePosition() {
+		return canvasPane.getMousePosition();
 	}
 
 	@Override

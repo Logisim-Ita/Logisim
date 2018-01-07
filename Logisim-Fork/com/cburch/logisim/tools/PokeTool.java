@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
@@ -87,9 +88,8 @@ public class PokeTool extends Tool {
 	private Circuit pokedCircuit;
 	private Component pokedComponent;
 	private Caret pokeCaret;
-	private float x0 = 0, y0 = 0;
 	private boolean mooving = false;
-	private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
+	private int x = 0, y = 0, x0 = 0, y0 = 0, ScrollBarX = 0, ScrollBarY = 0;
 
 	public PokeTool() {
 		this.listener = new Listener();
@@ -168,10 +168,9 @@ public class PokeTool extends Tool {
 			canvas.getProject().repaintCanvas();
 		}
 		// move scrollpane dragging hand
-		int x = Math.round(this.x0 - this.ScrollBarX
-				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar()));
-		int y = Math.round(this.y0 - this.ScrollBarY
-				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar()));
+		Point m = canvas.getMousePosition();
+		int x = (int) (this.x0 - m.getX());
+		int y = (int) (this.y0 - m.getY());
 		if (!this.mooving && (Math.abs(x) > 3 || Math.abs(y) > 3))
 			this.mooving = true;
 		if (this.mooving) {
@@ -183,8 +182,8 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
-		this.x0 = e.getX() * (float) canvas.getZoomFactor();
-		this.y0 = e.getY() * (float) canvas.getZoomFactor();
+		this.x0 = (int) canvas.getMousePosition().getX();
+		this.y0 = (int) canvas.getMousePosition().getY();
 		this.x = e.getX();
 		this.y = e.getY();
 		this.ScrollBarX = canvas.getHorizzontalScrollBar();

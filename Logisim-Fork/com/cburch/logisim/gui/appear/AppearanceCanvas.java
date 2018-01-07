@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
@@ -85,11 +86,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		public void mouseDragged(MouseEvent arg0) {
 			if (mooving) {
 				setCursor(move);
-				int x = Math.round(this.ScrollBarX + ((this.x * (float) getZoomFactor() - this.ScrollBarX)
-						- (arg0.getX() * (float) getZoomFactor() - getHorizzontalScrollBar())));
-				int y = Math.round(this.ScrollBarY + ((this.y * (float) getZoomFactor() - this.ScrollBarY)
-						- (arg0.getY() * (float) getZoomFactor() - getVerticalScrollBar())));
-				setScrollBar(x, y);
+				Point m = getMousePosition();
+				int x = (int) (this.x - m.getX());
+				int y = (int) (this.y - m.getY());
+				setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
 				setArrows();
 			}
 		}
@@ -109,10 +109,8 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		@Override
 		public void mousePressed(MouseEvent arg0) {
 			if (arg0.getButton() == MouseEvent.BUTTON2) {
-				this.x = arg0.getX();
-				this.y = arg0.getY();
-				this.ScrollBarX = getHorizzontalScrollBar();
-				this.ScrollBarY = getVerticalScrollBar();
+				this.x = (int) getMousePosition().getX();
+				this.y = (int) getMousePosition().getY();
 				this.mooving = true;
 			} else if (arg0.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
 					&& com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(viewport.getSize(),
@@ -462,6 +460,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		return canvasPane.getHorizontalScrollBar().getValue();
 	}
 
+	public Point getMousePosition() {
+		return canvasPane.getMousePosition();
+	}
+
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -639,6 +641,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		setModel(circuit.getAppearance(), this);
 	}
 
+	public void setHorizontalScrollBar(int X) {
+		canvasPane.getHorizontalScrollBar().setValue(X);
+	}
+
 	@Override
 	public void setModel(CanvasModel value, ActionDispatcher dispatcher) {
 		CanvasModel oldModel = super.getModel();
@@ -652,14 +658,18 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 	}
 
 	public void setScrollBar(int X, int Y) {
-		canvasPane.getHorizontalScrollBar().setValue(X);
-		canvasPane.getVerticalScrollBar().setValue(Y);
+		setHorizontalScrollBar(X);
+		setVerticalScrollBar(Y);
 	}
 
 	@Override
 	public void setTool(CanvasTool value) {
 		hidePopup();
 		super.setTool(value);
+	}
+
+	public void setVerticalScrollBar(int Y) {
+		canvasPane.getVerticalScrollBar().setValue(Y);
 	}
 
 	@Override
