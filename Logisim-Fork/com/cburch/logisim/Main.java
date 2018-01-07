@@ -59,7 +59,7 @@ public class Main {
 					System.exit(-1);
 				}
 			} else {
-				Startup.runRemotePhpCode("https://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
+				Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
 				Startup.restart();
 			}
 		}

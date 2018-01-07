@@ -114,9 +114,10 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 				this.ScrollBarX = getHorizzontalScrollBar();
 				this.ScrollBarY = getVerticalScrollBar();
 				this.mooving = true;
-			} else if (viewport.zoomButtonVisible && com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(
-					viewport.getSize(), arg0.getX() * getZoomFactor() - getHorizzontalScrollBar(),
-					arg0.getY() * getZoomFactor() - getVerticalScrollBar())) {
+			} else if (arg0.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
+					&& com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(viewport.getSize(),
+							arg0.getX() * getZoomFactor() - getHorizzontalScrollBar(),
+							arg0.getY() * getZoomFactor() - getVerticalScrollBar())) {
 				viewport.zoomButtonColor = com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor.darker();
 				viewport.repaint();
 				// avoid actions under the button
@@ -128,14 +129,15 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			if (arg0.getButton() == MouseEvent.BUTTON2) {
+			if (arg0.getButton() == MouseEvent.BUTTON2 && arg0.getClickCount() == 1) {
 				setCursor(cursor);
 				this.mooving = false;
-			} else if (viewport.zoomButtonVisible
+			} else if ((arg0.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
 					&& com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(viewport.getSize(),
 							arg0.getX() * getZoomFactor() - getHorizzontalScrollBar(),
 							arg0.getY() * getZoomFactor() - getVerticalScrollBar())
-					&& viewport.zoomButtonColor != com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor) {
+					&& viewport.zoomButtonColor != com.cburch.logisim.gui.main.Canvas.defaultzoomButtonColor)
+					|| arg0.getButton() == MouseEvent.BUTTON2 && arg0.getClickCount() == 2) {
 				autoZoomCenter();
 			}
 			if (getTool() == null)

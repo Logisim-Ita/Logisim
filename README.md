@@ -1,11 +1,11 @@
 # Logisim Fork ITA
 Logisim is a digital circuit simulator, [originally available here](http://www.cburch.com/logisim/).<br><br>
 This is an italian fork based on the original Logisim version.<br>
-<b>[DOWNLOAD BUTTON AND CHANGELOG](https://logisim.altervista.org)</b><br>
-<b>[CONTACT US](https://logisim.altervista.org/contacts.html)</b><br>
-<b>[PLUGINS](https://logisim.altervista.org/plugins.html)</b><br>
-<b>[USER TUTORIALS](https://logisim.altervista.org/userstutorial.php)</b><br>
-<b>[DEVS TUTORIALS](https://logisim.altervista.org/developerstutorial.php)</b><br>
+<b>[DOWNLOAD BUTTON AND CHANGELOG](http://logisim.altervista.org)</b><br>
+<b>[CONTACT US](http://logisim.altervista.org/contacts.html)</b><br>
+<b>[PLUGINS](http://logisim.altervista.org/plugins.html)</b><br>
+<b>[USER TUTORIALS](http://logisim.altervista.org/userstutorial.php)</b><br>
+<b>[DEVS TUTORIALS](http://logisim.altervista.org/developerstutorial.php)</b><br>
 ## Changelog
 * Italian translation!
 * Possibility to use french translations already done (not very well)
@@ -54,8 +54,8 @@ This is an italian fork based on the original Logisim version.<br>
 Due to a bug in the original Logisim, wide gates with 4 inputs had a bad positioning of the ports.
 I fixed this problem but if you open an old file containig gates with those attributes, its inputs will be disconnected and a warning message will appear
 ## EXE and JAR downloads + microprocessor project
-All in our website [here](https://logisim.altervista.org)
+All in our website [here](http://logisim.altervista.org)
 ## How to compile & use
-Watch our tutorials on "TUTORIAL" section of our [website](https://logisim.altervista.org/developerstutorial.php)
+Watch our tutorials on "TUTORIAL" section of our [website](http://logisim.altervista.org/developerstutorial.php)
 ## Translation
 New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one, if you want so, contact me at logisimit@gmail.com

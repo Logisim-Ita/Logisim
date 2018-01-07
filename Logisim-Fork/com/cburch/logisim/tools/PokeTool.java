@@ -88,6 +88,7 @@ public class PokeTool extends Tool {
 	private Component pokedComponent;
 	private Caret pokeCaret;
 	private float x0 = 0, y0 = 0;
+	private boolean mooving = false;
 	private int x = 0, y = 0, ScrollBarX = 0, ScrollBarY = 0;
 
 	public PokeTool() {
@@ -171,9 +172,13 @@ public class PokeTool extends Tool {
 				- (e.getX() * (float) canvas.getZoomFactor() - canvas.getHorizzontalScrollBar()));
 		int y = Math.round(this.y0 - this.ScrollBarY
 				- (e.getY() * (float) canvas.getZoomFactor() - canvas.getVerticalScrollBar()));
-		canvas.setCursor(move);
-		canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
-		canvas.setArrows();
+		if (!this.mooving && (Math.abs(x) > 3 || Math.abs(y) > 3))
+			this.mooving = true;
+		if (this.mooving) {
+			canvas.setCursor(move);
+			canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
+			canvas.setArrows();
+		}
 	}
 
 	@Override
@@ -228,6 +233,7 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
+		this.mooving = false;
 		if (pokeCaret != null) {
 			pokeCaret.mouseReleased(e);
 			canvas.getProject().repaintCanvas();

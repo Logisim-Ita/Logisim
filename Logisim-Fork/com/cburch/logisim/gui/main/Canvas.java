@@ -185,7 +185,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
 					proj.setStartupScreen(false);
 			}
-			if (viewport.zoomButtonVisible
+			if (e.getButton() == MouseEvent.BUTTON1 &&viewport.zoomButtonVisible
 					&& AutoZoomButtonClicked(viewport.getSize(), e.getX() * getZoomFactor() - getHorizzontalScrollBar(),
 							e.getY() * getZoomFactor() - getVerticalScrollBar())) {
 				viewport.zoomButtonColor = defaultzoomButtonColor.darker();
@@ -202,10 +202,11 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (viewport.zoomButtonVisible
+			if ((e.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
 					&& AutoZoomButtonClicked(viewport.getSize(), e.getX() * getZoomFactor() - getHorizzontalScrollBar(),
 							e.getY() * getZoomFactor() - getVerticalScrollBar())
-					&& viewport.zoomButtonColor != defaultzoomButtonColor) {
+					&& viewport.zoomButtonColor != defaultzoomButtonColor)
+					|| e.getButton() == MouseEvent.BUTTON2 && e.getClickCount() == 2) {
 				autoZoomCenter();
 			} else {
 				if (drag_tool != null) {
@@ -1121,8 +1122,16 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		painter.setHighlightedWires(value);
 	}
 
-	public void setScrollBar(int X, int Y) {
+	public void setHorizontalScrollBar(int X) {
 		canvasPane.getHorizontalScrollBar().setValue(X);
+	}
+
+	public void setScrollBar(int X, int Y) {
+		setHorizontalScrollBar(X);
+		setVerticalScrollBar(Y);
+	}
+
+	public void setVerticalScrollBar(int Y) {
 		canvasPane.getVerticalScrollBar().setValue(Y);
 	}
 

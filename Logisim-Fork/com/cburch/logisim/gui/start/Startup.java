@@ -290,12 +290,11 @@ public class Startup {
 	public static void runRemotePhpCode(String url) {
 		try {
 			HttpURLConnection uC = (HttpURLConnection) new URL(url).openConnection();
-			InputStream is;
-			is = uC.getInputStream();
-			is.close();
+			// you can send any type of request to run php
+			uC.getContentLength();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println("No Internet connection");
+			System.err.println("cannot reach server");
 		}
 	}
 
@@ -341,20 +340,15 @@ public class Startup {
 	}
 
 	/**
-	 * Auto-update Logisim if a new version is available
-	 * 
-	 * Original idea taken from logisim-evolution:
-	 * https://github.com/reds-heig/logisim-evolution
-	 * 
-	 * @return true if the code has been updated, and therefore the execution has to
-	 *         be stopped, false otherwise
+	 * Auto-update Logisim if a new version is available return true if the code has
+	 * been updated, and therefore the execution has to be stopped, false otherwise
 	 */
 	public boolean autoUpdate(boolean FromMain, Frame frame) {
-		if ((AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) && FromMain)
-				|| !networkConnectionAvailable()) {
-			// Auto-update disabled from command line or preference window, or network
-			// connection not
-			// available
+		if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.NO) && FromMain) {
+			// Auto-update disabled from preference window and called at startup, if you
+			// call this
+			// function from help menu, FromMain is set to false to check updates even with
+			// "Never" preference
 			return (false);
 		}
 		// Get the remote XML file containing the current version
@@ -622,33 +616,6 @@ public class Startup {
 		} else if (templPlain) {
 			AppPreferences.setTemplateType(AppPreferences.TEMPLATE_PLAIN);
 		}
-	}
-
-	/**
-	 * Check if network connection is available.
-	 * 
-	 * This function tries to connect to google in order to test the availability of
-	 * a network connection. This step is needed before attempting to perform an
-	 * auto-update. It assumes that google is accessible -- usually this is the
-	 * case, and it should also provide a quick reply to the connection attempt,
-	 * reducing the lag.
-	 * 
-	 * @return true if the connection is available, false otherwise
-	 */
-	private boolean networkConnectionAvailable() {
-		try {
-			URLConnection uC = new URL("http://www.google.com").openConnection();
-			uC.connect();
-			return (true);
-		} catch (MalformedURLException e) {
-			System.err.println("The URL used to check the connectivity is malformed -- no Google?");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("No Internet connection");
-			// If we get here, the connection somehow failed
-			return (false);
-		}
-		return (false);
 	}
 
 	public void run() {
