@@ -28,6 +28,7 @@ import java.io.Writer;
 import javax.swing.JOptionPane;
 
 import com.cburch.logisim.gui.start.Startup;
+import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
 	public static final LogisimVersion VERSION = LogisimVersion.get(2, 12, 0, 0, LogisimVersion.getVariantFromFile());
@@ -50,7 +51,8 @@ public class Main {
 			if (!startup.autoUpdate(true, null)) {
 				try {
 					startup.run();
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
+					if (AppPreferences.SEND_DATA.getBoolean())
+						Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
 				} catch (Throwable e) {
 					Writer result = new StringWriter();
 					PrintWriter printWriter = new PrintWriter(result);
@@ -59,7 +61,8 @@ public class Main {
 					System.exit(-1);
 				}
 			} else {
-				Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
+				if (AppPreferences.SEND_DATA.getBoolean())
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
 				Startup.restart();
 			}
 		}

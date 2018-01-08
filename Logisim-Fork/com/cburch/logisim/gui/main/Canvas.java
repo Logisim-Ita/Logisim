@@ -19,6 +19,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -273,6 +274,11 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					return;
 				Startup.AsktoSave(proj.getFrame());
 				Startup.restart();
+			} else if (AppPreferences.SEND_DATA.isSource(event)) {
+				if (AppPreferences.SEND_DATA.getBoolean())
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
+				else
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
 			}
 		}
 	}
@@ -641,31 +647,32 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 
-	private static final Font ZOOM_BUTTON_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 18);
-
-	public static int zoomButtonHeight = 35, zoomButtonWidth = 0, zoomButtonMargin = 30;
+	public static int zoomButtonSize = 52, zoomButtonMargin = 30;
 
 	public static Color defaultzoomButtonColor = Color.WHITE;
 
 	public static boolean AutoZoomButtonClicked(Dimension sz, double x, double y) {
-		return (x < sz.width - zoomButtonMargin && x > sz.width - zoomButtonMargin - zoomButtonWidth
-				&& y < sz.height - zoomButtonMargin && y > sz.height - zoomButtonMargin - zoomButtonHeight);
+		return Point2D.distance(x, y, sz.width - zoomButtonSize / 2 - zoomButtonMargin,
+				sz.height - zoomButtonMargin - zoomButtonSize / 2) <= zoomButtonSize / 2;
 	}
 
 	public static void paintAutoZoomButton(Graphics g, Dimension sz, Color zoomButtonColor) {
 		Color oldcolor = g.getColor();
-		g.setFont(ZOOM_BUTTON_FONT);
-		FontMetrics fm = g.getFontMetrics();
-		String zoomButtonString = Strings.get("Reposition").toUpperCase();
-		zoomButtonWidth = fm.stringWidth(zoomButtonString) + 20;
-		g.fillRect(sz.width - zoomButtonMargin - 2 - zoomButtonWidth,
-				sz.height - zoomButtonMargin - 2 - zoomButtonHeight, zoomButtonWidth + 4, zoomButtonHeight + 4);
+		g.setColor(TICK_RATE_COLOR);
+		g.fillOval(sz.width - zoomButtonSize - 33, sz.height - zoomButtonSize - 33, zoomButtonSize + 6,
+				zoomButtonSize + 6);
 		g.setColor(zoomButtonColor);
-		g.fillRect(sz.width - zoomButtonMargin - zoomButtonWidth, sz.height - zoomButtonMargin - zoomButtonHeight,
-				zoomButtonWidth, zoomButtonHeight);
+		g.fillOval(sz.width - zoomButtonSize - 30, sz.height - zoomButtonSize - 30, zoomButtonSize, zoomButtonSize);
 		g.setColor(Value.UNKNOWN_COLOR);
-		GraphicsUtil.drawCenteredText(g, zoomButtonString, sz.width - zoomButtonMargin - zoomButtonWidth / 2,
-				sz.height - zoomButtonMargin - zoomButtonHeight / 2 - 3);
+		GraphicsUtil.switchToWidth(g, 3);
+		int width = sz.width - zoomButtonMargin;
+		int height = sz.height - zoomButtonMargin;
+		g.drawOval(width - zoomButtonSize * 3 / 4, height - zoomButtonSize * 3 / 4, zoomButtonSize / 2,
+				zoomButtonSize / 2);
+		g.drawLine(width - zoomButtonSize / 4 + 4, height - zoomButtonSize / 2, width - zoomButtonSize * 3 / 4 - 4,
+				height - zoomButtonSize / 2);
+		g.drawLine(width - zoomButtonSize / 2, height - zoomButtonSize / 4 + 4, width - zoomButtonSize / 2,
+				height - zoomButtonSize * 3 / 4 - 4);
 		g.setColor(oldcolor);
 	}
 
@@ -746,6 +753,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
 		AppPreferences.ANTI_ALIASING.addPropertyChangeListener(myListener);
 		AppPreferences.FILL_COMPONENT_BACKGROUND.addPropertyChangeListener(myListener);
+		AppPreferences.SEND_DATA.addPropertyChangeListener(myListener);
 		AppPreferences.SHOW_TICK_RATE.addPropertyChangeListener(myListener);
 		AppPreferences.LOOK_AND_FEEL.addPropertyChangeListener(myListener);
 		AppPreferences.GRAPHICS_ACCELERATION.addPropertyChangeListener(myListener);

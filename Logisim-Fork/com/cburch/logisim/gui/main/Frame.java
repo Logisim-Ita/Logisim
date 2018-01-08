@@ -140,7 +140,8 @@ public class Frame extends LFrame implements LocaleListener {
 				layoutCanvas.closeCanvas();
 				Frame.this.dispose();
 			}
-			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
+			if (AppPreferences.SEND_DATA.getBoolean())
+				Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
 		}
 
 		@Override

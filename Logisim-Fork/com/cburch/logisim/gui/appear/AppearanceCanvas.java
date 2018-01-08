@@ -87,6 +87,20 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			if (mooving) {
 				setCursor(move);
 				Point m = getMousePosition();
+				if (m == null) {
+					// if mouse exited and continue dragging
+					this.x = -1;
+					this.y = -1;
+					this.ScrollBarX = -1;
+					this.ScrollBarY = -1;
+					return;
+				} else if (this.x == -1 || this.y == -1 || this.ScrollBarX == -1 || this.ScrollBarY == -1) {
+					// if mouse re-entered after it exited without releasing the button
+					this.x = (int) m.getX();
+					this.y = (int) m.getY();
+					this.ScrollBarX = getHorizzontalScrollBar();
+					this.ScrollBarY = getVerticalScrollBar();
+				}
 				int x = (int) (this.x - m.getX());
 				int y = (int) (this.y - m.getY());
 				setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
@@ -111,6 +125,8 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 			if (arg0.getButton() == MouseEvent.BUTTON2) {
 				this.x = (int) getMousePosition().getX();
 				this.y = (int) getMousePosition().getY();
+				this.ScrollBarX = getHorizzontalScrollBar();
+				this.ScrollBarY = getVerticalScrollBar();
 				this.mooving = true;
 			} else if (arg0.getButton() == MouseEvent.BUTTON1 && viewport.zoomButtonVisible
 					&& com.cburch.logisim.gui.main.Canvas.AutoZoomButtonClicked(viewport.getSize(),

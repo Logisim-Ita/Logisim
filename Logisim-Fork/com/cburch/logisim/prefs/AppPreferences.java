@@ -198,7 +198,7 @@ public class AppPreferences {
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
 	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(
 			new PrefMonitorBoolean("FillComponentBackground", true));
-
+	public static final PrefMonitor<Boolean> SEND_DATA = create(new PrefMonitorBoolean("SendLogisimUsageData", true));
 	public static final String ALWAYS = "Always";
 	public static final String ASKME = "Ask Me";
 	public static final String NO = "No";

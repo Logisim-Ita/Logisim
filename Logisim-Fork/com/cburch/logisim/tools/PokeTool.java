@@ -169,6 +169,20 @@ public class PokeTool extends Tool {
 		}
 		// move scrollpane dragging hand
 		Point m = canvas.getMousePosition();
+		if (m == null) {
+			// if mouse exited and continue dragging
+			this.x0 = -1;
+			this.y0 = -1;
+			this.ScrollBarX = -1;
+			this.ScrollBarY = -1;
+			return;
+		} else if (this.x0 == -1 || this.y0 == -1 || this.ScrollBarX == -1 || this.ScrollBarY == -1) {
+			// if mouse re-entered after it exited without releasing the button
+			this.x0 = (int) m.getX();
+			this.y0 = (int) m.getY();
+			this.ScrollBarX = canvas.getHorizzontalScrollBar();
+			this.ScrollBarY = canvas.getVerticalScrollBar();
+		}
 		int x = (int) (this.x0 - m.getX());
 		int y = (int) (this.y0 - m.getY());
 		if (!this.mooving && (Math.abs(x) > 3 || Math.abs(y) > 3))
