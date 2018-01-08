@@ -18,6 +18,6 @@
 * Fixed opening new file in new window bug when the old window wasn't dirty
 * Fixed zoom with mouse wheel bug on old frames after opening a new file
 * Better zoom function
-* Small fixes about Thread/s conflicts
+* Small fixes about Threads conflicts
   </changelog>
 </logisim>
