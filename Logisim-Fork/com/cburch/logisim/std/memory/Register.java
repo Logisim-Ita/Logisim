@@ -29,6 +29,7 @@ public class Register extends InstanceFactory {
 	private static final int CLR = 3;
 	private static final int EN = 4;
 	private static final int CS = 5;
+	private static final int PRE = 6;
 
 	public Register() {
 		super("Register", Strings.getter("registerComponent"));
@@ -55,17 +56,19 @@ public class Register extends InstanceFactory {
 	}
 
 	void configurePorts(Instance instance) {
-		Port[] ps = new Port[6];
+		Port[] ps = new Port[7];
 		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
 		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
 		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
 		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
+		ps[PRE] = new Port(-10, -20, Port.INPUT, 1);
 		ps[EN] = new Port(-30, 10, Port.INPUT, 1);
 		ps[CS] = new Port(-30, -10, Port.INPUT, 1);
 		ps[OUT].setToolTip(Strings.getter("registerQTip"));
 		ps[IN].setToolTip(Strings.getter("registerDTip"));
 		ps[CK].setToolTip(Strings.getter("registerClkTip"));
 		ps[CLR].setToolTip(Strings.getter("registerClrTip"));
+		ps[PRE].setToolTip(Strings.getter("registerPreTip"));
 		ps[EN].setToolTip(Strings.getter("registerEnableTip"));
 		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
 			ps[CS].setToolTip(Strings.getter("memCSTip", "0"));
@@ -120,6 +123,7 @@ public class Register extends InstanceFactory {
 		}
 		g.setColor(Color.GRAY);
 		painter.drawPort(CLR, "0", Direction.SOUTH);
+		painter.drawPort(PRE);
 		painter.drawPort(EN, Strings.get("memEnableLabel"), Direction.EAST);
 		painter.drawPort(CS);
 		g.setColor(Color.BLACK);
@@ -157,6 +161,8 @@ public class Register extends InstanceFactory {
 		}
 		if (state.getPort(CLR) == Value.TRUE) {
 			data.value = 0;
+		} else if (state.getPort(PRE) == Value.TRUE) {
+			data.value = (int) Math.pow(2, dataWidth.getWidth()) - 1;
 		} else if (triggered && state.getPort(EN) != Value.FALSE) {
 			Value in = state.getPort(IN);
 			if (in.isFullyDefined())
