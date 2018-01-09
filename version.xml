@@ -15,9 +15,10 @@
     the auto zoom / centering function
 * Updating to this version you'll accept to send data about Logisim usage (visible on http://logisim.altervista.org/)
     You can disable it in Preference / Fork
-* Fixed opening new file in new window bug when the old window wasn't dirty
+* Fixed opening new file in new window bug when the old window wasn't used
 * Fixed zoom with mouse wheel bug on old frames after opening a new file
 * Better zoom function
 * Small fixes about Thread conflicts
+* Pre input in Counter and Register components
   </changelog>
 </logisim>
