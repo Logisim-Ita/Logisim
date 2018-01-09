@@ -44,6 +44,7 @@ public class Counter extends InstanceFactory {
 	private static final int LD = 4;
 	private static final int CT = 5;
 	private static final int CARRY = 6;
+	private static final int PRE = 7;
 
 	public Counter() {
 		super("Counter", Strings.getter("counterComponent"));
@@ -53,7 +54,7 @@ public class Counter extends InstanceFactory {
 		setInstanceLogger(RegisterLogger.class);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 
-		Port[] ps = new Port[7];
+		Port[] ps = new Port[8];
 		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
 		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
 		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
@@ -61,6 +62,7 @@ public class Counter extends InstanceFactory {
 		ps[LD] = new Port(-30, -10, Port.INPUT, 1);
 		ps[CT] = new Port(-30, 10, Port.INPUT, 1);
 		ps[CARRY] = new Port(0, 10, Port.OUTPUT, 1);
+		ps[PRE] = new Port(-10, -20, Port.INPUT, 1);
 		ps[OUT].setToolTip(Strings.getter("counterQTip"));
 		ps[IN].setToolTip(Strings.getter("counterDataTip"));
 		ps[CK].setToolTip(Strings.getter("counterClockTip"));
@@ -68,6 +70,7 @@ public class Counter extends InstanceFactory {
 		ps[LD].setToolTip(Strings.getter("counterLoadTip"));
 		ps[CT].setToolTip(Strings.getter("counterEnableTip"));
 		ps[CARRY].setToolTip(Strings.getter("counterCarryTip"));
+		ps[PRE].setToolTip(Strings.getter("registerPreTip"));
 		setPorts(ps);
 	}
 
@@ -125,6 +128,7 @@ public class Counter extends InstanceFactory {
 		g.setColor(Color.GRAY);
 		painter.drawPort(LD);
 		painter.drawPort(CARRY);
+		painter.drawPort(PRE);
 		painter.drawPort(CLR, "0", Direction.SOUTH);
 		painter.drawPort(CT, Strings.get("counterEnableLabel"), Direction.EAST);
 		g.setColor(Color.BLACK);
@@ -158,7 +162,11 @@ public class Counter extends InstanceFactory {
 		if (state.getPort(CLR) == Value.TRUE) {
 			newValue = Value.createKnown(dataWidth, 0);
 			carry = false;
+		} else if (state.getPort(PRE) == Value.TRUE) {
+			newValue = Value.createKnown(dataWidth, -1);
+			carry = false;
 		} else {
+
 			boolean ld = state.getPort(LD) == Value.TRUE;
 			boolean ct = state.getPort(CT) != Value.FALSE;
 			int oldVal = data.value;

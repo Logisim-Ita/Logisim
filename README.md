@@ -19,10 +19,14 @@ This is an italian fork based on the original Logisim version.<br>
 	* I/O->RGB LED
 	* Memory->PLA ROM
 	* Plexers->7-Segment Display Decoder
+* Complete new movement system with mouse dragging
+* Auto center and Auto zoom when opening new files/circuits, you can call this function with ctrl-0, double mouse wheel click or with the round button you'll see on the lower-right corner
+* Almost infinite canvas, arrow will show you in what direction is the circuit if it's outside of your view
 * New FF layout and attributes
 * FF D, S-R: Latch option in trigger list
 * Controlled Buffer / Inverter: Negate Control Input attribute
 * Added Sel pin in Register component
+* Added Pre pin in Register and Counter components
 * Added Sel Active Level attribute in components with Sel pin
 * Press ESC or DEL to cancel "Add Tool" action, F1 opens Library Reference
 * TTY and Keyboard components can use 16-bit values (UTF-16)
@@ -36,6 +40,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Analyze Circuit should calculate table/expression with any kind of component
 * Fixed empty template bug introduced in Logisim 2.7.0
 * Fixed input positions in wide gates with 4 inputs
+* Fixed opening new file in new window before adding any kind of component
 * Changed some default value
 * Anti Aliasing, Look and Feel and Fill Component's Background preference
 * Graphical changes
@@ -44,15 +49,15 @@ This is an italian fork based on the original Logisim version.<br>
 * PLA ROM doesn't save configurations in .circ and its logic is not calculated in Analyze Circuit
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
-* Solve propagation bugs not solved in the original Logisim
+* Solve dirty points when rotating
 * Programmable Generator (95% done)
 * Buzzer (75% done)
 * Add a new type of library
 * Draw also in circuits
 * Suggest us everything at logisimit@gmail.com
 ## Retro-compatibility
-Due to a bug in the original Logisim, wide gates with 4 inputs had a bad positioning of the ports.
-I fixed this problem but if you open an old file containig gates with those attributes, its inputs will be disconnected and a warning message will appear
+Due to a bug in the original Logisim, wide gates with 4 inputs had a bad pin positioning.
+I fixed this problem but if you open an old file containing gates with those attributes, its inputs will be disconnected and a warning message will appear
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](http://logisim.altervista.org)
 ## How to compile & use

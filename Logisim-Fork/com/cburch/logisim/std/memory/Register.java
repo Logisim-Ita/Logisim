@@ -155,14 +155,13 @@ public class Register extends InstanceFactory {
 		boolean chipSelect = !(state.getPort(CS) == Value.FALSE && selection
 				|| state.getPort(CS) == Value.TRUE && !selection);
 		if (!chipSelect) {
-			// myState.setCurrent(-1);
 			state.setPort(OUT, Value.createUnknown(dataWidth), DELAY);
 			return;
 		}
 		if (state.getPort(CLR) == Value.TRUE) {
 			data.value = 0;
 		} else if (state.getPort(PRE) == Value.TRUE) {
-			data.value = (int) Math.pow(2, dataWidth.getWidth()) - 1;
+			data.value = -1;
 		} else if (triggered && state.getPort(EN) != Value.FALSE) {
 			Value in = state.getPort(IN);
 			if (in.isFullyDefined())
