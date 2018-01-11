@@ -93,6 +93,7 @@ class AboutCredits extends JComponent {
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleLead")));
 		lines.add(new CreditsLine(1, "Andrea Sanguineti"));
 		lines.add(new CreditsLine(2, "Samuele Capani"));
+		lines.add(new CreditsLine(2, "Angelo Sterlini"));
 		lines.add(new CreditsLine(2, "Theldo Cruz Franqueira"));
 		initialLines = lines.size();
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleItalian")));
