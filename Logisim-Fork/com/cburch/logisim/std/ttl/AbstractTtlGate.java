@@ -40,9 +40,9 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		this.outputports = outputports;
 	}
 
-	protected AbstractTtlGate(String name, int pins, int[] outputports, int ngatestodrawforside) {
+	protected AbstractTtlGate(String name, int pins, int[] outputports, boolean drawgates) {
 		this(name, pins, outputports);
-		this.ngatestodraw = ngatestodrawforside * 2;
+		this.ngatestodraw = drawgates ? outputports.length : 0;
 	}
 
 	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
@@ -382,7 +382,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			// Set the port (output/input)
 			if (isoutput) {// output port
 				ps[portindex] = new Port(dx, dy, Port.OUTPUT, 1);
-				if (this.portnames == null)
+				if (this.portnames == null || this.portnames.length <= portindex)
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(i + 1)));
 				else
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip",
@@ -399,7 +399,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					portindex--;
 				} else if (i != this.pinnumber - 1 && i != this.pinnumber / 2 - 1) {// normal output
 					ps[portindex] = new Port(dx, dy, Port.INPUT, 1);
-					if (this.portnames == null)
+					if (this.portnames == null || this.portnames.length <= portindex)
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(i + 1)));
 					else
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip",
