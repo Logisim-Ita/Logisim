@@ -6,7 +6,6 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
@@ -139,10 +138,10 @@ public class Register extends InstanceFactory {
 		}
 		painter.drawLabel();
 	}
-	
+
 	@Override
 	public void propagate(InstanceState state) {
-		
+
 		RegisterData data = (RegisterData) state.getData();
 		if (data == null) {
 			data = new RegisterData();

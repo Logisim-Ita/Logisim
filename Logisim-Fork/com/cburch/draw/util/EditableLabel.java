@@ -43,12 +43,12 @@ public class EditableLabel implements Cloneable {
 	private int[] charX;
 	private int[] charY;
 
-	public EditableLabel(int x, int y, String text, Font font) {
+	public EditableLabel(int x, int y, String text, Font font, Color color) {
 		this.x = x;
 		this.y = y;
 		this.text = text;
 		this.font = font;
-		this.color = Color.BLACK;
+		this.color = color;
 		this.horzAlign = LEFT;
 		this.vertAlign = BASELINE;
 		this.dimsKnown = false;
@@ -59,7 +59,7 @@ public class EditableLabel implements Cloneable {
 		try {
 			return (EditableLabel) super.clone();
 		} catch (CloneNotSupportedException e) {
-			return new EditableLabel(x, y, text, font);
+			return new EditableLabel(x, y, text, font, color);
 		}
 	}
 

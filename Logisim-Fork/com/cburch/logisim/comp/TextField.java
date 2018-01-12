@@ -53,8 +53,8 @@ public class TextField {
 	}
 
 	public void draw(Graphics g) {
-		Font Fold = g.getFont();
-		Color Cold = g.getColor();
+		Font oldFont = g.getFont();
+		Color oldColor = g.getColor();
 		if (font != null)
 			g.setFont(font);
 		if (color != null)
@@ -92,8 +92,8 @@ public class TextField {
 			break;
 		}
 		g.drawString(text, x, y);
-		g.setFont(Fold);
-		g.setColor(Cold);
+		g.setFont(oldFont);
+		g.setColor(oldColor);
 	}
 
 	public void fireTextChanged(TextFieldEvent e) {
@@ -193,6 +193,10 @@ public class TextField {
 		this.valign = valign;
 	}
 
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
 	public void setFont(Font font) {
 		this.font = font;
 	}
@@ -226,10 +230,6 @@ public class TextField {
 
 	public void setVertAlign(int valign) {
 		this.valign = valign;
-	}
-
-	public void setColor(Color color) {
-		this.color = color;
 	}
 
 }

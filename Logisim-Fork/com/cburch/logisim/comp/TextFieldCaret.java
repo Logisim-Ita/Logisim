@@ -70,7 +70,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			g.setFont(field.getFont());
 		// draw boundary
 		Bounds bds = getBounds(g);
-		g.setColor(Color.white);
+		g.setColor(new Color(255, 255, 255, 128));
 		g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 		g.setColor(Color.black);
 		g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
@@ -236,6 +236,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 				curText += c;
 			}
 			++pos;
+			field.setText(curText);
 		}
 	}
 
