@@ -6,6 +6,7 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
@@ -29,14 +30,15 @@ public class ShiftRegister extends InstanceFactory {
 			Strings.getter("shiftRegLengthAttr"), 1, 32);
 	static final Attribute<Boolean> ATTR_LOAD = Attributes.forBoolean("parallel",
 			Strings.getter("shiftRegParallelAttr"));
-
+	static final Attribute<Boolean> ATTR_MULTIBIT = Attributes.forBoolean("multibit",
+			Strings.getter("shiftRegisterMultibit"));
 	private static final int IN = 0;
 	private static final int SH = 1;
 	private static final int CK = 2;
 	private static final int CLR = 3;
 	private static final int OUT = 4;
 	private static final int LD = 5;
-
+	
 	public ShiftRegister() {
 		super("Shift Register", Strings.getter("shiftRegisterComponent"));
 		setAttributes(
@@ -57,7 +59,17 @@ public class ShiftRegister extends InstanceFactory {
 		configurePorts(instance);
 		instance.addAttributeListener();
 	}
-
+	@Override
+	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
+		if (attr == ATTR_MULTIBIT) {
+			if (ver.compareTo(LogisimVersion.get(2, 12, 1, 0)) < 0) {
+				return Boolean.FALSE;
+			} else {
+				return Boolean.TRUE;
+			}
+		}
+	return super.getDefaultAttributeValue(attr, ver);
+	}
 	private void configurePorts(Instance instance) {
 		BitWidth widthObj = instance.getAttributeValue(StdAttr.WIDTH);
 		int width = widthObj.getWidth();
@@ -65,14 +77,25 @@ public class ShiftRegister extends InstanceFactory {
 		Bounds bds = instance.getBounds();
 		Port[] ps;
 		if (parallelObj == null || parallelObj.booleanValue()) {
-			Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
-			int len = lenObj == null ? 8 : lenObj.intValue();
-			ps = new Port[6 + 2 * len];
-			ps[LD] = new Port(10, -20, Port.INPUT, 1);
-			ps[LD].setToolTip(Strings.getter("shiftRegLoadTip"));
-			for (int i = 0; i < len; i++) {
-				ps[6 + 2 * i] = new Port(20 + 10 * i, -20, Port.INPUT, width);
-				ps[6 + 2 * i + 1] = new Port(20 + 10 * i, 20, Port.OUTPUT, width);
+			if(instance.getAttributeValue(ATTR_MULTIBIT)==Boolean.FALSE) {
+				Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
+				int len = lenObj == null ? 8 : lenObj.intValue();
+				ps = new Port[6 + 2 * len];
+				ps[LD] = new Port(10, -20, Port.INPUT, 1);
+				ps[LD].setToolTip(Strings.getter("shiftRegLoadTip"));
+				for (int i = 0; i < len; i++) {
+					ps[6 + 2 * i] = new Port(20 + 10 * i, -20, Port.INPUT, width);
+					ps[6 + 2 * i + 1] = new Port(20 + 10 * i, 20, Port.OUTPUT, width);
+				}
+			}else{
+				Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
+				int len = lenObj == null ? 8 : lenObj.intValue();
+				ps = new Port[6 + 2];
+				ps[LD] = new Port(10, -20, Port.INPUT, 1);
+				ps[LD].setToolTip(Strings.getter("shiftRegLoadTip"));
+				ps[6] = new Port(30 , -20, Port.INPUT, len);
+				ps[7] = new Port(30 , 20, Port.OUTPUT, len);
+				
 			}
 		} else {
 			ps = new Port[5];
@@ -201,9 +224,11 @@ public class ShiftRegister extends InstanceFactory {
 		} else if (triggered) {
 			if (parallel && state.getPort(LD) == Value.TRUE) {
 				data.clear();
-				for (int i = len - 1; i >= 0; i--) {
-					data.push(state.getPort(6 + 2 * i));
-				}
+				if(state.getAttributeValue(ATTR_MULTIBIT)==Boolean.FALSE)  
+					for (int i = len - 1; i >= 0; i--) 
+						data.push(state.getPort(6 + 2 * i));
+				else for (int i = len - 1; i >= 0; i--) 
+					data.push(state.getPort(6).get(len-1-i));
 			} else if (state.getPort(SH) != Value.FALSE) {
 				data.push(state.getPort(IN));
 			}
@@ -211,9 +236,11 @@ public class ShiftRegister extends InstanceFactory {
 
 		state.setPort(OUT, data.get(0), 4);
 		if (parallel) {
-			for (int i = 0; i < len; i++) {
-				state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
-			}
+			if(state.getAttributeValue(ATTR_MULTIBIT)==Boolean.FALSE) 
+				for (int i = 0; i < len; i++) 
+					state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
+			else for (int i = 0; i < len; i++) 
+				state.setPort(7,data.get(i),4);
 		}
 	}
 }
