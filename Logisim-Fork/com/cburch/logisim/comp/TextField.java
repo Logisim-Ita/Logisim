@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.comp;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -27,19 +28,21 @@ public class TextField {
 	private int halign;
 	private int valign;
 	private Font font;
+	private Color color;
 	private String text = "";
 	private LinkedList<TextFieldListener> listeners = new LinkedList<TextFieldListener>();
 
 	public TextField(int x, int y, int halign, int valign) {
-		this(x, y, halign, valign, null);
+		this(x, y, halign, valign, null, null);
 	}
 
-	public TextField(int x, int y, int halign, int valign, Font font) {
+	public TextField(int x, int y, int halign, int valign, Font font, Color color) {
 		this.x = x;
 		this.y = y;
 		this.halign = halign;
 		this.valign = valign;
 		this.font = font;
+		this.color = color;
 	}
 
 	//
@@ -50,10 +53,12 @@ public class TextField {
 	}
 
 	public void draw(Graphics g) {
-		Font old = g.getFont();
+		Font Fold = g.getFont();
+		Color Cold = g.getColor();
 		if (font != null)
 			g.setFont(font);
-
+		if (color != null)
+			g.setColor(color);
 		int x = this.x;
 		int y = this.y;
 		FontMetrics fm = g.getFontMetrics();
@@ -87,7 +92,8 @@ public class TextField {
 			break;
 		}
 		g.drawString(text, x, y);
-		g.setFont(old);
+		g.setFont(Fold);
+		g.setColor(Cold);
 	}
 
 	public void fireTextChanged(TextFieldEvent e) {
@@ -145,6 +151,10 @@ public class TextField {
 	//
 	public TextFieldCaret getCaret(Graphics g, int x, int y) {
 		return new TextFieldCaret(this, g, x, y);
+	}
+
+	public Color getColor() {
+		return color;
 	}
 
 	public Font getFont() {
@@ -216,6 +226,10 @@ public class TextField {
 
 	public void setVertAlign(int valign) {
 		this.valign = valign;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 }

@@ -100,7 +100,7 @@ public class Probe extends InstanceFactory {
 			}
 		}
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	//
@@ -468,7 +468,6 @@ public class Probe extends InstanceFactory {
 			g.drawRoundRect(x, y, bds.getWidth(), bds.getHeight(), 10, 10);
 		}
 
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		if (!painter.getShowState()) {

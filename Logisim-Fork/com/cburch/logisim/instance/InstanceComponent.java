@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -358,14 +359,15 @@ class InstanceComponent implements Component, AttributeListener, ToolTipMaker {
 		computeEnds();
 	}
 
-	void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign, int valign) {
+	void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, Attribute<Color> colorAttr, int x, int y,
+			int halign, int valign) {
 		InstanceTextField field = textField;
 		if (field == null) {
 			field = new InstanceTextField(this);
-			field.update(labelAttr, fontAttr, x, y, halign, valign);
+			field.update(labelAttr, fontAttr, colorAttr, x, y, halign, valign);
 			textField = field;
 		} else {
-			field.update(labelAttr, fontAttr, x, y, halign, valign);
+			field.update(labelAttr, fontAttr, colorAttr, x, y, halign, valign);
 		}
 	}
 

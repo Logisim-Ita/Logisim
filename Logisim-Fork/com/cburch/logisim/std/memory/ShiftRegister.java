@@ -89,8 +89,9 @@ public class ShiftRegister extends InstanceFactory {
 		ps[CLR].setToolTip(Strings.getter("shiftRegClearTip"));
 		instance.setPorts(ps);
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 4, GraphicsUtil.H_CENTER, GraphicsUtil.V_CENTER);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4, GraphicsUtil.H_CENTER,
+				GraphicsUtil.V_CENTER);
 	}
 
 	private ShiftRegisterData getData(InstanceState state) {
@@ -157,7 +158,6 @@ public class ShiftRegister extends InstanceFactory {
 						x += 10;
 
 					}
-					g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 					painter.drawLabel();
 				}
 			} else {
@@ -173,7 +173,6 @@ public class ShiftRegister extends InstanceFactory {
 				}
 				String b = Strings.get("shiftRegisterLabel2", "" + len, "" + wid);
 				GraphicsUtil.drawCenteredText(g, b, x, y + 3 * h / 4);
-				g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 				painter.drawLabel();
 			}
 

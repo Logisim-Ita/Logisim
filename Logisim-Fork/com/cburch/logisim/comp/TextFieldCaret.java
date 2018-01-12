@@ -68,7 +68,6 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	public void draw(Graphics g) {
 		if (field.getFont() != null)
 			g.setFont(field.getFont());
-
 		// draw boundary
 		Bounds bds = getBounds(g);
 		g.setColor(Color.white);
@@ -76,6 +75,8 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		g.setColor(Color.black);
 		g.drawRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 
+		if (field.getColor() != null)
+			g.setColor(field.getColor());
 		// draw text
 		int x = field.getX();
 		int y = field.getY();
@@ -112,6 +113,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		if (pos > 0)
 			x += fm.stringWidth(curText.substring(0, pos));
 		g.drawLine(x, y, x, y - ascent);
+		g.setColor(Color.BLACK);
 	}
 
 	@Override

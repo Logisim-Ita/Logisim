@@ -70,7 +70,8 @@ class NotGate extends InstanceFactory {
 				halign = TextField.H_CENTER;
 			}
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, TextField.V_BASELINE);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign,
+				TextField.V_BASELINE);
 	}
 
 	private NotGate() {
@@ -236,11 +237,9 @@ class NotGate extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
 		painter.getGraphics().setColor(Color.BLACK);
 		paintBase(painter);
 		painter.drawPorts();
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

@@ -82,7 +82,7 @@ public class Led extends InstanceFactory {
 			}
 		}
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -134,7 +134,6 @@ public class Led extends InstanceFactory {
 		GraphicsUtil.switchToWidth(g, 2);
 		g.drawOval(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 		GraphicsUtil.switchToWidth(g, 1);
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		painter.drawPorts();
 	}

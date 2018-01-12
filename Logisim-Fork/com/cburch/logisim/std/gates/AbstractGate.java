@@ -109,7 +109,8 @@ abstract class AbstractGate extends InstanceFactory {
 			cx = loc.getX() - axis;
 			cy = loc.getY() + perp;
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, cx, cy, TextField.H_CENTER, TextField.V_CENTER);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, cx, cy, TextField.H_CENTER,
+				TextField.V_CENTER);
 	}
 
 	protected abstract Value computeOutput(Value[] inputs, int numInputs, InstanceState state);
@@ -433,7 +434,6 @@ abstract class AbstractGate extends InstanceFactory {
 			((Graphics2D) g).rotate(-rotate);
 		}
 		g.translate(-loc.getX(), -loc.getY());
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

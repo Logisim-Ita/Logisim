@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -31,6 +32,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 	private TextField field;
 	private Attribute<String> labelAttr;
 	private Attribute<Font> fontAttr;
+	private Attribute<Color> colorAttr;
 	private int fieldX;
 	private int fieldY;
 	private int halign;
@@ -41,6 +43,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		this.field = null;
 		this.labelAttr = null;
 		this.fontAttr = null;
+		this.colorAttr = null;
 	}
 
 	@Override
@@ -55,12 +58,16 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		} else if (attr == fontAttr) {
 			if (field != null)
 				field.setFont((Font) e.getValue());
+		} else if (attr == colorAttr) {
+			if (field != null)
+				field.setColor((Color) e.getValue());
 		}
 	}
 
 	private void createField(AttributeSet attrs, String text) {
 		Font font = attrs.getValue(fontAttr);
-		field = new TextField(fieldX, fieldY, halign, valign, font);
+		Color color = attrs.getValue(colorAttr);
+		field = new TextField(fieldX, fieldY, halign, valign, font, color);
 		field.setText(text);
 		field.addTextFieldListener(this);
 	}
@@ -112,7 +119,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 	}
 
 	private boolean shouldRegister() {
-		return labelAttr != null || fontAttr != null;
+		return labelAttr != null || fontAttr != null || colorAttr != null;
 	}
 
 	@Override
@@ -124,10 +131,12 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		}
 	}
 
-	void update(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign, int valign) {
+	void update(Attribute<String> labelAttr, Attribute<Font> fontAttr, Attribute<Color> colorAttr, int x, int y,
+			int halign, int valign) {
 		boolean wasReg = shouldRegister();
 		this.labelAttr = labelAttr;
 		this.fontAttr = fontAttr;
+		this.colorAttr = colorAttr;
 		this.fieldX = x;
 		this.fieldY = y;
 		this.halign = halign;
@@ -156,6 +165,9 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 				Font font = attrs.getValue(fontAttr);
 				if (font != null)
 					field.setFont(font);
+				Color color = attrs.getValue(colorAttr);
+				if (color != null)
+					field.setColor(color);
 				field.setLocation(fieldX, fieldY, halign, valign);
 				field.setText(text);
 			}

@@ -81,7 +81,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			y = bds.getY() - 2;
 			valign = GraphicsUtil.V_BOTTOM;
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -242,7 +242,6 @@ public class DigitalOscilloscope extends InstanceFactory {
 		}
 		painter.drawClock(0, Direction.EAST);
 		// draw label
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

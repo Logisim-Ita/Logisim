@@ -112,7 +112,7 @@ public class Switch extends InstanceFactory {
 			}
 		}
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -266,7 +266,6 @@ public class Switch extends InstanceFactory {
 			}
 		}
 		if (!ghost) {
-			g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 			painter.drawLabel();
 			painter.drawPort((facing == Direction.SOUTH || facing == Direction.EAST ? 1 : 0));
 		}
