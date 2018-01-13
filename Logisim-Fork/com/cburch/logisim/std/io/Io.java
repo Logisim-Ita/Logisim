@@ -27,7 +27,7 @@ public class Io extends Library {
 	static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
 			Strings.getter("ioLabelColorAttr"));
 	static final Attribute<Boolean> ATTR_ACTIVE = Attributes.forBoolean("active", Strings.getter("ioActiveAttr"));
-	static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
+	public static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
 	static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255, 0);
 
 	private static FactoryDescription[] DESCRIPTIONS = {

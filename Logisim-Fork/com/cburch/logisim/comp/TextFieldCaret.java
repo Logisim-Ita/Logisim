@@ -292,6 +292,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	public void textChanged(TextFieldEvent e) {
 		curText = field.getText();
 		oldText = curText;
-		pos = curText.length();
+		if (Math.abs(e.getText().length() - e.getOldText().length()) > 1)
+			pos = curText.length();
 	}
 }
