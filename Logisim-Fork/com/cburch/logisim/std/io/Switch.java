@@ -68,7 +68,7 @@ public class Switch extends InstanceFactory {
 		super("Switch", Strings.getter("switchComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
-						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.EAST, BitWidth.ONE, Color.WHITE, "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);

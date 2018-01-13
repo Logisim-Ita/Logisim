@@ -25,7 +25,7 @@ public class RGBLed extends InstanceFactory {
 		super("RGBLed", Strings.getter("rgbledComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, Io.MULTI_BIT, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-						Io.ATTR_LABEL_COLOR },
+						StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.WEST, false, "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("rgbled.gif");

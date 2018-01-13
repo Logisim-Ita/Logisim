@@ -24,8 +24,6 @@ public class Io extends Library {
 	static final Attribute<Color> ATTR_BACKGROUND = Attributes.forColor("bg", Strings.getter("ioBackgroundColor"));
 	static final Attribute<Object> ATTR_LABEL_LOC = Attributes.forOption("labelloc", Strings.getter("ioLabelLocAttr"),
 			new Object[] { LABEL_CENTER, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST });
-	static final Attribute<Color> ATTR_LABEL_COLOR = Attributes.forColor("labelcolor",
-			Strings.getter("ioLabelColorAttr"));
 	static final Attribute<Boolean> ATTR_ACTIVE = Attributes.forBoolean("active", Strings.getter("ioActiveAttr"));
 	public static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
 	static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255, 0);
