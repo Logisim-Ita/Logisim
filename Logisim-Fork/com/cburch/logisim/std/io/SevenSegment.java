@@ -45,6 +45,8 @@ public class SevenSegment extends InstanceFactory {
 			if (painter.getShowState()) {
 				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
 			}
+			// draw connection lines
+			drawConnectionLines(g,bds,(byte) i);
 			if (i < 7) {
 				Bounds seg = SEGMENTS[i];
 				g.fillRect(x + seg.getX(), y + seg.getY(), seg.getWidth(), seg.getHeight());
@@ -53,6 +55,60 @@ public class SevenSegment extends InstanceFactory {
 			}
 		}
 		painter.drawPorts();
+	}
+
+	private static void drawConnectionLines(Graphics g, Bounds bds, byte which) {
+		int x = bds.getX() + 5;
+		int y = bds.getY();
+		switch (which) {
+		case 0:
+			// a pin
+			g.drawLine(x + 20, y, x + 20, y + SEGMENTS[which].getY());
+			break;
+		case 1:
+			// b pin
+			g.drawLine(x + 30, y, x + 30, y + 6);
+			g.drawLine(x + 30, y + 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + +SEGMENTS[which].getY());
+			break;
+		case 2:
+			// c pin
+			g.drawLine(x + 20, y + bds.getHeight(), x + 20, y + bds.getHeight() - 6);
+			g.drawLine(x + 20, y + bds.getHeight() - 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2,
+					y + bds.getHeight() - 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + bds.getHeight() - 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2,
+					y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 3:
+			// d pin
+			g.drawLine(x + 10, y + bds.getHeight(), x + 10, y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 4:
+			// e pin
+			g.drawLine(x, y + bds.getHeight(), x, y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 5:
+			// f pin
+			g.drawLine(x + 10, y, x + 10, y + 6);
+			g.drawLine(x + 10, y + 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + +SEGMENTS[which].getY());
+			break;
+		case 6:
+			// g pin
+			g.drawLine(x, y, x, y + 3);
+			g.drawLine(x, y + 3, x + 7, y + 3);
+			g.drawLine(x + 7, y + 3, x + 7, y + SEGMENTS[which].getY());
+			break;
+		case 7:
+			// dp
+			g.drawLine(x + 30, y + bds.getHeight(), x + 30, y + bds.getHeight() - 10);
+			break;
+		default:
+			break;
+		}
 	}
 
 	static void ensureSegments() {
