@@ -41,18 +41,29 @@ public class SevenSegment extends InstanceFactory {
 		}
 		painter.drawRoundBounds(Color.WHITE);
 		g.setColor(Color.DARK_GRAY);
+
+		// to not overlaps off line with on line
+		if (((summ >> 5) & 1) == desired && ((summ >> 6) & 1) != desired) {
+			g.setColor(offColor);
+			drawConnectionLines(g, bds, (byte) 6);
+			g.setColor(onColor);
+			drawConnectionLines(g, bds, (byte) 5);
+		} else {
+			g.setColor(((summ >> 5) & 1) == desired ? onColor : offColor);
+			drawConnectionLines(g, bds, (byte) 5);
+			g.setColor(((summ >> 6) & 1) == desired ? onColor : offColor);
+			drawConnectionLines(g, bds, (byte) 6);
+		}
 		for (int i = 0; i <= 7; i++) {
-			if (painter.getShowState()) {
+			if (painter.getShowState())
 				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
-			}
-			// draw connection lines
-			drawConnectionLines(g,bds,(byte) i);
+			if (i != 5 && i != 6)
+				drawConnectionLines(g, bds, (byte) i);
 			if (i < 7) {
 				Bounds seg = SEGMENTS[i];
 				g.fillRect(x + seg.getX(), y + seg.getY(), seg.getWidth(), seg.getHeight());
-			} else {
+			} else
 				g.fillOval(x + 28, y + 48, 5, 5); // draw decimal point
-			}
 		}
 		painter.drawPorts();
 	}
