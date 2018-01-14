@@ -34,12 +34,7 @@ public class SevenSegment extends InstanceFactory {
 		Color onColor = painter.getAttributeValue(Io.ATTR_ON_COLOR);
 		Color offColor = painter.getAttributeValue(Io.ATTR_OFF_COLOR);
 		Color bgColor = painter.getAttributeValue(Io.ATTR_BACKGROUND);
-		if (painter.shouldDrawColor() && bgColor.getAlpha() != 0) {
-			g.setColor(bgColor);
-			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
-			g.setColor(Color.BLACK);
-		}
-		painter.drawRoundBounds(Color.WHITE);
+		painter.drawRoundBounds(bgColor);
 		g.setColor(Color.DARK_GRAY);
 
 		// to not overlaps off line with on line

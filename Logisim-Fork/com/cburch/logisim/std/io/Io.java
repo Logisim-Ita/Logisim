@@ -26,7 +26,7 @@ public class Io extends Library {
 			new Object[] { LABEL_CENTER, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST });
 	static final Attribute<Boolean> ATTR_ACTIVE = Attributes.forBoolean("active", Strings.getter("ioActiveAttr"));
 	public static final Attribute<Boolean> MULTI_BIT = Attributes.forBoolean("multibit", Strings.getter("ioMultiBit"));
-	static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255, 0);
+	static final Color DEFAULT_BACKGROUND = new Color(255, 255, 255);
 
 	private static FactoryDescription[] DESCRIPTIONS = {
 			new FactoryDescription("Button", Strings.getter("buttonComponent"), "button.gif", "Button"),
