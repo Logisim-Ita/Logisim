@@ -41,17 +41,10 @@ public class ShiftRegister extends InstanceFactory {
 	public ShiftRegister() {
 		super("Shift Register", Strings.getter("shiftRegisterComponent"));
 		setAttributes(
-<<<<<<< HEAD
-				new Attribute[] { StdAttr.WIDTH, ATTR_LENGTH, ATTR_LOAD, StdAttr.EDGE_TRIGGER, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,ATTR_MULTIBIT },
-				new Object[] { BitWidth.ONE, Integer.valueOf(8), Boolean.TRUE, StdAttr.TRIG_RISING, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,Boolean.TRUE });
-=======
 				new Attribute[] { StdAttr.WIDTH, ATTR_LENGTH, ATTR_LOAD, Io.MULTI_BIT, StdAttr.EDGE_TRIGGER,
 						StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { BitWidth.ONE, Integer.valueOf(8), Boolean.TRUE, Boolean.TRUE, StdAttr.TRIG_RISING, "",
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
->>>>>>> b96b59db04ce5e58ee2062f2453290783576ba4c
 		setKeyConfigurator(JoinedConfigurator.create(new IntegerConfigurator(ATTR_LENGTH, 1, 32, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 
@@ -246,7 +239,6 @@ public class ShiftRegister extends InstanceFactory {
 			if (state.getAttributeValue(Io.MULTI_BIT) == Boolean.FALSE)
 				for (int i = 0; i < len; i++)
 					state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
-<<<<<<< HEAD
 			else {
 				int val=0;
 				for (int i = 0; i < len; i++) 
@@ -255,11 +247,6 @@ public class ShiftRegister extends InstanceFactory {
 				
 				state.setPort(7,Value.createKnown(BitWidth.create(len), val),4);
 			}
-=======
-			else
-				for (int i = 0; i < len; i++)
-					state.setPort(7, data.get(i), 4);
->>>>>>> b96b59db04ce5e58ee2062f2453290783576ba4c
 		}
 	}
 }
