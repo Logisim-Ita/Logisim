@@ -185,12 +185,15 @@ public class PokeTool extends Tool {
 		}
 		int x = (int) (this.x0 - m.getX());
 		int y = (int) (this.y0 - m.getY());
-		if (!this.mooving && (Math.abs(x) > 3 || Math.abs(y) > 3))
-			this.mooving = true;
 		if (this.mooving) {
 			canvas.setCursor(move);
 			canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
 			canvas.setArrows();
+		}
+		if (!this.mooving && (Math.abs(x) > 10 || Math.abs(y) > 10)) {
+			this.mooving = true;
+			this.x0 = (int) m.getX();
+			this.y0 = (int) m.getY();
 		}
 	}
 

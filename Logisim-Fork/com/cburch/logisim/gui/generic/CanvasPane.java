@@ -13,7 +13,10 @@ import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
@@ -87,6 +90,14 @@ public class CanvasPane extends JScrollPane {
 		this.contents = contents;
 		this.listener = new Listener();
 		this.zoomModel = null;
+		//avoid mooving with arrows / pg up down
+        InputMap im = this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        im.put(KeyStroke.getKeyStroke("UP"), "none");
+        im.put(KeyStroke.getKeyStroke("DOWN"), "none");
+        im.put(KeyStroke.getKeyStroke("LEFT"), "none");
+        im.put(KeyStroke.getKeyStroke("RIGHT"), "none");
+        im.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "none");
+        im.put(KeyStroke.getKeyStroke("PAGE_UP"), "none");
 		// if (MacCompatibility.mrjVersion >= 0.0) {
 		// i don't want the scrollabar you'll move the pane by dragging with poke tool
 		setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
