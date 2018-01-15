@@ -144,7 +144,7 @@ public class ShiftRegister extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH) {
+		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH || attr == Io.MULTI_BIT) {
 			instance.recomputeBounds();
 			configurePorts(instance);
 		}
@@ -240,12 +240,10 @@ public class ShiftRegister extends InstanceFactory {
 				for (int i = 0; i < len; i++)
 					state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
 			else {
-				int val=0;
-				for (int i = 0; i < len; i++) 
-					if(data.get(i)==Value.TRUE)
-					val+=Math.pow(2, i);
-				
-				state.setPort(7,Value.createKnown(BitWidth.create(len), val),4);
+				Value[] out = new Value[len];
+				for (int i = 0; i < len; i++)
+					out[i] = data.get(i);
+				state.setPort(7, Value.create(out), 4);
 			}
 		}
 	}

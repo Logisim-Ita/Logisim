@@ -19,7 +19,7 @@ public class SevenSegment extends InstanceFactory {
 	static Bounds[] SEGMENTS = null;
 	static Color DEFAULT_OFF = new Color(220, 220, 220);
 
-	static void drawBase(InstancePainter painter) {
+	static void drawBase(InstancePainter painter, boolean drawconnectionLines) {
 		ensureSegments();
 		InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
 		int summ = (data == null ? 0 : ((Integer) data.getValue()).intValue());
@@ -38,21 +38,23 @@ public class SevenSegment extends InstanceFactory {
 		g.setColor(Color.DARK_GRAY);
 
 		// to not overlaps off line with on line
-		if (((summ >> 5) & 1) == desired && ((summ >> 6) & 1) != desired) {
-			g.setColor(offColor);
-			drawConnectionLines(g, bds, (byte) 6);
-			g.setColor(onColor);
-			drawConnectionLines(g, bds, (byte) 5);
-		} else {
-			g.setColor(((summ >> 5) & 1) == desired ? onColor : offColor);
-			drawConnectionLines(g, bds, (byte) 5);
-			g.setColor(((summ >> 6) & 1) == desired ? onColor : offColor);
-			drawConnectionLines(g, bds, (byte) 6);
+		if (drawconnectionLines) {
+			if (((summ >> 5) & 1) == desired && ((summ >> 6) & 1) != desired) {
+				g.setColor(offColor);
+				drawConnectionLines(g, bds, (byte) 6);
+				g.setColor(onColor);
+				drawConnectionLines(g, bds, (byte) 5);
+			} else {
+				g.setColor(((summ >> 5) & 1) == desired ? onColor : offColor);
+				drawConnectionLines(g, bds, (byte) 5);
+				g.setColor(((summ >> 6) & 1) == desired ? onColor : offColor);
+				drawConnectionLines(g, bds, (byte) 6);
+			}
 		}
 		for (int i = 0; i <= 7; i++) {
 			if (painter.getShowState())
 				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
-			if (i != 5 && i != 6)
+			if (drawconnectionLines && i != 5 && i != 6)
 				drawConnectionLines(g, bds, (byte) i);
 			if (i < 7) {
 				Bounds seg = SEGMENTS[i];
@@ -145,7 +147,7 @@ public class SevenSegment extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		drawBase(painter);
+		drawBase(painter, true);
 	}
 
 	@Override

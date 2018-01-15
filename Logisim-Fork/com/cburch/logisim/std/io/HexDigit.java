@@ -32,7 +32,7 @@ public class HexDigit extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		SevenSegment.drawBase(painter);
+		SevenSegment.drawBase(painter, false);
 	}
 
 	@Override
