@@ -88,7 +88,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 			CIRCUIT_LABEL_FACING_ATTR, CIRCUIT_LABEL_FONT_ATTR, CIRCUIT_LABEL_COLOR_ATTR };
 
 	private static final Object[] STATIC_DEFAULTS = { "", /* true, */ "", Direction.EAST, StdAttr.DEFAULT_LABEL_FONT,
-			Color.BLACK };
+			StdAttr.DEFAULT_LABEL_COLOR };
 
 	private static final List<Attribute<?>> INSTANCE_ATTRS = Arrays
 			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.LABEL, LABEL_LOCATION_ATTR, StdAttr.LABEL_FONT,
@@ -119,7 +119,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		label = "";
 		labelLocation = Direction.NORTH;
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
-		labelcolor = Color.BLACK;
+		labelcolor = StdAttr.DEFAULT_LABEL_COLOR;
 		pinInstances = new Instance[0];
 	}
 
@@ -202,7 +202,7 @@ public class CircuitAttributes extends AbstractAttributeSet {
 		} else if (attr == StdAttr.ATTR_LABEL_COLOR) {
 			Color val = (Color) value;
 			labelcolor = val;
-			fireAttributeValueChanged(CIRCUIT_LABEL_COLOR_ATTR, val);
+			fireAttributeValueChanged(StdAttr.ATTR_LABEL_COLOR, val);
 		} else if (attr == LABEL_LOCATION_ATTR) {
 			Direction val = (Direction) value;
 			labelLocation = val;

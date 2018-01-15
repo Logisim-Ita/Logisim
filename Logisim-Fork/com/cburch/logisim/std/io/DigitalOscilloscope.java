@@ -53,7 +53,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		super("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"));
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
-						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
+						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { 3, 10, TRIG_RISING, true, new Color(0, 240, 240), "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setIconName("digitaloscilloscope.gif");
@@ -81,7 +81,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			y = bds.getY() - 2;
 			valign = GraphicsUtil.V_BOTTOM;
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -242,7 +242,6 @@ public class DigitalOscilloscope extends InstanceFactory {
 		}
 		painter.drawClock(0, Direction.EAST);
 		// draw label
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

@@ -54,11 +54,12 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		Bounds bds = instance.getBounds();
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		if (dir == Direction.EAST || dir == Direction.WEST)
-			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() + 3,
-					bds.getY() + bds.getHeight() / 2, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
+			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+					bds.getX() + bds.getWidth() + 3, bds.getY() + bds.getHeight() / 2, GraphicsUtil.H_LEFT,
+					GraphicsUtil.V_CENTER);
 		else
-			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
 	@Override
@@ -192,9 +193,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		painter.drawPorts();
 		Graphics2D g = (Graphics2D) painter.getGraphics();
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
-		g.setColor(Color.BLACK);
 		if (!painter.getAttributeValue(TTL.DRAW_INTERNAL_STRUCTURE)) {
 			Direction dir = painter.getAttributeValue(StdAttr.FACING);
 			Bounds bds = painter.getBounds();

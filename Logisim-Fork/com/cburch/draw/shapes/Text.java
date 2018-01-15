@@ -26,7 +26,7 @@ public class Text extends AbstractCanvasObject {
 	private EditableLabel label;
 
 	private Text(int x, int y, int halign, int valign, String text, Font font, Color color) {
-		label = new EditableLabel(x, y, text, font);
+		label = new EditableLabel(x, y, text, font, color);
 		label.setColor(color);
 		label.setHorizontalAlignment(halign);
 		label.setVerticalAlignment(valign);

@@ -193,7 +193,11 @@ public class TextTool extends Tool {
 
 	@Override
 	public void mouseDragged(Canvas canvas, Graphics g, MouseEvent e) {
-		// TODO: enhance label editing
+		if (caret != null && caret.getBounds(g).contains(e.getX(), e.getY())) {
+			caret.mousePressed(e);
+			canvas.getProject().repaintCanvas();
+			return;
+		}
 	}
 
 	@Override

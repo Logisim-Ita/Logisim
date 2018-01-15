@@ -120,8 +120,8 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		instance.addAttributeListener();
 		Bounds bds = instance.getBounds();
 		updateports(instance);
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
 	//
@@ -308,8 +308,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	@Override
 	public void paintInstance(InstancePainter painter) {
 		paintBase(painter, false);
-		Graphics g = painter.getGraphics();
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 
