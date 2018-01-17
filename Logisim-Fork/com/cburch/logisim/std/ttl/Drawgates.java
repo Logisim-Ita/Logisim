@@ -20,6 +20,20 @@ public class Drawgates {
 		}
 	}
 
+	static void paintBuffer(Graphics g, int x, int y, int width, int height) {
+		int[] xp = new int[4];
+		int[] yp = new int[4];
+		xp[0] = x - 4;
+		yp[0] = y;
+		xp[1] = x - width;
+		yp[1] = y - height / 2;
+		xp[2] = x - width;
+		yp[2] = y + height / 2;
+		xp[3] = x - 4;
+		yp[3] = y;
+		g.drawPolyline(xp, yp, 4);
+	}
+
 	static void paintDoubleInputgate(Graphics g, int xrightpin, int y, int xinput, int youtput, int portheight,
 			boolean up) {
 		int[] yPoints, xPoints;
@@ -63,19 +77,6 @@ public class Drawgates {
 		yp[3] = y;
 		g.drawPolyline(xp, yp, 4);
 		g.drawOval(x - 4, y - 2, 4, 4);
-	}
-	static void paintBuffer(Graphics g, int x, int y, int width, int height) {
-		int[] xp = new int[4];
-		int[] yp = new int[4];
-		xp[0] = x - 4;
-		yp[0] = y;
-		xp[1] = x - width;
-		yp[1] = y - height / 2;
-		xp[2] = x - width;
-		yp[2] = y + height / 2;
-		xp[3] = x - 4;
-		yp[3] = y;
-		g.drawPolyline(xp, yp, 4);
 	}
 
 	static void paintOr(Graphics g, int x, int y, boolean negated) {

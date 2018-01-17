@@ -6,25 +6,23 @@ package com.cburch.logisim.circuit;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.cburch.logisim.comp.Component;
 
 public class ReplacementMap {
 	private boolean frozen;
-	private ConcurrentHashMap<Component, HashSet<Component>> map;
-	private ConcurrentHashMap<Component, HashSet<Component>> inverse;
+	private HashMap<Component, HashSet<Component>> map;
+	private HashMap<Component, HashSet<Component>> inverse;
 
 	public ReplacementMap() {
-		this(new ConcurrentHashMap<Component, HashSet<Component>>(),
-				new ConcurrentHashMap<Component, HashSet<Component>>());
+		this(new HashMap<Component, HashSet<Component>>(), new HashMap<Component, HashSet<Component>>());
 	}
 
 	public ReplacementMap(Component oldComp, Component newComp) {
-		this(new ConcurrentHashMap<Component, HashSet<Component>>(),
-				new ConcurrentHashMap<Component, HashSet<Component>>());
+		this(new HashMap<Component, HashSet<Component>>(), new HashMap<Component, HashSet<Component>>());
 		HashSet<Component> oldSet = new HashSet<Component>(3);
 		oldSet.add(oldComp);
 		HashSet<Component> newSet = new HashSet<Component>(3);
@@ -33,8 +31,7 @@ public class ReplacementMap {
 		inverse.put(newComp, oldSet);
 	}
 
-	private ReplacementMap(ConcurrentHashMap<Component, HashSet<Component>> map,
-			ConcurrentHashMap<Component, HashSet<Component>> inverse) {
+	private ReplacementMap(HashMap<Component, HashSet<Component>> map, HashMap<Component, HashSet<Component>> inverse) {
 		this.map = map;
 		this.inverse = inverse;
 	}

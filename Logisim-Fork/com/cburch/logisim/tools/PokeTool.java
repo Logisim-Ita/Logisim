@@ -88,7 +88,6 @@ public class PokeTool extends Tool {
 	private Circuit pokedCircuit;
 	private Component pokedComponent;
 	private Caret pokeCaret;
-	private boolean mooving = false;
 	private int x = 0, y = 0, x0 = 0, y0 = 0, ScrollBarX = 0, ScrollBarY = 0;
 
 	public PokeTool() {
@@ -166,34 +165,28 @@ public class PokeTool extends Tool {
 		if (pokeCaret != null) {
 			pokeCaret.mouseDragged(e);
 			canvas.getProject().repaintCanvas();
-		}
-		// move scrollpane dragging hand
-		Point m = canvas.getMousePosition();
-		if (m == null) {
-			// if mouse exited and continue dragging
-			this.x0 = -1;
-			this.y0 = -1;
-			this.ScrollBarX = -1;
-			this.ScrollBarY = -1;
-			return;
-		} else if (this.x0 == -1 || this.y0 == -1 || this.ScrollBarX == -1 || this.ScrollBarY == -1) {
-			// if mouse re-entered after it exited without releasing the button
-			this.x0 = (int) m.getX();
-			this.y0 = (int) m.getY();
-			this.ScrollBarX = canvas.getHorizzontalScrollBar();
-			this.ScrollBarY = canvas.getVerticalScrollBar();
-		}
-		int x = (int) (this.x0 - m.getX());
-		int y = (int) (this.y0 - m.getY());
-		if (this.mooving) {
+		} else {
+			// move scrollpane dragging hand
+			Point m = canvas.getMousePosition();
+			if (m == null) {
+				// if mouse exited and continue dragging
+				this.x0 = -1;
+				this.y0 = -1;
+				this.ScrollBarX = -1;
+				this.ScrollBarY = -1;
+				return;
+			} else if (this.x0 == -1 || this.y0 == -1 || this.ScrollBarX == -1 || this.ScrollBarY == -1) {
+				// if mouse re-entered after it exited without releasing the button
+				this.x0 = (int) m.getX();
+				this.y0 = (int) m.getY();
+				this.ScrollBarX = canvas.getHorizzontalScrollBar();
+				this.ScrollBarY = canvas.getVerticalScrollBar();
+			}
+			int x = (int) (this.x0 - m.getX());
+			int y = (int) (this.y0 - m.getY());
 			canvas.setCursor(move);
 			canvas.setScrollBar(this.ScrollBarX + x, this.ScrollBarY + y);
 			canvas.setArrows();
-		}
-		if (!this.mooving && (Math.abs(x) > 10 || Math.abs(y) > 10)) {
-			this.mooving = true;
-			this.x0 = (int) m.getX();
-			this.y0 = (int) m.getY();
 		}
 	}
 
@@ -249,7 +242,6 @@ public class PokeTool extends Tool {
 
 	@Override
 	public void mouseReleased(Canvas canvas, Graphics g, MouseEvent e) {
-		this.mooving = false;
 		if (pokeCaret != null) {
 			pokeCaret.mouseReleased(e);
 			canvas.getProject().repaintCanvas();

@@ -6,7 +6,6 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.cburch.logisim.LogisimVersion;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
@@ -20,7 +19,6 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.std.io.Io;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.tools.key.IntegerConfigurator;
 import com.cburch.logisim.tools.key.JoinedConfigurator;
@@ -41,9 +39,9 @@ public class ShiftRegister extends InstanceFactory {
 	public ShiftRegister() {
 		super("Shift Register", Strings.getter("shiftRegisterComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.WIDTH, ATTR_LENGTH, ATTR_LOAD, Io.MULTI_BIT, StdAttr.EDGE_TRIGGER,
-						StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { BitWidth.ONE, Integer.valueOf(8), Boolean.TRUE, Boolean.TRUE, StdAttr.TRIG_RISING, "",
+				new Attribute[] { StdAttr.WIDTH, ATTR_LENGTH, ATTR_LOAD, StdAttr.EDGE_TRIGGER, StdAttr.LABEL,
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { BitWidth.ONE, Integer.valueOf(8), Boolean.TRUE, StdAttr.TRIG_RISING, "",
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setKeyConfigurator(JoinedConfigurator.create(new IntegerConfigurator(ATTR_LENGTH, 1, 32, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
@@ -66,22 +64,12 @@ public class ShiftRegister extends InstanceFactory {
 		Bounds bds = instance.getBounds();
 		Port[] ps;
 		if (parallelObj == null || parallelObj.booleanValue()) {
-			if (instance.getAttributeValue(Io.MULTI_BIT) == Boolean.FALSE) {
-				Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
-				int len = lenObj == null ? 8 : lenObj.intValue();
-				ps = new Port[6 + 2 * len];
-				for (int i = 0; i < len; i++) {
-					ps[6 + 2 * i] = new Port(20 + 10 * i, -20, Port.INPUT, width);
-					ps[6 + 2 * i + 1] = new Port(20 + 10 * i, 20, Port.OUTPUT, width);
-				}
-			} else {
-				Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
-				int len = lenObj == null ? 8 : lenObj.intValue();
-				ps = new Port[8];
-				int halflen = bds.getWidth() / 2 - bds.getWidth() / 2 % 10;
-				ps[6] = new Port(halflen, -20, Port.INPUT, len);
-				ps[7] = new Port(halflen, 20, Port.OUTPUT, len);
-
+			Integer lenObj = instance.getAttributeValue(ATTR_LENGTH);
+			int len = lenObj == null ? 8 : lenObj.intValue();
+			ps = new Port[6 + 2 * len];
+			for (int i = 0; i < len; i++) {
+				ps[6 + 2 * i] = new Port(20 + 10 * i, -20, Port.INPUT, width);
+				ps[6 + 2 * i + 1] = new Port(20 + 10 * i, 20, Port.OUTPUT, width);
 			}
 			ps[LD] = new Port(10, -20, Port.INPUT, 1);
 			ps[LD].setToolTip(Strings.getter("shiftRegLoadTip"));
@@ -120,18 +108,6 @@ public class ShiftRegister extends InstanceFactory {
 	}
 
 	@Override
-	public Object getDefaultAttributeValue(Attribute<?> attr, LogisimVersion ver) {
-		if (attr == Io.MULTI_BIT) {
-			if (ver.compareTo(LogisimVersion.get(2, 12, 1, 0)) < 0) {
-				return Boolean.FALSE;
-			} else {
-				return Boolean.TRUE;
-			}
-		}
-		return super.getDefaultAttributeValue(attr, ver);
-	}
-
-	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Object parallel = attrs.getValue(ATTR_LOAD);
 		if (parallel == null || ((Boolean) parallel).booleanValue()) {
@@ -144,7 +120,7 @@ public class ShiftRegister extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH || attr == Io.MULTI_BIT) {
+		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH) {
 			instance.recomputeBounds();
 			configurePorts(instance);
 		}
@@ -223,12 +199,8 @@ public class ShiftRegister extends InstanceFactory {
 		} else if (triggered) {
 			if (parallel && state.getPort(LD) == Value.TRUE) {
 				data.clear();
-				if (state.getAttributeValue(Io.MULTI_BIT) == Boolean.FALSE)
-					for (int i = len - 1; i >= 0; i--)
-						data.push(state.getPort(6 + 2 * i));
-				else
-					for (int i = len - 1; i >= 0; i--)
-						data.push(state.getPort(6).get(len - 1 - i));
+				for (int i = len - 1; i >= 0; i--)
+					data.push(state.getPort(6 + 2 * i));
 			} else if (state.getPort(SH) != Value.FALSE) {
 				data.push(state.getPort(IN));
 			}
@@ -236,15 +208,8 @@ public class ShiftRegister extends InstanceFactory {
 
 		state.setPort(OUT, data.get(0), 4);
 		if (parallel) {
-			if (state.getAttributeValue(Io.MULTI_BIT) == Boolean.FALSE)
-				for (int i = 0; i < len; i++)
-					state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
-			else {
-				Value[] out = new Value[len];
-				for (int i = 0; i < len; i++)
-					out[i] = data.get(i);
-				state.setPort(7, Value.create(out), 4);
-			}
+			for (int i = 0; i < len; i++)
+				state.setPort(6 + 2 * i + 1, data.get(len - 1 - i), 4);
 		}
 	}
 }
