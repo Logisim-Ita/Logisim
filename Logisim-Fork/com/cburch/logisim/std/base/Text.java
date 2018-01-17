@@ -56,7 +56,7 @@ public class Text extends InstanceFactory {
 	private void configureLabel(Instance instance) {
 		TextAttributes attrs = (TextAttributes) instance.getAttributeSet();
 		Location loc = instance.getLocation();
-		instance.setTextField(ATTR_TEXT, ATTR_FONT, loc.getX(), loc.getY(), attrs.getHorizontalAlign(),
+		instance.setTextField(ATTR_TEXT, ATTR_FONT, ATTR_COLOR, loc.getX(), loc.getY(), attrs.getHorizontalAlign(),
 				attrs.getVerticalAlign());
 	}
 
@@ -121,9 +121,6 @@ public class Text extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_HALIGN || attr == ATTR_VALIGN || attr == ATTR_COLOR) {
-			configureLabel(instance);
-		}
 	}
 
 	//
@@ -139,7 +136,8 @@ public class Text extends InstanceFactory {
 		int halign = attrs.getHorizontalAlign();
 		int valign = attrs.getVerticalAlign();
 		Graphics g = painter.getGraphics();
-		Font old = g.getFont();
+		Font oldFont = g.getFont();
+		Color oldColor = g.getColor();
 		g.setFont(attrs.getFont());
 		g.setColor(painter.getAttributeValue(ATTR_COLOR));
 		GraphicsUtil.drawText(g, text, 0, 0, halign, valign);
@@ -157,8 +155,8 @@ public class Text extends InstanceFactory {
 			if (instance != null)
 				instance.recomputeBounds();
 		}
-
-		g.setFont(old);
+		g.setFont(oldFont);
+		g.setColor(oldColor);
 	}
 
 	@Override

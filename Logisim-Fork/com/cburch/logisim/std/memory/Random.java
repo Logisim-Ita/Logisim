@@ -117,8 +117,8 @@ public class Random extends InstanceFactory {
 	@Override
 	protected void configureNewInstance(Instance instance) {
 		Bounds bds = instance.getBounds();
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
 	@Override
@@ -131,7 +131,6 @@ public class Random extends InstanceFactory {
 
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 
 		// draw input and output ports

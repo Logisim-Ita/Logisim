@@ -22,10 +22,14 @@ public class TTL extends Library {
 					"Ttl74165"),
 			new FactoryDescription("74283", Strings.getter("74283: 4-bit binary full adder"), "ttl.gif", "Ttl74283"),
 			new FactoryDescription("747266", Strings.getter("747266: quad 2-input XNOR gate"), "ttl.gif",
+<<<<<<< HEAD
 					"Ttl747266"),
 			new FactoryDescription("Buffer", Strings.getter("Buffer"), "ttl.gif",
 					"Buffer"),
 	};
+=======
+					"Ttl747266"), };
+>>>>>>> 002f11628bafc1b68356b4700364783175836ca1
 
 	static final Attribute<Boolean> VCC_GND = Attributes.forBoolean("VccGndPorts", Strings.getter("VccGndPorts"));
 	static final Attribute<Boolean> DRAW_INTERNAL_STRUCTURE = Attributes.forBoolean("ShowInternalStructure",

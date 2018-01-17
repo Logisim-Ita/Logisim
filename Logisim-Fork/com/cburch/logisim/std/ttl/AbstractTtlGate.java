@@ -40,9 +40,9 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		this.outputports = outputports;
 	}
 
-	protected AbstractTtlGate(String name, int pins, int[] outputports, int ngatestodrawforside) {
+	protected AbstractTtlGate(String name, int pins, int[] outputports, boolean drawgates) {
 		this(name, pins, outputports);
-		this.ngatestodraw = ngatestodrawforside * 2;
+		this.ngatestodraw = drawgates ? outputports.length : 0;
 	}
 
 	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
@@ -54,11 +54,12 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		Bounds bds = instance.getBounds();
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		if (dir == Direction.EAST || dir == Direction.WEST)
-			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() + 3,
-					bds.getY() + bds.getHeight() / 2, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
+			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+					bds.getX() + bds.getWidth() + 3, bds.getY() + bds.getHeight() / 2, GraphicsUtil.H_LEFT,
+					GraphicsUtil.V_CENTER);
 		else
-			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-					GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 	}
 
 	@Override
@@ -192,9 +193,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		painter.drawPorts();
 		Graphics2D g = (Graphics2D) painter.getGraphics();
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
-		g.setColor(Color.BLACK);
 		if (!painter.getAttributeValue(TTL.DRAW_INTERNAL_STRUCTURE)) {
 			Direction dir = painter.getAttributeValue(StdAttr.FACING);
 			Bounds bds = painter.getBounds();
@@ -382,7 +381,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			// Set the port (output/input)
 			if (isoutput) {// output port
 				ps[portindex] = new Port(dx, dy, Port.OUTPUT, 1);
-				if (this.portnames == null)
+				if (this.portnames == null || this.portnames.length <= portindex)
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip", ": " + String.valueOf(i + 1)));
 				else
 					ps[portindex].setToolTip(Strings.getter("demultiplexerOutTip",
@@ -399,7 +398,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					portindex--;
 				} else if (i != this.pinnumber - 1 && i != this.pinnumber / 2 - 1) {// normal output
 					ps[portindex] = new Port(dx, dy, Port.INPUT, 1);
-					if (this.portnames == null)
+					if (this.portnames == null || this.portnames.length <= portindex)
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip", ": " + String.valueOf(i + 1)));
 					else
 						ps[portindex].setToolTip(Strings.getter("multiplexerInTip",

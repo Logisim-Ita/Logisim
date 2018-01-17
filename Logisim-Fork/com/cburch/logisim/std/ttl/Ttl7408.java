@@ -8,7 +8,7 @@ import com.cburch.logisim.instance.InstanceState;
 public class Ttl7408 extends AbstractTtlGate {
 
 	public Ttl7408() {
-		super("7408", 14, new int[] { 3, 6, 8, 11 }, 2);
+		super("7408", 14, new int[] { 3, 6, 8, 11 }, true);
 	}
 
 	@Override

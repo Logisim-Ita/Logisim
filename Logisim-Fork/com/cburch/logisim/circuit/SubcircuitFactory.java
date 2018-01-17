@@ -134,7 +134,7 @@ public class SubcircuitFactory extends InstanceFactory {
 			y = bds.getY() - 2;
 			va = GraphicsUtil.V_BASELINE;
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, ha, va);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, ha, va);
 	}
 
 	//
@@ -266,7 +266,7 @@ public class SubcircuitFactory extends InstanceFactory {
 	public void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == StdAttr.FACING) {
 			computePorts(instance);
-		} else if (attr == CircuitAttributes.LABEL_LOCATION_ATTR) {
+		} else if (attr == CircuitAttributes.LABEL_LOCATION_ATTR || attr == StdAttr.ATTR_LABEL_COLOR) {
 			configureLabel(instance);
 		}
 	}
@@ -280,7 +280,6 @@ public class SubcircuitFactory extends InstanceFactory {
 		source.getAppearance().paintSubcircuit(g, facing);
 		drawCircuitLabel(painter, getOffsetBounds(attrs), facing, defaultFacing);
 		g.translate(-loc.getX(), -loc.getY());
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

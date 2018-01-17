@@ -19,7 +19,7 @@ public class SevenSegment extends InstanceFactory {
 	static Bounds[] SEGMENTS = null;
 	static Color DEFAULT_OFF = new Color(220, 220, 220);
 
-	static void drawBase(InstancePainter painter) {
+	static void drawBase(InstancePainter painter, boolean drawconnectionLines) {
 		ensureSegments();
 		InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
 		int summ = (data == null ? 0 : ((Integer) data.getValue()).intValue());
@@ -34,25 +34,89 @@ public class SevenSegment extends InstanceFactory {
 		Color onColor = painter.getAttributeValue(Io.ATTR_ON_COLOR);
 		Color offColor = painter.getAttributeValue(Io.ATTR_OFF_COLOR);
 		Color bgColor = painter.getAttributeValue(Io.ATTR_BACKGROUND);
-		if (painter.shouldDrawColor() && bgColor.getAlpha() != 0) {
-			g.setColor(bgColor);
-			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
-			g.setColor(Color.BLACK);
-		}
-		painter.drawRoundBounds(Color.WHITE);
+		painter.drawRoundBounds(bgColor);
 		g.setColor(Color.DARK_GRAY);
-		for (int i = 0; i <= 7; i++) {
-			if (painter.getShowState()) {
-				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
+
+		// to not overlaps off line with on line
+		if (drawconnectionLines) {
+			if (((summ >> 5) & 1) == desired && ((summ >> 6) & 1) != desired) {
+				g.setColor(offColor);
+				drawConnectionLines(g, bds, (byte) 6);
+				g.setColor(onColor);
+				drawConnectionLines(g, bds, (byte) 5);
+			} else {
+				g.setColor(((summ >> 5) & 1) == desired ? onColor : offColor);
+				drawConnectionLines(g, bds, (byte) 5);
+				g.setColor(((summ >> 6) & 1) == desired ? onColor : offColor);
+				drawConnectionLines(g, bds, (byte) 6);
 			}
+		}
+		for (int i = 0; i <= 7; i++) {
+			if (painter.getShowState())
+				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
+			if (drawconnectionLines && i != 5 && i != 6)
+				drawConnectionLines(g, bds, (byte) i);
 			if (i < 7) {
 				Bounds seg = SEGMENTS[i];
 				g.fillRect(x + seg.getX(), y + seg.getY(), seg.getWidth(), seg.getHeight());
-			} else {
+			} else
 				g.fillOval(x + 28, y + 48, 5, 5); // draw decimal point
-			}
 		}
 		painter.drawPorts();
+	}
+
+	private static void drawConnectionLines(Graphics g, Bounds bds, byte which) {
+		int x = bds.getX() + 5;
+		int y = bds.getY();
+		switch (which) {
+		case 0:
+			// a pin
+			g.drawLine(x + 20, y, x + 20, y + SEGMENTS[which].getY());
+			break;
+		case 1:
+			// b pin
+			g.drawLine(x + 30, y, x + 30, y + 6);
+			g.drawLine(x + 30, y + 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + +SEGMENTS[which].getY());
+			break;
+		case 2:
+			// c pin
+			g.drawLine(x + 20, y + bds.getHeight(), x + 20, y + bds.getHeight() - 6);
+			g.drawLine(x + 20, y + bds.getHeight() - 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2,
+					y + bds.getHeight() - 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + bds.getHeight() - 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2,
+					y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 3:
+			// d pin
+			g.drawLine(x + 10, y + bds.getHeight(), x + 10, y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 4:
+			// e pin
+			g.drawLine(x, y + bds.getHeight(), x, y + SEGMENTS[which].getY() + SEGMENTS[which].getHeight());
+			break;
+		case 5:
+			// f pin
+			g.drawLine(x + 10, y, x + 10, y + 6);
+			g.drawLine(x + 10, y + 6, x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6);
+			g.drawLine(x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + 6,
+					x + SEGMENTS[which].getX() + SEGMENTS[which].getWidth() / 2, y + +SEGMENTS[which].getY());
+			break;
+		case 6:
+			// g pin
+			g.drawLine(x, y, x, y + 3);
+			g.drawLine(x, y + 3, x + 7, y + 3);
+			g.drawLine(x + 7, y + 3, x + 7, y + SEGMENTS[which].getY());
+			break;
+		case 7:
+			// dp
+			g.drawLine(x + 30, y + bds.getHeight(), x + 30, y + bds.getHeight() - 10);
+			break;
+		default:
+			break;
+		}
 	}
 
 	static void ensureSegments() {
@@ -83,7 +147,7 @@ public class SevenSegment extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		drawBase(painter);
+		drawBase(painter, true);
 	}
 
 	@Override

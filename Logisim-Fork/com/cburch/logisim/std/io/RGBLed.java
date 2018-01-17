@@ -25,7 +25,7 @@ public class RGBLed extends InstanceFactory {
 		super("RGBLed", Strings.getter("rgbledComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, Io.MULTI_BIT, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-						Io.ATTR_LABEL_COLOR },
+						StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.WEST, false, "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("rgbled.gif");
@@ -63,7 +63,7 @@ public class RGBLed extends InstanceFactory {
 			}
 		}
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -160,7 +160,6 @@ public class RGBLed extends InstanceFactory {
 		}
 		g.drawOval(cx, cy, cw, ch);
 		GraphicsUtil.switchToWidth(g, 1);
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 	}
 
 	@Override

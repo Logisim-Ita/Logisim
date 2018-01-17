@@ -53,7 +53,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		super("Digital Oscilloscope", Strings.getter("DigitalOscilloscopeComponent"));
 		setAttributes(
 				new Attribute<?>[] { ATTR_INPUTS, ATTR_NSTATE, VERT_LINE, SHOW_CLOCK, ATTR_COLOR, StdAttr.LABEL,
-						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
+						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { 3, 10, TRIG_RISING, true, new Color(0, 240, 240), "", Direction.NORTH,
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setIconName("digitaloscilloscope.gif");
@@ -81,7 +81,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			y = bds.getY() - 2;
 			valign = GraphicsUtil.V_BOTTOM;
 		}
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -146,8 +146,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		DiagramState diagramstate = getDiagramState(painter);
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		// draw border
-		g.setColor(painter.getAttributeValue(ATTR_COLOR));
-		g.fillRoundRect(x, y, width, height, border / 2, border / 2);
+		painter.drawRoundBounds(painter.getAttributeValue(ATTR_COLOR));
 		// draw white space
 		g.setColor(new Color(250, 250, 250));
 		g.fillRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
@@ -232,8 +231,6 @@ public class DigitalOscilloscope extends InstanceFactory {
 							x + border + 15 * (j + 1), y + border + 30 * (i + 1) + showclock * 2);
 			}
 		}
-
-		g.drawRoundRect(x, y, width, height, border, border);
 		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
 
 		// draw ports
@@ -242,7 +239,6 @@ public class DigitalOscilloscope extends InstanceFactory {
 		}
 		painter.drawClock(0, Direction.EAST);
 		// draw label
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 

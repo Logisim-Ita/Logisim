@@ -37,4 +37,5 @@ public interface StdAttr {
 	public static final Attribute<Font> LABEL_FONT = Attributes.forFont("labelfont",
 			Strings.getter("stdLabelFontAttr"));
 	public static final Font DEFAULT_LABEL_FONT = new Font("Sans Serif", Font.PLAIN, 12);
+	public static final Color DEFAULT_LABEL_COLOR = Color.BLACK;
 }

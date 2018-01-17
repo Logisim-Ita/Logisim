@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.instance;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
 
@@ -92,8 +93,8 @@ public class Instance {
 		comp.setPorts(ports);
 	}
 
-	public void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, int x, int y, int halign,
-			int valign) {
-		comp.setTextField(labelAttr, fontAttr, x, y, halign, valign);
+	public void setTextField(Attribute<String> labelAttr, Attribute<Font> fontAttr, Attribute<Color> colorAttr, int x,
+			int y, int halign, int valign) {
+		comp.setTextField(labelAttr, fontAttr, colorAttr, x, y, halign, valign);
 	}
 }

@@ -50,8 +50,8 @@ public class Register extends InstanceFactory {
 	protected void configureNewInstance(Instance instance) {
 		Bounds bds = instance.getBounds();
 		instance.addAttributeListener();
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, bds.getX() + bds.getWidth() / 2, bds.getY() - 3,
-				GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 		configurePorts(instance);
 	}
 
@@ -136,12 +136,12 @@ public class Register extends InstanceFactory {
 			GraphicsUtil.drawText(g, a, bds.getX() + 15, bds.getY() + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 			GraphicsUtil.drawText(g, b, bds.getX() + 15, bds.getY() + 15, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
+
 		RegisterData data = (RegisterData) state.getData();
 		if (data == null) {
 			data = new RegisterData();

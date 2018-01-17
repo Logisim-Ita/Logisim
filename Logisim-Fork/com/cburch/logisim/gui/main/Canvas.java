@@ -768,7 +768,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			return;
 		}
 		// the white space around
-		int padding = 75;
+		int padding = 50;
 		// set autozoom
 		double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
 		double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();

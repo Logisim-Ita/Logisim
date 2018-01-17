@@ -161,7 +161,7 @@ public class DipSwitch extends InstanceFactory {
 		super("DipSwitch", Strings.getter("DipSwitchComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, ATTR_NSWITCHES, Io.ATTR_COLOR, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
-						StdAttr.LABEL_FONT, Io.ATTR_LABEL_COLOR },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
 				new Object[] { Direction.EAST, 4, Color.WHITE, "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
@@ -205,7 +205,7 @@ public class DipSwitch extends InstanceFactory {
 			}
 		}
 
-		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, x, y, halign, valign);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -365,7 +365,6 @@ public class DipSwitch extends InstanceFactory {
 				}
 			}
 		}
-		g.setColor(painter.getAttributeValue(Io.ATTR_LABEL_COLOR));
 		painter.drawLabel();
 		painter.drawPorts();
 	}
