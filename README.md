@@ -35,7 +35,8 @@ This is an italian fork based on the original Logisim version.<br>
 * Added missing tooltips
 * Zoom in and out using mouse wheel where you're pointing at
 * Big fixes to Log menu and Log output file, added buttons to clear Log Table
-* Added Label Color attribute for each component with Label attribute
+* Added Label Color attribute for each component with Label attribute and Text Tool
+* Big fixes for Text Tool
 * Increased output limit in Analyze Circuit to 32
 * Analyze Circuit should calculate table/expression with any kind of component
 * Fixed empty template bug introduced in Logisim 2.7.0

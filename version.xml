@@ -2,23 +2,13 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.12.0.0</jar_version>
+  <jar_version>2.12.1.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.12.0.0</exe_version>
+  <exe_version>2.12.1.0</exe_version>
   <changelog>
-* New movement system: there are no more scrollbars and the size of the canvas is almost infinite;
-    you can move it by dragging with poke tool or by dragging with mouse wheel clicked
-* Auto zooming and centering: each time you'll open a new file or circuit, Logisim will center and zoom
-    it for you, you can call this new function whenever you want with Ctrl-0 / Double mouse wheel click
-* Arrows around the canvas indicate you where the circuit is if it's outside of your view
-* If there is at least 1 arrow visible, a button will pop up and, if you click it, you'll call the
-    the auto zoom / centering function
-* Updating to this version you'll accept to send data about Logisim usage (visible on http://logisim.altervista.org/)
-    You can disable it in Preference / Fork
-* Fixed opening new file in new window bug when the old window wasn't used
-* Fixed zoom with mouse wheel bug on old frames after opening a new file
-* Better zoom function
-* Small fixes about Thread conflicts
-* Pre input in Counter and Register components
+* New 7-Segment Display Layout, fixed background attribute not working
+* Big fixes for Text Tool (Cursor, color, etc...)
+* Fix when you start dragging with poke tool on a pokeable object
+* Arrows and Page Up/Down won't move the canvas anymore
   </changelog>
 </logisim>
