@@ -210,6 +210,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					&& viewport.zoomButtonColor != defaultzoomButtonColor)
 					|| e.getButton() == MouseEvent.BUTTON2 && e.getClickCount() == 2) {
 				autoZoomCenter();
+				setCursor(proj.getTool().getCursor());
 			} else {
 				if (drag_tool != null) {
 					drag_tool.mouseReleased(Canvas.this, getGraphics(), e);
@@ -733,7 +734,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		this.canvasPane = null;
 		this.tickCounter = new TickCounter();
 
-		setBackground(Color.white);
+		setBackground(Color.WHITE);
 		setPreferredSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 		addMouseListener(myListener);
 		addMouseMotionListener(myListener);

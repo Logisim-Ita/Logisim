@@ -208,7 +208,7 @@ public class AppPreferences {
 	public static final String NIMBUS = NimbusLookAndFeel.class.getName();
 	public static final String METAL = MetalLookAndFeel.class.getName();
 	public static final PrefMonitor<String> LOOK_AND_FEEL = create(
-			new PrefMonitorStringOpts("lookAndFeel", new String[] { SYSTEM, NIMBUS, /* MOTIF, */ METAL }, SYSTEM));
+			new PrefMonitorStringOpts("lookAndFeel", new String[] { SYSTEM, NIMBUS, METAL }, SYSTEM));
 
 	// hidden window preferences - not part of the preferences dialog, changes
 	// to preference does not affect current windows, and the values are not
