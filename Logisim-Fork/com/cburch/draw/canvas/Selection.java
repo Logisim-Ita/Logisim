@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +26,7 @@ public class Selection {
 	private ArrayList<SelectionListener> listeners;
 	private HashSet<CanvasObject> selected;
 	private Set<CanvasObject> selectedView;
-	private ConcurrentHashMap<CanvasObject, String> suppressed;
+	private Map<CanvasObject, String> suppressed;
 	private Set<CanvasObject> suppressedView;
 	private Handle selectedHandle;
 	private HandleGesture curHandleGesture;

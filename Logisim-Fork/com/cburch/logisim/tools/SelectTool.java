@@ -115,7 +115,7 @@ public class SelectTool extends Tool {
 	private int curDy;
 	private boolean drawConnections;
 	private MoveGesture moveGesture;
-	private ConcurrentHashMap<Component, KeyConfigurator> keyHandlers;
+	private Map<Component, KeyConfigurator> keyHandlers;
 
 	private HashSet<Selection> selectionsAdded;
 
@@ -501,7 +501,7 @@ public class SelectTool extends Tool {
 	}
 
 	private void processKeyEvent(Canvas canvas, KeyEvent e, int type) {
-		ConcurrentHashMap<Component, KeyConfigurator> handlers = keyHandlers;
+		Map<Component, KeyConfigurator> handlers = keyHandlers;
 		if (handlers == null) {
 			handlers = new ConcurrentHashMap<Component, KeyConfigurator>();
 			Selection sel = canvas.getSelection();

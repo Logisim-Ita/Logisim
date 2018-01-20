@@ -59,7 +59,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 					GraphicsUtil.V_CENTER);
 		else
 			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
-					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_CENTER);
 	}
 
 	@Override

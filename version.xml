@@ -2,13 +2,12 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.12.1.0</jar_version>
+  <jar_version>2.12.1.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.12.1.0</exe_version>
+  <exe_version>2.12.1.1</exe_version>
   <changelog>
-* New 7-Segment Display Layout, fixed background attribute not working
-* Big fixes for Text Tool (Cursor, color, etc...)
-* Fix when you start dragging with poke tool on a pokeable object
-* Arrows and Page Up/Down won't move the canvas anymore
+* Added label and its attributes for RAM, ROM and PLA ROM
+* Fixed some label alignment
+* Maybe fixed white screen on startup
   </changelog>
 </logisim>

@@ -36,6 +36,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Zoom in and out using mouse wheel where you're pointing at
 * Big fixes to Log menu and Log output file, added buttons to clear Log Table
 * Added Label Color attribute for each component with Label attribute and Text Tool
+* Added Label for RAM, ROM and PLA ROM
 * Big fixes for Text Tool
 * Increased output limit in Analyze Circuit to 32
 * Analyze Circuit should calculate table/expression with any kind of component

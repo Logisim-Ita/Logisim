@@ -149,8 +149,10 @@ public class Ram extends Mem {
 	static final Attribute<AttributeOption> ATTR_BUS = Attributes.forOption("bus", Strings.getter("ramBusAttr"),
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
 
-	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, ATTR_BUS, Mem.ATTR_SELECTION };
-	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), BUS_COMBINED, Mem.SEL_LOW };
+	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, StdAttr.LABEL, StdAttr.LABEL_FONT,
+			StdAttr.ATTR_LABEL_COLOR, ATTR_BUS, Mem.ATTR_SELECTION };
+	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), "", StdAttr.DEFAULT_LABEL_FONT,
+			Color.BLACK, BUS_COMBINED, Mem.SEL_LOW };
 	private static final int OE = MEM_INPUTS + 0;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;
@@ -260,6 +262,8 @@ public class Ram extends Mem {
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		super.instanceAttributeChanged(instance, attr);
+		if (attr == StdAttr.LABEL || attr == StdAttr.LABEL_FONT || attr == StdAttr.ATTR_LABEL_COLOR)
+			return;
 		configurePorts(instance);
 		instance.fireInvalidated();
 	}

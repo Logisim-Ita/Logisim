@@ -36,6 +36,7 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
@@ -276,8 +277,11 @@ public class PlaRom extends InstanceFactory {
 	public PlaRom() {
 		super("PlaRom", Strings.getter("PlaRomComponent"));
 		setIconName("plarom.gif");
-		setAttributes(new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS, Mem.ATTR_SELECTION/* , CONTENTS_ATTR */ },
-				new Object[] { 4, 4, 4, Mem.SEL_LOW/* , PlaRom.CONTENTS_ATTR */ });
+		setAttributes(
+				new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS, Mem.ATTR_SELECTION, StdAttr.LABEL,
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR/* , CONTENTS_ATTR */ },
+				new Object[] { 4, 4, 4, Mem.SEL_LOW, "", StdAttr.DEFAULT_LABEL_FONT,
+						Color.BLACK /* , PlaRom.CONTENTS_ATTR */ });
 		setOffsetBounds(Bounds.create(0, -40, 80, 80));
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
@@ -285,8 +289,12 @@ public class PlaRom extends InstanceFactory {
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
+		Bounds bds = instance.getBounds();
 		instance.addAttributeListener();
 		updateports(instance);
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4, GraphicsUtil.H_CENTER,
+				GraphicsUtil.V_CENTER);
 	}
 
 	@Override
@@ -312,10 +320,12 @@ public class PlaRom extends InstanceFactory {
 		painter.drawRoundBounds(Color.WHITE);
 		Bounds bds = painter.getBounds();
 		g.setFont(new Font("sans serif", Font.BOLD, 11));
-		GraphicsUtil.drawCenteredText(g, Strings.getter("PlaRomComponent").toString(), bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 4);
+		Object label = painter.getAttributeValue(StdAttr.LABEL);
+		if (label == null || label.equals(""))
+			GraphicsUtil.drawCenteredText(g, Strings.getter("PlaRomComponent").toString(),
+					bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4);
 		GraphicsUtil.drawCenteredText(g, data.getSizeString(), bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() * 2 / 5);
+				bds.getY() + bds.getHeight() / 2 - 3);
 		g.setColor(Color.WHITE);
 		g.fillRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 11, 72, 16);
 		g.setColor(Color.BLACK);
@@ -327,6 +337,7 @@ public class PlaRom extends InstanceFactory {
 		g.setColor(Color.GRAY);
 		painter.drawPort(2, Strings.get("ramClrLabel"), Direction.SOUTH);
 		painter.drawPort(3, Strings.get("ramCSLabel"), Direction.NORTH);
+		painter.drawLabel();
 	}
 
 	@Override

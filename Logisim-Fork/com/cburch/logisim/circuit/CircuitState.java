@@ -133,12 +133,12 @@ public class CircuitState implements InstanceData {
 	// state
 	private ArraySet<CircuitState> substates = new ArraySet<CircuitState>();
 	private CircuitWires.State wireData = null;
-	private ConcurrentHashMap<Component, Object> componentData = new ConcurrentHashMap<Component, Object>();
-	private Map<Location, Value> values = new HashMap<Location, Value>();
+	private Map<Component, Object> componentData = new ConcurrentHashMap<Component, Object>();
+	private Map<Location, Value> values = new ConcurrentHashMap<Location, Value>();
 	private CopyOnWriteArrayList<Component> dirtyComponents = new CopyOnWriteArrayList<Component>();
 	private CopyOnWriteArrayList<Location> dirtyPoints = new CopyOnWriteArrayList<Location>();
 
-	ConcurrentHashMap<Location, SetData> causes = new ConcurrentHashMap<Location, SetData>();
+	Map<Location, SetData> causes = new ConcurrentHashMap<Location, SetData>();
 	private int id = lastId++;
 
 	public CircuitState(Project proj, Circuit circuit) {
