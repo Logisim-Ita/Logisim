@@ -40,6 +40,67 @@ public class PlaRomData implements InstanceData {
 		setOutputValue();
 	}
 
+	public void getSavedData(String s) {
+		Integer data;
+		try {
+			// can cast to int
+			data = Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			System.err.println("PlaRom: Cannot read saved data");
+			return;
+		}
+		// read first matrix
+		boolean[][] savedInputAnd = new boolean[getAnd()][getInputs() * 2];
+		int firstminSize = s.length() < getInputs() * getAnd() ? s.length() : getInputs() * getAnd();
+		int row = 0;
+		for (int i = 0; i < firstminSize; i++) {
+			row = i / getInputs();
+			data = Integer.parseInt(s, i);
+			switch (data) {
+			case 0:
+				// none selected
+				savedInputAnd[row][i * 2] = false;
+				savedInputAnd[row][i * 2 + 1] = false;
+				break;
+			case 1:
+				// not selected
+				savedInputAnd[row][i * 2] = true;
+				savedInputAnd[row][i * 2 + 1] = false;
+				break;
+			case 2:
+				// normal input selected
+				savedInputAnd[row][i * 2] = false;
+				savedInputAnd[row][i * 2 + 1] = true;
+				break;
+			default:
+				System.err.println("PlaRom: Error in saved data ");
+				return;
+			}
+		} // read first matrix
+		boolean[][] savedAndOutput = new boolean[getAnd()][getOutputs()];
+		int secondminSize = s.length() - firstminSize < getOutputs() * getAnd() ? s.length() - firstminSize
+				: getOutputs() * getAnd();
+		row = 0;
+		for (int i = 0; i < secondminSize; i++) {
+			row = i / getOutputs();
+			data = Integer.parseInt(s, i + firstminSize);
+			switch (data) {
+			case 0:
+				// not selected
+				savedAndOutput[row][i] = false;
+				break;
+			case 1:
+				savedAndOutput[row][i] = true;
+				break;
+			default:
+				System.err.println("PlaRom: Error in saved data 2");
+				return;
+			}
+		}
+		InputAnd = savedInputAnd;
+		AndOutput = savedAndOutput;
+	}
+
 	public void ClearMatrixValues() {
 		for (int i = 0; i < getAnd(); i++) {
 			for (int j = 0; j < getOutputs(); j++) {
