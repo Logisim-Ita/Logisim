@@ -60,6 +60,7 @@ public class PlaRom extends InstanceFactory {
 				if (data.editWindow() == 1)
 					data.ClearMatrixValues();
 				instance.fireInvalidated();
+				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
 			}
 		}
 
@@ -103,6 +104,7 @@ public class PlaRom extends InstanceFactory {
 				if (data.editWindow() == 1)
 					data.ClearMatrixValues();
 				state.fireInvalidated();
+				state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
 			}
 			isPressed = false;
 		}
@@ -140,7 +142,7 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) instance.getData(state);
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
-			ret.getSavedData(instance.getAttributeValue(CONTENTS_ATTR));
+			ret.setSavedData(instance.getAttributeValue(CONTENTS_ATTR));
 			instance.setData(state, ret);
 		} else {
 			ret.updateSize(inputs, outputs, and);
@@ -155,7 +157,7 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) state.getData();
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
-			ret.getSavedData(state.getAttributeValue(CONTENTS_ATTR));
+			ret.setSavedData(state.getAttributeValue(CONTENTS_ATTR));
 			state.setData(ret);
 		} else {
 			ret.updateSize(inputs, outputs, and);

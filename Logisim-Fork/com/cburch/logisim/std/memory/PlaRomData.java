@@ -15,6 +15,7 @@ import com.cburch.logisim.util.LocaleManager;
 public class PlaRomData implements InstanceData {
 	private int inputs, outputs, and;
 	private boolean clear = false;
+	private String SavedData = "";
 	private boolean[][] InputAnd;
 	private boolean[][] AndOutput;
 	private Value[] InputValue;
@@ -40,37 +41,63 @@ public class PlaRomData implements InstanceData {
 		setOutputValue();
 	}
 
-	public void getSavedData(String s) {
-		Integer data;
-		try {
-			// can cast to int
-			data = Integer.parseInt(s);
-		} catch (NumberFormatException e) {
-			System.err.println("PlaRom: Cannot read saved data");
-			return;
+	private void SaveData() {
+		// string to write inside the .circ to not lose data
+		int row, column;
+		String data = "";
+		for (int i = 0; i < getInputs() * getAnd(); i++) {
+			row = i / getInputs();
+			column = i - row * getInputs();
+			if (InputAnd[row][column * 2])
+				data += "1";
+			else if (InputAnd[row][column * 2 + 1])
+				data += "2";
+			else
+				data += "0";
 		}
+		for (int i = 0; i < getOutputs() * getAnd(); i++) {
+			row = i / getOutputs();
+			column = i - row * getOutputs();
+			if (AndOutput[row][column])
+				data += "1";
+			else
+				data += "0";
+		}
+		SavedData = data;
+	}
+
+	public String getSavedData() {
+		// return the string to save in the .circ
+		return SavedData;
+	}
+
+	public void setSavedData(String s) {
+		if (s == null || s == "")
+			return;
 		// read first matrix
 		boolean[][] savedInputAnd = new boolean[getAnd()][getInputs() * 2];
+		// if the string is shorter or longer you'll not have problems
 		int firstminSize = s.length() < getInputs() * getAnd() ? s.length() : getInputs() * getAnd();
-		int row = 0;
+		int data, row, column;
 		for (int i = 0; i < firstminSize; i++) {
 			row = i / getInputs();
-			data = Integer.parseInt(s, i);
+			column = i - row * getInputs();
+			data = Character.getNumericValue(s.charAt(i));
 			switch (data) {
 			case 0:
 				// none selected
-				savedInputAnd[row][i * 2] = false;
-				savedInputAnd[row][i * 2 + 1] = false;
+				savedInputAnd[row][column * 2] = false;
+				savedInputAnd[row][column * 2 + 1] = false;
 				break;
 			case 1:
 				// not selected
-				savedInputAnd[row][i * 2] = true;
-				savedInputAnd[row][i * 2 + 1] = false;
+				savedInputAnd[row][column * 2] = true;
+				savedInputAnd[row][column * 2 + 1] = false;
 				break;
 			case 2:
 				// normal input selected
-				savedInputAnd[row][i * 2] = false;
-				savedInputAnd[row][i * 2 + 1] = true;
+				savedInputAnd[row][column * 2] = false;
+				savedInputAnd[row][column * 2 + 1] = true;
 				break;
 			default:
 				System.err.println("PlaRom: Error in saved data ");
@@ -80,17 +107,17 @@ public class PlaRomData implements InstanceData {
 		boolean[][] savedAndOutput = new boolean[getAnd()][getOutputs()];
 		int secondminSize = s.length() - firstminSize < getOutputs() * getAnd() ? s.length() - firstminSize
 				: getOutputs() * getAnd();
-		row = 0;
 		for (int i = 0; i < secondminSize; i++) {
 			row = i / getOutputs();
-			data = Integer.parseInt(s, i + firstminSize);
+			column = i - row * getOutputs();
+			data = Character.getNumericValue(s.charAt(i + firstminSize));
 			switch (data) {
 			case 0:
 				// not selected
-				savedAndOutput[row][i] = false;
+				savedAndOutput[row][column] = false;
 				break;
 			case 1:
-				savedAndOutput[row][i] = true;
+				savedAndOutput[row][column] = true;
 				break;
 			default:
 				System.err.println("PlaRom: Error in saved data 2");
@@ -133,8 +160,10 @@ public class PlaRomData implements InstanceData {
 		if (this.drawing.getPreferredSize().getHeight() >= (int) (screenSize.height * 0.75))
 			panel.setPreferredSize(
 					new Dimension((int) panel.getPreferredSize().getWidth(), (int) (screenSize.height * 0.75)));
-		return JOptionPane.showOptionDialog(null, panel, Strings.getter("ProgrammableGeneratorComponent").get(),
+		int ret = JOptionPane.showOptionDialog(null, panel, Strings.getter("ProgrammableGeneratorComponent").get(),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, this.options, null);
+		SaveData();
+		return ret;
 	}
 
 	public int getAnd() {
@@ -287,6 +316,8 @@ public class PlaRomData implements InstanceData {
 			InitializeInputValue();
 			setAndValue();
 			setOutputValue();
+			// data to save in the .circ
+			SaveData();
 		}
 	}
 }
