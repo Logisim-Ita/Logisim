@@ -26,6 +26,7 @@ import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
@@ -99,6 +100,9 @@ abstract class Mem extends InstanceFactory {
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
+		Bounds bds = instance.getBounds();
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
+				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
 		configurePorts(instance);
 	}
 
@@ -184,6 +188,7 @@ abstract class Mem extends InstanceFactory {
 		painter.drawPort(ADDR, Strings.get("ramAddrLabel"), Direction.EAST);
 		g.setColor(Color.GRAY);
 		painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
+		painter.drawLabel();
 	}
 
 	@Override

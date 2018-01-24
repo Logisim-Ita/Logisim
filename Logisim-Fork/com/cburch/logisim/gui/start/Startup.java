@@ -281,6 +281,7 @@ public class Startup {
 			for (int i = 3; i < exexute.length; i++)
 				exexute[i] = Main.Args[i - 3];
 			Runtime.getRuntime().exec(exexute);
+			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
 			System.exit(0);
 		} catch (Exception ex) {
 			ex.printStackTrace();

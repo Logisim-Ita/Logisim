@@ -21,12 +21,12 @@ This is an italian fork based on the original Logisim version.<br>
 	* Plexers->7-Segment Display Decoder
 * Complete new movement system with mouse dragging
 * Auto center and Auto zoom when opening new files/circuits, you can call this function with ctrl-0, double mouse wheel click or with the round button you'll see on the lower-right corner
-* Almost infinite canvas, arrow will show you in what direction is the circuit if it's outside of your view
+* Almost infinite canvas, arrows will show you in what direction is the circuit if it's outside of your view
 * New FF layout and attributes
 * FF D, S-R: Latch option in trigger list
 * Controlled Buffer / Inverter: Negate Control Input attribute
 * Added Sel pin in Register component
-* Added Pre pin in Register and Counter components
+* Added Preset pin in Register and Counter components
 * Added Sel Active Level attribute in components with Sel pin
 * Press ESC or DEL to cancel "Add Tool" action, F1 opens Library Reference
 * TTY and Keyboard components can use 16-bit values (UTF-16)
@@ -35,12 +35,14 @@ This is an italian fork based on the original Logisim version.<br>
 * Added missing tooltips
 * Zoom in and out using mouse wheel where you're pointing at
 * Big fixes to Log menu and Log output file, added buttons to clear Log Table
-* Added Label Color attribute for each component with Label attribute
+* Added Label Color attribute for each component with Label attribute and Text Tool
+* Added Label for RAM, ROM and PLA ROM
+* Big fixes for Text Tool
 * Increased output limit in Analyze Circuit to 32
 * Analyze Circuit should calculate table/expression with any kind of component
 * Fixed empty template bug introduced in Logisim 2.7.0
 * Fixed input positions in wide gates with 4 inputs
-* Fixed opening new file in new window before adding any kind of component
+* Fixed opening new file in new window with old window not used
 * Changed some default value
 * Anti Aliasing, Look and Feel and Fill Component's Background preference
 * Graphical changes

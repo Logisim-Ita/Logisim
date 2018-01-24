@@ -121,7 +121,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		Bounds bds = instance.getBounds();
 		updateports(instance);
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
-				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
 	}
 
 	//

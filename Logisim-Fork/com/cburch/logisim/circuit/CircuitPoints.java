@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,8 +24,8 @@ class CircuitPoints {
 		// these lists are parallel - ends corresponding to wires are null
 	}
 
-	private ConcurrentHashMap<Location, LocationData> map = new ConcurrentHashMap<Location, LocationData>();
-	private ConcurrentHashMap<Location, WidthIncompatibilityData> incompatibilityData = new ConcurrentHashMap<Location, WidthIncompatibilityData>();
+	private Map<Location, LocationData> map = new ConcurrentHashMap<Location, LocationData>();
+	private Map<Location, WidthIncompatibilityData> incompatibilityData = new ConcurrentHashMap<Location, WidthIncompatibilityData>();
 
 	public CircuitPoints() {
 	}

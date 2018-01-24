@@ -26,11 +26,12 @@ import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 
 public class Rom extends Mem {
-	private static class ContentsAttribute extends Attribute<MemContents> {
-		private ContentsAttribute() {
+	 static class ContentsAttribute extends Attribute<MemContents> {
+		ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
 		}
 
@@ -149,7 +150,7 @@ public class Rom extends Mem {
 		MemContents contents = getMemContents(instance);
 		MemListener listener = new MemListener(instance);
 		memListeners.put(instance, listener);
-		contents.addHexModelListener(listener);
+		contents.addHexModelListener(listener);		
 	}
 
 	@Override
@@ -204,6 +205,8 @@ public class Rom extends Mem {
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		super.instanceAttributeChanged(instance, attr);
+		if (attr == StdAttr.LABEL || attr == StdAttr.LABEL_FONT || attr == StdAttr.ATTR_LABEL_COLOR)
+			return;
 		configurePorts(instance);
 		instance.fireInvalidated();
 	}
