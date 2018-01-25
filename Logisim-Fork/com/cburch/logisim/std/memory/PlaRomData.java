@@ -43,25 +43,51 @@ public class PlaRomData implements InstanceData {
 
 	private void SaveData() {
 		// string to write inside the .circ to not lose data
-		int row, column;
+		int row, column, count = 0;
+		char val, last = 'x';                                                                                                                                                     
 		String data = "";
 		for (int i = 0; i < getInputs() * getAnd(); i++) {
 			row = i / getInputs();
 			column = i - row * getInputs();
 			if (InputAnd[row][column * 2])
-				data += "1";
+				val = '1';
 			else if (InputAnd[row][column * 2 + 1])
-				data += "2";
+				val = '2';
 			else
-				data += "0";
+				val = '0';
+			if ((last == val || last == 'x') && i != getInputs() * getAnd() - 1)
+				count++;
+			else {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else {
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				}
+				count = 1;
+			}
+			last = val;
 		}
+		last = 'x';
 		for (int i = 0; i < getOutputs() * getAnd(); i++) {
 			row = i / getOutputs();
 			column = i - row * getOutputs();
 			if (AndOutput[row][column])
-				data += "1";
+				val = '1';
 			else
-				data += "0";
+				val = '0';
+			if ((last == val || last == 'x') && i != getOutputs() * getAnd() - 1)
+				count++;
+			else {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else {
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				}
+				count = 0;
+			}
+			last = val;
 		}
 		SavedData = data;
 	}
