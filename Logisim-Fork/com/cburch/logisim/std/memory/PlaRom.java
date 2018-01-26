@@ -142,11 +142,14 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) instance.getData(state);
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
+			// if new, fill the content with the saved data
 			ret.decodeSavedData(instance.getAttributeValue(CONTENTS_ATTR));
 			instance.setData(state, ret);
-		} else {
-			ret.updateSize(inputs, outputs, and);
-		}		
+		} else if (ret.updateSize(inputs, outputs, and)) {
+			// if size updated, update the content attribute, written here because can't
+			// access PlaRomData object from instanceAttributeChanged method
+			instance.getAttributeSet().setValue(CONTENTS_ATTR, ret.getSavedData());
+		}
 		return ret;
 	}
 
@@ -157,11 +160,14 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) state.getData();
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
+			// if new, fill the content with the saved data
 			ret.decodeSavedData(state.getAttributeValue(CONTENTS_ATTR));
 			state.setData(ret);
-		} else {
-			ret.updateSize(inputs, outputs, and);			
-		}		
+		} else if (ret.updateSize(inputs, outputs, and)) {
+			// if size updated, update the content attribute, written here because can't
+			// access PlaRomData object from instanceAttributeChanged method
+			state.getAttributeSet().setValue(CONTENTS_ATTR, ret.getSavedData());
+		}
 		return ret;
 	}
 
@@ -197,7 +203,7 @@ public class PlaRom extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS) 
+		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS)
 			updateports(instance);
 		else
 			instance.fireInvalidated();
@@ -244,6 +250,8 @@ public class PlaRom extends InstanceFactory {
 		if (clear == Value.TRUE) {
 			data.setClear(true);
 			data.ClearMatrixValues();
+			if (state.getAttributeValue(CONTENTS_ATTR) != "")
+				state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
 		} else
 			data.setClear(false);
 

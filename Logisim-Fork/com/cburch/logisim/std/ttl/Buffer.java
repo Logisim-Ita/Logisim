@@ -14,7 +14,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class Buffer extends AbstractTtlGate {
 
 	public Buffer() {
-		super("Buffer", 14, new int[] { 3, 6, 8, 11 },true);
+		super("Buffer", 14, new int[] { 3, 6, 8, 11 }, true);
 	}
 
 	public void paintBase(InstancePainter painter) {

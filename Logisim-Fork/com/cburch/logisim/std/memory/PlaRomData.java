@@ -64,11 +64,16 @@ public class PlaRomData implements InstanceData {
 	}
 
 	public void decodeSavedData(String s) {
+		// if empty, all to false so don't do anything
 		if (s == null || s == "")
 			return;
+		// split the attribute content string in an array of strings with a single
+		// information each one
 		String[] datas = s.split(" "), tmp;
 		int value, cnt = 0;
 		for (int i = 0; i < datas.length; i++) {
+			// if contains a '*' it has to fill the array with the first value for x (second
+			// number) cycles
 			if (datas[i].contains("*")) {
 				tmp = datas[i].split("\\*");
 				for (int j = 0; j < Integer.parseInt(tmp[1]); j++) {
@@ -160,17 +165,23 @@ public class PlaRomData implements InstanceData {
 
 	private void SaveData() {
 		// string to write inside the .circ to not lose data
-		int row, column, count = 0, size1 = getInputs() * getAnd(), size2 = getOutputs() * getAnd();
+		int row, column, size1 = getInputs() * getAnd(), size2 = getOutputs() * getAnd(), count = 0;
 		char val, last = 'x';
+		boolean dirty = false;
 		String data = "";
+		// input-and matrix
 		for (int i = 0; i < size1; i++) {
 			row = i / getInputs();
 			column = i - row * getInputs();
-			if (InputAnd[row][column * 2])
+			// 1= not line selected, 2 = input line selected, 0 = nothing selected in that
+			// input line
+			if (InputAnd[row][column * 2]) {
 				val = '1';
-			else if (InputAnd[row][column * 2 + 1])
+				dirty = true;
+			} else if (InputAnd[row][column * 2 + 1]) {
 				val = '2';
-			else
+				dirty = true;
+			} else
 				val = '0';
 			if (val == last)
 				count++;
@@ -193,12 +204,15 @@ public class PlaRomData implements InstanceData {
 		}
 		last = 'x';
 		count = 0;
+		// and-or matrix
 		for (int i = 0; i < size2; i++) {
 			row = i / getOutputs();
 			column = i - row * getOutputs();
-			if (AndOutput[row][column])
+			// 0 = nothing selected, 1 = node selected
+			if (AndOutput[row][column]) {
 				val = '1';
-			else
+				dirty = true;
+			} else
 				val = '0';
 			if (val == last)
 				count++;
@@ -218,6 +232,8 @@ public class PlaRomData implements InstanceData {
 				last = val;
 			}
 		}
+		if (!dirty)
+			data = "";
 		SavedData = data;
 	}
 
@@ -293,7 +309,7 @@ public class PlaRomData implements InstanceData {
 		}
 	}
 
-	public void updateSize(int inputs, int outputs, int and) {
+	public boolean updateSize(int inputs, int outputs, int and) {
 		if (this.inputs != inputs || this.outputs != outputs || this.and != and) {
 			int mininputs = getInputs() < inputs ? getInputs() : inputs;
 			int minoutputs = getOutputs() < outputs ? getOutputs() : outputs;
@@ -321,7 +337,9 @@ public class PlaRomData implements InstanceData {
 			setOutputValue();
 			// data to save in the .circ
 			SaveData();
+			return true;
 		}
+		return false;
 	}
 
 	private void writeData(int value, int node) {
