@@ -142,11 +142,11 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) instance.getData(state);
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
-			ret.setSavedData(instance.getAttributeValue(CONTENTS_ATTR));
+			ret.decodeSavedData(instance.getAttributeValue(CONTENTS_ATTR));
 			instance.setData(state, ret);
 		} else {
 			ret.updateSize(inputs, outputs, and);
-		}
+		}		
 		return ret;
 	}
 
@@ -157,11 +157,11 @@ public class PlaRom extends InstanceFactory {
 		PlaRomData ret = (PlaRomData) state.getData();
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
-			ret.setSavedData(state.getAttributeValue(CONTENTS_ATTR));
+			ret.decodeSavedData(state.getAttributeValue(CONTENTS_ATTR));
 			state.setData(ret);
 		} else {
-			ret.updateSize(inputs, outputs, and);
-		}
+			ret.updateSize(inputs, outputs, and);			
+		}		
 		return ret;
 	}
 
@@ -197,7 +197,7 @@ public class PlaRom extends InstanceFactory {
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS)
+		if (attr == ATTR_INPUTS || attr == ATTR_OUTPUTS) 
 			updateports(instance);
 		else
 			instance.fireInvalidated();

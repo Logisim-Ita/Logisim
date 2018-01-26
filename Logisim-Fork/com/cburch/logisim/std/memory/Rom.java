@@ -30,7 +30,7 @@ import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 
 public class Rom extends Mem {
-	 static class ContentsAttribute extends Attribute<MemContents> {
+	static class ContentsAttribute extends Attribute<MemContents> {
 		ContentsAttribute() {
 			super("contents", Strings.getter("romContentsAttr"));
 		}
@@ -150,7 +150,7 @@ public class Rom extends Mem {
 		MemContents contents = getMemContents(instance);
 		MemListener listener = new MemListener(instance);
 		memListeners.put(instance, listener);
-		contents.addHexModelListener(listener);		
+		contents.addHexModelListener(listener);
 	}
 
 	@Override

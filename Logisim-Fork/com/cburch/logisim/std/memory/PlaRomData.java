@@ -41,119 +41,6 @@ public class PlaRomData implements InstanceData {
 		setOutputValue();
 	}
 
-	private void SaveData() {
-		// string to write inside the .circ to not lose data
-		int row, column, count = 0;
-		char val, last = 'x';                                                                                                                                                     
-		String data = "";
-		for (int i = 0; i < getInputs() * getAnd(); i++) {
-			row = i / getInputs();
-			column = i - row * getInputs();
-			if (InputAnd[row][column * 2])
-				val = '1';
-			else if (InputAnd[row][column * 2 + 1])
-				val = '2';
-			else
-				val = '0';
-			if ((last == val || last == 'x') && i != getInputs() * getAnd() - 1)
-				count++;
-			else {
-				if (count >= 3)
-					data += last + "*" + count + " ";
-				else {
-					for (int j = 0; j < count; j++)
-						data += last + " ";
-				}
-				count = 1;
-			}
-			last = val;
-		}
-		last = 'x';
-		for (int i = 0; i < getOutputs() * getAnd(); i++) {
-			row = i / getOutputs();
-			column = i - row * getOutputs();
-			if (AndOutput[row][column])
-				val = '1';
-			else
-				val = '0';
-			if ((last == val || last == 'x') && i != getOutputs() * getAnd() - 1)
-				count++;
-			else {
-				if (count >= 3)
-					data += last + "*" + count + " ";
-				else {
-					for (int j = 0; j < count; j++)
-						data += last + " ";
-				}
-				count = 0;
-			}
-			last = val;
-		}
-		SavedData = data;
-	}
-
-	public String getSavedData() {
-		// return the string to save in the .circ
-		return SavedData;
-	}
-
-	public void setSavedData(String s) {
-		if (s == null || s == "")
-			return;
-		// read first matrix
-		boolean[][] savedInputAnd = new boolean[getAnd()][getInputs() * 2];
-		// if the string is shorter or longer you'll not have problems
-		int firstminSize = s.length() < getInputs() * getAnd() ? s.length() : getInputs() * getAnd();
-		int data, row, column;
-		for (int i = 0; i < firstminSize; i++) {
-			row = i / getInputs();
-			column = i - row * getInputs();
-			data = Character.getNumericValue(s.charAt(i));
-			switch (data) {
-			case 0:
-				// none selected
-				savedInputAnd[row][column * 2] = false;
-				savedInputAnd[row][column * 2 + 1] = false;
-				break;
-			case 1:
-				// not selected
-				savedInputAnd[row][column * 2] = true;
-				savedInputAnd[row][column * 2 + 1] = false;
-				break;
-			case 2:
-				// normal input selected
-				savedInputAnd[row][column * 2] = false;
-				savedInputAnd[row][column * 2 + 1] = true;
-				break;
-			default:
-				System.err.println("PlaRom: Error in saved data ");
-				return;
-			}
-		} // read first matrix
-		boolean[][] savedAndOutput = new boolean[getAnd()][getOutputs()];
-		int secondminSize = s.length() - firstminSize < getOutputs() * getAnd() ? s.length() - firstminSize
-				: getOutputs() * getAnd();
-		for (int i = 0; i < secondminSize; i++) {
-			row = i / getOutputs();
-			column = i - row * getOutputs();
-			data = Character.getNumericValue(s.charAt(i + firstminSize));
-			switch (data) {
-			case 0:
-				// not selected
-				savedAndOutput[row][column] = false;
-				break;
-			case 1:
-				savedAndOutput[row][column] = true;
-				break;
-			default:
-				System.err.println("PlaRom: Error in saved data 2");
-				return;
-			}
-		}
-		InputAnd = savedInputAnd;
-		AndOutput = savedAndOutput;
-	}
-
 	public void ClearMatrixValues() {
 		for (int i = 0; i < getAnd(); i++) {
 			for (int j = 0; j < getOutputs(); j++) {
@@ -163,6 +50,7 @@ public class PlaRomData implements InstanceData {
 				setInputAndValue(i, k, false);
 			}
 		}
+		this.SavedData = "";
 	}
 
 	@Override
@@ -172,6 +60,27 @@ public class PlaRomData implements InstanceData {
 			return ret;
 		} catch (CloneNotSupportedException e) {
 			return null;
+		}
+	}
+
+	public void decodeSavedData(String s) {
+		if (s == null || s == "")
+			return;
+		String[] datas = s.split(" "), tmp;
+		int value, cnt = 0;
+		for (int i = 0; i < datas.length; i++) {
+			if (datas[i].contains("*")) {
+				tmp = datas[i].split("\\*");
+				for (int j = 0; j < Integer.parseInt(tmp[1]); j++) {
+					value = Integer.parseInt(tmp[0]);
+					writeData(value, cnt);
+					cnt++;
+				}
+			} else {
+				value = Integer.parseInt(datas[i]);
+				writeData(value, cnt);
+				cnt++;
+			}
 		}
 	}
 
@@ -235,6 +144,11 @@ public class PlaRomData implements InstanceData {
 		return OutputValuecopy;
 	}
 
+	public String getSavedData() {
+		// return the string to save in the .circ
+		return SavedData;
+	}
+
 	public String getSizeString() {
 		return this.getInputs() + "x" + this.getAnd() + "x" + this.getOutputs();
 	}
@@ -242,6 +156,69 @@ public class PlaRomData implements InstanceData {
 	private void InitializeInputValue() {
 		for (int i = 0; i < getInputs(); i++)
 			InputValue[i] = Value.UNKNOWN;
+	}
+
+	private void SaveData() {
+		// string to write inside the .circ to not lose data
+		int row, column, count = 0, size1 = getInputs() * getAnd(), size2 = getOutputs() * getAnd();
+		char val, last = 'x';
+		String data = "";
+		for (int i = 0; i < size1; i++) {
+			row = i / getInputs();
+			column = i - row * getInputs();
+			if (InputAnd[row][column * 2])
+				val = '1';
+			else if (InputAnd[row][column * 2 + 1])
+				val = '2';
+			else
+				val = '0';
+			if (val == last)
+				count++;
+			else if (last == 'x') {
+				last = val;
+				count++;
+			}
+			if (val != last || i == size1 - 1) {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				if (val != last && i == size1 - 1)
+					data += val + " ";
+				count = 1;
+				last = val;
+
+			}
+		}
+		last = 'x';
+		count = 0;
+		for (int i = 0; i < size2; i++) {
+			row = i / getOutputs();
+			column = i - row * getOutputs();
+			if (AndOutput[row][column])
+				val = '1';
+			else
+				val = '0';
+			if (val == last)
+				count++;
+			else if (last == 'x') {
+				last = val;
+				count++;
+			}
+			if (val != last || i == size2 - 1) {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				if (val != last && i == size2 - 1)
+					data += val + " ";
+				count = 1;
+				last = val;
+			}
+		}
+		SavedData = data;
 	}
 
 	public void setAndOutputValue(int row, int column, boolean b) {
@@ -344,6 +321,52 @@ public class PlaRomData implements InstanceData {
 			setOutputValue();
 			// data to save in the .circ
 			SaveData();
+		}
+	}
+
+	private void writeData(int value, int node) {
+		int row, column;
+		// first matrix
+		if (node < getInputs() * getAnd()) {
+			row = node / getInputs();
+			column = node - row * getInputs();
+			switch (value) {
+			case 0:
+				// none selected
+				InputAnd[row][column * 2] = false;
+				InputAnd[row][column * 2 + 1] = false;
+				break;
+			case 1:
+				// not selected
+				InputAnd[row][column * 2] = true;
+				InputAnd[row][column * 2 + 1] = false;
+				break;
+			case 2:
+				// normal input selected
+				InputAnd[row][column * 2] = false;
+				InputAnd[row][column * 2 + 1] = true;
+				break;
+			default:
+				System.err.println("PlaRom: Error in saved data ");
+				return;
+			}
+		} // second matrix
+		else if (node < getInputs() * getAnd() + getOutputs() * getAnd()) {
+			node -= getInputs() * getAnd();
+			row = node / getOutputs();
+			column = node - row * getOutputs();
+			switch (value) {
+			case 0:
+				// not selected
+				AndOutput[row][column] = false;
+				break;
+			case 1:
+				AndOutput[row][column] = true;
+				break;
+			default:
+				System.err.println("PlaRom: Error in saved data 2");
+				return;
+			}
 		}
 	}
 }
