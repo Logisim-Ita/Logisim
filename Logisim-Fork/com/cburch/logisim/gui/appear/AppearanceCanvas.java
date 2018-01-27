@@ -476,6 +476,7 @@ public class AppearanceCanvas extends Canvas implements CanvasPaneContents, Acti
 		return canvasPane.getHorizontalScrollBar().getValue();
 	}
 
+	@Override
 	public Point getMousePosition() {
 		return canvasPane.getMousePosition();
 	}

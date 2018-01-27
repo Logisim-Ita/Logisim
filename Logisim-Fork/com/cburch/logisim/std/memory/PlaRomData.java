@@ -14,7 +14,6 @@ import com.cburch.logisim.util.LocaleManager;
 
 public class PlaRomData implements InstanceData {
 	private int inputs, outputs, and;
-	private boolean clear = false;
 	private String SavedData = "";
 	private boolean[][] InputAnd;
 	private boolean[][] AndOutput;
@@ -117,10 +116,6 @@ public class PlaRomData implements InstanceData {
 
 	public Value getAndValue(int i) {
 		return AndValue[i];
-	}
-
-	public boolean getClear() {
-		return this.clear;
 	}
 
 	public boolean getInputAndValue(int row, int column) {
@@ -273,10 +268,6 @@ public class PlaRomData implements InstanceData {
 				AndValue[i] = Value.ERROR;
 			thereisadot = false;
 		}
-	}
-
-	public void setClear(boolean b) {
-		this.clear = b;
 	}
 
 	public void setInputAndValue(int row, int column, boolean b) {

@@ -873,6 +873,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		return canvasPane.getHorizontalScrollBar().getValue();
 	}
 
+	@Override
 	public Point getMousePosition() {
 		return canvasPane.getMousePosition();
 	}

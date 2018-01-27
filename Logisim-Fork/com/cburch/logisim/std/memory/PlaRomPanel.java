@@ -72,32 +72,30 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (!data.getClear()) {
-			// click area arownd node is 20*20
-			int row = getRow(e.getY());
-			int column = getColumn(e.getX());
-			int column2 = getColumn(e.getX() + 10);
-			if (row % 2 == 0 && row > 0 && column > 0) {
-				row = row / 2 - 1;
-				if (row <= data.getAnd() - 1) {
-					// is a clickable area
-					if (column <= data.getInputs() * 2) {// input and area
-						column -= 1;
-						if (column % 2 == 1 && !data.getInputAndValue(row, column)
-								&& data.getInputAndValue(row, column - 1))
-							data.setInputAndValue(row, column - 1, false);
-						else if (column % 2 == 0 && !data.getInputAndValue(row, column)
-								&& data.getInputAndValue(row, column + 1))
-							data.setInputAndValue(row, column + 1, false);
-						data.setInputAndValue(row, column, !data.getInputAndValue(row, column));
+		// click area arownd node is 20*20
+		int row = getRow(e.getY());
+		int column = getColumn(e.getX());
+		int column2 = getColumn(e.getX() + 10);
+		if (row % 2 == 0 && row > 0 && column > 0) {
+			row = row / 2 - 1;
+			if (row <= data.getAnd() - 1) {
+				// is a clickable area
+				if (column <= data.getInputs() * 2) {// input and area
+					column -= 1;
+					if (column % 2 == 1 && !data.getInputAndValue(row, column)
+							&& data.getInputAndValue(row, column - 1))
+						data.setInputAndValue(row, column - 1, false);
+					else if (column % 2 == 0 && !data.getInputAndValue(row, column)
+							&& data.getInputAndValue(row, column + 1))
+						data.setInputAndValue(row, column + 1, false);
+					data.setInputAndValue(row, column, !data.getInputAndValue(row, column));
+					repaint();
+				} else if (column2 > data.getInputs() * 2 + 3) {// and or area
+					column2 -= (data.getInputs() * 2 + 4);
+					if (column2 % 2 == 0) {
+						column2 /= 2;
+						data.setAndOutputValue(row, column2, !data.getAndOutputValue(row, column2));
 						repaint();
-					} else if (column2 > data.getInputs() * 2 + 3) {// and or area
-						column2 -= (data.getInputs() * 2 + 4);
-						if (column2 % 2 == 0) {
-							column2 /= 2;
-							data.setAndOutputValue(row, column2, !data.getAndOutputValue(row, column2));
-							repaint();
-						}
 					}
 				}
 			}

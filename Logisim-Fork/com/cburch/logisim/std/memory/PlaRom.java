@@ -19,14 +19,12 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
@@ -80,16 +78,16 @@ public class PlaRom extends InstanceFactory {
 		}
 
 		public void setData(Instance instance, CircuitState circ) {
-			if (this.instance == null)
+			if (!instance.equals(this.instance))
 				this.instance = instance;
-			if (this.circ == null)
+			if (!circ.equals(this.circ))
 				this.circ = circ;
 		}
 
 		// i don't know other ways to do this, I'll try to change this when I'll know
 		// better Burch's code
 		public void setData(InstanceState state) {
-			if (this.state == null)
+			if (!state.equals(this.state))
 				this.state = state;
 		}
 
@@ -196,51 +194,6 @@ public class PlaRom extends InstanceFactory {
 		}
 	}
 
-	public static class Poker extends InstancePoker {
-		private boolean isPressed = true;
-
-		private boolean isInside(InstanceState state, MouseEvent e) {
-			Location loc = state.getInstance().getLocation();
-			int dx = e.getX() - loc.getX();
-			int dy = e.getY() - loc.getY();
-			return (dx >= 4 && dx <= 76 && dy >= 7 && dy <= 24);
-		}
-
-		@Override
-		public void mousePressed(InstanceState state, MouseEvent e) {
-			isPressed = isInside(state, e);
-		}
-
-		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) {
-			if (isPressed && isInside(state, e)) {
-				PlaRomData data = PlaRom.getPlaRomData(state);
-				if (data.editWindow() == 1)
-					data.ClearMatrixValues();
-				// if something changed
-				if (!data.getSavedData().equals(state.getAttributeValue(CONTENTS_ATTR))) {
-					state.fireInvalidated();
-					state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
-					state.getProject().getLogisimFile().setDirty(true);
-				}
-			}
-			isPressed = false;
-		}
-
-		@Override
-		public void paint(InstancePainter painter) {
-			Graphics g = painter.getGraphics();
-			Bounds bds = painter.getBounds();
-			g.setFont(new Font("sans serif", Font.BOLD, 11));
-			g.setColor((isPressed) ? Color.LIGHT_GRAY : Color.WHITE);
-			g.fillRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 12, 72, 16);
-			g.setColor(Color.BLACK);
-			g.drawRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 12, 72, 16);
-			GraphicsUtil.drawCenteredText(g, com.cburch.logisim.gui.menu.Strings.get("editMenu"),
-					bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 6);
-		}
-	}
-
 	private static final Attribute<Integer> ATTR_INPUTS = Attributes.forIntegerRange("inputs",
 			Strings.getter("gateInputsAttr"), 1, 32);
 
@@ -294,11 +247,10 @@ public class PlaRom extends InstanceFactory {
 		super("PlaRom", Strings.getter("PlaRomComponent"));
 		setIconName("plarom.gif");
 		setAttributes(
-				new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS, Mem.ATTR_SELECTION, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, CONTENTS_ATTR },
-				new Object[] { 4, 4, 4, Mem.SEL_LOW, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, "" });
-		setOffsetBounds(Bounds.create(0, -40, 80, 80));
-		setInstancePoker(Poker.class);
+				new Attribute[] { ATTR_INPUTS, ATTR_AND, ATTR_OUTPUTS, StdAttr.LABEL, StdAttr.LABEL_FONT,
+						StdAttr.ATTR_LABEL_COLOR, CONTENTS_ATTR, Mem.ATTR_SELECTION },
+				new Object[] { 4, 4, 4, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, "", Mem.SEL_LOW });
+		setOffsetBounds(Bounds.create(0, -30, 60, 60));
 		setInstanceLogger(Logger.class);
 	}
 
@@ -308,7 +260,7 @@ public class PlaRom extends InstanceFactory {
 		instance.addAttributeListener();
 		updateports(instance);
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
-				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4, GraphicsUtil.H_CENTER,
+				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 3, GraphicsUtil.H_CENTER,
 				GraphicsUtil.V_CENTER);
 	}
 
@@ -338,42 +290,26 @@ public class PlaRom extends InstanceFactory {
 		Object label = painter.getAttributeValue(StdAttr.LABEL);
 		if (label == null || label.equals(""))
 			GraphicsUtil.drawCenteredText(g, Strings.getter("PlaRomComponent").toString(),
-					bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4);
+					bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 3);
 		GraphicsUtil.drawCenteredText(g, data.getSizeString(), bds.getX() + bds.getWidth() / 2,
-				bds.getY() + bds.getHeight() / 2 - 3);
-		g.setColor(Color.WHITE);
-		g.fillRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 11, 72, 16);
-		g.setColor(Color.BLACK);
-		g.drawRect(bds.getX() + 4, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 12, 72, 16);
-		GraphicsUtil.drawCenteredText(g, com.cburch.logisim.gui.menu.Strings.get("editMenu"),
-				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - bds.getHeight() / 4 - 6);
+				bds.getY() + bds.getHeight() / 3 * 2 - 3);
 		painter.drawPort(0);
 		painter.drawPort(1);
 		g.setColor(Color.GRAY);
-		painter.drawPort(2, Strings.get("ramClrLabel"), Direction.SOUTH);
-		painter.drawPort(3, Strings.get("ramCSLabel"), Direction.NORTH);
+		painter.drawPort(2, Strings.get("ramCSLabel"), Direction.SOUTH);
 		painter.drawLabel();
 	}
 
 	@Override
 	public void propagate(InstanceState state) {
 		PlaRomData data = getPlaRomData(state);
-		Value clear = state.getPort(2);
-		Value cs = state.getPort(3);
+		Value cs = state.getPort(2);
 		boolean selection = state.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH;
 		boolean ComponentActive = !(cs == Value.FALSE && selection || cs == Value.TRUE && !selection);
 		if (!ComponentActive) {
 			state.setPort(1, Value.createUnknown(BitWidth.create(data.getOutputs())), Mem.DELAY);
 			return;
 		}
-		if (clear == Value.TRUE) {
-			data.setClear(true);
-			data.ClearMatrixValues();
-			if (state.getAttributeValue(CONTENTS_ATTR) != "" && data.getClear())
-				state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
-		} else
-			data.setClear(false);
-
 		Value[] inputs = state.getPort(0).getAll();
 		for (int i = 0; i < inputs.length / 2; i++) {// reverse array
 			Value temp = inputs[i];
@@ -388,18 +324,16 @@ public class PlaRom extends InstanceFactory {
 	private void updateports(Instance instance) {
 		int inputbitwidth = instance.getAttributeValue(ATTR_INPUTS);
 		int outputbitwidth = instance.getAttributeValue(ATTR_OUTPUTS);
-		Port[] ps = new Port[4];
+		Port[] ps = new Port[3];
 		ps[0] = new Port(0, 0, Port.INPUT, inputbitwidth);
-		ps[1] = new Port(80, 0, Port.OUTPUT, outputbitwidth);
-		ps[2] = new Port(40, 40, Port.INPUT, 1); // clear
-		ps[3] = new Port(40, -40, Port.INPUT, 1); // enable
+		ps[1] = new Port(60, 0, Port.OUTPUT, outputbitwidth);
+		ps[2] = new Port(30, 30, Port.INPUT, 1); // chip select
 		ps[0].setToolTip(Strings.getter("demultiplexerInTip"));
 		ps[1].setToolTip(Strings.getter("multiplexerOutTip"));
-		ps[2].setToolTip(Strings.getter("PlaRomCleartip"));
 		if (instance.getAttributeValue(Mem.ATTR_SELECTION) == Mem.SEL_HIGH)
-			ps[3].setToolTip(Strings.getter("memCSTip", "0"));
+			ps[2].setToolTip(Strings.getter("memCSTip", "0"));
 		else
-			ps[3].setToolTip(Strings.getter("memCSTip", "1"));
+			ps[2].setToolTip(Strings.getter("memCSTip", "1"));
 		instance.setPorts(ps);
 	}
 }
