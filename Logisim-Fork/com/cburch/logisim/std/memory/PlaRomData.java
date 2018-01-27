@@ -100,7 +100,8 @@ public class PlaRomData implements InstanceData {
 		if (this.drawing.getPreferredSize().getHeight() >= (int) (screenSize.height * 0.75))
 			panel.setPreferredSize(
 					new Dimension((int) panel.getPreferredSize().getWidth(), (int) (screenSize.height * 0.75)));
-		int ret = JOptionPane.showOptionDialog(null, panel, Strings.getter("ProgrammableGeneratorComponent").get(),
+		int ret = JOptionPane.showOptionDialog(null, panel,
+				Strings.getter("Logisim: Pla Rom " + getSizeString() + " Edit Window").get(),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, this.options, null);
 		SaveData();
 		return ret;

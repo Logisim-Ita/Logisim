@@ -260,7 +260,7 @@ public class Project {
 	}
 
 	public boolean isFileDirty() {
-		return undoMods != 0;
+		return undoMods != 0 || getLogisimFile().isDirty();
 	}
 
 	// We track whether this project is the empty project opened
@@ -347,7 +347,7 @@ public class Project {
 
 	public void setFileAsClean() {
 		undoMods = 0;
-		file.setDirty(isFileDirty());
+		file.setDirty(false);
 	}
 
 	public void setFrame(Frame value) {
