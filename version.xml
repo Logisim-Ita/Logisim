@@ -2,12 +2,11 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.12.1.1</jar_version>
+  <jar_version>2.12.2.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.12.1.1</exe_version>
+  <exe_version>2.12.2.0</exe_version>
   <changelog>
-* Added label and its attributes for RAM, ROM and PLA ROM
-* Fixed some label alignment
-* Maybe fixed white screen on startup
+* Fixed PlaRom not saving its contents in .circ files
+* Removed clear pin (useless) and edit button from PlaRom (click on contents attribute or right click)
   </changelog>
 </logisim>

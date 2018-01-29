@@ -277,9 +277,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				Startup.restart();
 			} else if (AppPreferences.SEND_DATA.isSource(event)) {
 				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
+					Startup.runRemotePhpCode(
+							"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
 				else
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/removeOnline.php");
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=no");
 			}
 		}
 	}

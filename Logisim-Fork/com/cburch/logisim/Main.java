@@ -31,11 +31,11 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 12, 1, 1, LogisimVersion.getVariantFromFile());
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 12, 2, 0, LogisimVersion.getVariantFromFile());
 
 	public static final String VERSION_NAME = VERSION.toString();
 
-	public static final int COPYRIGHT_YEAR = 2017;
+	public static final int COPYRIGHT_YEAR = 2018;
 
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 
@@ -52,7 +52,8 @@ public class Main {
 				try {
 					startup.run();
 					if (AppPreferences.SEND_DATA.getBoolean())
-						Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/addOnline.php");
+						Startup.runRemotePhpCode(
+								"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
 				} catch (Throwable e) {
 					Writer result = new StringWriter();
 					PrintWriter printWriter = new PrintWriter(result);
@@ -62,7 +63,8 @@ public class Main {
 				}
 			} else {
 				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
+					Startup.runRemotePhpCode(
+							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=add");
 				Startup.restart();
 			}
 		}

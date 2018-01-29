@@ -48,7 +48,6 @@ This is an italian fork based on the original Logisim version.<br>
 * Graphical changes
 * Includes some fix from original early version 2.7.2.255
 ## Bugs
-* PLA ROM doesn't save configurations in .circ and its logic is not calculated in Analyze Circuit
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
 * Solve dirty points when rotating
