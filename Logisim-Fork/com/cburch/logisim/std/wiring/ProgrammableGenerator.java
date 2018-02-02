@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -26,7 +25,6 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
@@ -45,29 +43,6 @@ public class ProgrammableGenerator extends InstanceFactory {
 		public Value getLogValue(InstanceState state, Object option) {
 			ProgrammableGeneratorState s = getState(state);
 			return s.sending;
-		}
-	}
-
-	public static class ClockPoker extends InstancePoker {
-		boolean isPressed = true;
-
-		private boolean isInside(InstanceState state, MouseEvent e) {
-			Bounds bds = state.getInstance().getBounds();
-			return bds.contains(e.getX(), e.getY());
-		}
-
-		@Override
-		public void mousePressed(InstanceState state, MouseEvent e) {
-			isPressed = isInside(state, e);
-		}
-
-		@Override
-		public void mouseReleased(InstanceState state, MouseEvent e) {
-			if (isPressed && isInside(state, e)) {
-				ProgrammableGeneratorState myState = (ProgrammableGeneratorState) state.getData();
-				myState.editWindow();
-			}
-			isPressed = false;
 		}
 	}
 
@@ -178,7 +153,6 @@ public class ProgrammableGenerator extends InstanceFactory {
 						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
-		setInstancePoker(ClockPoker.class);
 		setIconName("programmablegenerator.gif");
 	}
 
@@ -236,7 +210,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 		boolean drawUp;
 		if (painter.getShowState()) {
 			ProgrammableGeneratorState state = getState(painter);
-			painter.drawBounds(state.sending.getColor());
+			painter.drawRoundBounds(state.sending.getColor());
 			drawUp = state.sending == Value.TRUE;
 		} else {
 			painter.drawBounds(Color.BLACK);

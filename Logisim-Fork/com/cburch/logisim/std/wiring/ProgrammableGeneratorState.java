@@ -43,6 +43,77 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		}
 	}
 
+	public void decodeSavedData(String s) {
+		// if empty, all to false so don't do anything
+		if (s == null || s == "")
+			return;
+		// split the attribute content string in an array of strings with a single
+		// information each one
+		String[] datas = s.split(" "), tmp;
+		int value, cnt = 0;
+		for (int i = 0; i < datas.length; i++) {
+			// if contains a '*' it has to fill the array with the first value for x (second
+			// number) cycles
+			if (datas[i].contains("*")) {
+				tmp = datas[i].split("\\*");
+				for (int j = 0; j < Integer.parseInt(tmp[1]); j++) {
+					value = Integer.parseInt(tmp[0]);
+					writeData(value, cnt);
+					cnt++;
+				}
+			} else {
+				value = Integer.parseInt(datas[i]);
+				writeData(value, cnt);
+				cnt++;
+			}
+		}
+	}
+
+	private void writeData(int value, int cnt) {
+		if (cnt < this.durationHigh.length)
+			setdurationHigh(cnt, value);
+		else
+			setdurationLow(cnt - this.durationHigh.length, value);
+	}
+	public void SaveData() {
+		int size = this.durationHigh.length+this.durationLow.length, count = 0;
+		char val, last = 'x';
+		boolean dirty = false;
+		String data = "";
+		// input-and matrix
+		for (int i = 0; i < size; i++) {
+			// 1= not line selected, 2 = input line selected, 0 = nothing selected in that
+			// input line
+			if(i<size)
+			if (InputAnd[row][column * 2]) {
+				val = '1';
+				dirty = true;
+			} else if (InputAnd[row][column * 2 + 1]) {
+				val = '2';
+				dirty = true;
+			} else
+				val = '0';
+			if (val == last)
+				count++;
+			else if (last == 'x') {
+				last = val;
+				count++;
+			}
+			if (val != last || i == size - 1) {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				if (val != last && i == size - 1)
+					data += val + " ";
+				count = 1;
+				last = val;
+
+			}
+		}
+	}
+
 	@Override
 	public ProgrammableGeneratorState clone() {
 		try {
@@ -63,8 +134,6 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		Insets empty = new Insets(0, 0, 0, 0);
 		// insets between states
 		Insets newstate = new Insets(5, 0, 10, 0);
-		// arrow font
-		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 		// state number font
 		Font state = new Font(Font.SANS_SERIF, Font.BOLD, 18);
 		JLabel up, down, statenumber, clock;
@@ -73,6 +142,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			statenumber = new JLabel(String.valueOf(i / 2 + 1));
 			statenumber.setFont(state);
 			statenumber.setForeground(Color.DARK_GRAY);
+			gbs.anchor = GridBagConstraints.EAST;
 			gbs.gridx = 0;
 			gbs.gridy = i;
 			// 2 rows height
@@ -83,8 +153,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			gbs.fill = GridBagConstraints.VERTICAL;
 			panel.add(statenumber, gbs);
 
-			up = new JLabel("↑ ");
-			up.setFont(font);
+			up = new JLabel(Strings.get("clockHighAttr") + ":  ");
 			gbs.gridx = 1;
 			gbs.gridy = i;
 			gbs.gridheight = 1;
@@ -97,16 +166,14 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			gbs.gridheight = 1;
 			panel.add(inputs[i], gbs);
 
-			clock = new JLabel(StringUtil.format(
+			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationHigh(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
-			up.setFont(font);
 			gbs.gridx = 3;
 			gbs.gridy = i;
 			gbs.gridheight = 1;
 			panel.add(clock, gbs);
 
-			down = new JLabel("↓ ");
-			down.setFont(font);
+			down = new JLabel(Strings.get("clockLowAttr") + ":  ");
 			gbs.gridx = 1;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
@@ -119,16 +186,15 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			gbs.insets = newstate;
 			panel.add(inputs[i + 1], gbs);
 
-			clock = new JLabel(StringUtil.format(
+			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationLow(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
-			up.setFont(font);
 			gbs.gridx = 3;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
 			panel.add(clock, gbs);
 		}
 		JScrollPane scrollable = new JScrollPane(panel);
-		scrollable.setPreferredSize(new Dimension(175, 300));
+		scrollable.setPreferredSize(new Dimension(300, 300));
 		scrollable.setBorder(null);
 
 		int option = JOptionPane.showOptionDialog(null, scrollable,
