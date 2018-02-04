@@ -51,7 +51,7 @@ This is an italian fork based on the original Logisim version.<br>
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
 * Solve dirty points when rotating
-* Programmable Generator (95% done)
+* Programmable Generator (99% done)
 * Buzzer (75% done)
 * Add a new type of library
 * Draw also in circuits

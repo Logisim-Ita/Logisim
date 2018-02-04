@@ -33,12 +33,12 @@ import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class PlaRom extends InstanceFactory {
-	static class ContentsAttribute extends Attribute<String> {
+	private static class ContentsAttribute extends Attribute<String> {
 		private InstanceState state = null;
 		private Instance instance = null;
 		private CircuitState circ = null;
 
-		public ContentsAttribute() {
+		private ContentsAttribute() {
 			super("Contents", Strings.getter("romContentsAttr"));
 		}
 
@@ -76,17 +76,17 @@ public class PlaRom extends InstanceFactory {
 		public String parse(String value) {
 			return value;
 		}
-
-		public void setData(Instance instance, CircuitState circ) {
+		
+		// i don't know other ways to do this, I'll try to change this when I'll know
+		// better Burch's code
+		void setData(Instance instance, CircuitState circ) {
 			if (!instance.equals(this.instance))
 				this.instance = instance;
 			if (!circ.equals(this.circ))
 				this.circ = circ;
 		}
 
-		// i don't know other ways to do this, I'll try to change this when I'll know
-		// better Burch's code
-		public void setData(InstanceState state) {
+		void setData(InstanceState state) {
 			if (!state.equals(this.state))
 				this.state = state;
 		}

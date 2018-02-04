@@ -3,11 +3,16 @@
 
 package com.cburch.logisim.std.wiring;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -21,6 +26,7 @@ import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
@@ -30,9 +36,125 @@ import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
-import com.cburch.logisim.util.GraphicsUtil;
 
 public class ProgrammableGenerator extends InstanceFactory {
+	private static class ContentsAttribute extends Attribute<String> {
+		private InstanceState state = null;
+		private Instance instance = null;
+		private CircuitState circ = null;
+		private Component comp = null;
+
+		private ContentsAttribute() {
+			super("Contents", Strings.getter("romContentsAttr"));
+		}
+
+		@Override
+		public java.awt.Component getCellEditor(Window source, String value) {
+			Project proj = null;
+			if (source instanceof Frame)
+				proj = ((Frame) source).getProject();
+			ProgrammableGeneratorState data = null;
+			if (this.state != null)
+				data = getState(state);
+			else if (this.instance != null && this.circ != null)
+				data = getState(instance, circ);
+			else if (this.comp != null && this.circ != null)
+				data = getState(comp, circ);
+			ContentsCell ret = new ContentsCell(data);
+			// call mouse click function and open edit window
+			ret.mouseClicked(null);
+			// if something changed
+			if (this.state != null && !data.getSavedData().equals(state.getAttributeValue(CONTENTS_ATTR))) {
+				state.fireInvalidated();
+				state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
+				if (proj != null)
+					proj.getLogisimFile().setDirty(true);
+			} else if (this.instance != null
+					&& !data.getSavedData().equals(instance.getAttributeValue(CONTENTS_ATTR))) {
+				instance.fireInvalidated();
+				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
+				if (proj != null)
+					proj.getLogisimFile().setDirty(true);
+			} else if (this.comp != null && this.circ != null
+					&& !data.getSavedData().equals(comp.getAttributeSet().getValue(CONTENTS_ATTR))) {
+				circ.getInstanceState(comp).fireInvalidated();
+				comp.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
+				if (proj != null)
+					proj.getLogisimFile().setDirty(true);
+			}
+			return ret;
+		}
+
+		@Override
+		public String parse(String value) {
+			return value;
+		}
+
+		// i don't know other ways to do this, I'll try to change this when I'll know
+		// better Burch's code
+		void setData(Instance instance, CircuitState circ) {
+			if (!instance.equals(this.instance))
+				this.instance = instance;
+			if (!circ.equals(this.circ))
+				this.circ = circ;
+		}
+
+		void setData(Component comp, CircuitState circ) {
+			if (!comp.equals(this.comp))
+				this.comp = comp;
+			if (!circ.equals(this.circ))
+				this.circ = circ;
+		}
+
+		void setData(InstanceState state) {
+			if (!state.equals(this.state))
+				this.state = state;
+		}
+
+		@Override
+		public String toDisplayString(String value) {
+			return Strings.get("romContentsValue");
+		}
+
+	}
+
+	public static class ContentsCell extends JLabel implements MouseListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -53754819096800664L;
+		private ProgrammableGeneratorState data;
+
+		ContentsCell(ProgrammableGeneratorState data) {
+			super(Strings.get("romContentsValue"));
+			this.data = data;
+			addMouseListener(this);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (data == null)
+				return;
+			data.editWindow();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+	}
+
 	public static class ClockLogger extends InstanceLogger {
 		@Override
 		public String getLogName(InstanceState state, Object option) {
@@ -58,11 +180,16 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			ProgrammableGeneratorState state = ProgrammableGenerator.getState(instance, circState);
+			ProgrammableGeneratorState data = ProgrammableGenerator.getState(instance, circState);
 			if (evt.getSource() == edit)
-				state.editWindow();
+				data.editWindow();
 			else if (evt.getSource() == reset)
-				state.clearValues();
+				data.clearValues();
+			if (!data.getSavedData().equals(instance.getAttributeValue(CONTENTS_ATTR))) {
+				instance.fireInvalidated();
+				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
+				circState.getProject().getLogisimFile().setDirty(true);
+			}
 		}
 
 		@Override
@@ -87,6 +214,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 	private static final Attribute<Integer> ATTR_NSTATE = Attributes.forIntegerRange("nState",
 			Strings.getter("NStateAttr"), 1, 32);
+	private static final ContentsAttribute CONTENTS_ATTR = new ContentsAttribute();
 
 	public static final ProgrammableGenerator FACTORY = new ProgrammableGenerator();
 
@@ -95,10 +223,15 @@ public class ProgrammableGenerator extends InstanceFactory {
 		int nstate = comp.getAttributeSet().getValue(ATTR_NSTATE);
 		if (ret == null) {
 			ret = new ProgrammableGeneratorState(nstate);
+			// if new, fill the content with the saved data
+			ret.decodeSavedData(comp.getAttributeSet().getValue(CONTENTS_ATTR));
 			circ.setData(comp, ret);
-		} else {
-			ret.updateSize(nstate);
+		} else if (ret.updateSize(nstate)) {
+			// if size updated, update the content attribute, written here because can't
+			// access PlaRomData object from instanceAttributeChanged method
+			comp.getAttributeSet().setValue(CONTENTS_ATTR, ret.getSavedData());
 		}
+		CONTENTS_ATTR.setData(comp, circ);
 		return ret;
 	}
 
@@ -107,10 +240,15 @@ public class ProgrammableGenerator extends InstanceFactory {
 		int nstate = state.getAttributeValue(ATTR_NSTATE);
 		if (ret == null) {
 			ret = new ProgrammableGeneratorState(nstate);
+			// if new, fill the content with the saved data
+			ret.decodeSavedData(state.getAttributeValue(CONTENTS_ATTR));
 			state.setData(circ, ret);
-		} else {
-			ret.updateSize(nstate);
+		} else if (ret.updateSize(nstate)) {
+			// if size updated, update the content attribute, written here because can't
+			// access PlaRomData object from instanceAttributeChanged method
+			state.getAttributeSet().setValue(CONTENTS_ATTR, ret.getSavedData());
 		}
+		CONTENTS_ATTR.setData(state, circ);
 		return ret;
 	}
 
@@ -119,10 +257,15 @@ public class ProgrammableGenerator extends InstanceFactory {
 		int nstate = state.getAttributeValue(ATTR_NSTATE);
 		if (ret == null) {
 			ret = new ProgrammableGeneratorState(nstate);
+			// if new, fill the content with the saved data
+			ret.decodeSavedData(state.getAttributeValue(CONTENTS_ATTR));
 			state.setData(ret);
-		} else {
-			ret.updateSize(nstate);
+		} else if (ret.updateSize(nstate)) {
+			// if size updated, update the content attribute, written here because can't
+			// access PlaRomData object from instanceAttributeChanged method
+			state.getAttributeSet().setValue(CONTENTS_ATTR, ret.getSavedData());
 		}
+		CONTENTS_ATTR.setData(state);
 		return ret;
 	}
 
@@ -148,9 +291,9 @@ public class ProgrammableGenerator extends InstanceFactory {
 		super("ProgrammableGenerator", Strings.getter("ProgrammableGeneratorComponent"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, ATTR_NSTATE, StdAttr.LABEL, Pin.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-						StdAttr.ATTR_LABEL_COLOR },
+						StdAttr.ATTR_LABEL_COLOR, CONTENTS_ATTR },
 				new Object[] { Direction.EAST, Integer.valueOf(4), "", Direction.WEST, StdAttr.DEFAULT_LABEL_FONT,
-						Color.BLACK });
+						Color.BLACK, "" });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
 		setIconName("programmablegenerator.gif");
@@ -200,7 +343,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
-		Graphics g = painter.getGraphics();
+		Graphics2D g = (Graphics2D) painter.getGraphics();
 		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
@@ -217,6 +360,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 			drawUp = true;
 		}
 		g.setColor(Color.WHITE);
+		g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		x += 10;
 		y += 10;
 		int[] xs = { x + 1, x + 1, x + 4, x + 4, x + 7, x + 7 };
@@ -227,9 +371,9 @@ public class ProgrammableGenerator extends InstanceFactory {
 			ys = new int[] { y + 5, y + 7, y + 7, y + 3, y + 3, y + 5 };
 		}
 		g.drawPolyline(xs, ys, xs.length);
-		GraphicsUtil.switchToWidth(g, 2);
-		xs = new int[] { x - 6, x - 6, x + 1, x + 1, x - 5 };
-		ys = new int[] { y + 6, y - 6, y - 6, y, y };
+		g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		xs = new int[] { x - 5, x - 5, x + 1, x + 1, x - 4 };
+		ys = new int[] { y + 5, y - 5, y - 5, y, y };
 		g.drawPolyline(xs, ys, xs.length);
 		painter.drawPorts();
 	}

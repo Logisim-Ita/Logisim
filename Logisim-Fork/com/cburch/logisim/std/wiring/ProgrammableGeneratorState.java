@@ -23,6 +23,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	Value sending = Value.FALSE;
 	private int[] durationHigh;
 	private int[] durationLow;
+	private String SavedData = "";
 	// number of clock ticks performed in the current state
 	private int ticks, currentstate;
 	private JTextField[] inputs;
@@ -41,11 +42,21 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			durationHigh[i] = 1;
 			durationLow[i] = 1;
 		}
+		this.SavedData = "";
+	}
+
+	@Override
+	public ProgrammableGeneratorState clone() {
+		try {
+			return (ProgrammableGeneratorState) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
 	}
 
 	public void decodeSavedData(String s) {
 		// if empty, all to false so don't do anything
-		if (s == null || s == "")
+		if (s == null || s.equals(""))
 			return;
 		// split the attribute content string in an array of strings with a single
 		// information each one
@@ -66,60 +77,6 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 				writeData(value, cnt);
 				cnt++;
 			}
-		}
-	}
-
-	private void writeData(int value, int cnt) {
-		if (cnt < this.durationHigh.length)
-			setdurationHigh(cnt, value);
-		else
-			setdurationLow(cnt - this.durationHigh.length, value);
-	}
-	public void SaveData() {
-		int size = this.durationHigh.length+this.durationLow.length, count = 0;
-		char val, last = 'x';
-		boolean dirty = false;
-		String data = "";
-		// input-and matrix
-		for (int i = 0; i < size; i++) {
-			// 1= not line selected, 2 = input line selected, 0 = nothing selected in that
-			// input line
-			if(i<size)
-			if (InputAnd[row][column * 2]) {
-				val = '1';
-				dirty = true;
-			} else if (InputAnd[row][column * 2 + 1]) {
-				val = '2';
-				dirty = true;
-			} else
-				val = '0';
-			if (val == last)
-				count++;
-			else if (last == 'x') {
-				last = val;
-				count++;
-			}
-			if (val != last || i == size - 1) {
-				if (count >= 3)
-					data += last + "*" + count + " ";
-				else
-					for (int j = 0; j < count; j++)
-						data += last + " ";
-				if (val != last && i == size - 1)
-					data += val + " ";
-				count = 1;
-				last = val;
-
-			}
-		}
-	}
-
-	@Override
-	public ProgrammableGeneratorState clone() {
-		try {
-			return (ProgrammableGeneratorState) super.clone();
-		} catch (CloneNotSupportedException e) {
-			return null;
 		}
 	}
 
@@ -148,7 +105,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			// 2 rows height
 			gbs.gridheight = 2;
 			// x padding
-			gbs.ipadx = 10;
+			gbs.ipadx = 20;
 			gbs.insets = empty;
 			gbs.fill = GridBagConstraints.VERTICAL;
 			panel.add(statenumber, gbs);
@@ -168,12 +125,14 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 
 			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationHigh(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
+			gbs.anchor = GridBagConstraints.WEST;
 			gbs.gridx = 3;
 			gbs.gridy = i;
 			gbs.gridheight = 1;
 			panel.add(clock, gbs);
 
 			down = new JLabel(Strings.get("clockLowAttr") + ":  ");
+			gbs.anchor = GridBagConstraints.EAST;
 			gbs.gridx = 1;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
@@ -188,21 +147,23 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 
 			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationLow(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
+			gbs.anchor = GridBagConstraints.WEST;
 			gbs.gridx = 3;
 			gbs.gridy = i + 1;
 			gbs.gridheight = 1;
 			panel.add(clock, gbs);
 		}
 		JScrollPane scrollable = new JScrollPane(panel);
-		scrollable.setPreferredSize(new Dimension(300, 300));
+		scrollable.setPreferredSize(new Dimension(350, 300));
 		scrollable.setBorder(null);
 
 		int option = JOptionPane.showOptionDialog(null, scrollable,
 				Strings.getter("ProgrammableGeneratorComponent").get(), JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, null, options, null);
-		if (option == 0)
+		if (option == 0) {
 			SaveValues(inputs);
-		else if (option == 1)
+			SaveData();
+		} else if (option == 1)
 			clearValues();
 	}
 
@@ -222,6 +183,11 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		return this.durationLow[this.currentstate];
 	}
 
+	public String getSavedData() {
+		// return the string to save in the .circ
+		return SavedData;
+	}
+
 	public int getStateTick() {
 		return this.ticks;
 	}
@@ -237,6 +203,43 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		this.ticks++;
 		if (this.ticks > getdurationHighValue() + getdurationLowValue())
 			incrementCurrentState();
+	}
+
+	public void SaveData() {
+		int size = this.durationHigh.length + this.durationLow.length, count = 0;
+		String val, data = "", last = "x";
+		boolean dirty = false;
+		// input-and matrix
+		for (int i = 0; i < size; i++) {
+			// 1= not line selected, 2 = input line selected, 0 = nothing selected in that
+			// input line
+			if (i < this.durationHigh.length)
+				val = String.valueOf(getdurationHigh(i));
+			else
+				val = String.valueOf(getdurationLow(i - this.durationHigh.length));
+			if (!dirty && !val.equals("1"))
+				dirty = true;
+			if (val.equals(last))
+				count++;
+			else if (last.equals("x")) {
+				last = val;
+				count++;
+			}
+			if (!val.equals(last) || i == size - 1) {
+				if (count >= 3)
+					data += last + "*" + count + " ";
+				else
+					for (int j = 0; j < count; j++)
+						data += last + " ";
+				if (!val.equals(last) && i == size - 1)
+					data += val + " ";
+				count = 1;
+				last = val;
+			}
+		}
+		if (!dirty)
+			data = "";
+		this.SavedData = data;
 	}
 
 	private void SaveValues(JTextField[] inputs) {
@@ -272,7 +275,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			this.durationLow[i] = value;
 	}
 
-	public void updateSize(int newsize) {
+	public boolean updateSize(int newsize) {
 		if (newsize != this.durationHigh.length) {
 			// update arrays size maintaining values
 			int[] oldDurationHigh = Arrays.copyOf(durationHigh, durationHigh.length);
@@ -285,6 +288,16 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 				durationHigh[i] = oldDurationHigh[i];
 				durationLow[i] = oldDurationLow[i];
 			}
+			SaveData();
+			return true;
 		}
+		return false;
+	}
+
+	private void writeData(int value, int cnt) {
+		if (cnt < this.durationHigh.length)
+			setdurationHigh(cnt, value);
+		else if (cnt < this.durationHigh.length + this.durationLow.length)
+			setdurationLow(cnt - this.durationHigh.length, value);
 	}
 }
