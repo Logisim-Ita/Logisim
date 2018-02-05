@@ -3,7 +3,6 @@
 
 package com.cburch.logisim.std.wiring;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Window;
@@ -31,13 +30,29 @@ import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstancePainter;
+import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
+import com.cburch.logisim.util.GraphicsUtil;
 
 public class ProgrammableGenerator extends InstanceFactory {
+	public static class ClockLogger extends InstanceLogger {
+		@Override
+		public String getLogName(InstanceState state, Object option) {
+			return state.getAttributeValue(StdAttr.LABEL);
+		}
+
+		@Override
+		public Value getLogValue(InstanceState state, Object option) {
+			// send current value to log window
+			ProgrammableGeneratorState s = getState(state);
+			return s.sending;
+		}
+	}
+
 	private static class ContentsAttribute extends Attribute<String> {
 		private InstanceState state = null;
 		private Instance instance = null;
@@ -63,7 +78,8 @@ public class ProgrammableGenerator extends InstanceFactory {
 			ContentsCell ret = new ContentsCell(data);
 			// call mouse click function and open edit window
 			ret.mouseClicked(null);
-			// if something changed
+			// if something changed change the attribute value using the first different
+			// from null
 			if (this.state != null && !data.getSavedData().equals(state.getAttributeValue(CONTENTS_ATTR))) {
 				state.fireInvalidated();
 				state.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
@@ -90,18 +106,19 @@ public class ProgrammableGenerator extends InstanceFactory {
 			return value;
 		}
 
-		// i don't know other ways to do this, I'll try to change this when I'll know
-		// better Burch's code
-		void setData(Instance instance, CircuitState circ) {
-			if (!instance.equals(this.instance))
-				this.instance = instance;
+		void setData(Component comp, CircuitState circ) {
+			if (!comp.equals(this.comp))
+				this.comp = comp;
 			if (!circ.equals(this.circ))
 				this.circ = circ;
 		}
 
-		void setData(Component comp, CircuitState circ) {
-			if (!comp.equals(this.comp))
-				this.comp = comp;
+		// i don't know other ways to do this, I'll try to change this when I'll know
+		// better Burch's code. Save these variables so I can change the contents
+		// attribute and get the component's data
+		void setData(Instance instance, CircuitState circ) {
+			if (!instance.equals(this.instance))
+				this.instance = instance;
 			if (!circ.equals(this.circ))
 				this.circ = circ;
 		}
@@ -133,6 +150,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			// open edit window when attribute clicked
 			if (data == null)
 				return;
 			data.editWindow();
@@ -155,16 +173,23 @@ public class ProgrammableGenerator extends InstanceFactory {
 		}
 	}
 
-	public static class ClockLogger extends InstanceLogger {
+	public static class Poker extends InstancePoker {
 		@Override
-		public String getLogName(InstanceState state, Object option) {
-			return state.getAttributeValue(StdAttr.LABEL);
-		}
-
-		@Override
-		public Value getLogValue(InstanceState state, Object option) {
-			ProgrammableGeneratorState s = getState(state);
-			return s.sending;
+		public void mouseReleased(InstanceState state, MouseEvent e) {
+			// click on component with poke tool
+			// get component data
+			ProgrammableGeneratorState data = getState(state);
+			// increment ticks so you can use it step by step
+			data.incrementTicks();
+			int durationHigh = data.getdurationHighValue();
+			int statetick = data.getStateTick();
+			// set the next value
+			Value desired = (statetick - 1 < durationHigh ? Value.TRUE : Value.FALSE);
+			if (!data.sending.equals(desired)) {
+				data.sending = desired;
+				// set state as dirty
+				state.fireInvalidated();
+			}
 		}
 	}
 
@@ -180,11 +205,13 @@ public class ProgrammableGenerator extends InstanceFactory {
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
+			// when you click a jmenuitem after a right click on component
 			ProgrammableGeneratorState data = ProgrammableGenerator.getState(instance, circState);
 			if (evt.getSource() == edit)
 				data.editWindow();
 			else if (evt.getSource() == reset)
 				data.clearValues();
+			// set .circ to save
 			if (!data.getSavedData().equals(instance.getAttributeValue(CONTENTS_ATTR))) {
 				instance.fireInvalidated();
 				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
@@ -296,6 +323,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 						Color.BLACK, "" });
 		setFacingAttribute(StdAttr.FACING);
 		setInstanceLogger(ClockLogger.class);
+		setInstancePoker(Poker.class);
 		setIconName("programmablegenerator.gif");
 	}
 
@@ -360,7 +388,6 @@ public class ProgrammableGenerator extends InstanceFactory {
 			drawUp = true;
 		}
 		g.setColor(Color.WHITE);
-		g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		x += 10;
 		y += 10;
 		int[] xs = { x + 1, x + 1, x + 4, x + 4, x + 7, x + 7 };
@@ -371,7 +398,7 @@ public class ProgrammableGenerator extends InstanceFactory {
 			ys = new int[] { y + 5, y + 7, y + 7, y + 3, y + 3, y + 5 };
 		}
 		g.drawPolyline(xs, ys, xs.length);
-		g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		GraphicsUtil.switchToWidth(g, 2);
 		xs = new int[] { x - 5, x - 5, x + 1, x + 1, x - 4 };
 		ys = new int[] { y + 5, y - 5, y - 5, y, y };
 		g.drawPolyline(xs, ys, xs.length);

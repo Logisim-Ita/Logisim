@@ -125,7 +125,7 @@ public class GraphicsUtil {
 	static public void switchToWidth(Graphics g, float width) {
 		if (g instanceof Graphics2D) {
 			Graphics2D g2 = (Graphics2D) g;
-			g2.setStroke(new BasicStroke(width));
+			g2.setStroke(new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		}
 	}
 

@@ -153,7 +153,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		// draw clock edge lines if not disabled
 		if (painter.getAttributeValue(VERT_LINE) != NO) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
-			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
 					new float[] { 6.0f, 4.0f }, 8.0f));
 			for (int j = 1; j < length; j++) {
 				// rising or both || falling or both
@@ -172,7 +172,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		for (int i = 0; i < inputs; i++) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker().darker().darker());
 			// horizontal line
-			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+			GraphicsUtil.switchToWidth(g, 0.5f);
 			g.drawLine(x + border, y + border + i * 30 + 30 + showclock * 2, x + border + 15 * length + 4,
 					y + border + i * 30 + 30 + showclock * 2);
 

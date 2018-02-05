@@ -196,7 +196,7 @@ public class Caret {
 
 	private static Color SELECT_COLOR = new Color(192, 192, 255);
 
-	private static final Stroke CURSOR_STROKE = new BasicStroke(2.0f);
+	private static final Stroke CURSOR_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 
 	private HexEditor hex;
 	private ArrayList<ChangeListener> listeners;

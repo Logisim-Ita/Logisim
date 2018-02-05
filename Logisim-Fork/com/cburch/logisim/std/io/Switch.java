@@ -3,9 +3,8 @@
 
 package com.cburch.logisim.std.io;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.circuit.Wire;
@@ -169,8 +168,7 @@ public class Switch extends InstanceFactory {
 			color = new Color(hue, hue, hue);
 		}
 
-		Graphics2D g = (Graphics2D) painter.getGraphics();
-		g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		Graphics g = painter.getGraphics();
 		if (active) { // case true output
 			if (facing == Direction.NORTH || facing == Direction.WEST) {
 				Location p = painter.getLocation();

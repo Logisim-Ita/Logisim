@@ -76,7 +76,7 @@ public class PlaRom extends InstanceFactory {
 		public String parse(String value) {
 			return value;
 		}
-		
+
 		// i don't know other ways to do this, I'll try to change this when I'll know
 		// better Burch's code
 		void setData(Instance instance, CircuitState circ) {
