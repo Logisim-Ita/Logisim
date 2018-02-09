@@ -9,6 +9,7 @@ import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
 import com.cburch.draw.toolbar.ToolbarSeparator;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.UnmodifiableList;
 
 class ExplorerToolbarModel extends AbstractToolbarModel implements MenuListener.EnabledListener {
@@ -31,8 +32,10 @@ class ExplorerToolbarModel extends AbstractToolbarModel implements MenuListener.
 		itemAppearance = new LogisimToolbarItem(menu, "projapp.gif", LogisimMenuBar.EDIT_APPEARANCE,
 				Strings.getter("projectEditAppearanceTip"));
 
-		items = UnmodifiableList.create(new ToolbarItem[] { itemToolbox, itemSimulation, new ToolbarSeparator(4),
-				itemLayout, itemAppearance, });
+		items = UnmodifiableList
+				.create((AppPreferences.NEW_TOOLBAR.getBoolean()) ? new ToolbarItem[] { itemLayout, itemAppearance, }
+						: new ToolbarItem[] { itemToolbox, itemSimulation, new ToolbarSeparator(4), itemLayout,
+								itemAppearance, });
 
 		menu.addEnabledListener(this);
 	}

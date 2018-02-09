@@ -119,6 +119,12 @@ public class Frame extends LFrame implements LocaleListener {
 		public void propertyChange(PropertyChangeEvent event) {
 			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
 				placeToolbar();
+			} else if (AppPreferences.NEW_TOOLBAR.isSource(event)) {
+				explPanel.remove(projectToolbar);
+				ToolbarModel projectToolbarModel = new ExplorerToolbarModel(proj.getFrame(), menuListener);
+				projectToolbar = new Toolbar(projectToolbarModel);
+				explPanel.add(projectToolbar, BorderLayout.NORTH);
+				explPanel.validate();
 			}
 		}
 
@@ -236,7 +242,7 @@ public class Frame extends LFrame implements LocaleListener {
 	private Toolbar toolbar;
 	private HorizontalSplitPane leftRegion;
 	private VerticalSplitPane mainRegion;
-	private JPanel mainPanelSuper;
+	private JPanel mainPanelSuper, explPanel;
 	private CardPanel mainPanel;
 	// left-side elements
 	private Toolbar projectToolbar;
@@ -310,7 +316,7 @@ public class Frame extends LFrame implements LocaleListener {
 		// set up the contents, split down the middle, with the canvas
 		// on the right and a split pane on the left containing the
 		// explorer and attribute values.
-		JPanel explPanel = new JPanel(new BorderLayout());
+		explPanel = new JPanel(new BorderLayout());
 		explPanel.add(projectToolbar, BorderLayout.NORTH);
 		explPanel.add(explorerPane, BorderLayout.CENTER);
 		JPanel attrPanel = new JPanel(new BorderLayout());
@@ -343,6 +349,7 @@ public class Frame extends LFrame implements LocaleListener {
 		mainPanel.addChangeListener(myProjectListener);
 		explorerPane.addChangeListener(myProjectListener);
 		AppPreferences.TOOLBAR_PLACEMENT.addPropertyChangeListener(myProjectListener);
+		AppPreferences.NEW_TOOLBAR.addPropertyChangeListener(myProjectListener);
 		placeToolbar();
 		((MenuListener.EnabledListener) projectToolbarModel).menuEnableChanged(menuListener);
 
@@ -439,7 +446,6 @@ public class Frame extends LFrame implements LocaleListener {
 						value = BorderLayout.NORTH;
 				}
 			}
-
 			contents.add(toolbar, value);
 			boolean vertical = value == BorderLayout.WEST || value == BorderLayout.EAST;
 			toolbar.setOrientation(vertical ? Toolbar.VERTICAL : Toolbar.HORIZONTAL);
