@@ -10,17 +10,21 @@ import javax.swing.event.ChangeListener;
 
 import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
+import com.cburch.draw.toolbar.ToolbarSeparator;
 import com.cburch.logisim.circuit.Simulator;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.UnmodifiableList;
 
-class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListener {
+class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListener, MenuListener.EnabledListener {
 	private Project project;
 	private LogisimToolbarItem simEnable;
 	private LogisimToolbarItem simStep;
 	private LogisimToolbarItem tickEnable;
 	private LogisimToolbarItem tickStep;
+	private LogisimToolbarItem itemLayout;
+	private LogisimToolbarItem itemAppearance;
 	private List<ToolbarItem> items;
 
 	public SimulationToolbarModel(Project project, MenuListener menu) {
@@ -34,9 +38,17 @@ class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListe
 				Strings.getter("simulateEnableTicksTip"));
 		tickStep = new LogisimToolbarItem(menu, "simtstep.png", LogisimMenuBar.TICK_STEP,
 				Strings.getter("simulateTickTip"));
+		itemLayout = new LogisimToolbarItem(menu, "projlayo.gif", LogisimMenuBar.EDIT_LAYOUT,
+				Strings.getter("projectEditLayoutTip"));
+		itemAppearance = new LogisimToolbarItem(menu, "projapp.gif", LogisimMenuBar.EDIT_APPEARANCE,
+				Strings.getter("projectEditAppearanceTip"));
 
-		items = UnmodifiableList.create(new ToolbarItem[] { simEnable, simStep, tickEnable, tickStep, });
+		items = UnmodifiableList.create(AppPreferences.NEW_TOOLBAR.getBoolean()
+				? new ToolbarItem[] { simEnable, simStep, tickEnable, tickStep, new ToolbarSeparator(4), itemLayout,
+						itemAppearance, }
+				: new ToolbarItem[] { simEnable, simStep, tickEnable, tickStep, });
 
+		menu.addEnabledListener(this);
 		menu.getMenuBar().addEnableListener(this);
 		stateChanged(null);
 	}
@@ -48,7 +60,13 @@ class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListe
 
 	@Override
 	public boolean isSelected(ToolbarItem item) {
-		return false;
+		if (item == itemLayout) {
+			return project.getFrame().getEditorView().equals(Frame.EDIT_LAYOUT);
+		} else if (item == itemAppearance) {
+			return project.getFrame().getEditorView().equals(Frame.EDIT_APPEARANCE);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -72,6 +90,11 @@ class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListe
 		tickEnable.setIcon(ticking ? "simtstop.png" : "simtplay.png");
 		tickEnable.setToolTip(
 				ticking ? Strings.getter("simulateDisableTicksTip") : Strings.getter("simulateEnableTicksTip"));
+		fireToolbarAppearanceChanged();
+	}
+
+	@Override
+	public void menuEnableChanged(MenuListener source) {
 		fireToolbarAppearanceChanged();
 	}
 }

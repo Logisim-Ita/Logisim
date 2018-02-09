@@ -120,11 +120,26 @@ public class Frame extends LFrame implements LocaleListener {
 			if (AppPreferences.TOOLBAR_PLACEMENT.isSource(event)) {
 				placeToolbar();
 			} else if (AppPreferences.NEW_TOOLBAR.isSource(event)) {
-				explPanel.remove(projectToolbar);
-				ToolbarModel projectToolbarModel = new ExplorerToolbarModel(proj.getFrame(), menuListener);
-				projectToolbar = new Toolbar(projectToolbarModel);
-				explPanel.add(projectToolbar, BorderLayout.NORTH);
+				// remove a toolbar row
+				if (AppPreferences.NEW_TOOLBAR.getBoolean())
+					explPanel.remove(projectToolbar);
+				//add the old toolbar row
+				else
+					explPanel.add(projectToolbar, BorderLayout.NORTH);
 				explPanel.validate();
+				//save the old view (simulation/explorer)
+				String oldview = explorerPane.getView();
+				//recreate all with lower toolbar row updated
+				explorerPane.remove(toolbox);
+				explorerPane.remove(simExplorer);
+				toolbox = new Toolbox(proj.getFrame(), proj, menuListener);
+				simExplorer = new SimulationExplorer(proj, menuListener);
+				explorerPane.addView(VIEW_TOOLBOX, toolbox);
+				explorerPane.addView(VIEW_SIMULATION, simExplorer);
+				//set old view
+				explorerPane.setView(oldview);
+				//update components
+				explorerPane.validate();
 			}
 		}
 
@@ -295,7 +310,7 @@ public class Frame extends LFrame implements LocaleListener {
 		// set up the left-side components
 		ToolbarModel projectToolbarModel = new ExplorerToolbarModel(this, menuListener);
 		projectToolbar = new Toolbar(projectToolbarModel);
-		toolbox = new Toolbox(proj, menuListener);
+		toolbox = new Toolbox(this, proj, menuListener);
 		simExplorer = new SimulationExplorer(proj, menuListener);
 		explorerPane = new CardPanel();
 		explorerPane.addView(VIEW_TOOLBOX, toolbox);
@@ -317,7 +332,8 @@ public class Frame extends LFrame implements LocaleListener {
 		// on the right and a split pane on the left containing the
 		// explorer and attribute values.
 		explPanel = new JPanel(new BorderLayout());
-		explPanel.add(projectToolbar, BorderLayout.NORTH);
+		if (!AppPreferences.NEW_TOOLBAR.getBoolean())
+			explPanel.add(projectToolbar, BorderLayout.NORTH);
 		explPanel.add(explorerPane, BorderLayout.CENTER);
 		JPanel attrPanel = new JPanel(new BorderLayout());
 		attrPanel.add(attrTable, BorderLayout.CENTER);

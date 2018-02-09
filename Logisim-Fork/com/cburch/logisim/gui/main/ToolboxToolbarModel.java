@@ -7,17 +7,23 @@ import java.util.List;
 
 import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
+import com.cburch.draw.toolbar.ToolbarSeparator;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
+import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.UnmodifiableList;
 
 class ToolboxToolbarModel extends AbstractToolbarModel implements MenuListener.EnabledListener {
+	private Frame frame;
 	private LogisimToolbarItem itemAdd;
 	private LogisimToolbarItem itemUp;
 	private LogisimToolbarItem itemDown;
 	private LogisimToolbarItem itemDelete;
+	private LogisimToolbarItem itemLayout;
+	private LogisimToolbarItem itemAppearance;
 	private List<ToolbarItem> items;
 
-	public ToolboxToolbarModel(MenuListener menu) {
+	public ToolboxToolbarModel(Frame frame, MenuListener menu) {
+		this.frame = frame;
 		itemAdd = new LogisimToolbarItem(menu, "projadd.gif", LogisimMenuBar.ADD_CIRCUIT,
 				Strings.getter("projectAddCircuitTip"));
 		itemUp = new LogisimToolbarItem(menu, "projup.gif", LogisimMenuBar.MOVE_CIRCUIT_UP,
@@ -26,8 +32,15 @@ class ToolboxToolbarModel extends AbstractToolbarModel implements MenuListener.E
 				Strings.getter("projectMoveCircuitDownTip"));
 		itemDelete = new LogisimToolbarItem(menu, "projdel.gif", LogisimMenuBar.REMOVE_CIRCUIT,
 				Strings.getter("projectRemoveCircuitTip"));
+		itemLayout = new LogisimToolbarItem(menu, "projlayo.gif", LogisimMenuBar.EDIT_LAYOUT,
+				Strings.getter("projectEditLayoutTip"));
+		itemAppearance = new LogisimToolbarItem(menu, "projapp.gif", LogisimMenuBar.EDIT_APPEARANCE,
+				Strings.getter("projectEditAppearanceTip"));
 
-		items = UnmodifiableList.create(new ToolbarItem[] { itemAdd, itemUp, itemDown, itemDelete, });
+		items = UnmodifiableList.create(AppPreferences.NEW_TOOLBAR.getBoolean()
+				? new ToolbarItem[] { itemAdd, itemUp, itemDown, itemDelete, new ToolbarSeparator(4), itemLayout,
+						itemAppearance, }
+				: new ToolbarItem[] { itemAdd, itemUp, itemDown, itemDelete });
 
 		menu.addEnabledListener(this);
 	}
@@ -39,7 +52,13 @@ class ToolboxToolbarModel extends AbstractToolbarModel implements MenuListener.E
 
 	@Override
 	public boolean isSelected(ToolbarItem item) {
-		return false;
+		if (item == itemLayout) {
+			return frame.getEditorView().equals(Frame.EDIT_LAYOUT);
+		} else if (item == itemAppearance) {
+			return frame.getEditorView().equals(Frame.EDIT_APPEARANCE);
+		} else {
+			return false;
+		}
 	}
 
 	@Override

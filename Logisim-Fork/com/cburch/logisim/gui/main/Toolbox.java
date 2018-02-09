@@ -19,10 +19,10 @@ class Toolbox extends JPanel {
 	private static final long serialVersionUID = 5713124867071121331L;
 	private ProjectExplorer toolbox;
 
-	Toolbox(Project proj, MenuListener menu) {
+	Toolbox(Frame frame, Project proj, MenuListener menu) {
 		super(new BorderLayout());
 
-		ToolboxToolbarModel toolbarModel = new ToolboxToolbarModel(menu);
+		ToolboxToolbarModel toolbarModel = new ToolboxToolbarModel(frame, menu);
 		Toolbar toolbar = new Toolbar(toolbarModel);
 		add(toolbar, BorderLayout.NORTH);
 

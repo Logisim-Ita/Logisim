@@ -199,7 +199,7 @@ public class AppPreferences {
 	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(
 			new PrefMonitorBoolean("FillComponentBackground", true));
 	public static final PrefMonitor<Boolean> SEND_DATA = create(new PrefMonitorBoolean("SendLogisimUsageData", true));
-	public static final PrefMonitor<Boolean> NEW_TOOLBAR = create(new PrefMonitorBoolean("UseNewToolbar", true));
+	public static final PrefMonitor<Boolean> NEW_TOOLBAR = create(new PrefMonitorBoolean("UseSimpleToolbar", true));
 	public static final String ALWAYS = "Always";
 	public static final String ASKME = "Ask Me";
 	public static final String NO = "No";
