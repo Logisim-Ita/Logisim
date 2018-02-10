@@ -123,22 +123,22 @@ public class Frame extends LFrame implements LocaleListener {
 				// remove a toolbar row
 				if (AppPreferences.NEW_TOOLBAR.getBoolean())
 					explPanel.remove(projectToolbar);
-				//add the old toolbar row
+				// add the old toolbar row
 				else
 					explPanel.add(projectToolbar, BorderLayout.NORTH);
 				explPanel.validate();
-				//save the old view (simulation/explorer)
+				// save the old view (simulation/explorer)
 				String oldview = explorerPane.getView();
-				//recreate all with lower toolbar row updated
+				// recreate all with lower toolbar row updated
 				explorerPane.remove(toolbox);
 				explorerPane.remove(simExplorer);
 				toolbox = new Toolbox(proj.getFrame(), proj, menuListener);
 				simExplorer = new SimulationExplorer(proj, menuListener);
 				explorerPane.addView(VIEW_TOOLBOX, toolbox);
 				explorerPane.addView(VIEW_SIMULATION, simExplorer);
-				//set old view
+				// set old view
 				explorerPane.setView(oldview);
-				//update components
+				// update components
 				explorerPane.validate();
 			}
 		}

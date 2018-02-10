@@ -12,6 +12,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Autoupdates!
 * Compiled with Java 9
 * New components:
+	* Wiring->Programmable Generator
 	* TTL gates (7400, 7402, 7404, 7408, 7432, 7447, 7485, 7486, 74165, 74283, 747266)
 	* I/O->Digital Oscilloscope
 	* I/O->Switch

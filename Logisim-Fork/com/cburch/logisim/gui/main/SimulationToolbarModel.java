@@ -76,6 +76,11 @@ class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListe
 		}
 	}
 
+	@Override
+	public void menuEnableChanged(MenuListener source) {
+		fireToolbarAppearanceChanged();
+	}
+
 	//
 	// ChangeListener methods
 	//
@@ -90,11 +95,6 @@ class SimulationToolbarModel extends AbstractToolbarModel implements ChangeListe
 		tickEnable.setIcon(ticking ? "simtstop.png" : "simtplay.png");
 		tickEnable.setToolTip(
 				ticking ? Strings.getter("simulateDisableTicksTip") : Strings.getter("simulateEnableTicksTip"));
-		fireToolbarAppearanceChanged();
-	}
-
-	@Override
-	public void menuEnableChanged(MenuListener source) {
 		fireToolbarAppearanceChanged();
 	}
 }
