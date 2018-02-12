@@ -958,6 +958,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		}
 	}
 
+	public Rectangle getViewableRectangle() {
+		Rectangle r = canvasPane.getViewport().getViewRect();
+		double zoom = getZoomFactor();
+		return new Rectangle((int) Math.round(r.x / zoom), (int) Math.round(r.y / zoom),
+				(int) Math.round(r.width / zoom), (int) Math.round(r.height / zoom));
+	}
+
 	boolean isPopupMenuUp() {
 		return myListener.menu_on;
 	}

@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
@@ -68,18 +69,32 @@ public class PokeTool extends Tool {
 			}
 
 			FontMetrics fm = g.getFontMetrics();
-			g.setColor(caretColor);
-			g.fillRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, fm.getAscent() + fm.getDescent() + 4);
-			g.setColor(Color.BLACK);
-			g.drawRect(x + 2, y + 2, fm.stringWidth(vStr) + 4, fm.getAscent() + fm.getDescent() + 4);
-			g.fillOval(x - 2, y - 2, 5, 5);
-			g.drawString(vStr, x + 4, y + 4 + fm.getAscent());
+			Rectangle r = canvas.getViewableRectangle();
+			g.fillOval(x - 2, y - 2, 4, 4);
+			g.setColor(Color.WHITE);
+			if (r.x + r.width - x - fm.stringWidth(vStr) - 4 > x - r.x - fm.stringWidth(vStr) - 4) {
+				// left oriented
+				int[] xPoints = { x, x, x + 4 + fm.stringWidth(vStr), x + 4 + fm.stringWidth(vStr), x + 3 };
+				int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(), y + 8 + fm.getAscent() + fm.getDescent(),
+						y + 6, y + 6 };
+				g.fillPolygon(xPoints, yPoints, 5);
+				g.setColor(Color.BLACK);
+				g.drawPolygon(xPoints, yPoints, 5);
+				g.drawString(vStr, x + 2, y + 7 + fm.getAscent());
+			} else {
+				// right oriented
+				int[] xPoints = { x, x, x - 4 - fm.stringWidth(vStr), x - 4 - fm.stringWidth(vStr), x - 3 };
+				int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(), y + 8 + fm.getAscent() + fm.getDescent(),
+						y + 6, y + 6 };
+				g.fillPolygon(xPoints, yPoints, 5);
+				g.setColor(Color.BLACK);
+				g.drawPolygon(xPoints, yPoints, 5);
+				g.drawString(vStr, x - 2 - fm.stringWidth(vStr), y + 7 + fm.getAscent());
+			}
 		}
 	}
 
 	private static final Icon toolIcon = Icons.getIcon("poke.gif");
-
-	private static final Color caretColor = new Color(255, 255, 150);
 
 	private static final Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 	private static final Cursor move = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
