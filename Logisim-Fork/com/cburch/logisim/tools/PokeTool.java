@@ -72,24 +72,49 @@ public class PokeTool extends Tool {
 			Rectangle r = canvas.getViewableRectangle();
 			g.fillOval(x - 2, y - 2, 4, 4);
 			g.setColor(Color.WHITE);
-			if (r.x + r.width - x - fm.stringWidth(vStr) - 4 > x - r.x - fm.stringWidth(vStr) - 4) {
+			boolean left = r.x + r.width - x - fm.stringWidth(vStr) - 4 > x - r.x - fm.stringWidth(vStr) - 4;
+			boolean up = r.y + r.height - y - fm.getAscent() - fm.getDescent() - 4 > y - r.y - fm.getAscent()
+					- fm.getDescent() - 4;
+			if (left) {
 				// left oriented
 				int[] xPoints = { x, x, x + 4 + fm.stringWidth(vStr), x + 4 + fm.stringWidth(vStr), x + 3 };
-				int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(), y + 8 + fm.getAscent() + fm.getDescent(),
-						y + 6, y + 6 };
-				g.fillPolygon(xPoints, yPoints, 5);
-				g.setColor(Color.BLACK);
-				g.drawPolygon(xPoints, yPoints, 5);
-				g.drawString(vStr, x + 2, y + 7 + fm.getAscent());
+				if (up) {
+					// number above the mouse
+					int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(),
+							y + 8 + fm.getAscent() + fm.getDescent(), y + 6, y + 6 };
+					g.fillPolygon(xPoints, yPoints, 5);
+					g.setColor(Color.BLACK);
+					g.drawPolygon(xPoints, yPoints, 5);
+					g.drawString(vStr, x + 2, y + 7 + fm.getAscent());
+				} else {
+					// number below the mouse
+					int[] yPoints = { y, y - 8 - fm.getAscent() - fm.getDescent(),
+							y - 8 - fm.getAscent() - fm.getDescent(), y - 6, y - 6 };
+					g.fillPolygon(xPoints, yPoints, 5);
+					g.setColor(Color.BLACK);
+					g.drawPolygon(xPoints, yPoints, 5);
+					g.drawString(vStr, x + 2, y - 7 - fm.getDescent());
+				}
 			} else {
 				// right oriented
 				int[] xPoints = { x, x, x - 4 - fm.stringWidth(vStr), x - 4 - fm.stringWidth(vStr), x - 3 };
-				int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(), y + 8 + fm.getAscent() + fm.getDescent(),
-						y + 6, y + 6 };
-				g.fillPolygon(xPoints, yPoints, 5);
-				g.setColor(Color.BLACK);
-				g.drawPolygon(xPoints, yPoints, 5);
-				g.drawString(vStr, x - 2 - fm.stringWidth(vStr), y + 7 + fm.getAscent());
+				if (up) {
+					// number above the mouse
+					int[] yPoints = { y, y + 8 + fm.getAscent() + fm.getDescent(),
+							y + 8 + fm.getAscent() + fm.getDescent(), y + 6, y + 6 };
+					g.fillPolygon(xPoints, yPoints, 5);
+					g.setColor(Color.BLACK);
+					g.drawPolygon(xPoints, yPoints, 5);
+					g.drawString(vStr, x - 2 - fm.stringWidth(vStr), y + 7 + fm.getAscent());
+				} else {
+					// number below the mouse
+					int[] yPoints = { y, y - 8 - fm.getAscent() - fm.getDescent(),
+							y - 8 - fm.getAscent() - fm.getDescent(), y - 6, y - 6 };
+					g.fillPolygon(xPoints, yPoints, 5);
+					g.setColor(Color.BLACK);
+					g.drawPolygon(xPoints, yPoints, 5);
+					g.drawString(vStr, x - 2 - fm.stringWidth(vStr), y - 7 - fm.getDescent());
+				}
 			}
 		}
 	}
