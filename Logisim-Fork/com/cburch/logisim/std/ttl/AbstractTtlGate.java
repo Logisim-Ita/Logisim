@@ -27,6 +27,15 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	protected String[] portnames = null;
 	private int[] outputports;
 
+	/**
+	 * @param name
+	 *            = name to display in the center of the TTl
+	 * @param pins
+	 *            = the total number of pins (GND and VCC included)
+	 * @param outputports
+	 *            = an array with the indexes of the output ports (indexes are the
+	 *            same you can find on Google searching the TTL you want to add)
+	 **/
 	protected AbstractTtlGate(String name, int pins, int[] outputports) {
 		super(name);
 		setIconName("ttl.gif");
@@ -40,12 +49,39 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		this.outputports = outputports;
 	}
 
+	/**
+	 * @param name
+	 *            = name to display in the center of the TTl
+	 * @param pins
+	 *            = the total number of pins (GND and VCC included)
+	 * @param outputports
+	 *            = an array with the indexes of the output ports (indexes are the
+	 *            same you can find on Google searching the TTL you want to add)
+	 * @param drawgates
+	 *            = if true, it calls the paintInternal method many times as the
+	 *            number of output ports passing the coordinates
+	 **/
 	protected AbstractTtlGate(String name, int pins, int[] outputports, boolean drawgates) {
 		this(name, pins, outputports);
 		this.ngatestodraw = drawgates ? outputports.length : 0;
 	}
 
+	/**
+	 * @param name
+	 *            = name to display in the center of the TTl
+	 * @param pins
+	 *            = the total number of pins (GND and VCC included)
+	 * @param outputports
+	 *            = an array with the indexes of the output ports (indexes are the
+	 *            same you can find on Google searching the TTL you want to add)
+	 * @param Ttlportnames
+	 *            = an array of strings which will be tooltips of the corresponding
+	 *            port in the order you pass
+	 **/
 	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
+		// the ttl name, the total number of pins and an array with the indexes of
+		// output ports (indexes are the one you can find on Google), an array of
+		// strings which will be tooltips of the corresponding port in order
 		this(name, pins, outputports);
 		this.portnames = Ttlportnames;
 	}
@@ -288,6 +324,25 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			paintInternalBase(painter);
 	}
 
+	/**
+	 * @param painter
+	 *            = the instance painter you have to use to create Graphics
+	 *            (Graphics g = painter.getGraphics())
+	 * @param x
+	 *            = if drawgates is false or not used, the component's left side; if
+	 *            drawgates is true it gets the component's width, subtracts 20 (for
+	 *            GND or Vcc) and divides for the number of outputs for each side,
+	 *            you'll get the x coordinate of the leftmost input -10 before the
+	 *            last output
+	 * @param y
+	 *            = the component's upper side
+	 * @param height
+	 *            = the component's height
+	 * @param up
+	 *            = true if drawgates is true when drawing the gates in the upper
+	 *            side (introduced this because can't draw upside down so you have
+	 *            to write what to draw if down and up)
+	 **/
 	abstract public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up);
 
 	private void paintInternalBase(InstancePainter painter) {
@@ -312,11 +367,14 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				paintInternal(painter,
 						x + (i < this.ngatestodraw / 2 ? i : i - this.ngatestodraw / 2)
 								* ((width - 20) / (this.ngatestodraw / 2)) + (i < this.ngatestodraw / 2 ? 0 : 20),
-						y, height, !(i < this.ngatestodraw / 2));
+						y, height, i >= this.ngatestodraw / 2);
 			}
 		}
 	}
 
+	/**
+	 * Here you have to write the logic of your component
+	 **/
 	@Override
 	public void propagate(InstanceState state) {
 		if (state.getAttributeValue(TTL.VCC_GND) && (state.getPort(this.pinnumber - 2) != Value.FALSE

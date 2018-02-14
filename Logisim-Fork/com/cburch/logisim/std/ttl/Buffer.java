@@ -1,15 +1,10 @@
 package com.cburch.logisim.std.ttl;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 
-import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.util.GraphicsUtil;
 
 public class Buffer extends AbstractTtlGate {
 
@@ -17,37 +12,6 @@ public class Buffer extends AbstractTtlGate {
 		super("Buffer", 14, new int[] { 3, 6, 8, 11 }, true);
 	}
 
-	public void paintBase(InstancePainter painter) {
-		Direction facing = painter.getAttributeValue(StdAttr.FACING);
-		Location loc = painter.getLocation();
-		int x = loc.getX();
-		int y = loc.getY();
-		Graphics g = painter.getGraphics();
-		g.translate(x, y);
-		double rotate = 0.0;
-		if (facing != Direction.EAST && g instanceof Graphics2D) {
-			rotate = -facing.toRadians();
-			((Graphics2D) g).rotate(rotate);
-		}
-
-		GraphicsUtil.switchToWidth(g, 2);
-		int[] xp = new int[4];
-		int[] yp = new int[4];
-		xp[0] = 0;
-		yp[0] = 0;
-		xp[1] = -19;
-		yp[1] = -7;
-		xp[2] = -19;
-		yp[2] = 7;
-		xp[3] = 0;
-		yp[3] = 0;
-		g.drawPolyline(xp, yp, 4);
-
-		if (rotate != 0.0) {
-			((Graphics2D) g).rotate(-rotate);
-		}
-		g.translate(-x, -y);
-	}
 
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
