@@ -12,7 +12,6 @@ public class Buffer extends AbstractTtlGate {
 		super("Buffer", 14, new int[] { 3, 6, 8, 11 }, true);
 	}
 
-
 	@Override
 	public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up) {
 		Graphics g = painter.getGraphics();

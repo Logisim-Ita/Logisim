@@ -614,6 +614,21 @@ class XmlReader {
 				}
 
 			}
+			// switch attribute cause a bug
+			if (version.compareTo(LogisimVersion.get(2, 14, 0, 0)) < 0) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").endsWith("Flip-Flop")) {
+						for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+							if (attrElt.getAttribute("name").equals("NegatePresetClear")) {
+								if (attrElt.getAttribute("val").equals("true"))
+									attrElt.setAttribute("val", "false");
+								else
+									attrElt.setAttribute("val", "true");
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
