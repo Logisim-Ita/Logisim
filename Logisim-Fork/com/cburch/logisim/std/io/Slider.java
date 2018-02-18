@@ -1,10 +1,13 @@
 package com.cburch.logisim.std.io;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
+import com.cburch.logisim.circuit.RadixOption;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.BitWidth;
@@ -23,7 +26,7 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class Slider extends InstanceFactory {
 	public static class Poker extends InstancePoker {
-		SliderValue data;
+		private SliderValue data;
 		private boolean dragging = false;
 
 		@Override
@@ -38,8 +41,8 @@ public class Slider extends InstanceFactory {
 		public void mousePressed(InstanceState state, MouseEvent e) {
 			data = getValueState(state);
 			Bounds bds = state.getInstance().getBounds();
-			Rectangle slider = new Rectangle(bds.getX() + data.getCurrentX() + 5, bds.getY() + bds.getHeight() / 2 - 2,
-					10, 10);
+			Rectangle slider = new Rectangle(bds.getX() + data.getCurrentX() + 5, bds.getY() + bds.getHeight() - 16, 12,
+					12);
 			// check if clicking slider rectangle
 			if (slider.contains(e.getX(), e.getY()))
 				this.dragging = true;
@@ -88,10 +91,10 @@ public class Slider extends InstanceFactory {
 	public Slider() {
 		super("Slider", Strings.getter("SliderComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, Io.ATTR_COLOR, StdAttr.LABEL, StdAttr.LABEL_FONT,
-						StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.EAST, BitWidth.create(8), Color.WHITE, "", StdAttr.DEFAULT_LABEL_FONT,
-						Color.BLACK });
+				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -101,12 +104,14 @@ public class Slider extends InstanceFactory {
 	private void computeTextField(Instance instance) {
 		Object d = instance.getAttributeValue(StdAttr.FACING);
 		Bounds bds = instance.getBounds();
-		int x = bds.getX() + bds.getWidth() / 2;
-		int y = bds.getY() - 3;
-		int halign = GraphicsUtil.H_CENTER;
-		int valign = GraphicsUtil.V_BOTTOM;
-		if (d == Direction.NORTH)
-			x = bds.getX();
+		int x = bds.getX() - 3;
+		int y = bds.getY() + bds.getHeight() / 2 - 1;
+		int halign = GraphicsUtil.H_RIGHT;
+		int valign = GraphicsUtil.V_CENTER_OVERALL;
+		if (d == Direction.WEST) {
+			y = bds.getY();
+			valign = GraphicsUtil.V_BASELINE;
+		}
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
@@ -120,7 +125,7 @@ public class Slider extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int width = 120, height = 20;
+		int width = 120, height = 30;
 		if (facing == Direction.EAST)
 			return Bounds.create(-width, -height / 2, width, height);
 		else if (facing == Direction.WEST)
@@ -150,13 +155,25 @@ public class Slider extends InstanceFactory {
 		int x = bds.getX(), y = bds.getY();
 		painter.drawRoundBounds(painter.getAttributeValue(Io.ATTR_COLOR));
 		GraphicsUtil.switchToWidth(g, 2);
-		g.drawLine(x + 10, y + bds.getHeight() / 2, x + bds.getWidth() - 10, y + bds.getHeight() / 2);
+		// slider line
+		g.drawLine(x + 10, y + bds.getHeight() - 10, x + bds.getWidth() - 10, y + bds.getHeight() - 10);
 		g.setColor(Color.DARK_GRAY);
-		g.fillRoundRect(x + data.getCurrentX() + 5, y + bds.getHeight() / 2 - 5, 10, 10, 4, 4);
+		// slider
+		g.fillRoundRect(x + data.getCurrentX() + 5, y + bds.getHeight() - 15, 10, 10, 4, 4);
 		g.setColor(Color.BLACK);
-		g.drawRoundRect(x + data.getCurrentX() + 5, y + bds.getHeight() / 2 - 5, 10, 10, 4, 4);
+		g.drawRoundRect(x + data.getCurrentX() + 5, y + bds.getHeight() - 15, 10, 10, 4, 4);
 		painter.drawPorts();
 		painter.drawLabel();
+		// paint current value
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 9));
+		Value v = painter.getPort(0);
+		FontMetrics fm = g.getFontMetrics();
+		RadixOption radix = painter.getAttributeValue(RadixOption.ATTRIBUTE);
+		String vStr = radix.toString(v);
+		// if the string is too long, reduce its dimension
+		if (fm.stringWidth(vStr) > bds.getWidth() - 10)
+			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 5));
+		GraphicsUtil.drawCenteredText(g, vStr, x + bds.getWidth() / 2, y + 6);
 	}
 
 	@Override
@@ -164,7 +181,7 @@ public class Slider extends InstanceFactory {
 		SliderValue data = getValueState(state);
 		BitWidth b = state.getAttributeValue(StdAttr.WIDTH);
 		Bounds bds = state.getInstance().getBounds();
-		// 100(slider width):2^b-1 = currentx:value(dec)
+		// 100(slider width-20):2^b-1 = currentx:value(dec)
 		state.setPort(0,
 				Value.createKnown(b,
 						(int) Math.round(data.getCurrentX() * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20))),

@@ -181,7 +181,7 @@ public class AppPreferences {
 		POKE_WIRE_RADIX1 = create(
 				new PrefMonitorStringOpts("pokeRadix1", radixStrings, RadixOption.RADIX_2.getSaveString()));
 		POKE_WIRE_RADIX2 = create(
-				new PrefMonitorStringOpts("pokeRadix2", radixStrings, RadixOption.RADIX_10_SIGNED.getSaveString()));
+				new PrefMonitorStringOpts("pokeRadix2", radixStrings, RadixOption.RADIX_10_UNSIGNED.getSaveString()));
 	}
 
 	// Experimental preferences

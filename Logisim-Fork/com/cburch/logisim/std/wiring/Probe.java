@@ -446,7 +446,13 @@ public class Probe extends InstanceFactory {
 	public void paintGhost(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		Bounds bds = painter.getOffsetBounds();
-		g.drawOval(bds.getX() + 1, bds.getY() + 1, bds.getWidth() - 1, bds.getHeight() - 1);
+		int x = bds.getX();
+		int y = bds.getY();
+		if (bds.getWidth() <= 20) {
+			g.drawOval(x, y, bds.getWidth(), bds.getHeight());
+		} else {
+			g.drawRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
+		}
 	}
 
 	@Override

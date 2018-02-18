@@ -941,6 +941,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		return canvasPane.getVerticalScrollBar().getValue();
 	}
 
+	public Rectangle getViewableRectangle() {
+		Rectangle r = canvasPane.getViewport().getViewRect();
+		double zoom = getZoomFactor();
+		return new Rectangle((int) Math.round(r.x / zoom), (int) Math.round(r.y / zoom),
+				(int) Math.round(r.width / zoom), (int) Math.round(r.height / zoom));
+	}
+
 	//
 	// graphics methods
 	//
@@ -956,13 +963,6 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		} else {
 			return true;
 		}
-	}
-
-	public Rectangle getViewableRectangle() {
-		Rectangle r = canvasPane.getViewport().getViewRect();
-		double zoom = getZoomFactor();
-		return new Rectangle((int) Math.round(r.x / zoom), (int) Math.round(r.y / zoom),
-				(int) Math.round(r.width / zoom), (int) Math.round(r.height / zoom));
 	}
 
 	boolean isPopupMenuUp() {
