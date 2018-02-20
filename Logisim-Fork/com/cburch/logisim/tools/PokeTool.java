@@ -72,9 +72,8 @@ public class PokeTool extends Tool {
 			Rectangle r = canvas.getViewableRectangle();
 			g.fillOval(x - 2, y - 2, 4, 4);
 			g.setColor(Color.WHITE);
-			boolean left = r.x + r.width - x - fm.stringWidth(vStr) - 4 > x - r.x - fm.stringWidth(vStr) - 4;
-			boolean up = r.y + r.height - y - fm.getAscent() - fm.getDescent() - 4 > y - r.y - fm.getAscent()
-					- fm.getDescent() - 4;
+			boolean left = x < r.x + r.width / 2;
+			boolean up = y < r.y + r.height / 2;
 			if (left) {
 				// left oriented
 				int[] xPoints = { x, x, x + 4 + fm.stringWidth(vStr), x + 4 + fm.stringWidth(vStr), x + 3 };

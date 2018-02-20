@@ -103,7 +103,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		setAttributes(
 				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, Plexers.ATTR_ENABLE,
 						NEW_FF_LAYOUT, StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, "",
+				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, "",
 						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setInstancePoker(Poker.class);
 		setInstanceLogger(Logger.class);
@@ -328,9 +328,9 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		boolean triggered = (withclock == 1) ? data.updateClock(state.getPort(n + STD_PORTS + enable), triggerType)
 				: true;
 
-		if (clear == Value.FALSE) { // clear requested
+		if (clear == Value.TRUE) { // clear requested
 			data.curValue = Value.FALSE;
-		} else if (preset == Value.FALSE) { // preset requested
+		} else if (preset == Value.TRUE) { // preset requested
 			data.curValue = Value.TRUE;
 		} else if (triggered && (enable != 0 ? state.getPort(n + 4) != Value.FALSE : true)) {
 			// Clock has triggered and flip-flop is enabled: Update the state
@@ -386,9 +386,13 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		}
 		ps[numInputs].setToolTip(Strings.getter("flipFlopQTip"));
 		ps[numInputs + 1].setToolTip(Strings.getter("flipFlopNotQTip"));
-		ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip"));
-		ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip"));
-
+		if (instance.getAttributeValue(NEGATE_PRE_CLR)) {
+			ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip", "0"));
+			ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip", "0"));
+		} else {
+			ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip", "1"));
+			ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip", "1"));
+		}
 		instance.setPorts(ps);
 	}
 }
