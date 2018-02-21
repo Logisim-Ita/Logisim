@@ -21,7 +21,6 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class ComponentDrawContext {
 	private static final byte PIN_OFFS = 3;
 	private static final byte PIN_SIZE = 6;
-	private static final Color PIN_OUTLINE_COLOR = Color.BLACK;
 
 	private java.awt.Component dest;
 	private Circuit circuit;
@@ -129,32 +128,24 @@ public class ComponentDrawContext {
 		EndData e = comp.getEnd(i);
 		Location pt = e.getLocation();
 		Color curColor = g.getColor();
-		Color pinColor = Color.WHITE;
+		Color pinColor = Color.BLACK;
 		boolean isInput = e.isInput();
 		if (getShowState()) {
 			CircuitState state = getCircuitState();
 			pinColor = state.getValue(pt).getColor();
 		}
-		// outline pin
-		if (pinColor == Color.BLACK)
-			pinColor = Color.WHITE;
-		g.setColor(PIN_OUTLINE_COLOR);
+		//pin
+		g.setColor(pinColor);
 		if (isInput)
 			g.fillRect(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
 		else
 			g.fillOval(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-		// pin
-		g.setColor(pinColor);
-		if (isInput)
-			g.fillRect(pt.getX() - PIN_OFFS + 1, pt.getY() - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
-		else
-			g.fillOval(pt.getX() - PIN_OFFS + 1, pt.getY() - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
 		g.setColor(curColor);
 	}
 
 	public void drawPin(Component comp, int i, String label, Direction dir) {
 		Color curColor = g.getColor();
-		Color pinColor = Color.WHITE;
+		Color pinColor = Color.BLACK;
 		if (i < 0 || i >= comp.getEnds().size())
 			return;
 		EndData e = comp.getEnd(i);
@@ -166,35 +157,27 @@ public class ComponentDrawContext {
 			CircuitState state = getCircuitState();
 			pinColor = state.getValue(pt).getColor();
 		}
-		// outline pin
-		if (pinColor == Color.BLACK)
-			pinColor = Color.WHITE;
-		g.setColor(PIN_OUTLINE_COLOR);
+		// pin
+		g.setColor(pinColor);
 		if (isInput)
 			g.fillRect(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
 		else
 			g.fillOval(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-		// pin
-		g.setColor(pinColor);
-		if (isInput)
-			g.fillRect(x - PIN_OFFS + 1, y - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
-		else
-			g.fillOval(x - PIN_OFFS + 1, y - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
 		g.setColor(curColor);
 		if (dir == Direction.EAST) {
-			GraphicsUtil.drawText(g, label, x + 3, y, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
+			GraphicsUtil.drawText(g, label, x + 4, y, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER_OVERALL);
 		} else if (dir == Direction.WEST) {
-			GraphicsUtil.drawText(g, label, x - 3, y, GraphicsUtil.H_RIGHT, GraphicsUtil.V_CENTER);
+			GraphicsUtil.drawText(g, label, x - 4, y, GraphicsUtil.H_RIGHT, GraphicsUtil.V_CENTER_OVERALL);
 		} else if (dir == Direction.SOUTH) {
-			GraphicsUtil.drawText(g, label, x, y - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
+			GraphicsUtil.drawText(g, label, x, y - 4, GraphicsUtil.H_CENTER, GraphicsUtil.V_BASELINE);
 		} else if (dir == Direction.NORTH) {
-			GraphicsUtil.drawText(g, label, x, y + 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
+			GraphicsUtil.drawText(g, label, x, y + 4, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		}
 	}
 
 	public void drawPins(Component comp) {
 		Color curColor = g.getColor();
-		Color pinColor = Color.WHITE;
+		Color pinColor = Color.BLACK;
 		boolean isInput;
 		for (EndData e : comp.getEnds()) {
 			isInput = e.isInput();
@@ -203,20 +186,12 @@ public class ComponentDrawContext {
 				CircuitState state = getCircuitState();
 				pinColor = state.getValue(pt).getColor();
 			}
-			// outline pin
-			if (pinColor == Color.BLACK)
-				pinColor = Color.WHITE;
-			g.setColor(PIN_OUTLINE_COLOR);
+			// pin
+			g.setColor(pinColor);
 			if (isInput)
 				g.fillRect(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
 			else
 				g.fillOval(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-			// pin
-			g.setColor(pinColor);
-			if (isInput)
-				g.fillRect(pt.getX() - PIN_OFFS + 1, pt.getY() - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
-			else
-				g.fillOval(pt.getX() - PIN_OFFS + 1, pt.getY() - PIN_OFFS + 1, PIN_SIZE - 2, PIN_SIZE - 2);
 		}
 		g.setColor(curColor);
 	}
