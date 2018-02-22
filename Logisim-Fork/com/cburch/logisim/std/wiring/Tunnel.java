@@ -193,6 +193,9 @@ public class Tunnel extends InstanceFactory {
 			}
 		}
 		GraphicsUtil.switchToWidth(g, 2);
+		g.setColor(Color.WHITE);
+		g.fillPolygon(xp, yp, xp.length);
+		g.setColor(Color.BLACK);
 		g.drawPolygon(xp, yp, xp.length);
 	}
 
@@ -207,6 +210,7 @@ public class Tunnel extends InstanceFactory {
 		paintGhost(painter);
 		g.translate(-x, -y);
 		painter.drawPorts();
+		painter.drawLabel();
 	}
 
 	@Override

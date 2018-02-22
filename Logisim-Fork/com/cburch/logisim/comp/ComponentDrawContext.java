@@ -56,8 +56,11 @@ public class ComponentDrawContext {
 	// helper methods
 	//
 	public void drawBounds(Component comp, Color color) {
+		drawBounds(comp, comp.getBounds(), color);
+	}
+
+	public void drawBounds(Component comp, Bounds bds, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		Bounds bds = comp.getBounds();
 		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 			g.setColor(color);
 			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
@@ -134,7 +137,7 @@ public class ComponentDrawContext {
 			CircuitState state = getCircuitState();
 			pinColor = state.getValue(pt).getColor();
 		}
-		//pin
+		// pin
 		g.setColor(pinColor);
 		if (isInput)
 			g.fillRect(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
@@ -211,8 +214,11 @@ public class ComponentDrawContext {
 	}
 
 	public void drawRoundBounds(Component comp, Color color) {
+		drawRoundBounds(comp, comp.getBounds(), color);
+	}
+
+	public void drawRoundBounds(Component comp, Bounds bds, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		Bounds bds = comp.getBounds();
 		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 			g.setColor(color);
 			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);

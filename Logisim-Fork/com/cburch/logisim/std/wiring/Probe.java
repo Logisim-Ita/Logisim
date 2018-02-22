@@ -353,12 +353,11 @@ public class Probe extends InstanceFactory {
 		return data == null ? Value.NIL : data.curValue;
 	}
 
-	static void paintValue(InstancePainter painter, Value value) {
+	static void paintValue(InstancePainter painter, Bounds bds, Value value) {
 		Graphics g = painter.getGraphics();
-		Bounds bds = painter.getBounds(); // intentionally with no graphics
-											// object - we don't want label
-											// included
-
+		// intentionally with no graphics
+		// object - we don't want label
+		// included
 		RadixOption radix = painter.getAttributeValue(RadixOption.ATTRIBUTE);
 		if (radix == null || radix == RadixOption.RADIX_2) {
 			int x = bds.getX();
@@ -394,6 +393,10 @@ public class Probe extends InstanceFactory {
 			String text = radix.toString(value);
 			GraphicsUtil.drawCenteredText(g, text, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
 		}
+	}
+
+	static void paintValue(InstancePainter painter, Value value) {
+		paintValue(painter, painter.getBounds(), value);
 	}
 
 	public Probe() {

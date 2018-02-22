@@ -32,7 +32,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	public TunnelAttributes() {
 		facing = Direction.EAST;
 		width = BitWidth.ONE;
-		label = "";
+		label = "tunnel";
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
 		offsetBounds = null;
 		configureLabel();

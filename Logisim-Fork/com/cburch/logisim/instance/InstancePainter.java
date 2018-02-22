@@ -40,6 +40,10 @@ public class InstancePainter implements InstanceState {
 		context.drawBounds(comp, color);
 	}
 
+	public void drawBounds(Bounds bds, Color color) {
+		context.drawBounds(comp, bds, color);
+	}
+
 	public void drawClock(int i, Direction dir) {
 		context.drawClock(comp, i, dir);
 	}
@@ -88,6 +92,10 @@ public class InstancePainter implements InstanceState {
 
 	public void drawRoundBounds(Color color) {
 		context.drawRoundBounds(comp, color);
+	}
+
+	public void drawRoundBounds(Bounds bds, Color color) {
+		context.drawRoundBounds(comp, bds, color);
 	}
 
 	public void drawRoundRectangle(Bounds bds, String label) {

@@ -73,7 +73,23 @@ public class Pin extends InstanceFactory {
 			} else {
 				// intentionally with no graphics object - we don't want label
 				// included
+				Direction facing = state.getAttributeValue(StdAttr.FACING);
+				// intentionally with no graphics object - we don't want label included
 				Bounds bds = state.getInstance().getBounds();
+				int x = bds.getX();
+				int y = bds.getY();
+				int w = bds.getWidth();
+				int h = bds.getHeight();
+				if (facing == Direction.EAST || facing == Direction.WEST) {
+					w -= 5;
+					if (facing == Direction.WEST)
+						x += 5;
+				} else {
+					h -= 5;
+					if (facing == Direction.NORTH)
+						y += 5;
+				}
+				bds = Bounds.create(x, y, w, h);
 				int i = (bds.getX() + bds.getWidth() - e.getX()) / 10;
 				int j = (bds.getY() + bds.getHeight() - e.getY()) / 20;
 				int bit = 8 * j + i;
@@ -254,7 +270,15 @@ public class Pin extends InstanceFactory {
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
 		BitWidth width = attrs.getValue(StdAttr.WIDTH);
-		return Probe.getOffsetBounds(facing, width, RadixOption.RADIX_2);
+		Bounds bds = Probe.getOffsetBounds(facing, width, RadixOption.RADIX_2);
+		if (facing == Direction.EAST)
+			return Bounds.create(bds.getX() - 5, bds.getY(), bds.getWidth() + 5, bds.getHeight());
+		else if (facing == Direction.WEST)
+			return Bounds.create(bds.getX(), bds.getY(), bds.getWidth() + 5, bds.getHeight());
+		else if (facing == Direction.NORTH)
+			return Bounds.create(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight() + 5);
+		else // SOUTH
+			return Bounds.create(bds.getX(), bds.getY() - 5, bds.getWidth(), bds.getHeight() + 5);
 	}
 
 	public int getType(Instance instance) {
@@ -389,55 +413,110 @@ public class Pin extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Graphics g = painter.getGraphics();
+		Direction facing = attrs.getValue(StdAttr.FACING);
 		// intentionally with no graphics object - we don't want label included
 		Bounds bds = painter.getInstance().getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
+		int width = bds.getWidth();
+		int height = bds.getHeight();
+		if (facing == Direction.EAST || facing == Direction.WEST) {
+			width -= 5;
+			if (facing == Direction.WEST)
+				x += 5;
+		} else {
+			height -= 5;
+			if (facing == Direction.NORTH)
+				y += 5;
+		}
 		GraphicsUtil.switchToWidth(g, 2);
+		// print label
 		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
 		painter.drawLabel();
-		// if bitwidth is more that 1, first draw the bounds and then the number
-		if (attrs.width.getWidth() > 1) {
-			g.setColor(Color.black);
+		PinState state = getState(painter);
+		// outline coordinates
+		int[] xPoints;
+		int[] yPoints;
+		if (facing == Direction.WEST) {
+			xPoints = new int[] { x, bds.getX(), x, x + width, x + width };
+			yPoints = new int[] { bds.getY(), bds.getY() + bds.getHeight() / 2, bds.getY() + bds.getHeight(),
+					bds.getY() + bds.getHeight(), bds.getY() };
 			if (attrs.type == EndData.OUTPUT_ONLY) {
-				painter.drawRoundBounds(Color.WHITE);
-			} else {
-				painter.drawBounds(Color.WHITE);
+				xPoints[4] -= 10;
+				xPoints[3] -= 10;
+			}
+		} else if (facing == Direction.EAST) {
+			xPoints = new int[] { x + width, x + bds.getWidth(), x + width, x, x };
+			yPoints = new int[] { bds.getY(), bds.getY() + bds.getHeight() / 2, bds.getY() + bds.getHeight(),
+					bds.getY() + bds.getHeight(), bds.getY() };
+			if (attrs.type == EndData.OUTPUT_ONLY) {
+				xPoints[4] += 10;
+				xPoints[3] += 10;
+			}
+		} else if (facing == Direction.NORTH) {
+			xPoints = new int[] { bds.getX(), bds.getX() + bds.getWidth() / 2, bds.getX() + bds.getWidth(),
+					bds.getX() + bds.getWidth(), bds.getX() };
+			yPoints = new int[] { y, bds.getY(), y, y + height, y + height };
+			if (attrs.type == EndData.OUTPUT_ONLY) {
+				yPoints[4] -= 10;
+				yPoints[3] -= 10;
+			}
+		} else {// SOUTH
+			xPoints = new int[] { bds.getX(), bds.getX() + bds.getWidth() / 2, bds.getX() + bds.getWidth(),
+					bds.getX() + bds.getWidth(), bds.getX() };
+			yPoints = new int[] { y + height, y + bds.getHeight(), y + height, y, y };
+			if (attrs.type == EndData.OUTPUT_ONLY) {
+				yPoints[4] += 10;
+				yPoints[3] += 10;
 			}
 		}
-
-		if (!painter.getShowState()) {
+		// draw shape
+		Color bgColor = Color.WHITE;
+		if (attrs.width.getWidth() <= 1)
+			bgColor = state.receiving.getColor();
+		g.setColor(bgColor);
+		if (attrs.type == EndData.OUTPUT_ONLY) {
+			// output pin
+			g.fillRoundRect(x, y, width, height, 20, 20);
+			g.fillPolygon(new int[] { xPoints[4], xPoints[0], xPoints[1], xPoints[2], xPoints[3] },
+					new int[] { yPoints[4], yPoints[0], yPoints[1], yPoints[2], yPoints[3] }, 5);
 			g.setColor(Color.BLACK);
-			GraphicsUtil.drawCenteredText(g, "x" + attrs.width.getWidth(), bds.getX() + bds.getWidth() / 2,
-					bds.getY() + bds.getHeight() / 2);
+			g.drawPolyline(new int[] { xPoints[4], xPoints[0], xPoints[1], xPoints[2], xPoints[3] },
+					new int[] { yPoints[4], yPoints[0], yPoints[1], yPoints[2], yPoints[3] }, 5);
+			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
+				if (width > 20)
+					g.drawLine(xPoints[4] + 10, yPoints[4] + (facing == Direction.NORTH ? 10 : -10), xPoints[3] - 10,
+							yPoints[3] + (facing == Direction.NORTH ? 10 : -10));
+				yPoints[3] -= 10;
+				yPoints[4] -= 10;
+				xPoints[3] -= 20;
+			} else {
+				if (height > 20)
+					g.drawLine(xPoints[4] + (facing == Direction.WEST ? 10 : -10), yPoints[4] + 10,
+							xPoints[3] + (facing == Direction.WEST ? 10 : -10), yPoints[3] - 10);
+				xPoints[3] -= 10;
+				xPoints[4] -= 10;
+				yPoints[3] -= 20;
+			}
+			g.drawArc(xPoints[4], yPoints[4], 20, 20, facing.toDegrees() - 180,
+					(facing == Direction.NORTH || facing == Direction.EAST) ? -90 : 90);
+			g.drawArc(xPoints[3], yPoints[3], 20, 20, facing.toDegrees() - 180,
+					(facing == Direction.NORTH || facing == Direction.EAST) ? 90 : -90);
 		} else {
-			PinState state = getState(painter);
-			if (attrs.width.getWidth() <= 1) {
-				Value receiving = state.receiving;
-				g.setColor(receiving.getColor());
-				if (attrs.type == EndData.OUTPUT_ONLY)
-					g.fillOval(x, y, bds.getWidth(), bds.getHeight());
-				else
-					g.fillRect(x, y, bds.getWidth(), bds.getHeight());
-				if (attrs.width.getWidth() == 1) {
-					g.setColor(Color.WHITE);
-					GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 11, y + 8);
-				}
-			} else {
-				Probe.paintValue(painter, state.sending);
-			}
+			// input pin
+			g.fillPolygon(xPoints, yPoints, 5);
+			g.setColor(Color.BLACK);
+			g.drawPolygon(xPoints, yPoints, 5);
 		}
-		// if bitwidth is equal to 1, first draw the colored base and value, then the
-		// bounds
+		// print value
 		if (attrs.width.getWidth() == 1) {
-			g.setColor(Color.black);
-			if (attrs.type == EndData.OUTPUT_ONLY) {
-				g.drawOval(x, y, bds.getWidth(), bds.getHeight());
-			} else {
-				g.drawRect(x, y, bds.getWidth(), bds.getHeight());
-			}
+			g.setColor(Color.WHITE);
+			GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 10, y + 8);
+		} else {
+			Probe.paintValue(painter, Bounds.create(x, y, width, height), state.sending);
 		}
 		painter.drawPorts();
+
 	}
 
 	@Override
