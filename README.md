@@ -34,6 +34,7 @@ This is an italian fork based on the original Logisim version.<br>
 * TTY and Keyboard components can use 16-bit values (UTF-16)
 * Clock custom frequency
 * Joystick facing attribute
+* Sel location attribute for Bit Finder component
 * Added missing tooltips
 * Zoom in and out using mouse wheel where you're pointing at
 * Big fixes to Log menu and Log output file, added buttons to clear Log Table

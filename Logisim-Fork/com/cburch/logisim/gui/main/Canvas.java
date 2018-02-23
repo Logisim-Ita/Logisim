@@ -197,6 +197,9 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				drag_tool = getToolFor(e);
 				if (drag_tool != null) {
 					drag_tool.mousePressed(Canvas.this, getGraphics(), e);
+					if (e.getButton() != MouseEvent.BUTTON1)
+						temp_tool = proj.getTool();
+					proj.setTool(drag_tool);
 				}
 				completeAction();
 			}
@@ -211,32 +214,34 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					|| e.getButton() == MouseEvent.BUTTON2 && e.getClickCount() == 2) {
 				autoZoomCenter();
 				setCursor(proj.getTool().getCursor());
-			} else {
-				if (drag_tool != null) {
-					drag_tool.mouseReleased(Canvas.this, getGraphics(), e);
-					drag_tool = null;
-				}
-
-				Tool tool = proj.getTool();
-				if (tool != null) {
-					tool.mouseMoved(Canvas.this, getGraphics(), e);
-					setCursor(tool.getCursor());
-				}
-				completeAction();
 			}
+			if (drag_tool != null) {
+				drag_tool.mouseReleased(Canvas.this, getGraphics(), e);
+				drag_tool = null;
+			}
+			if (temp_tool != null) {
+				proj.setTool(temp_tool);
+				temp_tool = null;
+			}
+			Tool tool = proj.getTool();
+			if (tool != null && !(tool instanceof EditTool)) {
+				tool.mouseMoved(Canvas.this, getGraphics(), e);
+				setCursor(tool.getCursor());
+			}
+			completeAction();
+
 			viewport.zoomButtonColor = defaultzoomButtonColor;
 		}
 
 		@Override
-		public void mouseWheelMoved(MouseWheelEvent arg0) {// zoom mouse wheel
-			if (arg0.getPreciseWheelRotation() < 0) {
+		public void mouseWheelMoved(MouseWheelEvent e) {// zoom mouse wheel
+			if (e.getPreciseWheelRotation() < 0) {
 				proj.getFrame().getZoomControl().spinnerModel
 						.setValue(proj.getFrame().getZoomControl().spinnerModel.getNextValue());
-			} else if (arg0.getPreciseWheelRotation() > 0) {
+			} else if (e.getPreciseWheelRotation() > 0) {
 				proj.getFrame().getZoomControl().spinnerModel
 						.setValue(proj.getFrame().getZoomControl().spinnerModel.getPreviousValue());
 			}
-
 		}
 
 		//
@@ -706,7 +711,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	private Project proj;
-	private Tool drag_tool;
+	private Tool drag_tool, temp_tool;
 	private Selection selection;
 	private MouseMappings mappings;
 	private CanvasPane canvasPane;

@@ -10,6 +10,7 @@
 * New TTL! TTL -> 74125: quad bus buffer, three-state outputs, negative enable
 * New Pin layout!
 * New end ports layout!
+* Sel pin position attribute for BitFinder component
 * Better value display when clicking on a wire with PokeTool
 * Fixes
 
