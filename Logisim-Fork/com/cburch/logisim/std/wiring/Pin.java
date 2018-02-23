@@ -23,7 +23,6 @@ import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
-import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.gui.main.Canvas;
 import com.cburch.logisim.instance.Instance;
@@ -321,24 +320,7 @@ public class Pin extends InstanceFactory {
 
 	@Override
 	public void paintGhost(InstancePainter painter) {
-		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
-		Location loc = painter.getLocation();
-		Bounds bds = painter.getOffsetBounds();
-		int x = loc.getX();
-		int y = loc.getY();
-		Graphics g = painter.getGraphics();
-		GraphicsUtil.switchToWidth(g, 2);
-		boolean output = attrs.isOutput();
-		if (output) {
-			BitWidth width = attrs.getValue(StdAttr.WIDTH);
-			if (width == BitWidth.ONE) {
-				g.drawOval(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
-			} else {
-				g.drawRoundRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
-			}
-		} else {
-			g.drawRect(x + bds.getX(), y + bds.getY(), bds.getWidth(), bds.getHeight());
-		}
+		paintBase(painter, true);
 	}
 
 	//
@@ -411,11 +393,23 @@ public class Pin extends InstanceFactory {
 
 	@Override
 	public void paintInstance(InstancePainter painter) {
+		paintBase(painter, false);
+		painter.drawPorts();
+		// print label
+		painter.getGraphics().setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+		painter.drawLabel();
+	}
+
+	private void paintBase(InstancePainter painter, boolean isGhost) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Graphics g = painter.getGraphics();
 		Direction facing = attrs.getValue(StdAttr.FACING);
 		// intentionally with no graphics object - we don't want label included
-		Bounds bds = painter.getInstance().getBounds();
+		Bounds bds;
+		if (!isGhost)
+			bds = painter.getInstance().getBounds();
+		else
+			bds = painter.getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
 		int width = bds.getWidth();
@@ -430,10 +424,9 @@ public class Pin extends InstanceFactory {
 				y += 5;
 		}
 		GraphicsUtil.switchToWidth(g, 2);
-		// print label
-		g.setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
-		painter.drawLabel();
-		PinState state = getState(painter);
+		PinState state = null;
+		if (!isGhost)
+			state = getState(painter);
 		// outline coordinates
 		int[] xPoints;
 		int[] yPoints;
@@ -472,15 +465,19 @@ public class Pin extends InstanceFactory {
 		}
 		// draw shape
 		Color bgColor = Color.WHITE;
-		if (attrs.width.getWidth() <= 1)
-			bgColor = state.receiving.getColor();
-		g.setColor(bgColor);
+		if (!isGhost) {
+			if (attrs.width.getWidth() <= 1)
+				bgColor = state.receiving.getColor();
+			g.setColor(bgColor);
+		}
 		if (attrs.type == EndData.OUTPUT_ONLY) {
-			// output pin
-			g.fillRoundRect(x, y, width, height, 20, 20);
-			g.fillPolygon(new int[] { xPoints[4], xPoints[0], xPoints[1], xPoints[2], xPoints[3] },
-					new int[] { yPoints[4], yPoints[0], yPoints[1], yPoints[2], yPoints[3] }, 5);
-			g.setColor(Color.BLACK);
+			if (!isGhost) {
+				// output pin
+				g.fillRoundRect(x, y, width, height, 20, 20);
+				g.fillPolygon(new int[] { xPoints[4], xPoints[0], xPoints[1], xPoints[2], xPoints[3] },
+						new int[] { yPoints[4], yPoints[0], yPoints[1], yPoints[2], yPoints[3] }, 5);
+				g.setColor(Color.BLACK);
+			}
 			g.drawPolyline(new int[] { xPoints[4], xPoints[0], xPoints[1], xPoints[2], xPoints[3] },
 					new int[] { yPoints[4], yPoints[0], yPoints[1], yPoints[2], yPoints[3] }, 5);
 			if (facing == Direction.NORTH || facing == Direction.SOUTH) {
@@ -503,20 +500,21 @@ public class Pin extends InstanceFactory {
 			g.drawArc(xPoints[3], yPoints[3], 20, 20, facing.toDegrees() - 180,
 					(facing == Direction.NORTH || facing == Direction.EAST) ? 90 : -90);
 		} else {
-			// input pin
-			g.fillPolygon(xPoints, yPoints, 5);
-			g.setColor(Color.BLACK);
+			if (!isGhost) {
+				// input pin
+				g.fillPolygon(xPoints, yPoints, 5);
+				g.setColor(Color.BLACK);
+			}
 			g.drawPolygon(xPoints, yPoints, 5);
 		}
-		// print value
-		if (attrs.width.getWidth() == 1) {
-			g.setColor(Color.WHITE);
-			GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 10, y + 8);
-		} else {
-			Probe.paintValue(painter, Bounds.create(x, y, width, height), state.sending);
+		if (!isGhost) {
+			// print value
+			if (attrs.width.getWidth() == 1) {
+				g.setColor(Color.WHITE);
+				GraphicsUtil.drawCenteredText(g, state.sending.toDisplayString(), x + 10, y + 8);
+			} else
+				Probe.paintValue(painter, Bounds.create(x, y, width, height), state.sending);
 		}
-		painter.drawPorts();
-
 	}
 
 	@Override

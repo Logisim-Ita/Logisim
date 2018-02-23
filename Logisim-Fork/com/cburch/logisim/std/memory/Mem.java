@@ -109,7 +109,7 @@ abstract class Mem extends InstanceFactory {
 	abstract void configurePorts(Instance instance);
 
 	void configureStandardPorts(Instance instance, Port[] ps) {
-		ps[DATA] = new Port(0, 0, Port.INOUT, DATA_ATTR);
+		ps[DATA] = new Port(0, 0, Port.OUTPUT, DATA_ATTR);
 		ps[ADDR] = new Port(-140, 0, Port.INPUT, ADDR_ATTR);
 		ps[CS] = new Port(-90, 40, Port.INPUT, 1);
 		ps[DATA].setToolTip(Strings.getter("memDataTip"));

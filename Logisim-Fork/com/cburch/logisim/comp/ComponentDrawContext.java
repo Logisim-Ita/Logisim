@@ -132,17 +132,22 @@ public class ComponentDrawContext {
 		Location pt = e.getLocation();
 		Color curColor = g.getColor();
 		Color pinColor = Color.BLACK;
-		boolean isInput = e.isInput();
+		int x = pt.getX();
+		int y = pt.getY();
+		byte endType = e.getType();
 		if (getShowState()) {
 			CircuitState state = getCircuitState();
 			pinColor = state.getValue(pt).getColor();
 		}
 		// pin
 		g.setColor(pinColor);
-		if (isInput)
-			g.fillRect(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-		else
-			g.fillOval(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+		if (endType == 1)// input
+			g.fillRect(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+		else if (endType == 2)// output
+			g.fillOval(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+		else// input-output
+			g.fillPolygon(new int[] { x, x - PIN_OFFS - 1, x, x + PIN_OFFS + 1 },
+					new int[] { y - PIN_OFFS - 1, y, y + PIN_OFFS + 1, y }, 4);
 		g.setColor(curColor);
 	}
 
@@ -155,17 +160,20 @@ public class ComponentDrawContext {
 		Location pt = e.getLocation();
 		int x = pt.getX();
 		int y = pt.getY();
-		boolean isInput = e.isInput();
+		byte endType = e.getType();
 		if (getShowState()) {
 			CircuitState state = getCircuitState();
 			pinColor = state.getValue(pt).getColor();
 		}
 		// pin
 		g.setColor(pinColor);
-		if (isInput)
+		if (endType == 1)// input
 			g.fillRect(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-		else
+		else if (endType == 2)// output
 			g.fillOval(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+		else// input-output
+			g.fillPolygon(new int[] { x, x - PIN_OFFS - 1, x, x + PIN_OFFS + 1 },
+					new int[] { y - PIN_OFFS - 1, y, y + PIN_OFFS + 1, y }, 4);
 		g.setColor(curColor);
 		if (dir == Direction.EAST) {
 			GraphicsUtil.drawText(g, label, x + 4, y, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER_OVERALL);
@@ -181,20 +189,24 @@ public class ComponentDrawContext {
 	public void drawPins(Component comp) {
 		Color curColor = g.getColor();
 		Color pinColor = Color.BLACK;
-		boolean isInput;
 		for (EndData e : comp.getEnds()) {
-			isInput = e.isInput();
+			byte endType = e.getType();
 			Location pt = e.getLocation();
+			int x = pt.getX();
+			int y = pt.getY();
 			if (getShowState()) {
 				CircuitState state = getCircuitState();
 				pinColor = state.getValue(pt).getColor();
 			}
 			// pin
 			g.setColor(pinColor);
-			if (isInput)
-				g.fillRect(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
-			else
-				g.fillOval(pt.getX() - PIN_OFFS, pt.getY() - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+			if (endType == 1)// input
+				g.fillRect(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+			else if (endType == 2)// output
+				g.fillOval(x - PIN_OFFS, y - PIN_OFFS, PIN_SIZE, PIN_SIZE);
+			else// input-output
+				g.fillPolygon(new int[] { x, x - PIN_OFFS - 1, x, x + PIN_OFFS + 1 },
+						new int[] { y - PIN_OFFS - 1, y, y + PIN_OFFS + 1, y }, 4);
 		}
 		g.setColor(curColor);
 	}

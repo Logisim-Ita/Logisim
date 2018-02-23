@@ -42,7 +42,7 @@ public class Port {
 			throw new IllegalArgumentException("Not recognized exclusion type");
 	}
 
-	private static int toType(String s) {
+	private static byte toType(String s) {
 		if (s == null)
 			throw new IllegalArgumentException("Null port type");
 		else if (s.equals(INPUT))
@@ -57,7 +57,7 @@ public class Port {
 
 	private int dx;
 	private int dy;
-	private int type;
+	private byte type;
 	private BitWidth widthFixed;
 
 	private Attribute<BitWidth> widthAttr;

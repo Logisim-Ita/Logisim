@@ -2,13 +2,16 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.13.0.0</jar_version>
+  <jar_version>2.14.0.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.13.0.0</exe_version>
+  <exe_version>2.14.0.0</exe_version>
   <changelog>
-* New Component! Wiring -> Programmable Generator, it works as a clock but you can edit the duration of each state
-* Simpler Toolbar, if you want back the old one go to Preference->Fork and uncheck Use Simple Toolbar
-* Graphical improvements
+* New component! I/O -> Slider
+* New TTL! TTL -> 74125: quad bus buffer, three-state outputs, negative enable
+* New Pin layout!
+* New end ports layout!
+* Better value display when clicking on a wire with PokeTool
+* Fixes
 
 If you want to help the project, I need for translators and suggestions
 Contact me at logisimit@gmail.com

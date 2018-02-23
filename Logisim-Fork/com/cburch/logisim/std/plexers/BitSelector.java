@@ -30,8 +30,8 @@ public class BitSelector extends InstanceFactory {
 
 	public BitSelector() {
 		super("BitSelector", Strings.getter("bitSelectorComponent"));
-		setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, GROUP_ATTR },
-				new Object[] { Direction.EAST, BitWidth.create(8), BitWidth.ONE });
+		setAttributes(new Attribute[] { StdAttr.FACING, Plexers.ATTR_SELECT_LOC, StdAttr.WIDTH, GROUP_ATTR },
+				new Object[] { Direction.EAST, Plexers.SELECT_BOTTOM_LEFT, BitWidth.create(8), BitWidth.ONE });
 		setKeyConfigurator(JoinedConfigurator.create(new BitWidthConfigurator(GROUP_ATTR, 1, Value.MAX_WIDTH, 0),
 				new BitWidthConfigurator(StdAttr.WIDTH)));
 
@@ -57,7 +57,7 @@ public class BitSelector extends InstanceFactory {
 		if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			updatePorts(instance);
-		} else if (attr == StdAttr.WIDTH || attr == GROUP_ATTR) {
+		} else if (attr == StdAttr.WIDTH || attr == GROUP_ATTR || attr == Plexers.ATTR_SELECT_LOC) {
 			updatePorts(instance);
 		}
 	}
@@ -112,6 +112,7 @@ public class BitSelector extends InstanceFactory {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		BitWidth data = instance.getAttributeValue(StdAttr.WIDTH);
 		BitWidth group = instance.getAttributeValue(GROUP_ATTR);
+		Object selectLoc = instance.getAttributeValue(Plexers.ATTR_SELECT_LOC);
 		int groups = (data.getWidth() + group.getWidth() - 1) / group.getWidth() - 1;
 		int selectBits = 1;
 		if (groups > 0) {
@@ -126,16 +127,28 @@ public class BitSelector extends InstanceFactory {
 		Location selPt;
 		if (facing == Direction.WEST) {
 			inPt = Location.create(30, 0);
-			selPt = Location.create(10, 10);
+			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
+				selPt = Location.create(10, -10);
+			else // DOWN/LEFT
+				selPt = Location.create(10, 10);
 		} else if (facing == Direction.NORTH) {
 			inPt = Location.create(0, 30);
-			selPt = Location.create(-10, 10);
+			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
+				selPt = Location.create(-10, 10);
+			else // DOWN/LEFT
+				selPt = Location.create(10, 10);
 		} else if (facing == Direction.SOUTH) {
 			inPt = Location.create(0, -30);
-			selPt = Location.create(-10, -10);
+			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
+				selPt = Location.create(-10, -10);
+			else // DOWN/LEFT
+				selPt = Location.create(10, -10);
 		} else {
 			inPt = Location.create(-30, 0);
-			selPt = Location.create(-10, 10);
+			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
+				selPt = Location.create(-10, 10);
+			else // DOWN/LEFT
+				selPt = Location.create(10, 10);
 		}
 
 		Port[] ps = new Port[3];

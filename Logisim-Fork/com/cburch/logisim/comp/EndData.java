@@ -7,20 +7,20 @@ import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Location;
 
 public class EndData {
-	public static final int INPUT_ONLY = 1;
-	public static final int OUTPUT_ONLY = 2;
-	public static final int INPUT_OUTPUT = 3;
+	public static final byte INPUT_ONLY = 1;
+	public static final byte OUTPUT_ONLY = 2;
+	public static final byte INPUT_OUTPUT = 3;
 
 	private Location loc;
 	private BitWidth width;
-	private int i_o;
+	private byte i_o;
 	private boolean exclusive;
 
-	public EndData(Location loc, BitWidth width, int type) {
+	public EndData(Location loc, BitWidth width, byte type) {
 		this(loc, width, type, type == OUTPUT_ONLY);
 	}
 
-	public EndData(Location loc, BitWidth width, int type, boolean exclusive) {
+	public EndData(Location loc, BitWidth width, byte type, boolean exclusive) {
 		this.loc = loc;
 		this.width = width;
 		this.i_o = type;
@@ -42,7 +42,7 @@ public class EndData {
 		return loc;
 	}
 
-	public int getType() {
+	public byte getType() {
 		return i_o;
 	}
 

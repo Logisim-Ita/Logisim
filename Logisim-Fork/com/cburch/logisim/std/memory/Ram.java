@@ -211,6 +211,7 @@ public class Ram extends Mem {
 			ps[DIN].setToolTip(Strings.getter("ramInTip"));
 		} else {
 			ps[DATA].setToolTip(Strings.getter("ramBusTip"));
+			ps[DATA] = new Port(0, 0, Port.INOUT, DATA_ATTR);
 		}
 		instance.setPorts(ps);
 	}

@@ -17,6 +17,7 @@ This is an italian fork based on the original Logisim version.<br>
 	* I/O->Digital Oscilloscope
 	* I/O->Switch
 	* I/O->Dip Switch
+	* I/O->Slider
 	* I/O->RGB LED
 	* Memory->PLA ROM
 	* Plexers->7-Segment Display Decoder
@@ -52,7 +53,6 @@ This is an italian fork based on the original Logisim version.<br>
 * All the original Logisim's bugs we haven't fixed yet
 ## Features we want to add
 * Solve dirty points when rotating
-* Programmable Generator (99% done)
 * Buzzer (75% done)
 * Add a new type of library
 * Draw also in circuits

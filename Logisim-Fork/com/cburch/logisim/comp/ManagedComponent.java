@@ -164,11 +164,11 @@ public abstract class ManagedComponent extends AbstractComponent {
 		}
 	}
 
-	public void setEnd(int i, Location end, BitWidth width, int type) {
+	public void setEnd(int i, Location end, BitWidth width, byte type) {
 		setEnd(i, new EndData(end, width, type));
 	}
 
-	public void setEnd(int i, Location end, BitWidth width, int type, boolean exclusive) {
+	public void setEnd(int i, Location end, BitWidth width, byte type, boolean exclusive) {
 		setEnd(i, new EndData(end, width, type, exclusive));
 	}
 

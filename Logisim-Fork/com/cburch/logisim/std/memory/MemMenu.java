@@ -45,9 +45,9 @@ class MemMenu implements ActionListener, MenuExtender {
 		else if (src == clear)
 			doClear();
 		else if (src == load)
-			doLoad();
+			doLoad(factory instanceof Ram);
 		else if (src == save)
-			doSave();
+			doSave(factory instanceof Ram);
 	}
 
 	@Override
@@ -103,12 +103,15 @@ class MemMenu implements ActionListener, MenuExtender {
 		frame.toFront();
 	}
 
-	private void doLoad() {
+	private void doLoad(boolean ram) {
 		JFileChooser chooser = proj.createChooser();
 		File oldSelected = factory.getCurrentImage(instance);
 		if (oldSelected != null)
 			chooser.setSelectedFile(oldSelected);
-		chooser.setDialogTitle(Strings.get("ramLoadDialogTitle"));
+		if (ram)
+			chooser.setDialogTitle(Strings.get("ramLoadDialogTitle"));
+		else
+			chooser.setDialogTitle(Strings.get("romLoadDialogTitle"));
 		int choice = chooser.showOpenDialog(frame);
 		if (choice == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
@@ -121,14 +124,17 @@ class MemMenu implements ActionListener, MenuExtender {
 		}
 	}
 
-	private void doSave() {
+	private void doSave(boolean ram) {
 		MemState s = factory.getState(instance, circState);
 
 		JFileChooser chooser = proj.createChooser();
 		File oldSelected = factory.getCurrentImage(instance);
 		if (oldSelected != null)
 			chooser.setSelectedFile(oldSelected);
-		chooser.setDialogTitle(Strings.get("ramSaveDialogTitle"));
+		if (ram)
+			chooser.setDialogTitle(Strings.get("ramSaveDialogTitle"));
+		else
+			chooser.setDialogTitle(Strings.get("romSaveDialogTitle"));
 		int choice = chooser.showSaveDialog(frame);
 		if (choice == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
