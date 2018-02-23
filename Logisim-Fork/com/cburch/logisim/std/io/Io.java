@@ -32,7 +32,7 @@ public class Io extends Library {
 			new FactoryDescription("Button", Strings.getter("buttonComponent"), "button.gif", "Button"),
 			new FactoryDescription("Switch", Strings.getter("switchComponent"), "switch.gif", "Switch"),
 			new FactoryDescription("DipSwitch", Strings.getter("DipSwitchComponent"), "dipswitch.gif", "DipSwitch"),
-			new FactoryDescription("Slider", Strings.getter("SliderComponent"), "slider.gif", "Slider"),
+			new FactoryDescription("Slider", Strings.getter("Slider"), "slider.gif", "Slider"),
 			new FactoryDescription("Joystick", Strings.getter("joystickComponent"), "joystick.gif", "Joystick"),
 			new FactoryDescription("Keyboard", Strings.getter("keyboardComponent"), "keyboard.gif", "Keyboard"),
 			// new FactoryDescription("Buzzer", Strings.getter("buzzerComponent"),

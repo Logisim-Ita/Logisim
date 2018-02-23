@@ -89,7 +89,7 @@ public class Slider extends InstanceFactory {
 	}
 
 	public Slider() {
-		super("Slider", Strings.getter("SliderComponent"));
+		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
 						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
