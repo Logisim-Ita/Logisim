@@ -136,14 +136,14 @@ public class BitSelector extends InstanceFactory {
 			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
 				selPt = Location.create(10, 10);
 			else // DOWN/LEFT
-				selPt = Location.create(-10, 10);				
+				selPt = Location.create(-10, 10);
 		} else if (facing == Direction.SOUTH) {
 			inPt = Location.create(0, -30);
-			if (selectLoc == Plexers.SELECT_TOP_RIGHT)	
+			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
 				selPt = Location.create(10, -10);
 			else // DOWN/LEFT
-				selPt = Location.create(-10, -10);				
-		} else {//EAST
+				selPt = Location.create(-10, -10);
+		} else {// EAST
 			inPt = Location.create(-30, 0);
 			if (selectLoc == Plexers.SELECT_TOP_RIGHT)
 				selPt = Location.create(-10, -10);

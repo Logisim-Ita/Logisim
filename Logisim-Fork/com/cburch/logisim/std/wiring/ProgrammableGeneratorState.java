@@ -83,87 +83,75 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	public void editWindow() {
 		// array of jtextfields, here will be saved the new values
 		inputs = new JTextField[this.durationHigh.length + this.durationLow.length];
+		// save / clear text for buttons transalted
 		String[] options = new String[] { new LocaleManager("resources/logisim", "gui").get("saveOption"),
 				Strings.get("ramClearMenuItem") };
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbs = new GridBagConstraints();
-		// to remove insets
-		Insets empty = new Insets(0, 0, 0, 0);
 		// insets between states
-		Insets newstate = new Insets(5, 0, 10, 0);
+		Insets inset = new Insets(5, 0, 10, 0);
 		// state number font
 		Font state = new Font(Font.SANS_SERIF, Font.BOLD, 18);
-		JLabel up, down, statenumber, clock;
+		JLabel statenumber, clock;
+		JLabel up = new JLabel(Strings.get("clockHighAttr"));
+		gbs.gridx = 2;
+		gbs.gridwidth = 2;
+		gbs.anchor = GridBagConstraints.CENTER;
+		gbs.weightx = 2;
+		panel.add(up, gbs);
+		JLabel down = new JLabel(Strings.get("clockLowAttr"));
+		gbs.gridx = 4;
+		panel.add(down, gbs);
+		gbs.gridwidth = 1;
+		gbs.insets = inset;
+		// 2 inputs a row
 		for (int i = 0; i < inputs.length; i += 2) {
-
+			// number of state to edit
 			statenumber = new JLabel(String.valueOf(i / 2 + 1));
 			statenumber.setFont(state);
 			statenumber.setForeground(Color.DARK_GRAY);
 			gbs.anchor = GridBagConstraints.EAST;
 			gbs.gridx = 0;
-			gbs.gridy = i;
-			// 2 rows height
-			gbs.gridheight = 2;
+			gbs.gridy = i + 1;
 			// x padding
-			gbs.ipadx = 20;
-			gbs.insets = empty;
-			gbs.fill = GridBagConstraints.VERTICAL;
 			panel.add(statenumber, gbs);
-
-			up = new JLabel(Strings.get("clockHighAttr") + ":  ");
-			gbs.gridx = 1;
-			gbs.gridy = i;
-			gbs.gridheight = 1;
-			gbs.ipadx = 0;
-			panel.add(up, gbs);
-
-			inputs[i] = new JTextField(String.valueOf(getdurationHigh(i / 2)), 5);
+			// high duration edit box
+			inputs[i] = new JTextField(String.valueOf(getdurationHigh(i / 2)), 3);
+			inputs[i].setHorizontalAlignment(JTextField.CENTER);
 			gbs.gridx = 2;
-			gbs.gridy = i;
-			gbs.gridheight = 1;
 			panel.add(inputs[i], gbs);
-
+			// print tick/ticks
 			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationHigh(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
 			gbs.anchor = GridBagConstraints.WEST;
 			gbs.gridx = 3;
-			gbs.gridy = i;
-			gbs.gridheight = 1;
 			panel.add(clock, gbs);
-
-			down = new JLabel(Strings.get("clockLowAttr") + ":  ");
+			// low duration edit box
+			inputs[i + 1] = new JTextField(String.valueOf(getdurationLow(i / 2)), 3);
+			inputs[i + 1].setHorizontalAlignment(JTextField.CENTER);
 			gbs.anchor = GridBagConstraints.EAST;
-			gbs.gridx = 1;
-			gbs.gridy = i + 1;
-			gbs.gridheight = 1;
-			panel.add(down, gbs);
-
-			inputs[i + 1] = new JTextField(String.valueOf(getdurationLow(i / 2)), 5);
-			gbs.gridx = 2;
-			gbs.gridy = i + 1;
-			gbs.gridheight = 1;
-			gbs.insets = newstate;
+			gbs.gridx = 4;
 			panel.add(inputs[i + 1], gbs);
-
+			// print tick/ticks
 			clock = new JLabel("  " + StringUtil.format(
 					Strings.get((getdurationLow(i / 2) > 1 ? "clockDurationValue" : "clockDurationOneValue")), ""));
 			gbs.anchor = GridBagConstraints.WEST;
-			gbs.gridx = 3;
-			gbs.gridy = i + 1;
-			gbs.gridheight = 1;
+			gbs.gridx = 5;
 			panel.add(clock, gbs);
 		}
 		JScrollPane scrollable = new JScrollPane(panel);
-		scrollable.setPreferredSize(new Dimension(350, 300));
+		scrollable.setPreferredSize(new Dimension(300, 300));
 		scrollable.setBorder(null);
 
 		int option = JOptionPane.showOptionDialog(null, scrollable,
 				Strings.getter("ProgrammableGeneratorComponent").get(), JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, null, options, null);
 		if (option == 0) {
+			// save
 			SaveValues(inputs);
 			SaveData();
 		} else if (option == 1)
+			// clear
 			clearValues();
 	}
 

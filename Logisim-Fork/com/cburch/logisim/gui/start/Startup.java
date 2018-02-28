@@ -299,7 +299,7 @@ public class Startup {
 			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println("cannot reach server");			
+			System.err.println("cannot reach server");
 		}
 	}
 
