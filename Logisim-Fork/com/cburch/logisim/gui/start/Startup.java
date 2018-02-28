@@ -385,7 +385,9 @@ public class Startup {
 			if (AppPreferences.AUTO_UPDATES.get().equals(AppPreferences.ASKME) || !FromMain) {
 				int answer = JOptionPane.showConfirmDialog(null,
 						StringUtil.format(Strings.get("UpdateMessage"), remoteVersion.toString(),
-								logisimData.child("changelog").content()),
+								logisimData.child("changelog").content() + "\r\n"
+										+ "If you want to help the project, I need for translators and suggestions\r\n"
+										+ "Contact me at logisimit@gmail.com"),
 						Strings.get("Update"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
 				if (answer != 0)
