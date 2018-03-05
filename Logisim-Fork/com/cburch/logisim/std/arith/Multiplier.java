@@ -34,7 +34,13 @@ public class Multiplier extends InstanceFactory {
 		if (c_in == Value.NIL || c_in.isUnknown())
 			c_in = Value.createKnown(width, 0);
 		if (a.isFullyDefined() && b.isFullyDefined() && c_in.isFullyDefined()) {
-			long sum = (long) a.toIntValue() * (long) b.toIntValue() + c_in.toIntValue();
+			long sum = 0;
+			// pseudo-unsigned long cast if w = 32-bit
+			if (w < 32)
+				sum = (long) a.toIntValue() * (long) b.toIntValue() + c_in.toIntValue();
+			else
+				sum = (a.toIntValue() & 0xffffffffL) * (b.toIntValue() & 0xffffffffL)
+						+ (c_in.toIntValue() & 0xffffffffL);
 			return new Value[] { Value.createKnown(width, (int) sum), Value.createKnown(width, (int) (sum >> w)) };
 		} else {
 			Value[] avals = a.getAll();
