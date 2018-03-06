@@ -27,7 +27,6 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 
 	public PlaRomPanel(PlaRomData data) {
 		this.data = data;
-		;
 		super.addMouseListener(this);
 	}
 

@@ -93,6 +93,7 @@ public class PlaRomData implements InstanceData {
 		panel = new JScrollPane(this.drawing, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		panel.setBorder(null);
+		panel.getVerticalScrollBar().setUnitIncrement(10);
 		if (this.drawing.getPreferredSize().getWidth() >= (int) (screenSize.width * 0.75))
 			panel.setPreferredSize(
 					new Dimension((int) (screenSize.width * 0.75), (int) panel.getPreferredSize().getHeight()));

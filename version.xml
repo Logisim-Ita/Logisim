@@ -2,16 +2,12 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.jar</jar_file>
-  <jar_version>2.14.0.0</jar_version>
+  <jar_version>2.14.1.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-Fork.exe</exe_file>
-  <exe_version>2.14.0.0</exe_version>
+  <exe_version>2.14.1.0</exe_version>
   <changelog>
-* New component! I/O -> Slider
-* New TTL! TTL -> 74125: quad bus buffer, three-state outputs, negative enable
-* New Pin layout!
-* New end ports layout!
-* Sel pin position attribute for BitFinder component
-* Better value display when clicking on a wire with PokeTool
-* Fixes
+* Better layout for Programmable Generator's edit window
+* Fixed bugged 32b multiplier, thanks to Youlien Pohl
+* Increased steps in some scroll bar when using mouse wheel
   </changelog>
 </logisim>

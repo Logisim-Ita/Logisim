@@ -46,6 +46,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Fixed empty template bug introduced in Logisim 2.7.0
 * Fixed input positions in wide gates with 4 inputs
 * Fixed opening new file in new window with old window not used
+* Fixed bugged 32b multiplier
 * Changed some default value
 * Anti Aliasing, Look and Feel and Fill Component's Background preference
 * Graphical changes
