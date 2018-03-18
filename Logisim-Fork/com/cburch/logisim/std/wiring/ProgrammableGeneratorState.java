@@ -37,7 +37,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		this.ticks = 0;
 		this.currentstate = 0;
 		// set all the values to 1
-		for (int i = 0; i < durationHigh.length; i++) {
+		for (byte i = 0; i < durationHigh.length; i++) {
 			durationHigh[i] = 1;
 			durationLow[i] = 1;
 		}
@@ -59,20 +59,20 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			return;
 		// split the attribute content string in an array of strings with a single
 		// information each one
-		String[] datas = s.split(" "), tmp;
+		String[] data = s.split(" "), tmp;
 		int value, cnt = 0;
-		for (int i = 0; i < datas.length; i++) {
+		for (int i = 0; i < data.length; i++) {
 			// if contains a '*' it has to fill the array with the first value for x (second
 			// number) cycles
-			if (datas[i].contains("*")) {
-				tmp = datas[i].split("\\*");
+			if (data[i].contains("*")) {
+				tmp = data[i].split("\\*");
 				for (int j = 0; j < Integer.parseInt(tmp[1]); j++) {
 					value = Integer.parseInt(tmp[0]);
 					writeData(value, cnt);
 					cnt++;
 				}
 			} else {
-				value = Integer.parseInt(datas[i]);
+				value = Integer.parseInt(data[i]);
 				writeData(value, cnt);
 				cnt++;
 			}
@@ -81,7 +81,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 
 	public void editWindow() {
 		// array of jtextfields, here will be saved the new values
-		inputs = new JTextField[this.durationHigh.length + this.durationLow.length];
+		inputs = new JTextField[this.durationHigh.length*2];
 		// save / clear text for buttons transalted
 		String[] options = new String[] { new LocaleManager("resources/logisim", "gui").get("saveOption"),
 				Strings.get("ramClearMenuItem") };
@@ -105,7 +105,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		gbs.gridx = 2;
 		panel.add(down, gbs);
 		// 2 inputs a row
-		for (int i = 0; i < inputs.length; i += 2) {
+		for (byte i = 0; i < inputs.length; i += 2) {
 			// number of state to edit
 			statenumber = new JLabel(String.valueOf(i / 2 + 1));
 			statenumber.setFont(state);
@@ -180,7 +180,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	}
 
 	public void SaveData() {
-		int size = this.durationHigh.length + this.durationLow.length, count = 0;
+		int size = this.durationHigh.length*2, count = 0;
 		String val, data = "", last = "x";
 		boolean dirty = false;
 		// input-and matrix
@@ -219,11 +219,11 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	private void SaveValues(JTextField[] inputs) {
 		String onlynumber;
 		int value;
-		for (int i = 0; i < inputs.length; i++) {
+		for (byte i = 0; i < inputs.length; i++) {
 			onlynumber = "";
 			value = 0;
 			// create a string composed by the digits of the text field
-			for (int j = 0; j < inputs[i].getText().length(); j++) {
+			for (byte j = 0; j < inputs[i].getText().length(); j++) {
 				if (Character.isDigit(inputs[i].getText().charAt(j)))
 					onlynumber += inputs[i].getText().charAt(j);
 			}
@@ -258,7 +258,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			durationLow = new int[newsize];
 			clearValues();
 			int lowerlength = (oldDurationHigh.length < newsize) ? oldDurationHigh.length : newsize;
-			for (int i = 0; i < lowerlength; i++) {
+			for (byte i = 0; i < lowerlength; i++) {
 				durationHigh[i] = oldDurationHigh[i];
 				durationLow[i] = oldDurationLow[i];
 			}

@@ -53,7 +53,7 @@ public class BitAdder extends InstanceFactory {
 
 	private void configurePorts(Instance instance) {
 		BitWidth inWidth = instance.getAttributeValue(StdAttr.WIDTH);
-		int inputs = instance.getAttributeValue(NUM_INPUTS).intValue();
+		byte inputs = instance.getAttributeValue(NUM_INPUTS).byteValue();
 		int outWidth = computeOutputBits(inWidth.getWidth(), inputs);
 
 		int y;
@@ -76,7 +76,7 @@ public class BitAdder extends InstanceFactory {
 		Port[] ps = new Port[inputs + 1];
 		ps[0] = new Port(0, 0, Port.OUTPUT, BitWidth.create(outWidth));
 		ps[0].setToolTip(Strings.getter("bitAdderOutputManyTip"));
-		for (int i = 0; i < inputs; i++) {
+		for (byte i = 0; i < inputs; i++) {
 			ps[i + 1] = new Port(-40, y + i * dy, Port.INPUT, inWidth);
 			ps[i + 1].setToolTip(Strings.getter("bitAdderInputTip"));
 		}
@@ -85,7 +85,7 @@ public class BitAdder extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int inputs = attrs.getValue(NUM_INPUTS).intValue();
+		byte inputs = attrs.getValue(NUM_INPUTS).byteValue();
 		int h = Math.max(40, 10 * inputs);
 		int y = inputs < 4 ? 20 : (((inputs - 1) / 2) * 10 + 5);
 		return Bounds.create(-40, -y, 40, h);
@@ -120,7 +120,7 @@ public class BitAdder extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		int width = state.getAttributeValue(StdAttr.WIDTH).getWidth();
-		int inputs = state.getAttributeValue(NUM_INPUTS).intValue();
+		byte inputs = state.getAttributeValue(NUM_INPUTS).byteValue();
 
 		// compute the number of 1 bits
 		int minCount = 0; // number that are definitely 1

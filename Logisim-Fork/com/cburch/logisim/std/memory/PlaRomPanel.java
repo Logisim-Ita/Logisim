@@ -22,7 +22,7 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 7182231893518001053L;
-	private static final int IMAGE_BORDER = 20;
+	private static final byte IMAGE_BORDER = 20;
 	private PlaRomData data;
 
 	public PlaRomPanel(PlaRomData data) {
@@ -52,6 +52,7 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 	}
 
 	private int getColumn(int x) {
+		System.out.println(x);
 		x += (20 - IMAGE_BORDER);
 		int column = x / 20;
 		return column;
@@ -64,6 +65,7 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 	}
 
 	private int getRow(int y) {
+		System.out.println(y);
 		y -= (20 + IMAGE_BORDER);
 		int row = y / 20;
 		return row;
@@ -82,11 +84,11 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 				if (column <= data.getInputs() * 2) {// input and area
 					column -= 1;
 					if (column % 2 == 1 && !data.getInputAndValue(row, column)
-							&& data.getInputAndValue(row, column - 1))
-						data.setInputAndValue(row, column - 1, false);
+							&& data.getInputAndValue(row, (column - 1)))
+						data.setInputAndValue(row, (column - 1), false);
 					else if (column % 2 == 0 && !data.getInputAndValue(row, column)
-							&& data.getInputAndValue(row, column + 1))
-						data.setInputAndValue(row, column + 1, false);
+							&& data.getInputAndValue(row, (column + 1)))
+						data.setInputAndValue(row, (column + 1), false);
 					data.setInputAndValue(row, column, !data.getInputAndValue(row, column));
 					repaint();
 				} else if (column2 > data.getInputs() * 2 + 3) {// and or area
@@ -126,9 +128,9 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 		super.paintComponent(g);
-		int inputs = data.getInputs();
-		int outputs = data.getOutputs();
-		int and = data.getAnd();
+		byte inputs = data.getInputs();
+		byte outputs = data.getOutputs();
+		byte and = data.getAnd();
 		GraphicsUtil.switchToWidth(g, 2);
 		g.setColor(Color.DARK_GRAY);
 		g.setFont(new Font("sans serif", Font.BOLD, 14));
@@ -136,13 +138,13 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 				40 * (inputs + 1) - (20 - IMAGE_BORDER) + 5, IMAGE_BORDER);
 		GraphicsUtil.drawCenteredText(g, Strings.getter("multiplexerOutTip").toString() + "\u2192",
 				IMAGE_BORDER + 20 + 40 * inputs - 10, IMAGE_BORDER + 100 + 40 * and);
-		for (Integer i = 1; i <= inputs; i++) {
-			Color inputColor = data.getInputValue(i - 1).getColor();
-			Color notColor = data.getInputValue(i - 1).not().getColor();
+		for (byte i = 1; i <= inputs; i++) {
+			Color inputColor = data.getInputValue((byte) (i - 1)).getColor();
+			Color notColor = data.getInputValue((byte) (i - 1)).not().getColor();
 			g.setColor(inputColor);
 			// draw input value
-			GraphicsUtil.drawCenteredText(g, data.getInputValue(i - 1).toString(), 40 * i - (20 - IMAGE_BORDER),
-					IMAGE_BORDER);
+			GraphicsUtil.drawCenteredText(g, data.getInputValue((byte) (i - 1)).toString(),
+					40 * i - (20 - IMAGE_BORDER), IMAGE_BORDER);
 			g.drawLine(40 * i - (20 - IMAGE_BORDER), IMAGE_BORDER + 15, 40 * i - (20 - IMAGE_BORDER),
 					IMAGE_BORDER + 22);
 			g.drawLine(40 * i - (30 - IMAGE_BORDER), IMAGE_BORDER + 22, 40 * i - (10 - IMAGE_BORDER),
@@ -160,7 +162,7 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 		for (Integer i = 1; i <= and; i++) {
 			g.drawLine(IMAGE_BORDER + 10, IMAGE_BORDER + 30 + 40 * i, IMAGE_BORDER + 4 + 40 * inputs,
 					IMAGE_BORDER + 30 + 40 * i);
-			g.setColor(data.getAndValue(i - 1).getColor());
+			g.setColor(data.getAndValue((byte) (i - 1)).getColor());
 			g.drawLine(IMAGE_BORDER + 36 + 40 * inputs, IMAGE_BORDER + 30 + 40 * i,
 					IMAGE_BORDER + 40 * (inputs + 1) + 20 + 40 * (outputs - 1), IMAGE_BORDER + 30 + 40 * i);
 			g.setColor(Color.BLACK);
@@ -169,16 +171,16 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 		for (Integer i = 1; i <= outputs; i++) {
 			g.drawLine(IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 70, IMAGE_BORDER + 20 + 40 * (inputs + i),
 					IMAGE_BORDER + 54 + 40 * and);
-			g.setColor(data.getOutputValue(i - 1).getColor());
+			g.setColor(data.getOutputValue((byte) (i - 1)).getColor());
 			g.drawLine(IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 82 + 40 * and,
 					IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 89 + 40 * and);
-			GraphicsUtil.drawCenteredText(g, data.getOutputValue(i - 1).toString(),
+			GraphicsUtil.drawCenteredText(g, data.getOutputValue((byte) (i - 1)).toString(),
 					IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 100 + 40 * and);
 			g.setColor(Color.BLACK);
 			drawOr(g, IMAGE_BORDER + 20 + 40 * (inputs + i), IMAGE_BORDER + 54 + 40 * and);
 		}
-		for (int i = 0; i < and; i++) {
-			for (int j = 0; j < inputs * 2; j++) {
+		for (byte i = 0; i < and; i++) {
+			for (byte j = 0; j < inputs * 2; j++) {
 				if (data.getInputAndValue(i, j)) {
 					g.setColor(Color.WHITE);
 					g.fillOval(IMAGE_BORDER + 10 + 20 * j - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8, 8);
@@ -186,7 +188,7 @@ public class PlaRomPanel extends JPanel implements MouseListener {
 					g.drawOval(IMAGE_BORDER + 10 + 20 * j - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8, 8);
 				}
 			}
-			for (int k = 0; k < outputs; k++) {
+			for (byte k = 0; k < outputs; k++) {
 				if (data.getAndOutputValue(i, k)) {
 					g.setColor(Color.WHITE);
 					g.fillOval(IMAGE_BORDER + 20 + 40 * (inputs + 1) + 40 * k - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8,

@@ -14,8 +14,8 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class Ttl74165 extends AbstractTtlGate {
 
 	public Ttl74165() {
-		super("74165", 16, new int[] { 7, 9 }, new String[] { "Shift/Load", "Clock", "P4", "P5", "P6", "P7", "Q7n",
-				"Q7", "Serial Input", "P0", "P1", "P2", "P3", "Clock Inhibit" });
+		super("74165", (byte) 16, new byte[] { 7, 9 }, new String[] { "Shift/Load", "Clock", "P4", "P5", "P6", "P7",
+				"Q7n", "Q7", "Serial Input", "P0", "P1", "P2", "P3", "Clock Inhibit" });
 	}
 
 	private ShiftRegisterData getData(InstanceState state) {
@@ -35,7 +35,7 @@ public class Ttl74165 extends AbstractTtlGate {
 				"Q7", "SER", "P0", "P1", "P2", "P3", "CkIh" });
 		ShiftRegisterData data = getData(painter);
 		String s = "";
-		for (int i = 0; i < 8; i++)
+		for (byte i = 0; i < 8; i++)
 			s += data.get(7 - i).toHexString();
 		g.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN, 14));
 		GraphicsUtil.drawCenteredText(g, s, x + 80, y + height / 2 - 3);

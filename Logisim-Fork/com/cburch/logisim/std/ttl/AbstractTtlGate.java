@@ -21,11 +21,11 @@ import com.cburch.logisim.util.GraphicsUtil;
 public abstract class AbstractTtlGate extends InstanceFactory {
 
 	protected static final int pinwidth = 10, pinheight = 7, height = 60;
-	protected int pinnumber;
+	protected byte pinnumber;
 	private String name;
-	private int ngatestodraw = 0;
+	private byte ngatestodraw = 0;
 	protected String[] portnames = null;
-	private int[] outputports;
+	private byte[] outputports;
 
 	/**
 	 * @param name
@@ -36,7 +36,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	 *            = an array with the indexes of the output ports (indexes are the
 	 *            same you can find on Google searching the TTL you want to add)
 	 **/
-	protected AbstractTtlGate(String name, int pins, int[] outputports) {
+	protected AbstractTtlGate(String name, byte pins, byte[] outputports) {
 		super(name);
 		setIconName("ttl.gif");
 		setAttributes(
@@ -61,9 +61,9 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	 *            = if true, it calls the paintInternal method many times as the
 	 *            number of output ports passing the coordinates
 	 **/
-	protected AbstractTtlGate(String name, int pins, int[] outputports, boolean drawgates) {
+	protected AbstractTtlGate(String name, byte pins, byte[] outputports, boolean drawgates) {
 		this(name, pins, outputports);
-		this.ngatestodraw = drawgates ? outputports.length : 0;
+		this.ngatestodraw = (byte) (drawgates ? outputports.length : 0);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	 *            = an array of strings which will be tooltips of the corresponding
 	 *            port in the order you pass
 	 **/
-	protected AbstractTtlGate(String name, int pins, int[] outputports, String[] Ttlportnames) {
+	protected AbstractTtlGate(String name, byte pins, byte[] outputports, String[] Ttlportnames) {
 		// the ttl name, the total number of pins and an array with the indexes of
 		// output ports (indexes are the one you can find on Google), an array of
 		// strings which will be tooltips of the corresponding port in order
@@ -131,7 +131,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		int xp = x, yp = y;
 		int width = bds.getWidth();
 		int height = bds.getHeight();
-		for (int i = 0; i < this.pinnumber; i++) {
+		for (byte i = 0; i < this.pinnumber; i++) {
 			if (i < this.pinnumber / 2) {
 				if (dir == Direction.WEST || dir == Direction.EAST)
 					xp = i * 20 + (10 - pinwidth / 2) + x;
@@ -238,7 +238,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			int xp = x, yp = y;
 			int width = bds.getWidth();
 			int height = bds.getHeight();
-			for (int i = 0; i < this.pinnumber; i++) {
+			for (byte i = 0; i < this.pinnumber; i++) {
 				if (i == this.pinnumber / 2) {
 					xp = x;
 					yp = y;
@@ -363,7 +363,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 			paintInternal(painter, x, y, height, false);
 		else {
 			paintBase(painter, false, false);
-			for (int i = 0; i < this.ngatestodraw; i++) {
+			for (byte i = 0; i < this.ngatestodraw; i++) {
 				paintInternal(painter,
 						x + (i < this.ngatestodraw / 2 ? i : i - this.ngatestodraw / 2)
 								* ((width - 20) / (this.ngatestodraw / 2)) + (i < this.ngatestodraw / 2 ? 0 : 20),
@@ -380,7 +380,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		if (state.getAttributeValue(TTL.VCC_GND) && (state.getPort(this.pinnumber - 2) != Value.FALSE
 				|| state.getPort(this.pinnumber - 1) != Value.TRUE)) {
 			int port = 0;
-			for (int i = 0; i < this.outputports.length; i++) {
+			for (byte i = 0; i < this.outputports.length; i++) {
 				port = this.outputports[i] - (this.outputports[i] >= this.pinnumber / 2 ? 2 : 1);
 				state.setPort(port, Value.UNKNOWN, 1);
 			}
@@ -393,7 +393,8 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	private void updateports(Instance instance) {
 		Bounds bds = instance.getBounds();
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
-		int dx = 0, dy = 0, portindex = 0, width = bds.getWidth(), height = bds.getHeight();
+		int dx = 0, dy = 0, width = bds.getWidth(), height = bds.getHeight();
+		byte portindex = 0;
 		boolean isoutput = false, hasvccgnd = instance.getAttributeValue(TTL.VCC_GND);
 		/*
 		 * array port is composed in this order: lower ports less GND, upper ports less
@@ -401,8 +402,8 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		 */
 		Port[] ps = new Port[hasvccgnd ? this.pinnumber : this.pinnumber - 2];
 
-		for (int i = 0; i < this.pinnumber; i++) {
-			for (int j = 0; j < this.outputports.length; j++) {
+		for (byte i = 0; i < this.pinnumber; i++) {
+			for (byte j = 0; j < this.outputports.length; j++) {
 				if (this.outputports[j] == i + 1)
 					isoutput = true;
 			}
