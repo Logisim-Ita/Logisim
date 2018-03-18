@@ -22,9 +22,9 @@ public class SevenSegment extends InstanceFactory {
 	static void drawBase(InstancePainter painter, boolean drawconnectionLines) {
 		ensureSegments();
 		InstanceDataSingleton data = (InstanceDataSingleton) painter.getData();
-		int summ = (data == null ? 0 : ((Integer) data.getValue()).intValue());
+		byte summ = (data == null ? 0 : ((Integer) data.getValue()).byteValue());
 		Boolean active = painter.getAttributeValue(Io.ATTR_ACTIVE);
-		int desired = active == null || active.booleanValue() ? 1 : 0;
+		byte desired = (byte) (active == null || active.booleanValue() ? 1 : 0);
 
 		Bounds bds = painter.getBounds();
 		int x = bds.getX() + 5;
@@ -51,11 +51,11 @@ public class SevenSegment extends InstanceFactory {
 				drawConnectionLines(g, bds, (byte) 6);
 			}
 		}
-		for (int i = 0; i <= 7; i++) {
+		for (byte i = 0; i <= 7; i++) {
 			if (painter.getShowState())
 				g.setColor(((summ >> i) & 1) == desired ? onColor : offColor);
 			if (drawconnectionLines && i != 5 && i != 6)
-				drawConnectionLines(g, bds, (byte) i);
+				drawConnectionLines(g, bds, i);
 			if (i < 7) {
 				Bounds seg = SEGMENTS[i];
 				g.fillRect(x + seg.getX(), y + seg.getY(), seg.getWidth(), seg.getHeight());
@@ -137,7 +137,7 @@ public class SevenSegment extends InstanceFactory {
 				new Port(20, 60, Port.INPUT, 1), new Port(10, 60, Port.INPUT, 1), new Port(0, 60, Port.INPUT, 1),
 				new Port(10, 0, Port.INPUT, 1), new Port(0, 0, Port.INPUT, 1), new Port(30, 60, Port.INPUT, 1) };
 		char c = 97;// a
-		for (int i = 0; i < 7; i++) {
+		for (byte i = 0; i < 7; i++) {
 			port[i].setToolTip(Strings.getter("" + c));
 			c++;
 		}
@@ -153,7 +153,7 @@ public class SevenSegment extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		int summary = 0;
-		for (int i = 0; i < 8; i++) {
+		for (byte i = 0; i < 8; i++) {
 			Value val = state.getPort(i);
 			if (val == Value.TRUE)
 				summary |= 1 << i;

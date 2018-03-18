@@ -39,8 +39,8 @@ public class DipSwitch extends InstanceFactory {
 
 		@Override
 		public Object[] getLogOptions(InstanceState state) {
-			Integer stages = state.getAttributeValue(ATTR_NSWITCHES);
-			Object[] ret = new Object[stages.intValue()];
+			byte stages = state.getAttributeValue(ATTR_NSWITCHES).byteValue();
+			Object[] ret = new Object[stages];
 			for (int i = 0; i < ret.length; i++) {
 				ret[i] = Integer.valueOf(i);
 			}
@@ -92,9 +92,8 @@ public class DipSwitch extends InstanceFactory {
 			if (getValues().length != switches) {
 				Value[] oldvals = getValues();
 				vals = new Value[switches];
-				Valfalse(vals);
-				int min = oldvals.length < switches ? oldvals.length : switches;
-				for (int i = 0; i < min; i++) {
+				byte min = (byte) (oldvals.length < switches ? oldvals.length : switches);
+				for (byte i = 0; i < min; i++) {
 					vals[i] = oldvals[i];
 				}
 			}
@@ -230,7 +229,7 @@ public class DipSwitch extends InstanceFactory {
 	}
 
 	private pinValues getValueState(InstanceState state) {
-		int switches = state.getAttributeValue(ATTR_NSWITCHES).intValue();
+		byte switches = state.getAttributeValue(ATTR_NSWITCHES).byteValue();
 		pinValues ret = (pinValues) state.getData();
 		if (ret == null) {
 			ret = new pinValues(state);
@@ -269,16 +268,16 @@ public class DipSwitch extends InstanceFactory {
 
 		int x = bds.getX();
 		int y = bds.getY();
-		int switches = painter.getAttributeValue(ATTR_NSWITCHES).intValue();
+		byte switches = painter.getAttributeValue(ATTR_NSWITCHES).byteValue();
 		Graphics g = painter.getGraphics();
 		GraphicsUtil.switchToWidth(g, 2);
 		if (dir == Direction.EAST) {
 			g.setColor(Color.BLACK);
-			for (int i = 1; i < switches; i++) {
+			for (byte i = 1; i < switches; i++) {
 				g.drawLine(0 + x, i * 20 + y, 30 + x, i * 20 + y);
 
 			}
-			for (int i = 0; i < switches; i++) {
+			for (byte i = 0; i < switches; i++) {
 				if (obj.getValue(i) != Value.FALSE) {
 					g.setColor(Value.TRUE_COLOR);
 					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
@@ -297,11 +296,11 @@ public class DipSwitch extends InstanceFactory {
 			}
 		} else if (dir == Direction.WEST) {
 			g.setColor(Color.BLACK);
-			for (int i = 1; i < switches; i++) {
+			for (byte i = 1; i < switches; i++) {
 				g.drawLine(0 + x, i * 20 + y, 30 + x, i * 20 + y);
 
 			}
-			for (int i = 0; i < switches; i++) {
+			for (byte i = 0; i < switches; i++) {
 				if (obj.getValue(i) != Value.FALSE) {
 					g.setColor(Value.TRUE_COLOR);
 					g.fillRect(5 + x, i * 20 + 5 + y, 20, 10);
@@ -320,11 +319,9 @@ public class DipSwitch extends InstanceFactory {
 			}
 		} else if (dir == Direction.NORTH) {
 			g.setColor(Color.BLACK);
-			for (int i = 1; i < switches; i++) {
-				g.drawLine(i * 20 + x, 0 + y, i * 20 + x, 30 + y);
-
-			}
-			for (int i = 0; i < switches; i++) {
+			for (byte i = 0; i < switches; i++) {
+				if (i > 0)
+					g.drawLine(i * 20 + x, 0 + y, i * 20 + x, 30 + y);
 				if (obj.getValue(i) != Value.FALSE) {
 					g.setColor(Value.TRUE_COLOR);
 					g.fillRect(i * 20 + 5 + x, 5 + y, 10, 20);
@@ -343,11 +340,9 @@ public class DipSwitch extends InstanceFactory {
 			}
 		} else if (dir == Direction.SOUTH) {
 			g.setColor(Color.BLACK);
-			for (int i = 1; i < switches; i++) {
-				g.drawLine(i * 20 + x, 30 + y, i * 20 + x, 0 + y);
-
-			}
-			for (int i = 0; i < switches; i++) {
+			for (byte i = 0; i < switches; i++) {
+				if (i > 0)
+					g.drawLine(i * 20 + x, 30 + y, i * 20 + x, 0 + y);
 				if (obj.getValue(i) != Value.FALSE) {
 					g.setColor(Value.TRUE_COLOR);
 					g.fillRect(i * 20 + 5 + x, 5 + y, 10, 20);
@@ -373,7 +368,7 @@ public class DipSwitch extends InstanceFactory {
 	public void propagate(InstanceState state) {
 		pinValues obj = getValueState(state);
 		Value val;
-		for (int i = 0; i < state.getAttributeValue(ATTR_NSWITCHES); i++) {
+		for (byte i = 0; i < state.getAttributeValue(ATTR_NSWITCHES).byteValue(); i++) {
 			val = obj.getValue(i);
 			state.setPort(i, val, 1);
 		}
@@ -382,14 +377,14 @@ public class DipSwitch extends InstanceFactory {
 	private void updateports(Instance instance) {
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 
-		int switches = instance.getAttributeValue(ATTR_NSWITCHES).intValue();
+		byte switches = instance.getAttributeValue(ATTR_NSWITCHES).byteValue();
 		Port[] ports = new Port[switches];
 
 		if (dir == Direction.EAST || dir == Direction.WEST) {
-			for (int i = 0; i < ports.length; i++)
+			for (byte i = 0; i < ports.length; i++)
 				ports[i] = new Port(0, 20 * i + 10, Port.OUTPUT, 1);
 		} else {
-			for (int i = 0; i < ports.length; i++)
+			for (byte i = 0; i < ports.length; i++)
 				ports[i] = new Port(20 * i + 10, 0, Port.OUTPUT, 1);
 		}
 		instance.setPorts(ports);

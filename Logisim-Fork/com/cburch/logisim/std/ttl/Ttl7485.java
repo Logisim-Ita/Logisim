@@ -7,8 +7,8 @@ import com.cburch.logisim.instance.InstanceState;
 public class Ttl7485 extends AbstractTtlGate {
 
 	public Ttl7485() {
-		super("7485", 16, new int[] { 5, 6, 7 }, new String[] { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B", "B0",
-				"A0", "B1", "A1", "A2", "B2", "A3" });
+		super("7485", (byte) 16, new byte[] { 5, 6, 7 }, new String[] { "B3", "A<B", "A=B", "A>B", "A>B", "A=B", "A<B",
+				"B0", "A0", "B1", "A1", "A2", "B2", "A3" });
 	}
 
 	@Override

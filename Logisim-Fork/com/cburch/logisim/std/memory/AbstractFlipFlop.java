@@ -134,7 +134,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		Boolean newlayout = attrs.getValue(NEW_FF_LAYOUT);
 		int width = newlayout ? 60 : 40;
 		int height = newlayout ? 80 : 40;
-		int offs = newlayout ? -20 : -10;
+		byte offs = (byte) (newlayout ? -20 : -10);
 		return Bounds.create(-width, offs, width, height);
 	}
 
@@ -215,7 +215,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			g.setColor(Color.BLACK);
 			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH)
 				painter.drawClock(n + STD_PORTS + enable, Direction.EAST);
-			for (int i = 0; i < n; i++)
+			for (byte i = 0; i < n; i++)
 				painter.drawPort(i, getInputName(i), Direction.EAST);
 
 		} else { // new layout
@@ -272,7 +272,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				if (!isGhost)
 					painter.drawPort(n + STD_PORTS + enable);
 			}
-			for (int i = 0; i < n; i++) {
+			for (byte i = 0; i < n; i++) {
 				// inputs
 				g.drawLine(bds.getX(), bds.getY() + (i + 1 == n ? 60 : 40), bds.getX() + 10,
 						bds.getY() + (i + 1 == n ? 60 : 40));
@@ -319,9 +319,9 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			state.setData(data);
 		}
 
-		int n = inputs;
-		int enable = state.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0;
-		int withclock = state.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1;
+		byte n = inputs;
+		byte enable = (byte) (state.getAttributeValue(Plexers.ATTR_ENABLE) ? 1 : 0);
+		byte withclock = (byte) (state.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1);
 		Object triggerType = state.getAttributeValue(triggerAttribute);
 		Value clear = state.getAttributeValue(NEGATE_PRE_CLR) ? state.getPort(n + 2).not() : state.getPort(n + 2);
 		Value preset = state.getAttributeValue(NEGATE_PRE_CLR) ? state.getPort(n + 3).not() : state.getPort(n + 3);
@@ -335,7 +335,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		} else if (triggered && (enable != 0 ? state.getPort(n + 4) != Value.FALSE : true)) {
 			// Clock has triggered and flip-flop is enabled: Update the state
 			Value[] inputs = new Value[n];
-			for (int i = 0; i < n; i++) {
+			for (byte i = 0; i < n; i++) {
 				inputs[i] = state.getPort(i);
 			}
 

@@ -7,25 +7,25 @@ import com.cburch.logisim.instance.InstanceData;
 
 class DiagramState implements InstanceData {
 	// the array cell where to save the actual input value
-	private int usedcell = -1;
+	private byte usedcell = -1;
 	private Value LastClock;
 	private boolean moveback = false;
 	private Boolean diagram[][];
-	private int Inputs, Length; // current inputs and length (number of states)
-	private int clocknumber;
+	private byte Inputs, Length; // current inputs and length (number of states)
+	private byte clocknumber;
 
-	public DiagramState(int inputs, int length) {
+	public DiagramState(byte inputs, byte length) {
 		LastClock = Value.UNKNOWN;
 		diagram = new Boolean[inputs][length];
 		clear();
 		Inputs = inputs;
 		Length = length;
-		clocknumber = (Length / 2);
+		clocknumber = (byte) (Length / 2);
 	}
 
 	public void clear() { // set all to false
-		for (int i = 0; i < Inputs; i++) {
-			for (int j = 0; j < Length; j++) {
+		for (byte i = 0; i < Inputs; i++) {
+			for (byte j = 0; j < Length; j++) {
 				diagram[i][j] = null;
 			}
 		}
@@ -42,7 +42,7 @@ class DiagramState implements InstanceData {
 		}
 	}
 
-	public int getclocknumber() {
+	public byte getclocknumber() {
 		return clocknumber;
 	}
 
@@ -54,7 +54,7 @@ class DiagramState implements InstanceData {
 		return diagram[i][j];
 	}
 
-	public int getusedcell() {
+	public byte getusedcell() {
 		return usedcell;
 	}
 
@@ -63,14 +63,14 @@ class DiagramState implements InstanceData {
 	}
 
 	public void moveback() { // move back all old values
-		for (int i = 0; i < Inputs; i++) {
-			for (int j = 0; j < Length - 1; j++) {
+		for (byte i = 0; i < Inputs; i++) {
+			for (byte j = 0; j < Length - 1; j++) {
 				diagram[i][j] = diagram[i][j + 1];
 			}
 		}
 	}
 
-	public void setclocknumber(int i) {
+	public void setclocknumber(byte i) {
 		clocknumber = i < 100 ? i : 1;
 	}
 
@@ -81,24 +81,24 @@ class DiagramState implements InstanceData {
 		return ret;
 	}
 
-	public void setState(int i, int j, Boolean b) {
+	public void setState(byte i, byte j, Boolean b) {
 		diagram[i][j] = b;
 	}
 
-	public void setusedcell(int i) {
+	public void setusedcell(byte i) {
 		usedcell = i;
 	}
 
-	public void updateSize(int inputs, int length) {
+	public void updateSize(byte inputs, byte length) {
 		// if it's not the same size
 		if (inputs != Inputs || length != Length) {
-			int oldinputs = Inputs;
-			int oldlength = Length;
+			byte oldinputs = Inputs;
+			byte oldlength = Length;
 			// update current inputs and length to not go out of array bouds in
 			// clear() function
 			Inputs = inputs;
 			Length = length;
-			clocknumber = clocknumber + (Length - oldlength) / 2;
+			clocknumber = (byte) (clocknumber + (Length - oldlength) / 2);
 			// create a copy of old boolean matrix
 			Boolean olddiagram[][] = Arrays.copyOf(diagram, diagram.length);
 			diagram = new Boolean[Inputs][Length];
@@ -106,8 +106,8 @@ class DiagramState implements InstanceData {
 			clear();
 			if (usedcell < Length - 1) {
 				// set old values in new boolean matrix
-				for (int i = 0; i < Inputs && i < oldinputs; i++) {
-					for (int j = 0; j < Length && j < oldlength; j++) {
+				for (byte i = 0; i < Inputs && i < oldinputs; i++) {
+					for (byte j = 0; j < Length && j < oldlength; j++) {
 						diagram[i][j] = olddiagram[i][j];
 					}
 				}
@@ -117,12 +117,12 @@ class DiagramState implements InstanceData {
 				// set old values in new boolean matrix
 				for (int i = 0; i < Inputs && i < oldinputs; i++) {
 					h = oldlength - 1;
-					for (int j = Length - 1; j >= 0 && h >= 0; j--) {
+					for (byte j = (byte) (Length - 1); j >= 0 && h >= 0; j--) {
 						diagram[i][j] = olddiagram[i][h - (oldlength - usedcell - 1)];
 						h--;
 					}
 				}
-				usedcell = Length - 1;
+				usedcell = (byte) (Length - 1);
 				moveback = true;
 			}
 		}

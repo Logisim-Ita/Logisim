@@ -8,7 +8,7 @@ import com.cburch.logisim.instance.InstanceState;
 public class Ttl7408 extends AbstractTtlGate {
 
 	public Ttl7408() {
-		super("7408", 14, new int[] { 3, 6, 8, 11 }, true);
+		super("7408", (byte) 14, new byte[] { 3, 6, 8, 11 }, true);
 	}
 
 	@Override
@@ -25,10 +25,10 @@ public class Ttl7408 extends AbstractTtlGate {
 
 	@Override
 	public void ttlpropagate(InstanceState state) {
-		for (int i = 2; i < 6; i += 3) {
+		for (byte i = 2; i < 6; i += 3) {
 			state.setPort(i, state.getPort(i - 1).and(state.getPort(i - 2)), 1);
 		}
-		for (int i = 6; i < 12; i += 3) {
+		for (byte i = 6; i < 12; i += 3) {
 			state.setPort(i, state.getPort(i + 1).and(state.getPort(i + 2)), 1);
 		}
 	}
