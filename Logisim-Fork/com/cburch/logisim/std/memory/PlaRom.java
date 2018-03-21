@@ -206,9 +206,9 @@ public class PlaRom extends InstanceFactory {
 	private static final ContentsAttribute CONTENTS_ATTR = new ContentsAttribute();
 
 	public static PlaRomData getPlaRomData(Instance instance, CircuitState state) {
-		int inputs = instance.getAttributeValue(ATTR_INPUTS);
-		int outputs = instance.getAttributeValue(ATTR_OUTPUTS);
-		int and = instance.getAttributeValue(ATTR_AND);
+		byte inputs = instance.getAttributeValue(ATTR_INPUTS).byteValue();
+		byte outputs = instance.getAttributeValue(ATTR_OUTPUTS).byteValue();
+		byte and = instance.getAttributeValue(ATTR_AND).byteValue();
 		PlaRomData ret = (PlaRomData) instance.getData(state);
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
@@ -225,9 +225,9 @@ public class PlaRom extends InstanceFactory {
 	}
 
 	public static PlaRomData getPlaRomData(InstanceState state) {
-		int inputs = state.getAttributeValue(ATTR_INPUTS);
-		int outputs = state.getAttributeValue(ATTR_OUTPUTS);
-		int and = state.getAttributeValue(ATTR_AND);
+		byte inputs = state.getAttributeValue(ATTR_INPUTS).byteValue();
+		byte outputs = state.getAttributeValue(ATTR_OUTPUTS).byteValue();
+		byte and = state.getAttributeValue(ATTR_AND).byteValue();
 		PlaRomData ret = (PlaRomData) state.getData();
 		if (ret == null) {
 			ret = new PlaRomData(inputs, outputs, and);
@@ -311,7 +311,7 @@ public class PlaRom extends InstanceFactory {
 			return;
 		}
 		Value[] inputs = state.getPort(0).getAll();
-		for (int i = 0; i < inputs.length / 2; i++) {// reverse array
+		for (byte i = 0; i < inputs.length / 2; i++) {// reverse array
 			Value temp = inputs[i];
 			inputs[i] = inputs[inputs.length - i - 1];
 			inputs[inputs.length - i - 1] = temp;
@@ -322,8 +322,8 @@ public class PlaRom extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
-		int inputbitwidth = instance.getAttributeValue(ATTR_INPUTS);
-		int outputbitwidth = instance.getAttributeValue(ATTR_OUTPUTS);
+		byte inputbitwidth = instance.getAttributeValue(ATTR_INPUTS).byteValue();
+		byte outputbitwidth = instance.getAttributeValue(ATTR_OUTPUTS).byteValue();
 		Port[] ps = new Port[3];
 		ps[0] = new Port(0, 0, Port.INPUT, inputbitwidth);
 		ps[1] = new Port(60, 0, Port.OUTPUT, outputbitwidth);

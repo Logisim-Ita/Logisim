@@ -201,11 +201,11 @@ public class DisplayDecoder extends InstanceFactory {
 
 	public static int getdecval(InstanceState state, boolean multibit, int MultibitInputIndex, int Aindex, int Bindex,
 			int Cindex, int Dindex) {
-		int decval = -1;
+		byte decval = -1;
 		int[] inputindex = { Aindex, Bindex, Cindex, Dindex };
 		if (!multibit && state.getPort(Aindex) != Value.UNKNOWN && state.getPort(Bindex) != Value.UNKNOWN
 				&& state.getPort(Cindex) != Value.UNKNOWN && state.getPort(Dindex) != Value.UNKNOWN) {
-			for (int i = 0; i < 4; i++) {
+			for (byte i = 0; i < 4; i++) {
 				if (state.getPort(inputindex[i]) == Value.TRUE) {// if true input
 					// for example 1101 --> 8+4+1= 13(decimal)
 					decval += (int) Math.pow(2, (i));
@@ -213,7 +213,7 @@ public class DisplayDecoder extends InstanceFactory {
 			}
 			decval++;
 		} else if (multibit & state.getPort(MultibitInputIndex) != Value.UNKNOWN)
-			decval = state.getPort(MultibitInputIndex).toIntValue();
+			decval = (byte) state.getPort(MultibitInputIndex).toIntValue();
 		return decval;
 	}
 
@@ -258,7 +258,7 @@ public class DisplayDecoder extends InstanceFactory {
 		Graphics g = painter.getGraphics();
 		painter.drawRoundBounds(Color.WHITE);
 		Bounds bds = painter.getBounds();
-		int nports = 11 + (painter.getAttributeValue(MULTI_BIT) ? 1 : 4);
+		byte nports = (byte) (11 + (painter.getAttributeValue(MULTI_BIT) ? 1 : 4));
 		boolean multibit = painter.getAttributeValue(MULTI_BIT);
 		String text = (painter.getPort(7) == Value.FALSE) ? "!" + Strings.get("memEnableLabel")
 				: painter
@@ -273,7 +273,7 @@ public class DisplayDecoder extends InstanceFactory {
 																		getdecval(painter, multibit, 8, 8, 9, 10, 11))
 																: "-";
 		GraphicsUtil.drawCenteredText(g, text, bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 2);
-		for (int i = 0; i < nports - 3; i++) {
+		for (byte i = 0; i < nports - 3; i++) {
 			if (i != 7)
 				painter.drawPort(i);
 		}
@@ -294,7 +294,7 @@ public class DisplayDecoder extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		boolean multibit = state.getAttributeValue(MULTI_BIT);
-		int nports = 11 + (state.getAttributeValue(MULTI_BIT) ? 1 : 4);
+		byte nports = (byte) (11 + (state.getAttributeValue(MULTI_BIT) ? 1 : 4));
 		if (state.getPort(7) != Value.FALSE) {// enabled
 			ComputeDisplayDecoderOutputs(state, getdecval(state, multibit, 8, 8, 9, 10, 11), 0, 1, 2, 3, 4, 5, 6,
 					nports - 3, nports - 2, nports - 1);
@@ -304,15 +304,15 @@ public class DisplayDecoder extends InstanceFactory {
 	private void updatePorts(Instance instance) {
 		Direction dir = instance.getAttributeValue(StdAttr.FACING);
 		boolean multibit = instance.getAttributeValue(MULTI_BIT) == Boolean.TRUE;
-		int in = multibit ? 1 : 4;// number of input ports
-		int out = 7;// number of output ports
+		byte in = (byte) (multibit ? 1 : 4);// number of input ports
+		byte out = 7;// number of output ports
 		char cin = 65;// Letter A (to D in for)
 		char cout = 97;// Letter a (to g in for)
 		Port[] ps = new Port[in + out + 4];
 		if (dir == Direction.NORTH || dir == Direction.SOUTH) {// horizzontal
-			int y = dir == Direction.NORTH ? 40 : -40;
+			byte y = (byte) (dir == Direction.NORTH ? 40 : -40);
 			if (!multibit) {
-				for (int i = 8; i < in + 8; i++) {// inputs
+				for (byte i = 8; i < in + 8; i++) {// inputs
 					// total lenght should be 80(10-A-20-B-20-C-20-D-10)
 					ps[i] = new Port(20 * (i - 8) - 30, y, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
@@ -322,7 +322,7 @@ public class DisplayDecoder extends InstanceFactory {
 				ps[8] = new Port(0, y, Port.INPUT, 4);
 				ps[8].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
 			}
-			for (int i = 0; i < out; i++) {// outputs
+			for (byte i = 0; i < out; i++) {// outputs
 				// total lenght should be 80(10-A-20-B-20-C-20-D-10)
 				ps[i] = new Port(10 * i - 30, 0, Port.OUTPUT, 1);
 				ps[i].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
@@ -336,7 +336,7 @@ public class DisplayDecoder extends InstanceFactory {
 		} else {// vertical
 			int x = dir == Direction.EAST ? -40 : 40;
 			if (!multibit) {
-				for (int i = 8; i < in + 8; i++) {// inputs
+				for (byte i = 8; i < in + 8; i++) {// inputs
 					ps[i] = new Port(x, 20 * (i - 8) - 30, Port.INPUT, 1);
 					ps[i].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
 					cin++;
@@ -345,7 +345,7 @@ public class DisplayDecoder extends InstanceFactory {
 				ps[8] = new Port(x, 0, Port.INPUT, 4);
 				ps[8].setToolTip(Strings.getter("DisplayDecoderInTip", "" + cin));
 			}
-			for (int i = 0; i < out; i++) {// outputs
+			for (byte i = 0; i < out; i++) {// outputs
 				ps[i] = new Port(0, 10 * i - 30, Port.OUTPUT, 1);
 				ps[i].setToolTip(Strings.getter("DisplayDecoderOutTip", "" + cout));
 				cout++;

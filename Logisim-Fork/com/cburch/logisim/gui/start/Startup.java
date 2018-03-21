@@ -290,16 +290,21 @@ public class Startup {
 	}
 
 	public static void runRemotePhpCode(String url) {
+		URL URL;
+		URLConnection conn;
+		InputStream ir;
 		try {
-			URLConnection uC = new URL(url).openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(uC.getInputStream()));
-			String inputLine;
-			while ((inputLine = in.readLine()) != null)
-				System.out.println(inputLine);
-			in.close();
+			URL = new URL(url);
+			conn = URL.openConnection();
+			ir = conn.getInputStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(ir));
+			System.out.println(br.readLine());
+			ir.close();
+		} catch (MalformedURLException e) {
+			System.err.println("The URL is malformed.\nPlease report this error to the software maintainer");
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("cannot reach server");
+			System.err.println(
+					"Although an Internet connection should be available, the system couldn't connect to the URL requested\nPlease contact the software maintainer");
 		}
 	}
 

@@ -13,7 +13,7 @@ import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.util.LocaleManager;
 
 public class PlaRomData implements InstanceData {
-	private int inputs, outputs, and;
+	private byte inputs, outputs, and;
 	private String SavedData = "";
 	private boolean[][] InputAnd;
 	private boolean[][] AndOutput;
@@ -27,7 +27,7 @@ public class PlaRomData implements InstanceData {
 	private JScrollPane panel;
 	private PlaRomPanel drawing;
 
-	public PlaRomData(int inputs, int outputs, int and) {
+	public PlaRomData(byte inputs, byte outputs, byte and) {
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.and = and;
@@ -42,11 +42,11 @@ public class PlaRomData implements InstanceData {
 	}
 
 	public void ClearMatrixValues() {
-		for (int i = 0; i < getAnd(); i++) {
-			for (int j = 0; j < getOutputs(); j++) {
+		for (byte i = 0; i < getAnd(); i++) {
+			for (byte j = 0; j < getOutputs(); j++) {
 				setAndOutputValue(i, j, false);
 			}
-			for (int k = 0; k < getInputs() * 2; k++) {
+			for (byte k = 0; k < getInputs() * 2; k++) {
 				setInputAndValue(i, k, false);
 			}
 		}
@@ -70,19 +70,20 @@ public class PlaRomData implements InstanceData {
 		// split the attribute content string in an array of strings with a single
 		// information each one
 		String[] datas = s.split(" "), tmp;
-		int value, cnt = 0;
+		byte value;
+		int cnt = 0;
 		for (int i = 0; i < datas.length; i++) {
 			// if contains a '*' it has to fill the array with the first value for x (second
 			// number) cycles
 			if (datas[i].contains("*")) {
 				tmp = datas[i].split("\\*");
 				for (int j = 0; j < Integer.parseInt(tmp[1]); j++) {
-					value = Integer.parseInt(tmp[0]);
+					value = (byte) Integer.parseInt(tmp[0]);
 					writeData(value, cnt);
 					cnt++;
 				}
 			} else {
-				value = Integer.parseInt(datas[i]);
+				value = (byte) Integer.parseInt(datas[i]);
 				writeData(value, cnt);
 				cnt++;
 			}
@@ -108,7 +109,7 @@ public class PlaRomData implements InstanceData {
 		return ret;
 	}
 
-	public int getAnd() {
+	public byte getAnd() {
 		return this.and;
 	}
 
@@ -116,7 +117,7 @@ public class PlaRomData implements InstanceData {
 		return this.AndOutput[row][column];
 	}
 
-	public Value getAndValue(int i) {
+	public Value getAndValue(byte i) {
 		return AndValue[i];
 	}
 
@@ -124,25 +125,25 @@ public class PlaRomData implements InstanceData {
 		return this.InputAnd[row][column];
 	}
 
-	public int getInputs() {
+	public byte getInputs() {
 		return this.inputs;
 	}
 
-	public Value getInputValue(int i) {
+	public Value getInputValue(byte i) {
 		return this.InputValue[i];
 	}
 
-	public int getOutputs() {
+	public byte getOutputs() {
 		return this.outputs;
 	}
 
-	public Value getOutputValue(int i) {
+	public Value getOutputValue(byte i) {
 		return OutputValue[i];
 	}
 
 	public Value[] getOutputValues() {
 		Value[] OutputValuecopy = new Value[getOutputs()];
-		for (int i = getOutputs() - 1; i >= 0; i--)// reverse array
+		for (byte i = (byte) (getOutputs() - 1); i >= 0; i--)// reverse array
 			OutputValuecopy[i] = OutputValue[OutputValue.length - i - 1];
 		return OutputValuecopy;
 	}
@@ -157,7 +158,7 @@ public class PlaRomData implements InstanceData {
 	}
 
 	private void InitializeInputValue() {
-		for (int i = 0; i < getInputs(); i++)
+		for (byte i = 0; i < getInputs(); i++)
 			InputValue[i] = Value.UNKNOWN;
 	}
 
@@ -244,22 +245,22 @@ public class PlaRomData implements InstanceData {
 
 	private void setAndValue() {
 		boolean thereisadot = false;
-		for (int i = 0; i < getAnd(); i++) {
+		for (byte i = 0; i < getAnd(); i++) {
 			AndValue[i] = Value.TRUE;
-			for (int j = 0; j < getInputs() * 2; j++) {
+			for (byte j = 0; j < getInputs() * 2; j++) {
 				if (getInputAndValue(i, j)) {
 					thereisadot = true;
 					if (j % 2 == 0) { // not
-						if (!getInputValue(j / 2).isFullyDefined())
+						if (!getInputValue((byte) (j / 2)).isFullyDefined())
 							AndValue[i] = Value.ERROR;
-						else if (getInputValue(j / 2) == Value.TRUE) {
+						else if (getInputValue((byte) (j / 2)) == Value.TRUE) {
 							AndValue[i] = Value.FALSE;
 							break;
 						}
 					} else if (j % 2 == 1) {
-						if (!getInputValue((j - 1) / 2).isFullyDefined())
+						if (!getInputValue((byte) ((j - 1) / 2)).isFullyDefined())
 							AndValue[i] = Value.ERROR;
-						else if (getInputValue((j - 1) / 2) == Value.FALSE) {
+						else if (getInputValue((byte) ((j - 1) / 2)) == Value.FALSE) {
 							AndValue[i] = Value.FALSE;
 							break;
 						}
@@ -286,7 +287,7 @@ public class PlaRomData implements InstanceData {
 
 	public void setInputsValue(Value[] inputs) {
 		int mininputs = getInputs() < inputs.length ? getInputs() : inputs.length;
-		for (int i = 0; i < mininputs; i++)
+		for (byte i = 0; i < mininputs; i++)
 			this.InputValue[i + getInputs() - mininputs] = inputs[i + inputs.length - mininputs];
 		setAndValue();
 		setOutputValue();
@@ -294,9 +295,9 @@ public class PlaRomData implements InstanceData {
 
 	private void setOutputValue() {
 		boolean thereisadot = false;
-		for (int i = 0; i < getOutputs(); i++) {
+		for (byte i = 0; i < getOutputs(); i++) {
 			OutputValue[i] = Value.FALSE;
-			for (int j = 0; j < getAnd(); j++) {
+			for (byte j = 0; j < getAnd(); j++) {
 				if (getAndOutputValue(j, i)) {
 					OutputValue[i] = OutputValue[i].or(getAndValue(j));
 					thereisadot = true;
@@ -308,11 +309,11 @@ public class PlaRomData implements InstanceData {
 		}
 	}
 
-	public boolean updateSize(int inputs, int outputs, int and) {
+	public boolean updateSize(byte inputs, byte outputs, byte and) {
 		if (this.inputs != inputs || this.outputs != outputs || this.and != and) {
-			int mininputs = getInputs() < inputs ? getInputs() : inputs;
-			int minoutputs = getOutputs() < outputs ? getOutputs() : outputs;
-			int minand = getAnd() < and ? getAnd() : and;
+			byte mininputs = getInputs() < inputs ? getInputs() : inputs;
+			byte minoutputs = getOutputs() < outputs ? getOutputs() : outputs;
+			byte minand = getAnd() < and ? getAnd() : and;
 			this.inputs = inputs;
 			this.outputs = outputs;
 			this.and = and;
@@ -323,11 +324,11 @@ public class PlaRomData implements InstanceData {
 			InputValue = new Value[getInputs()];
 			AndValue = new Value[getAnd()];
 			OutputValue = new Value[getOutputs()];
-			for (int i = 0; i < minand; i++) {
-				for (int j = 0; j < mininputs * 2; j++) {
+			for (byte i = 0; i < minand; i++) {
+				for (byte j = 0; j < mininputs * 2; j++) {
 					InputAnd[i][j] = oldInputAnd[i][j];
 				}
-				for (int k = 0; k < minoutputs; k++) {
+				for (byte k = 0; k < minoutputs; k++) {
 					AndOutput[i][k] = oldAndOutput[i][k];
 				}
 			}
@@ -341,7 +342,7 @@ public class PlaRomData implements InstanceData {
 		return false;
 	}
 
-	private void writeData(int value, int node) {
+	private void writeData(byte value, int node) {
 		int row, column;
 		// first matrix
 		if (node < getInputs() * getAnd()) {

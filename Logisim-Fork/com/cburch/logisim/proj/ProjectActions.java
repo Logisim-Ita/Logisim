@@ -90,8 +90,7 @@ public class ProjectActions {
 		Frame newFrame = new Frame(newProject);
 		newProject.setFrame(newFrame);
 		if (AppPreferences.SEND_DATA.getBoolean())
-			Startup.runRemotePhpCode(
-					"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
+			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
 		return newFrame;
 	}
 

@@ -7,7 +7,7 @@ import com.cburch.logisim.std.plexers.DisplayDecoder;
 public class Ttl7447 extends AbstractTtlGate {
 
 	public Ttl7447() {
-		super("7447", 16, new int[] { 9, 10, 11, 12, 13, 14, 15 },
+		super("7447", (byte) 16, new byte[] { 9, 10, 11, 12, 13, 14, 15 },
 				new String[] { "B", "C", "LT", "BI", "RBI", "D", "A", "e", "d", "c", "b", "a", "g", "f" });
 	}
 

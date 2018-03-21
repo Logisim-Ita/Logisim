@@ -92,8 +92,8 @@ public class DigitalOscilloscope extends InstanceFactory {
 	}
 
 	private DiagramState getDiagramState(InstanceState state) {
-		int inputs = state.getAttributeValue(ATTR_INPUTS).intValue() + 1;
-		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
+		byte inputs = (byte) (state.getAttributeValue(ATTR_INPUTS).byteValue() + 1);
+		byte length = (byte) (state.getAttributeValue(ATTR_NSTATE).byteValue() * 2);
 		DiagramState ret = (DiagramState) state.getData();
 		if (ret == null) {
 			ret = new DiagramState(inputs, length);
@@ -109,7 +109,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int width = attrs.getValue(ATTR_NSTATE).intValue() * 30 + 2 * border + 15;
 		int height = attrs.getValue(SHOW_CLOCK) ? (attrs.getValue(ATTR_INPUTS).intValue() + 1) * 30 + 3 * border + 2
 				: attrs.getValue(ATTR_INPUTS).intValue() * 30 + 3 * border;
-		int showclock = attrs.getValue(SHOW_CLOCK) ? 32 : 0;
+		byte showclock = (byte) (attrs.getValue(SHOW_CLOCK) ? 32 : 0);
 		return Bounds.create(0, -border - showclock, width, height);
 	}
 
@@ -136,13 +136,13 @@ public class DigitalOscilloscope extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		Bounds bds = painter.getBounds();
 		// if showclock = true all diagram lines are moved down
-		int showclock = painter.getAttributeValue(SHOW_CLOCK) ? 1 : 0;
+		byte showclock = (byte) (painter.getAttributeValue(SHOW_CLOCK) ? 1 : 0);
 		int x = bds.getX();
 		int y = bds.getY();
 		int width = bds.getWidth();
 		int height = bds.getHeight();
-		int inputs = painter.getAttributeValue(ATTR_INPUTS).intValue() + showclock;
-		int length = painter.getAttributeValue(ATTR_NSTATE).intValue() * 2;
+		byte inputs = (byte) (painter.getAttributeValue(ATTR_INPUTS).byteValue() + showclock);
+		byte length = (byte) (painter.getAttributeValue(ATTR_NSTATE).byteValue() * 2);
 		DiagramState diagramstate = getDiagramState(painter);
 		Graphics2D g = (Graphics2D) painter.getGraphics();
 		// draw border
@@ -155,7 +155,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker());
 			g.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
 					new float[] { 6.0f, 4.0f }, 8.0f));
-			for (int j = 1; j < length; j++) {
+			for (byte j = 1; j < length; j++) {
 				// rising or both || falling or both
 				if (((painter.getAttributeValue(VERT_LINE) == TRIG_RISING
 						|| painter.getAttributeValue(VERT_LINE) == BOTH) && diagramstate.getState(0, j) == Boolean.TRUE
@@ -169,7 +169,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		}
 		byte nck = (byte) (length / 2);
 		g.setFont(new Font("sans serif", Font.PLAIN, 8));
-		for (int i = 0; i < inputs; i++) {
+		for (byte i = 0; i < inputs; i++) {
 			g.setColor(painter.getAttributeValue(ATTR_COLOR).darker().darker().darker());
 			// horizontal line
 			GraphicsUtil.switchToWidth(g, 0.5f);
@@ -194,7 +194,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 			else// input diagrams color
 				g.setColor(Color.BLACK);
 			// draw diagram
-			for (int j = 0; j < length; j++) {
+			for (byte j = 0; j < length; j++) {
 				// vertical line
 				if (j != 0
 						&& diagramstate.getState(i + (showclock == 0 ? 1 : 0), j) != diagramstate
@@ -234,7 +234,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		g.drawRoundRect(x + border, y + border, width - 2 * border, height - 2 * border, border / 2, border / 2);
 
 		// draw ports
-		for (int i = 1; i < inputs + 2; i++) {
+		for (byte i = 1; i < inputs + 2; i++) {
 			painter.drawPort(i);
 		}
 		painter.drawClock(0, Direction.EAST);
@@ -244,8 +244,8 @@ public class DigitalOscilloscope extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		int inputs = state.getAttributeValue(ATTR_INPUTS).intValue() + 1;
-		int length = state.getAttributeValue(ATTR_NSTATE).intValue() * 2;
+		byte inputs = (byte) (state.getAttributeValue(ATTR_INPUTS).byteValue() + 1);
+		byte length = (byte) (state.getAttributeValue(ATTR_NSTATE).byteValue() * 2);
 		Value clock = state.getPort(0);
 		Value enable = state.getPort(inputs);
 		Value clear = state.getPort(inputs + 1);
@@ -259,17 +259,17 @@ public class DigitalOscilloscope extends InstanceFactory {
 				// for each front
 				if (lastclock != clock) {
 					if (diagramstate.getusedcell() < length - 1)
-						diagramstate.setusedcell(diagramstate.getusedcell() + 1);
+						diagramstate.setusedcell((byte) (diagramstate.getusedcell() + 1));
 					// move back all old values
 					if (diagramstate.getmoveback() == true) {
 						diagramstate.moveback();
 						if (clock == Value.TRUE)
-							diagramstate.setclocknumber(diagramstate.getclocknumber() + 1);
+							diagramstate.setclocknumber((byte) (diagramstate.getclocknumber() + 1));
 					}
 					if (diagramstate.getusedcell() == length - 1)
 						diagramstate.hastomoveback(true);
 					// input values
-					for (int i = 0; i < inputs; i++)
+					for (byte i = 0; i < inputs; i++)
 						// set new value at the end
 						diagramstate.setState(i, diagramstate.getusedcell(),
 								(state.getPort(i) == Value.TRUE) ? Boolean.TRUE
@@ -278,7 +278,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 				} else if (diagramstate.getusedcell() != -1) {
 					// input's values can change also after clock front because
 					// of output's delays (Flip Flop, gates etc..)
-					for (int i = 1; i < inputs; i++)
+					for (byte i = 1; i < inputs; i++)
 						diagramstate.setState(i, diagramstate.getusedcell(),
 								(state.getPort(i) == Value.TRUE) ? Boolean.TRUE
 										: (state.getPort(i) == Value.FALSE) ? Boolean.FALSE : null);
@@ -288,17 +288,17 @@ public class DigitalOscilloscope extends InstanceFactory {
 		// clear
 		else if (clear == Value.TRUE) {
 			diagramstate.clear();
-			diagramstate.setusedcell(-1);
+			diagramstate.setusedcell((byte) -1);
 			diagramstate.setLastClock(Value.UNKNOWN);
 			diagramstate.hastomoveback(false);
-			diagramstate.setclocknumber(length / 2);
+			diagramstate.setclocknumber((byte) (length / 2));
 		}
 	}
 
 	private void updateports(Instance instance) {
-		int inputs = instance.getAttributeValue(ATTR_INPUTS).intValue();
+		byte inputs = instance.getAttributeValue(ATTR_INPUTS).byteValue();
 		Port[] port = new Port[inputs + 3];
-		for (int i = 0; i <= inputs; i++) {
+		for (byte i = 0; i <= inputs; i++) {
 			port[i] = new Port(0, 30 * i, Port.INPUT, 1);
 		}
 		// enable
