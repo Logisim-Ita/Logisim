@@ -72,11 +72,10 @@ public class DipSwitch extends InstanceFactory {
 		}
 
 		private Value getValue(int i) {
-			if (vals == null)
+			if (vals[i] == null)
 				return Value.FALSE;
 			else
 				return vals[i];
-
 		}
 
 		private Value[] getValues() {

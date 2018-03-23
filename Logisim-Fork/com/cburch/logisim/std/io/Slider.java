@@ -9,7 +9,9 @@ import java.awt.event.MouseEvent;
 
 import com.cburch.logisim.circuit.RadixOption;
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
@@ -32,7 +34,10 @@ public class Slider extends InstanceFactory {
 		@Override
 		public void mouseDragged(InstanceState state, MouseEvent e) {
 			if (dragging) {
-				data.setCurrentX(e.getX() - state.getInstance().getBounds().getX() - 10);
+				//if(state.getAttributeValue(ATTR_DIR)==RIGHT) 
+					data.setCurrentX(e.getX() - state.getInstance().getBounds().getX() - 10);
+				//else 
+				//	data.setCurrentX(100 - (e.getX() + state.getInstance().getBounds().getX())+ state.getInstance().getBounds().getWidth()-10);
 				state.fireInvalidated();
 			}
 		}
@@ -87,14 +92,19 @@ public class Slider extends InstanceFactory {
 		}
 		return ret;
 	}
+	private static final AttributeOption RIGHT = new AttributeOption("right",
+			Strings.getter("rightOption"));
+	private static final AttributeOption LEFT = new AttributeOption("left", Strings.getter("leftOption"));
 
+	private static final Attribute<AttributeOption> ATTR_DIR = Attributes.forOption("Direction",
+			Strings.getter("DirectionOfSlider"), new AttributeOption[] { RIGHT,LEFT });
 	public Slider() {
 		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,ATTR_DIR },
 				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,RIGHT });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -182,10 +192,16 @@ public class Slider extends InstanceFactory {
 		BitWidth b = state.getAttributeValue(StdAttr.WIDTH);
 		Bounds bds = state.getInstance().getBounds();
 		// 100(slider width-20):2^b-1 = currentx:value(dec)
-		state.setPort(0,
-				Value.createKnown(b,
-						(int) Math.round(data.getCurrentX() * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20))),
-				1);
+		if(state.getAttributeValue(ATTR_DIR)==LEFT) 
+			state.setPort(0,
+					Value.createKnown(b,
+							(int) Math.round((100-data.getCurrentX()) * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth()-20))),
+					1);
+		else
+			state.setPort(0,
+					Value.createKnown(b,
+							(int) Math.round(data.getCurrentX() * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth()-20))),
+					1);
 	}
 
 	private void updateports(Instance instance) {
