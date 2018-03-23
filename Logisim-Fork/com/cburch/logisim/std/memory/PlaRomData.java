@@ -17,7 +17,7 @@ public class PlaRomData implements InstanceData {
 	private String SavedData = "";
 	private boolean[][] InputAnd;
 	private boolean[][] AndOutput;
-	public int rowhovered = -1, columnhovered = -1;
+	public int rowhovered = -1, columnhovered = 0;
 	private Value[] InputValue;
 	private Value[] AndValue;
 	private Value[] OutputValue;

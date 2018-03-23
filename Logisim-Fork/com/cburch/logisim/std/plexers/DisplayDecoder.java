@@ -199,20 +199,18 @@ public class DisplayDecoder extends InstanceFactory {
 		}
 	}
 
-	public static int getdecval(InstanceState state, boolean multibit, int MultibitInputIndex, int Aindex, int Bindex,
+	public static byte getdecval(InstanceState state, boolean multibit, int MultibitInputIndex, int Aindex, int Bindex,
 			int Cindex, int Dindex) {
-		byte decval = -1;
+		byte decval = -1, powval = 0;
 		int[] inputindex = { Aindex, Bindex, Cindex, Dindex };
 		if (!multibit && state.getPort(Aindex) != Value.UNKNOWN && state.getPort(Bindex) != Value.UNKNOWN
 				&& state.getPort(Cindex) != Value.UNKNOWN && state.getPort(Dindex) != Value.UNKNOWN) {
-			for (byte i = 0; i < 4; i++) {
-				if (state.getPort(inputindex[i]) == Value.TRUE) {// if true input
+			for (byte i = 0; i < 4; i++)
+				if (state.getPort(inputindex[i]) == Value.TRUE) // if true input
 					// for example 1101 --> 8+4+1= 13(decimal)
-					decval += (int) Math.pow(2, (i));
-				}
-			}
-			decval++;
-		} else if (multibit & state.getPort(MultibitInputIndex) != Value.UNKNOWN)
+					powval |= 1 << i;
+			decval += (byte) (powval + 1);
+		} else if (multibit && state.getPort(MultibitInputIndex) != Value.UNKNOWN)
 			decval = (byte) state.getPort(MultibitInputIndex).toIntValue();
 		return decval;
 	}

@@ -26,7 +26,7 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 	private static final long serialVersionUID = 7182231893518001053L;
 	private static final byte IMAGE_BORDER = 20;
 	private PlaRomData data;
-	private boolean mooving = false;
+	private boolean hover = false;
 
 	public PlaRomPanel(PlaRomData data) {
 		this.data = data;
@@ -77,25 +77,24 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 		int row = getRow(e.getY());
 		int column = getColumn(e.getX());
 		int column2 = getColumn(e.getX() + 10);
+		this.hover = true;
 		if (row % 2 == 0 && row > 0 && column > 0) {
 			row = row / 2 - 1;
 			if (row <= data.getAnd() - 1) {
 				// is a clickable area
 				if (column <= data.getInputs() * 2) {// input and area
 					data.setHovered(row, column - 1);
-					repaint();
 					return true;
 				} else if (column2 > data.getInputs() * 2 + 3) {// and or area
 					column2 -= (data.getInputs() * 2 + 4);
 					if (column2 % 2 == 0) {
 						data.setHovered(row, data.getInputs() * 2 + column2 / 2);
-						repaint();
 						return true;
 					}
 				}
 			}
 		}
-		data.setHovered(-1, -1);
+		this.hover = false;
 		return false;
 	}
 
@@ -158,16 +157,14 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 		g.setColor(Value.TRUE_COLOR);
 		byte inputs = data.getInputs();
 		GraphicsUtil.switchToWidth(g, 2);
-		if (data.columnhovered > -1 && data.rowhovered > -1) {
+		if (hover) {
 			if (data.columnhovered < inputs * 2)
-				g.drawOval(IMAGE_BORDER + 10 + 20 * data.columnhovered - 6,
-						IMAGE_BORDER + 70 + 40 * data.rowhovered - 6, 12, 12);
+				g.drawOval(IMAGE_BORDER + 4 + 20 * data.columnhovered, IMAGE_BORDER + 64 + 40 * data.rowhovered, 12,
+						12);
 			else
-				g.drawOval(IMAGE_BORDER + 20 + 40 * (inputs + 1) + 40 * (data.columnhovered - 2 * inputs) - 6,
-						IMAGE_BORDER + 70 + 40 * data.rowhovered - 6, 12, 12);
+				g.drawOval(IMAGE_BORDER + 14 + 40 * (inputs + 1) + 40 * (data.columnhovered - 2 * inputs),
+						IMAGE_BORDER + 64 + 40 * data.rowhovered, 12, 12);
 		}
-		if (mooving)
-			return;
 		g.setColor(Color.BLACK);
 		byte outputs = data.getOutputs();
 		byte and = data.getAnd();
@@ -176,7 +173,7 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 		GraphicsUtil.drawCenteredText(g, "\u2190" + Strings.getter("demultiplexerInTip").toString(),
 				40 * (inputs + 1) - (20 - IMAGE_BORDER) + 5, IMAGE_BORDER);
 		GraphicsUtil.drawCenteredText(g, Strings.getter("multiplexerOutTip").toString() + "\u2192",
-				IMAGE_BORDER + 20 + 40 * inputs - 10, IMAGE_BORDER + 100 + 40 * and);
+				IMAGE_BORDER + 10 + 40 * inputs, IMAGE_BORDER + 100 + 40 * and);
 		for (byte i = 1; i <= inputs; i++) {
 			Color inputColor = data.getInputValue((byte) (i - 1)).getColor();
 			Color notColor = data.getInputValue((byte) (i - 1)).not().getColor();
@@ -222,19 +219,17 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 			for (byte j = 0; j < inputs * 2; j++) {
 				if (data.getInputAndValue(i, j)) {
 					g.setColor(Color.WHITE);
-					g.fillOval(IMAGE_BORDER + 10 + 20 * j - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8, 8);
+					g.fillOval(IMAGE_BORDER + 6 + 20 * j, IMAGE_BORDER + 66 + 40 * i, 8, 8);
 					g.setColor(Color.BLACK);
-					g.drawOval(IMAGE_BORDER + 10 + 20 * j - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8, 8);
+					g.drawOval(IMAGE_BORDER + 6 + 20 * j, IMAGE_BORDER + 66 + 40 * i, 8, 8);
 				}
 			}
 			for (byte k = 0; k < outputs; k++) {
 				if (data.getAndOutputValue(i, k)) {
 					g.setColor(Color.WHITE);
-					g.fillOval(IMAGE_BORDER + 20 + 40 * (inputs + 1) + 40 * k - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8,
-							8);
+					g.fillOval(IMAGE_BORDER + 16 + 40 * (inputs + 1) + 40 * k, IMAGE_BORDER + 66 + 40 * i, 8, 8);
 					g.setColor(Color.BLACK);
-					g.drawOval(IMAGE_BORDER + 20 + 40 * (inputs + 1) + 40 * k - 4, IMAGE_BORDER + 70 + 40 * i - 4, 8,
-							8);
+					g.drawOval(IMAGE_BORDER + 16 + 40 * (inputs + 1) + 40 * k, IMAGE_BORDER + 66 + 40 * i, 8, 8);
 				}
 			}
 		}
@@ -248,11 +243,10 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		mooving = true;
 		if (drawCircleConnection(e))
 			setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		else
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		mooving = false;
+		repaint();
 	}
 }
