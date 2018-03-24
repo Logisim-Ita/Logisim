@@ -154,20 +154,10 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 		super.paintComponent(g);
-		g.setColor(Value.TRUE_COLOR);
 		byte inputs = data.getInputs();
-		GraphicsUtil.switchToWidth(g, 2);
-		if (hover) {
-			if (data.columnhovered < inputs * 2)
-				g.drawOval(IMAGE_BORDER + 4 + 20 * data.columnhovered, IMAGE_BORDER + 64 + 40 * data.rowhovered, 12,
-						12);
-			else
-				g.drawOval(IMAGE_BORDER + 14 + 40 * (inputs + 1) + 40 * (data.columnhovered - 2 * inputs),
-						IMAGE_BORDER + 64 + 40 * data.rowhovered, 12, 12);
-		}
-		g.setColor(Color.BLACK);
 		byte outputs = data.getOutputs();
 		byte and = data.getAnd();
+		GraphicsUtil.switchToWidth(g, 2);
 		g.setColor(Color.DARK_GRAY);
 		g.setFont(new Font("sans serif", Font.BOLD, 14));
 		GraphicsUtil.drawCenteredText(g, "\u2190" + Strings.getter("demultiplexerInTip").toString(),
@@ -232,6 +222,15 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 					g.drawOval(IMAGE_BORDER + 16 + 40 * (inputs + 1) + 40 * k, IMAGE_BORDER + 66 + 40 * i, 8, 8);
 				}
 			}
+		}
+		if (hover) {
+			g.setColor(Value.TRUE_COLOR);
+			if (data.columnhovered < inputs * 2)
+				g.drawOval(IMAGE_BORDER + 4 + 20 * data.columnhovered, IMAGE_BORDER + 64 + 40 * data.rowhovered, 12,
+						12);
+			else
+				g.drawOval(IMAGE_BORDER + 14 + 40 * (inputs + 1) + 40 * (data.columnhovered - 2 * inputs),
+						IMAGE_BORDER + 64 + 40 * data.rowhovered, 12, 12);
 		}
 	}
 
