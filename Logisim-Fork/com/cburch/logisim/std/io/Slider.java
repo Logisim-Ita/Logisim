@@ -25,6 +25,7 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.util.GraphicsUtil;
+import com.cburch.logisim.util.LocaleManager;
 
 public class Slider extends InstanceFactory {
 	public static class Poker extends InstancePoker {
@@ -34,10 +35,11 @@ public class Slider extends InstanceFactory {
 		@Override
 		public void mouseDragged(InstanceState state, MouseEvent e) {
 			if (dragging) {
-				//if(state.getAttributeValue(ATTR_DIR)==RIGHT) 
-					data.setCurrentX(e.getX() - state.getInstance().getBounds().getX() - 10);
-				//else 
-				//	data.setCurrentX(100 - (e.getX() + state.getInstance().getBounds().getX())+ state.getInstance().getBounds().getWidth()-10);
+				// if(state.getAttributeValue(ATTR_DIR)==RIGHT)
+				data.setCurrentX((byte) (e.getX() - state.getInstance().getBounds().getX() - 10));
+				// else
+				// data.setCurrentX(100 - (e.getX() + state.getInstance().getBounds().getX())+
+				// state.getInstance().getBounds().getWidth()-10);
 				state.fireInvalidated();
 			}
 		}
@@ -60,7 +62,8 @@ public class Slider extends InstanceFactory {
 	}
 
 	public static class SliderValue implements InstanceData, Cloneable {
-		private int currentx = 0;
+		private byte currentx = 0;
+		private boolean right_to_left = false;
 
 		@Override
 		public Object clone() {
@@ -71,40 +74,51 @@ public class Slider extends InstanceFactory {
 			}
 		}
 
-		public int getCurrentX() {
+		public byte getCurrentX() {
 			return this.currentx;
 		}
 
-		public void setCurrentX(int x) {
+		public void setCurrentX(byte x) {
 			if (x < 0)
 				x = 0;
 			else if (x > 100)
 				x = 100;
 			this.currentx = x;
 		}
+
+		public void updateDir(boolean b) {
+			if (b != right_to_left) {
+				right_to_left = b;
+				currentx = (byte) (100 - currentx);
+			}
+		}
 	}
+
+	private static final AttributeOption RIGHT_TO_LEFT = new AttributeOption("right_to_left",
+			Strings.getter("right_to_leftOption"));
+	private static final AttributeOption LEFT_TO_RIGHT = new AttributeOption("left_to_right",
+			Strings.getter("left_to_rightOption"));
+	private static final Attribute<AttributeOption> ATTR_DIR = Attributes.forOption("Direction",
+			new LocaleManager("resources/logisim", "circuit").getter("wireDirectionAttr"),
+			new AttributeOption[] { RIGHT_TO_LEFT, LEFT_TO_RIGHT });
 
 	private static SliderValue getValueState(InstanceState state) {
 		SliderValue ret = (SliderValue) state.getData();
 		if (ret == null) {
 			ret = new SliderValue();
 			state.setData(ret);
-		}
+		} else
+			ret.updateDir(state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT);
 		return ret;
 	}
-	private static final AttributeOption RIGHT = new AttributeOption("right",
-			Strings.getter("rightOption"));
-	private static final AttributeOption LEFT = new AttributeOption("left", Strings.getter("leftOption"));
 
-	private static final Attribute<AttributeOption> ATTR_DIR = Attributes.forOption("Direction",
-			Strings.getter("DirectionOfSlider"), new AttributeOption[] { RIGHT,LEFT });
 	public Slider() {
 		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,ATTR_DIR },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR },
 				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK,RIGHT });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -154,6 +168,9 @@ public class Slider extends InstanceFactory {
 			computeTextField(instance);
 		} else if (attr == StdAttr.WIDTH)
 			updateports(instance);
+		else if (attr == ATTR_DIR) {
+			instance.fireInvalidated();
+		}
 
 	}
 
@@ -191,17 +208,11 @@ public class Slider extends InstanceFactory {
 		SliderValue data = getValueState(state);
 		BitWidth b = state.getAttributeValue(StdAttr.WIDTH);
 		Bounds bds = state.getInstance().getBounds();
+		byte currentx = (byte) (state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT ? 100 - data.getCurrentX()
+				: data.getCurrentX());
 		// 100(slider width-20):2^b-1 = currentx:value(dec)
-		if(state.getAttributeValue(ATTR_DIR)==LEFT) 
-			state.setPort(0,
-					Value.createKnown(b,
-							(int) Math.round((100-data.getCurrentX()) * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth()-20))),
-					1);
-		else
-			state.setPort(0,
-					Value.createKnown(b,
-							(int) Math.round(data.getCurrentX() * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth()-20))),
-					1);
+		state.setPort(0, Value.createKnown(b,
+				(int) Math.round(currentx * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20))), 1);
 	}
 
 	private void updateports(Instance instance) {

@@ -158,7 +158,7 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 				// fill the background of white if selected from preferences
 				if (!ghost && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean()) {
 					g.setColor(Color.WHITE);
-					g.fillRect(xp, yp, pinwidth, pinheight);
+					g.fillRect(xp, yp, pinheight, pinwidth);
 					g.setColor(Color.BLACK);
 				}
 				g.drawRect(xp, yp, pinheight, pinwidth);
