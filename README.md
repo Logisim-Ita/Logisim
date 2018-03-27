@@ -52,7 +52,11 @@ This is an italian fork based on the original Logisim version.<br>
 * Graphical changes
 * Includes some fix from original early version 2.7.2.255
 ## Bugs
-* All the original Logisim's bugs we haven't fixed yet
+* All the original Logisim's bugs we haven't fixed yet:
+	* Some random blue/red line caused by bad values refresh
+	* Sometimes bugged attribute's list
+	* Some problem with high frequencies
+	* String attribute not calling attributechanged method while writing its value
 ## Features we want to add
 * Solve dirty points when rotating
 * Buzzer (75% done)

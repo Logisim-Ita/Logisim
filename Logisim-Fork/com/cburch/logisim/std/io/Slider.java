@@ -35,11 +35,7 @@ public class Slider extends InstanceFactory {
 		@Override
 		public void mouseDragged(InstanceState state, MouseEvent e) {
 			if (dragging) {
-				// if(state.getAttributeValue(ATTR_DIR)==RIGHT)
 				data.setCurrentX((byte) (e.getX() - state.getInstance().getBounds().getX() - 10));
-				// else
-				// data.setCurrentX(100 - (e.getX() + state.getInstance().getBounds().getX())+
-				// state.getInstance().getBounds().getWidth()-10);
 				state.fireInvalidated();
 			}
 		}

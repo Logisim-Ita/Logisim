@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -291,11 +292,12 @@ public class Startup {
 
 	public static void runRemotePhpCode(String url) {
 		URL URL;
-		URLConnection conn;
+		HttpURLConnection conn;
 		InputStream ir;
 		try {
 			URL = new URL(url);
-			conn = URL.openConnection();
+			conn = (HttpURLConnection) URL.openConnection();
+			conn.setRequestMethod("GET");
 			ir = conn.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(ir));
 			System.out.println(br.readLine());
