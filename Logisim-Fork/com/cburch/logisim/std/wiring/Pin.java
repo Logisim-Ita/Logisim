@@ -318,88 +318,6 @@ public class Pin extends InstanceFactory {
 		return attrs.type != EndData.OUTPUT_ONLY;
 	}
 
-	@Override
-	public void paintGhost(InstancePainter painter) {
-		paintBase(painter, true);
-	}
-
-	//
-	// graphics methods
-	//
-	@Override
-	public void paintIcon(InstancePainter painter) {
-		BitWidth w = painter.getAttributeValue(StdAttr.WIDTH);
-		paintIconBase(painter, w);
-	}
-
-	private void paintIconBase(InstancePainter painter, BitWidth w) {
-		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
-		Direction dir = attrs.facing;
-		boolean output = attrs.isOutput();
-		boolean iconprinted = false;
-		Graphics g = painter.getGraphics();
-		g.setFont(ICON_WIDTH_FONT);
-		if (output) {
-			if (w.equals(BitWidth.ONE) && ICON_OUT != null) {
-				Icons.paintRotated(g, 2, 2, dir, ICON_OUT, painter.getDestination());
-				iconprinted = true;
-			} else if (ICON_OUT_MULTI != null) {
-				Icons.paintRotated(g, 2, 2, dir, ICON_OUT_MULTI, painter.getDestination());
-				iconprinted = true;
-			}
-		} else {
-			if (w.equals(BitWidth.ONE) && ICON_IN != null) {
-				Icons.paintRotated(g, 2, 2, dir, ICON_IN, painter.getDestination());
-				iconprinted = true;
-			} else if (ICON_IN_MULTI != null) {
-				Icons.paintRotated(g, 2, 2, dir, ICON_IN_MULTI, painter.getDestination());
-				iconprinted = true;
-			}
-		}
-		if (!iconprinted) {
-			int pinx = 16;
-			int piny = 9;
-			if (dir == Direction.EAST) { // keep defaults
-			} else if (dir == Direction.WEST) {
-				pinx = 4;
-			} else if (dir == Direction.NORTH) {
-				pinx = 9;
-				piny = 4;
-			} else if (dir == Direction.SOUTH) {
-				pinx = 9;
-				piny = 16;
-			}
-			g.setColor(w.equals(BitWidth.ONE) ? Value.TRUE.getColor() : Color.WHITE);
-			if (output) {
-				g.fillOval(4, 4, 13, 13);
-			} else {
-				g.fillRect(4, 4, 13, 13);
-			}
-			g.fillOval(pinx, piny, 3, 3);
-
-			g.setColor(Color.black);
-			if (output) {
-				g.drawOval(4, 4, 13, 13);
-			} else {
-				g.drawRect(4, 4, 13, 13);
-			}
-		}
-		if (w.equals(BitWidth.ONE))
-			g.setColor(Color.WHITE);
-		else
-			g.setColor(Color.BLACK);
-		GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
-	}
-
-	@Override
-	public void paintInstance(InstancePainter painter) {
-		paintBase(painter, false);
-		painter.drawPorts();
-		// print label
-		painter.getGraphics().setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
-		painter.drawLabel();
-	}
-
 	private void paintBase(InstancePainter painter, boolean isGhost) {
 		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
 		Graphics g = painter.getGraphics();
@@ -515,6 +433,88 @@ public class Pin extends InstanceFactory {
 			} else
 				Probe.paintValue(painter, Bounds.create(x, y, width, height), state.sending);
 		}
+	}
+
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		paintBase(painter, true);
+	}
+
+	//
+	// graphics methods
+	//
+	@Override
+	public void paintIcon(InstancePainter painter) {
+		BitWidth w = painter.getAttributeValue(StdAttr.WIDTH);
+		paintIconBase(painter, w);
+	}
+
+	private void paintIconBase(InstancePainter painter, BitWidth w) {
+		PinAttributes attrs = (PinAttributes) painter.getAttributeSet();
+		Direction dir = attrs.facing;
+		boolean output = attrs.isOutput();
+		boolean iconprinted = false;
+		Graphics g = painter.getGraphics();
+		g.setFont(ICON_WIDTH_FONT);
+		if (output) {
+			if (w.equals(BitWidth.ONE) && ICON_OUT != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_OUT, painter.getDestination());
+				iconprinted = true;
+			} else if (ICON_OUT_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_OUT_MULTI, painter.getDestination());
+				iconprinted = true;
+			}
+		} else {
+			if (w.equals(BitWidth.ONE) && ICON_IN != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_IN, painter.getDestination());
+				iconprinted = true;
+			} else if (ICON_IN_MULTI != null) {
+				Icons.paintRotated(g, 2, 2, dir, ICON_IN_MULTI, painter.getDestination());
+				iconprinted = true;
+			}
+		}
+		if (!iconprinted) {
+			int pinx = 16;
+			int piny = 9;
+			if (dir == Direction.EAST) { // keep defaults
+			} else if (dir == Direction.WEST) {
+				pinx = 4;
+			} else if (dir == Direction.NORTH) {
+				pinx = 9;
+				piny = 4;
+			} else if (dir == Direction.SOUTH) {
+				pinx = 9;
+				piny = 16;
+			}
+			g.setColor(w.equals(BitWidth.ONE) ? Value.TRUE.getColor() : Color.WHITE);
+			if (output) {
+				g.fillOval(4, 4, 13, 13);
+			} else {
+				g.fillRect(4, 4, 13, 13);
+			}
+			g.fillOval(pinx, piny, 3, 3);
+
+			g.setColor(Color.black);
+			if (output) {
+				g.drawOval(4, 4, 13, 13);
+			} else {
+				g.drawRect(4, 4, 13, 13);
+			}
+		}
+		if (w.equals(BitWidth.ONE))
+			g.setColor(Color.WHITE);
+		else
+			g.setColor(Color.BLACK);
+		GraphicsUtil.drawCenteredText(g, "" + w.getWidth(), 10, 9);
+	}
+
+	@Override
+	public void paintInstance(InstancePainter painter) {
+		paintBase(painter, false);
+		painter.drawPorts();
+		// print label
+		painter.getGraphics().setColor(painter.getAttributeValue(StdAttr.ATTR_LABEL_COLOR));
+		painter.drawLabel();
 	}
 
 	@Override

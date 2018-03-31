@@ -34,6 +34,31 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 		super.addMouseMotionListener(this);
 	}
 
+	private boolean drawCircleConnection(MouseEvent e) {
+		int row = getRow(e.getY());
+		int column = getColumn(e.getX());
+		int column2 = getColumn(e.getX() + 10);
+		this.hover = true;
+		if (row % 2 == 0 && row > 0 && column > 0) {
+			row = row / 2 - 1;
+			if (row <= data.getAnd() - 1) {
+				// is a clickable area
+				if (column <= data.getInputs() * 2) {// input and area
+					data.setHovered(row, column - 1);
+					return true;
+				} else if (column2 > data.getInputs() * 2 + 3) {// and or area
+					column2 -= (data.getInputs() * 2 + 4);
+					if (column2 % 2 == 0) {
+						data.setHovered(row, data.getInputs() * 2 + column2 / 2);
+						return true;
+					}
+				}
+			}
+		}
+		this.hover = false;
+		return false;
+	}
+
 	private void drawNot(Graphics g, int x, int y) {
 		int[] xp = new int[4];
 		int[] yp = new int[4];
@@ -73,31 +98,6 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 		return row;
 	}
 
-	private boolean drawCircleConnection(MouseEvent e) {
-		int row = getRow(e.getY());
-		int column = getColumn(e.getX());
-		int column2 = getColumn(e.getX() + 10);
-		this.hover = true;
-		if (row % 2 == 0 && row > 0 && column > 0) {
-			row = row / 2 - 1;
-			if (row <= data.getAnd() - 1) {
-				// is a clickable area
-				if (column <= data.getInputs() * 2) {// input and area
-					data.setHovered(row, column - 1);
-					return true;
-				} else if (column2 > data.getInputs() * 2 + 3) {// and or area
-					column2 -= (data.getInputs() * 2 + 4);
-					if (column2 % 2 == 0) {
-						data.setHovered(row, data.getInputs() * 2 + column2 / 2);
-						return true;
-					}
-				}
-			}
-		}
-		this.hover = false;
-		return false;
-	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// click area arownd node is 20*20
@@ -131,11 +131,26 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if (drawCircleConnection(e))
+			setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		else
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		repaint();
 	}
 
 	@Override
@@ -232,20 +247,5 @@ public class PlaRomPanel extends JPanel implements MouseListener, MouseMotionLis
 				g.drawOval(IMAGE_BORDER + 14 + 40 * (inputs + 1) + 40 * (data.columnhovered - 2 * inputs),
 						IMAGE_BORDER + 64 + 40 * data.rowhovered, 12, 12);
 		}
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		if (drawCircleConnection(e))
-			setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		else
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		repaint();
 	}
 }

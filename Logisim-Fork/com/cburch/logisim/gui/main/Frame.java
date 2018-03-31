@@ -17,6 +17,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,7 +48,6 @@ import com.cburch.logisim.gui.generic.LFrame;
 import com.cburch.logisim.gui.generic.ZoomControl;
 import com.cburch.logisim.gui.generic.ZoomModel;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
-import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
@@ -161,8 +161,9 @@ public class Frame extends LFrame implements LocaleListener {
 				layoutCanvas.closeCanvas();
 				Frame.this.dispose();
 			}
-			if (AppPreferences.SEND_DATA.getBoolean())
-				Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=no");
+			File closingfile = proj.getLogisimFile().getLoader().getMainFile();
+			if (closingfile != null)
+				Main.OpenedFiles.remove(closingfile.getAbsolutePath());
 		}
 
 		@Override

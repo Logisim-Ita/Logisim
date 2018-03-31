@@ -24,6 +24,7 @@ package com.cburch.logisim;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -31,7 +32,7 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 14, 2, 0, LogisimVersion.getVariantFromFile());
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 14, 3, 0, LogisimVersion.getVariantFromFile());
 
 	public static final String VERSION_NAME = VERSION.toString();
 
@@ -39,14 +40,21 @@ public class Main {
 
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 
-	// here will be saved the args so we can use them later in case of reboot when
-	// updating
-	public static String[] Args;
+	// here will be saved the file in use to reopen when restarting
+	public static ArrayList<String> OpenedFiles = new ArrayList<String>();
 	/* URL for the automatic updater */
 
 	public static void main(String[] args) throws Exception {
-		Args = args;
 		Startup startup = Startup.parseArgs(args);
+		if (AppPreferences.SEND_DATA.getBoolean())
+			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				if (AppPreferences.SEND_DATA.getBoolean())
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=no");
+			}
+		});
 		if (startup != null) {
 			if (!startup.autoUpdate(true, null)) {
 				try {
@@ -62,7 +70,7 @@ public class Main {
 				if (AppPreferences.SEND_DATA.getBoolean())
 					Startup.runRemotePhpCode(
 							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=add");
-				Startup.restart();
+				Startup.restart(args);
 			}
 		}
 	}

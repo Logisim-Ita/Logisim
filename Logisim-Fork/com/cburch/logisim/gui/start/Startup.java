@@ -273,17 +273,16 @@ public class Startup {
 		}
 	}
 
-	public static void restart() {
+	public static void restart(String[] parameters) {
 		try {
-			String[] exexute = new String[3 + Main.Args.length];
+			String[] exexute = new String[3 + parameters.length];
 			exexute[0] = "java";
 			exexute[1] = "-jar";
 			exexute[2] = new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
 					.getAbsolutePath();
-			for (int i = 3; i < exexute.length; i++)
-				exexute[i] = Main.Args[i - 3];
+			for (byte i = 0; i < parameters.length; i++)
+				exexute[i + 3] = parameters[i];
 			Runtime.getRuntime().exec(exexute);
-			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=no");
 			System.exit(0);
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -33,6 +33,7 @@ import javax.swing.event.MouseInputListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitEvent;
 import com.cburch.logisim.circuit.CircuitListener;
@@ -279,7 +280,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					// User refused to update
 					return;
 				Startup.AsktoSave(proj.getFrame());
-				Startup.restart();
+				Startup.restart((String[]) Main.OpenedFiles.toArray());
 			} else if (AppPreferences.SEND_DATA.isSource(event)) {
 				if (AppPreferences.SEND_DATA.getBoolean())
 					Startup.runRemotePhpCode(

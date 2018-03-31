@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstanceData;
@@ -116,12 +117,12 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			panel.add(statenumber, gbs);
 			// high duration edit box
 			inputs[i] = new JTextField(String.valueOf(getdurationHigh(i / 2)), 3);
-			inputs[i].setHorizontalAlignment(JTextField.CENTER);
+			inputs[i].setHorizontalAlignment(SwingConstants.CENTER);
 			gbs.gridx = 1;
 			panel.add(inputs[i], gbs);
 			// low duration edit box
 			inputs[i + 1] = new JTextField(String.valueOf(getdurationLow(i / 2)), 3);
-			inputs[i + 1].setHorizontalAlignment(JTextField.CENTER);
+			inputs[i + 1].setHorizontalAlignment(SwingConstants.CENTER);
 			gbs.gridx = 2;
 			panel.add(inputs[i + 1], gbs);
 		}

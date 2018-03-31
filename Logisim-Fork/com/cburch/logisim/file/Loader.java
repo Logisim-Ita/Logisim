@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.std.Builtin;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.JFileChoosers;
@@ -381,6 +382,12 @@ public class Loader implements LibraryLoader {
 	}
 
 	private void setMainFile(File value) {
+		if (value != null) {
+			String file = value.getAbsolutePath();
+			Main.OpenedFiles.add(file);
+		}
+		if (mainFile != null)
+			Main.OpenedFiles.remove(mainFile.getAbsolutePath());
 		mainFile = value;
 	}
 

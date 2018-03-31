@@ -273,16 +273,16 @@ public class PlaRomData implements InstanceData {
 		}
 	}
 
+	public void setHovered(int row, int column) {
+		rowhovered = row;
+		columnhovered = column;
+	}
+
 	public void setInputAndValue(int row, int column, boolean b) {
 		this.InputAnd[row][column] = b;
 		// update all values
 		setAndValue();
 		setOutputValue();
-	}
-
-	public void setHovered(int row, int column) {
-		rowhovered = row;
-		columnhovered = column;
 	}
 
 	public void setInputsValue(Value[] inputs) {

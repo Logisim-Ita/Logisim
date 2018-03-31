@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.gui.generic.LFrame;
 import com.cburch.logisim.gui.start.About;
 import com.cburch.logisim.gui.start.Startup;
@@ -101,8 +102,9 @@ class MenuHelp extends JMenu implements ActionListener {
 			Startup startup = new Startup(true);
 			if (startup.autoUpdate(false, menubar.getProject().getFrame())) {
 				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php");
-				Startup.restart();
+					Startup.runRemotePhpCode(
+							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=add");
+				Startup.restart((String[]) Main.OpenedFiles.toArray());
 			}
 
 		} else if (src == about) {
