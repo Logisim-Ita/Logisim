@@ -19,9 +19,9 @@ class CounterAttributes extends AbstractAttributeSet {
 	public CounterAttributes() {
 		base = AttributeSets.fixedSet(
 				new Attribute<?>[] { StdAttr.WIDTH, Counter.ATTR_MAX, Counter.ATTR_ON_GOAL, StdAttr.EDGE_TRIGGER,
-						StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { BitWidth.create(8), Integer.valueOf(0xFF), Counter.ON_GOAL_WRAP, StdAttr.TRIG_RISING, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+						Counter.BEHAVIOR, StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { BitWidth.create(8), Integer.valueOf(0xFF), Counter.ON_GOAL_WRAP, StdAttr.TRIG_RISING,
+						Counter.NEW_BEHAVIOR, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 	}
 
 	@Override

@@ -137,10 +137,11 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			// save
 			SaveValues(inputs);
 			SaveData();
-		} else if (option == 1)
+		} else if (option == 1) {
 			// clear
 			clearValues();
-		editWindow();
+			editWindow();
+		}
 	}
 
 	private int getdurationHigh(int i) {

@@ -35,16 +35,21 @@ public class Counter extends InstanceFactory {
 	static final Attribute<AttributeOption> ATTR_ON_GOAL = Attributes.forOption("ongoal",
 			Strings.getter("counterGoalAttr"),
 			new AttributeOption[] { ON_GOAL_WRAP, ON_GOAL_STAY, ON_GOAL_CONT, ON_GOAL_LOAD });
+	static final AttributeOption NEW_BEHAVIOR = new AttributeOption("new", "new", Strings.getter("counterNewBehavior"));
+	static final AttributeOption OLD_BEHAVIOR = new AttributeOption("old", "old", Strings.getter("counterOldBehavior"));
+	static final Attribute<AttributeOption> BEHAVIOR = Attributes.forOption("behavior",
+			Strings.getter("counterBehavior"), new AttributeOption[] { NEW_BEHAVIOR, OLD_BEHAVIOR });
 
-	private static final int DELAY = 8;
-	private static final int OUT = 0;
-	private static final int IN = 1;
-	private static final int CK = 2;
-	private static final int CLR = 3;
-	private static final int LD = 4;
-	private static final int CT = 5;
-	private static final int CARRY = 6;
-	private static final int PRE = 7;
+	private static final byte DELAY = 8;
+	private static final byte OUT = 0;
+	private static final byte IN = 1;
+	private static final byte CK = 2;
+	private static final byte CLR = 3;
+	private static final byte LD = 4;
+	private static final byte CT = 5;
+	private static final byte CARRY = 6;
+	private static final byte PRE = 7;
+	private static final byte EN = 8;
 
 	public Counter() {
 		super("Counter", Strings.getter("counterComponent"));
@@ -53,29 +58,11 @@ public class Counter extends InstanceFactory {
 		setInstancePoker(RegisterPoker.class);
 		setInstanceLogger(RegisterLogger.class);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
-
-		Port[] ps = new Port[8];
-		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
-		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
-		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
-		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
-		ps[LD] = new Port(-30, -10, Port.INPUT, 1);
-		ps[CT] = new Port(-30, 10, Port.INPUT, 1);
-		ps[CARRY] = new Port(0, 10, Port.OUTPUT, 1);
-		ps[PRE] = new Port(-10, -20, Port.INPUT, 1);
-		ps[OUT].setToolTip(Strings.getter("counterQTip"));
-		ps[IN].setToolTip(Strings.getter("counterDataTip"));
-		ps[CK].setToolTip(Strings.getter("counterClockTip"));
-		ps[CLR].setToolTip(Strings.getter("counterResetTip"));
-		ps[LD].setToolTip(Strings.getter("counterLoadTip"));
-		ps[CT].setToolTip(Strings.getter("counterEnableTip"));
-		ps[CARRY].setToolTip(Strings.getter("counterCarryTip"));
-		ps[PRE].setToolTip(Strings.getter("registerPreTip"));
-		setPorts(ps);
 	}
 
 	@Override
 	protected void configureNewInstance(Instance instance) {
+		updateports(instance);
 		Bounds bds = instance.getBounds();
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
 				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
@@ -130,6 +117,8 @@ public class Counter extends InstanceFactory {
 		painter.drawPort(PRE);
 		painter.drawPort(CLR, "0", Direction.SOUTH);
 		painter.drawPort(CT, Strings.get("counterEnableLabel"), Direction.EAST);
+		if (painter.getAttributeValue(BEHAVIOR) == NEW_BEHAVIOR)
+			painter.drawPort(EN);
 		g.setColor(Color.BLACK);
 		painter.drawClock(CK, Direction.NORTH);
 
@@ -155,9 +144,9 @@ public class Counter extends InstanceFactory {
 		int max = state.getAttributeValue(ATTR_MAX).intValue();
 		Value clock = state.getPort(CK);
 		boolean triggered = data.updateClock(clock, triggerType);
-
+		boolean newbehavior = state.getAttributeValue(BEHAVIOR) == NEW_BEHAVIOR;
 		Value newValue;
-		boolean carry;
+		boolean carry, ld, ct;
 		if (state.getPort(CLR) == Value.TRUE) {
 			newValue = Value.createKnown(dataWidth, 0);
 			carry = false;
@@ -165,15 +154,18 @@ public class Counter extends InstanceFactory {
 			newValue = Value.createKnown(dataWidth, -1);
 			carry = false;
 		} else {
-
-			boolean ld = state.getPort(LD) == Value.TRUE;
-			boolean ct = state.getPort(CT) != Value.FALSE;
+			if (newbehavior) {
+				if (state.getPort(EN) == Value.FALSE)
+					return;
+				ct = state.getPort(CT) == Value.TRUE;
+			} else
+				ct = state.getPort(CT) != Value.FALSE;
+			ld = state.getPort(LD) == Value.TRUE;
 			int oldVal = data.value;
 			int newVal;
 			if (!triggered) {
 				newVal = oldVal;
-			} else if (ct) { // trigger, enable = 1: should increment or
-								// decrement
+			} else if (!newbehavior && ct) { // trigger, enable = 1, old behavior: should increment or decrement
 				int goal = ld ? 0 : max;
 				if (oldVal == goal) {
 					Object onGoal = state.getAttributeValue(ATTR_ON_GOAL);
@@ -186,26 +178,48 @@ public class Counter extends InstanceFactory {
 						newVal = in.isFullyDefined() ? in.toIntValue() : 0;
 						if (newVal > max)
 							newVal &= max;
-					} else if (onGoal == ON_GOAL_CONT) {
+					} else if (onGoal == ON_GOAL_CONT) { // decrement or increment
 						newVal = ld ? oldVal - 1 : oldVal + 1;
 					} else {
 						System.err.println("Invalid goal attribute " + onGoal); // OK
 						newVal = ld ? max : 0;
 					}
-				} else {
+				} else { // decrement or increment
 					newVal = ld ? oldVal - 1 : oldVal + 1;
 				}
-			} else if (ld) { // trigger, enable = 0, load = 1: should load
+			} else if (ld) { // trigger, !(newbehavior && count), load = 1: should load
 				Value in = state.getPort(IN);
 				newVal = in.isFullyDefined() ? in.toIntValue() : 0;
 				if (newVal > max)
 					newVal &= max;
+			} else if (newbehavior) { // ld = 0, newbehavior
+				int goal = ct ? 0 : max;
+				if (oldVal == goal) {
+					Object onGoal = state.getAttributeValue(ATTR_ON_GOAL);
+					if (onGoal == ON_GOAL_WRAP) {
+						newVal = ct ? max : 0;
+					} else if (onGoal == ON_GOAL_STAY) {
+						newVal = oldVal;
+					} else if (onGoal == ON_GOAL_LOAD) {
+						Value in = state.getPort(IN);
+						newVal = in.isFullyDefined() ? in.toIntValue() : 0;
+						if (newVal > max)
+							newVal &= max;
+					} else if (onGoal == ON_GOAL_CONT) { // decrement or increment
+						newVal = ct ? oldVal - 1 : oldVal + 1;
+					} else {
+						System.err.println("Invalid goal attribute " + onGoal); // OK
+						newVal = ct ? max : 0;
+					}
+				} else { // decrement or increment
+					newVal = ct ? oldVal - 1 : oldVal + 1;
+				}
 			} else { // trigger, enable = 0, load = 0: no change
 				newVal = oldVal;
 			}
 			newValue = Value.createKnown(dataWidth, newVal);
 			newVal = newValue.toIntValue();
-			carry = newVal == (ld && ct ? 0 : max);
+			carry = newVal == ((!newbehavior && ld && ct) || (newbehavior && ct) ? 0 : max);
 			/*
 			 * I would want this if I were worried about the carry signal outrunning the
 			 * clock. But the component's delay should be enough to take care of it. if
@@ -217,5 +231,43 @@ public class Counter extends InstanceFactory {
 		data.value = newValue.toIntValue();
 		state.setPort(OUT, newValue, DELAY);
 		state.setPort(CARRY, carry ? Value.TRUE : Value.FALSE, DELAY);
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == BEHAVIOR) {
+			updateports(instance);
+			instance.fireInvalidated();
+		}
+	}
+
+	private void updateports(Instance instance) {
+		boolean newbehavior = instance.getAttributeValue(BEHAVIOR) == NEW_BEHAVIOR;
+		Port[] ps = new Port[(newbehavior ? 9 : 8)];
+		ps[OUT] = new Port(0, 0, Port.OUTPUT, StdAttr.WIDTH);
+		ps[IN] = new Port(-30, 0, Port.INPUT, StdAttr.WIDTH);
+		ps[CK] = new Port(-20, 20, Port.INPUT, 1);
+		ps[CLR] = new Port(-10, 20, Port.INPUT, 1);
+		ps[LD] = new Port(-30, -10, Port.INPUT, 1);
+		ps[CT] = new Port(-30, 10, Port.INPUT, 1);
+		ps[CARRY] = new Port(0, 10, Port.OUTPUT, 1);
+		ps[PRE] = new Port(-10, -20, Port.INPUT, 1);
+		ps[OUT].setToolTip(Strings.getter("counterQTip"));
+		ps[IN].setToolTip(Strings.getter("counterDataTip"));
+		ps[CK].setToolTip(Strings.getter("counterClockTip"));
+		ps[CLR].setToolTip(Strings.getter("counterResetTip"));
+		ps[CARRY].setToolTip(Strings.getter("counterCarryTip"));
+		ps[PRE].setToolTip(Strings.getter("registerPreTip"));
+		if (newbehavior) {
+			ps[EN] = new Port(-20, -20, Port.INPUT, 1);
+			ps[LD].setToolTip(Strings.getter("newcounterLoadTip"));
+			ps[CT].setToolTip(Strings.getter("newcounterReverseCountTip"));
+			ps[EN].setToolTip(Strings.getter("newcounterEnableTip"));
+
+		} else {
+			ps[LD].setToolTip(Strings.getter("counterLoadTip"));
+			ps[CT].setToolTip(Strings.getter("counterEnableTip"));
+		}
+		instance.setPorts(ps);
 	}
 }

@@ -104,7 +104,7 @@ class MenuHelp extends JMenu implements ActionListener {
 				if (AppPreferences.SEND_DATA.getBoolean())
 					Startup.runRemotePhpCode(
 							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=add");
-				Startup.restart((String[]) Main.OpenedFiles.toArray());
+				Startup.restart(Main.OpenedFiles.toArray(new String[0]));
 			}
 
 		} else if (src == about) {

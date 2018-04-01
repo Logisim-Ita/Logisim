@@ -280,7 +280,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					// User refused to update
 					return;
 				Startup.AsktoSave(proj.getFrame());
-				Startup.restart((String[]) Main.OpenedFiles.toArray());
+				Startup.restart(Main.OpenedFiles.toArray(new String[0]));
 			} else if (AppPreferences.SEND_DATA.isSource(event)) {
 				if (AppPreferences.SEND_DATA.getBoolean())
 					Startup.runRemotePhpCode(
