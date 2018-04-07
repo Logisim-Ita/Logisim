@@ -2,12 +2,25 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.14.2.0</jar_version>
+  <jar_version>2.14.3.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.14.2.0</exe_version>
+  <exe_version>2.14.3.0</exe_version>
   <changelog>
-* Code and RAM usage optimizations
-* Hover circles for nodes in the PLA ROM edit window
-* Reverse slider attribute
-  </changelog>
+* Bug fix for online users counter
+* Fixed Logisim not reopening all files after a restart (ex. after an update)
+* Fixed some translation
+* New Counter behavior, now easier to understand, with possibility to continue using the old one
+	Truth table:
+ RCNT        LD
+   0          0     up count
+   0          1     load
+   1          0     down count
+   1          1     load
+   X          X     up count
+   X          0     up count
+   X          1     load
+   0          X     up count
+   1          X     down count
+EN = 0 --> no count
+</changelog>
 </logisim>

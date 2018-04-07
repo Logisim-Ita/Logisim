@@ -75,6 +75,14 @@ public class Counter extends InstanceFactory {
 	}
 
 	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == BEHAVIOR) {
+			updateports(instance);
+			instance.fireInvalidated();
+		}
+	}
+
+	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		Bounds bds = painter.getBounds();
@@ -232,14 +240,6 @@ public class Counter extends InstanceFactory {
 		data.value = newValue.toIntValue();
 		state.setPort(OUT, newValue, DELAY);
 		state.setPort(CARRY, carry ? Value.TRUE : Value.FALSE, DELAY);
-	}
-
-	@Override
-	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == BEHAVIOR) {
-			updateports(instance);
-			instance.fireInvalidated();
-		}
 	}
 
 	private void updateports(Instance instance) {

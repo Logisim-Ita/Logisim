@@ -26,6 +26,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Almost infinite canvas, arrows will show you in what direction is the circuit if it's outside of your view
 * New FF layout and attributes
 * FF D, S-R: Latch option in trigger list
+* New Counter behavior
 * Controlled Buffer / Inverter: Negate Control Input attribute
 * Added Sel pin in Register component
 * Added Preset pin in Register and Counter components

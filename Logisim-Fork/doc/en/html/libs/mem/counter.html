@@ -75,6 +75,7 @@ counter is at 0. At all other times, this output is 0.</dd>
 will load the value found at the <var>data</var> input at the next clock
 trigger - or, if the <var>count</var> input happens to be 1, the counter's
 value will decrement.</dd>
+<dd>New: When 1 loads the value from the data input, when 0 normally counts</dd> 
 
 <dt>West edge, middle pin labeled <var>D</var>
   (input, bit with matches Data Bits attribute)</dt>
@@ -86,6 +87,7 @@ this input.</dd>
 <dd>Count: When this is 1 or unconnected, the value in the counter increments
 whenever the clock input is triggered - or it decrements if the <var>load</var>
 input happens to also be 1.</dd> 
+<dd>New: When 1 the counter decrements, when different from 1 increments</dd> 
 
 <dt>South edge, indicated with a triangle (input, bit width 1)
 <dd>Clock: At the instant that this is triggered as specified by the Trigger
@@ -97,6 +99,14 @@ attribute, the counter updates as indicated by the <var>load</var> and
 As long as it is 1, the counter's value is asynchronously pinned to 0. This
 occurs asynchronously - that is, without regard to the current clock input
 value. As long as this is 1, the other inputs have no effect.</dd>
+<dt>North edge, labeled 1 (input, bit width 1)
+<dd>Preset: When 0 or undefined, this input has no effect.
+As long as it is 1, the counter's value is asynchronously pinned to max value. This
+occurs asynchronously - that is, without regard to the current clock input
+value. As long as this is 1, the other inputs have no effect.</dd>
+<dt>North edge, leftmost pin (input, bit width 1)
+<dd>Enable: When 1 or undefined, this input has no effect.
+As long as it is 0, the other inputs have no effect.</dd>
 
 </dl>
 
@@ -134,6 +144,9 @@ as provided by the Data Bits attribute</dd>
 indicates that the counter should update its value at the instant when the
 clock rises from 0 to 1. The <q>falling edge</q> value indicates that it should
 update at the instant the clock falls from 1 to 0.</dd>
+
+<dt>Behavior</dt>
+<dd>Select if use the legacy behavior or the new one introduced in Logisim 2.14.3.0</dd>
 
 <dt>Label</dt>
 <dd>The text within the label associated with the component.</dd>

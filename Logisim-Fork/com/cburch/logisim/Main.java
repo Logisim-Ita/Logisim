@@ -47,12 +47,12 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
 		if (AppPreferences.SEND_DATA.getBoolean())
-			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=yes");
+			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=no");
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
 			}
 		});
 		if (startup != null) {
@@ -69,7 +69,7 @@ public class Main {
 			} else {
 				if (AppPreferences.SEND_DATA.getBoolean())
 					Startup.runRemotePhpCode(
-							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=add");
+							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1");
 				Startup.restart(args);
 			}
 		}
