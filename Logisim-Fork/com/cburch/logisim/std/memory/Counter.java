@@ -64,6 +64,7 @@ public class Counter extends InstanceFactory {
 	protected void configureNewInstance(Instance instance) {
 		updateports(instance);
 		Bounds bds = instance.getBounds();
+		instance.addAttributeListener();
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
 				bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
 	}

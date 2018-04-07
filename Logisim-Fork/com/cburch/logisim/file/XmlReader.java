@@ -629,6 +629,17 @@ class XmlReader {
 					}
 				}
 			}
+			// new counter behavior
+			if (version.compareTo(LogisimVersion.get(2, 14, 3, 0)) < 0) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Counter")) {
+						Element BehavorAttribute = doc.createElement("a");
+						BehavorAttribute.setAttribute("name", "behavior");
+						BehavorAttribute.setAttribute("val", "old");
+						compElt.appendChild(BehavorAttribute);
+					}
+				}
+			}
 		}
 	}
 
