@@ -257,9 +257,9 @@ public class HexEditor extends JComponent implements Scrollable {
 		String ret = Long.toHexString(value);
 		int retLen = ret.length();
 		if (retLen < chars) {
-			ret = "0" + ret;
-			for (int i = retLen + 1; i < chars; i++) {
-				ret = "0" + ret;
+			while (retLen < chars) {
+				ret += '0';
+				retLen++;
 			}
 			return ret;
 		} else if (retLen == chars) {
