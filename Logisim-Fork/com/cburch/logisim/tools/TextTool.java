@@ -18,6 +18,7 @@ import com.cburch.logisim.comp.ComponentUserEvent;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.gui.main.Canvas;
+import com.cburch.logisim.gui.main.SelectionActions;
 import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.base.Text;
@@ -204,7 +205,9 @@ public class TextTool extends Tool {
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
 		Project proj = canvas.getProject();
 		Circuit circ = canvas.getCircuit();
-
+		
+		Action act = SelectionActions.dropAll(canvas.getSelection());
+		canvas.getProject().doAction(act);
 		if (!proj.getLogisimFile().contains(circ)) {
 			if (caret != null)
 				caret.cancelEditing();
