@@ -82,7 +82,7 @@ public class Probe extends InstanceFactory {
 			}
 		} else if (labelLoc == Direction.EAST) {
 			halign = TextField.H_LEFT;
-			valign = TextField.V_CENTER;
+			valign = TextField.V_CENTER_OVERALL;
 			x = bds.getX() + bds.getWidth() + 2;
 			y = bds.getY() + bds.getHeight() / 2;
 			if (facing == labelLoc) {
@@ -91,7 +91,7 @@ public class Probe extends InstanceFactory {
 			}
 		} else { // WEST
 			halign = TextField.H_RIGHT;
-			valign = TextField.V_CENTER;
+			valign = TextField.V_CENTER_OVERALL;
 			x = bds.getX() - 2;
 			y = bds.getY() + bds.getHeight() / 2;
 			if (facing == labelLoc) {

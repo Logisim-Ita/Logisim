@@ -23,6 +23,7 @@ import com.cburch.logisim.circuit.Wire;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.comp.ComponentFactory;
+import com.cburch.logisim.comp.ComponentUserEvent;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Direction;
@@ -33,6 +34,7 @@ import com.cburch.logisim.gui.main.Selection;
 import com.cburch.logisim.gui.main.Selection.Event;
 import com.cburch.logisim.gui.main.SelectionActions;
 import com.cburch.logisim.proj.Action;
+import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.GraphicsUtil;
 
 public class EditTool extends Tool {
@@ -329,6 +331,34 @@ public class EditTool extends Tool {
 
 	@Override
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
+		// add label if double click
+		if (e.getClickCount() == 2) {
+			Project proj = canvas.getProject();
+			Circuit circ = canvas.getCircuit();
+			Location loc = Location.create(e.getX(), e.getY());
+			// only if clicking inside a component with label
+			for (Component comp : circ.getAllContaining(loc, g)) {
+				TextEditable editable = (TextEditable) comp.getFeature(TextEditable.class);
+				if (editable != null) {
+					canvas.getProject().doAction(SelectionActions.dropAll(canvas.getSelection()));
+					ComponentUserEvent event = new ComponentUserEvent(canvas, e.getX(), e.getY());
+					// search the text tool
+					Tool tool = Canvas.findTextTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
+					if (tool == null) {
+						for (Library lib : proj.getLogisimFile().getLibraries()) {
+							tool = Canvas.findTextTool(lib.getTools());
+							if (tool != null)
+								break;
+						}
+						if (tool == null)
+							tool = new TextTool();
+					}
+					((TextTool) tool).AddLabelforDoubleClick(canvas, comp, editable, event);
+					proj.setTool(tool);
+					return;
+				}
+			}
+		}
 		boolean wire = updateLocation(canvas, e);
 		Location oldWireLoc = wireLoc;
 		wireLoc = NULL_LOCATION;

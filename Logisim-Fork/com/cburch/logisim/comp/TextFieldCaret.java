@@ -99,6 +99,9 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			y += ascent;
 			break;
 		case TextField.V_CENTER:
+			y += ascent / 2;
+			break;
+		case TextField.V_CENTER_OVERALL:
 			y += (ascent - descent) / 2;
 			break;
 		case TextField.V_BOTTOM:
@@ -144,6 +147,9 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			y += ascent;
 			break;
 		case TextField.V_CENTER:
+			y += ascent / 2;
+			break;
+		case TextField.V_CENTER_OVERALL:
 			y += (ascent - descent) / 2;
 			break;
 		case TextField.V_BOTTOM:

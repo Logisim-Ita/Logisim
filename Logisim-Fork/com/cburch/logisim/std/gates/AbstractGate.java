@@ -110,7 +110,7 @@ abstract class AbstractGate extends InstanceFactory {
 			cy = loc.getY() + perp;
 		}
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, cx, cy, TextField.H_CENTER,
-				TextField.V_CENTER);
+				TextField.V_CENTER_OVERALL);
 	}
 
 	protected abstract Value computeOutput(Value[] inputs, int numInputs, InstanceState state);

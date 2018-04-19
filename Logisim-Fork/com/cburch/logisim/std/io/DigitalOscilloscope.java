@@ -66,7 +66,7 @@ public class DigitalOscilloscope extends InstanceFactory {
 		int x = bds.getX() + bds.getWidth() / 2;
 		int y = bds.getY() + bds.getHeight() / 2;
 		int halign = GraphicsUtil.H_CENTER;
-		int valign = GraphicsUtil.V_CENTER;
+		int valign = GraphicsUtil.V_CENTER_OVERALL;
 		if (labelLoc == Direction.NORTH) {
 			y = bds.getY() - 2;
 			valign = GraphicsUtil.V_BOTTOM;

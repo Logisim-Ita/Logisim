@@ -92,10 +92,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 		if (dir == Direction.EAST || dir == Direction.WEST)
 			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
 					bds.getX() + bds.getWidth() + 3, bds.getY() + bds.getHeight() / 2, GraphicsUtil.H_LEFT,
-					GraphicsUtil.V_CENTER);
+					GraphicsUtil.V_CENTER_OVERALL);
 		else
 			instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
-					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_CENTER);
+					bds.getX() + bds.getWidth() / 2, bds.getY() - 3, GraphicsUtil.H_CENTER,
+					GraphicsUtil.V_CENTER_OVERALL);
 	}
 
 	@Override

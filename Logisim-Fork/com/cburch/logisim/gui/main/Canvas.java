@@ -69,6 +69,7 @@ import com.cburch.logisim.proj.ProjectListener;
 import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.EditTool;
 import com.cburch.logisim.tools.Library;
+import com.cburch.logisim.tools.TextTool;
 import com.cburch.logisim.tools.Tool;
 import com.cburch.logisim.tools.ToolTipMaker;
 import com.cburch.logisim.util.GraphicsUtil;
@@ -198,9 +199,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				drag_tool = getToolFor(e);
 				if (drag_tool != null) {
 					drag_tool.mousePressed(Canvas.this, getGraphics(), e);
-					if (e.getButton() != MouseEvent.BUTTON1)
+					if (e.getButton() != MouseEvent.BUTTON1) {
 						temp_tool = proj.getTool();
-					proj.setTool(drag_tool);
+						proj.setTool(drag_tool);
+					}
 				}
 				completeAction();
 			}
@@ -283,8 +285,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				Startup.restart(Main.OpenedFiles.toArray(new String[0]));
 			} else if (AppPreferences.SEND_DATA.isSource(event)) {
 				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode(
-							"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
 				else
 					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
 			}
@@ -323,17 +324,6 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			} else if (act == CircuitEvent.ACTION_INVALIDATE) {
 				completeAction();
 			}
-		}
-
-		private Tool findTool(List<? extends Tool> opts) {
-			Tool ret = null;
-			for (Tool o : opts) {
-				if (ret == null && o != null)
-					ret = o;
-				else if (o instanceof EditTool)
-					ret = o;
-			}
-			return ret;
 		}
 
 		@Override
@@ -640,17 +630,17 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	 * 
 	 */
 	private static final long serialVersionUID = -4680658517189289645L;
+
 	static final Color HALO_COLOR = new Color(200, 250, 255);
+
 	// pixels shown in canvas beyond outermost boundaries
 	private static final int THRESH_SIZE_UPDATE = 10;
-
 	// don't bother to update the size if it hasn't changed more than this
 	static final double SQRT_2 = Math.sqrt(2.0);
 	private static final int BUTTONS_MASK = InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON2_DOWN_MASK
 			| InputEvent.BUTTON3_DOWN_MASK;
 
 	public static final Color DEFAULT_ERROR_COLOR = new Color(192, 0, 0);
-
 	public static final Color TICK_RATE_COLOR = Color.GRAY;
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
@@ -662,6 +652,28 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	public static boolean AutoZoomButtonClicked(Dimension sz, double x, double y) {
 		return Point2D.distance(x, y, sz.width - zoomButtonSize / 2 - zoomButtonMargin,
 				sz.height - zoomButtonMargin - zoomButtonSize / 2) <= zoomButtonSize / 2;
+	}
+
+	public static Tool findTextTool(List<? extends Tool> opts) {
+		Tool ret = null;
+		for (Tool o : opts) {
+			if (o instanceof TextTool) {
+				ret = o;
+				break;
+			}
+		}
+		return ret;
+	}
+
+	public static Tool findTool(List<? extends Tool> opts) {
+		Tool ret = null;
+		for (Tool o : opts) {
+			if (ret == null && o != null)
+				ret = o;
+			else if (o instanceof EditTool)
+				ret = o;
+		}
+		return ret;
 	}
 
 	public static void paintAutoZoomButton(Graphics g, Dimension sz, Color zoomButtonColor) {

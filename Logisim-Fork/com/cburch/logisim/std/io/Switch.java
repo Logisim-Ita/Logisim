@@ -84,7 +84,7 @@ public class Switch extends InstanceFactory {
 		int x = bds.getX() + bds.getWidth() / 2;
 		int y = bds.getY() + bds.getHeight() / 2;
 		int halign = GraphicsUtil.H_CENTER;
-		int valign = GraphicsUtil.V_CENTER;
+		int valign = GraphicsUtil.V_CENTER_OVERALL;
 		if (labelLoc == Io.LABEL_CENTER) {
 			x = bds.getX() + (bds.getWidth() - DEPTH) / 2;
 			y = bds.getY() + (bds.getHeight() - DEPTH) / 2;

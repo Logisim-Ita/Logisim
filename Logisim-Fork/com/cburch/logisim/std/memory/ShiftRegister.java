@@ -90,7 +90,7 @@ public class ShiftRegister extends InstanceFactory {
 
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
 				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 4, GraphicsUtil.H_CENTER,
-				GraphicsUtil.V_CENTER);
+				GraphicsUtil.V_CENTER_OVERALL);
 	}
 
 	private ShiftRegisterData getData(InstanceState state) {

@@ -261,7 +261,7 @@ public class PlaRom extends InstanceFactory {
 		updateports(instance);
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR,
 				bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() / 3, GraphicsUtil.H_CENTER,
-				GraphicsUtil.V_CENTER);
+				GraphicsUtil.V_CENTER_OVERALL);
 	}
 
 	@Override

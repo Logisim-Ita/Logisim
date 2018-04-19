@@ -92,7 +92,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 	}
 
 	@Override
-	public Caret getTextCaret(ComponentUserEvent event) {
+	public Caret getTextCaret(ComponentUserEvent event, boolean Fromdoubleclick) {
 		canvas = event.getCanvas();
 		Graphics g = canvas.getGraphics();
 
@@ -101,7 +101,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		if (field == null)
 			createField(comp.getAttributeSet(), "");
 		String text = field.getText();
-		if (text == null || text.equals(""))
+		if (text == null || text.equals("") || Fromdoubleclick)
 			return field.getCaret(g, 0);
 
 		Bounds bds = field.getBounds(g);

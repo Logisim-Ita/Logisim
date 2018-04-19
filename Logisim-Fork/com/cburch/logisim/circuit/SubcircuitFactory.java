@@ -120,7 +120,7 @@ public class SubcircuitFactory extends InstanceFactory {
 		int x = bds.getX() + bds.getWidth() / 2;
 		int y = bds.getY() + bds.getHeight() / 2;
 		int ha = GraphicsUtil.H_CENTER;
-		int va = GraphicsUtil.V_CENTER;
+		int va = GraphicsUtil.V_CENTER_OVERALL;
 		if (loc == Direction.EAST) {
 			x = bds.getX() + bds.getWidth() + 2;
 			ha = GraphicsUtil.H_LEFT;

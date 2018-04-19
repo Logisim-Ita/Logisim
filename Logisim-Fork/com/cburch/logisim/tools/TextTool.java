@@ -102,6 +102,21 @@ public class TextTool extends Tool {
 
 			if (a != null)
 				proj.doAction(a);
+			// reset edit tool after end edit
+			if (Fromdoubleclick) {
+				Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
+				if (tool == null) {
+					for (Library lib : proj.getLogisimFile().getLibraries()) {
+						tool = Canvas.findTool(lib.getTools());
+						if (tool != null)
+							break;
+					}
+					if (tool == null)
+						tool = new TextTool();
+				}
+				proj.setTool(tool);
+				Fromdoubleclick = false;
+			}
 		}
 	}
 
@@ -110,13 +125,32 @@ public class TextTool extends Tool {
 	private MyListener listener = new MyListener();
 	private AttributeSet attrs;
 	private Caret caret = null;
-	private boolean caretCreatingText = false;
+	private boolean caretCreatingText = false, Fromdoubleclick = false;
 	private Canvas caretCanvas = null;
 	private Circuit caretCircuit = null;
 	private Component caretComponent = null;
 
 	public TextTool() {
 		attrs = Text.FACTORY.createAttributeSet();
+	}
+
+	public void AddLabelforDoubleClick(Canvas canvas, Component comp, TextEditable editable, ComponentUserEvent event) {
+		Project proj = canvas.getProject();
+		Circuit circ = canvas.getCircuit();
+		Fromdoubleclick = true;
+		caret = editable.getTextCaret(event, Fromdoubleclick);
+		if (caret != null) {
+			caretComponent = comp;
+			proj.getFrame().viewComponentAttributes(circ, caretComponent);
+			caretCreatingText = false;
+		}
+		if (caret != null) {
+			caretCanvas = canvas;
+			caretCircuit = canvas.getCircuit();
+			caret.addCaretListener(listener);
+			caretCircuit.addCircuitListener(listener);
+		}
+		proj.repaintCanvas();
 	}
 
 	@Override
@@ -205,7 +239,7 @@ public class TextTool extends Tool {
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
 		Project proj = canvas.getProject();
 		Circuit circ = canvas.getCircuit();
-		
+		Fromdoubleclick = false;
 		Action act = SelectionActions.dropAll(canvas.getSelection());
 		canvas.getProject().doAction(act);
 		if (!proj.getLogisimFile().contains(circ)) {
@@ -237,7 +271,7 @@ public class TextTool extends Tool {
 		for (Component comp : proj.getSelection().getComponentsContaining(loc, g)) {
 			TextEditable editable = (TextEditable) comp.getFeature(TextEditable.class);
 			if (editable != null) {
-				caret = editable.getTextCaret(event);
+				caret = editable.getTextCaret(event, Fromdoubleclick);
 				if (caret != null) {
 					proj.getFrame().viewComponentAttributes(circ, comp);
 					caretComponent = comp;
@@ -252,7 +286,7 @@ public class TextTool extends Tool {
 			for (Component comp : circ.getAllContaining(loc, g)) {
 				TextEditable editable = (TextEditable) comp.getFeature(TextEditable.class);
 				if (editable != null) {
-					caret = editable.getTextCaret(event);
+					caret = editable.getTextCaret(event, Fromdoubleclick);
 					if (caret != null) {
 						proj.getFrame().viewComponentAttributes(circ, comp);
 						caretComponent = comp;
@@ -272,7 +306,7 @@ public class TextTool extends Tool {
 			caretCreatingText = true;
 			TextEditable editable = (TextEditable) caretComponent.getFeature(TextEditable.class);
 			if (editable != null) {
-				caret = editable.getTextCaret(event);
+				caret = editable.getTextCaret(event, Fromdoubleclick);
 				proj.getFrame().viewComponentAttributes(circ, caretComponent);
 			}
 		}

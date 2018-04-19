@@ -97,9 +97,11 @@ public class PullResistor extends InstanceFactory {
 		if (color && inColor != null)
 			g.setColor(inColor);
 		if (facing == Direction.EAST) {
-			GraphicsUtil.drawText(g, pullValue.toDisplayString(), -32, 0, GraphicsUtil.H_RIGHT, GraphicsUtil.V_CENTER);
+			GraphicsUtil.drawText(g, pullValue.toDisplayString(), -32, 0, GraphicsUtil.H_RIGHT,
+					GraphicsUtil.V_CENTER_OVERALL);
 		} else if (facing == Direction.WEST) {
-			GraphicsUtil.drawText(g, pullValue.toDisplayString(), 32, 0, GraphicsUtil.H_LEFT, GraphicsUtil.V_CENTER);
+			GraphicsUtil.drawText(g, pullValue.toDisplayString(), 32, 0, GraphicsUtil.H_LEFT,
+					GraphicsUtil.V_CENTER_OVERALL);
 		} else if (facing == Direction.NORTH) {
 			GraphicsUtil.drawText(g, pullValue.toDisplayString(), 0, 32, GraphicsUtil.H_CENTER, GraphicsUtil.V_TOP);
 		} else {
