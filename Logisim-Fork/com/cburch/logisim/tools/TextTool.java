@@ -56,6 +56,9 @@ public class TextTool extends Tool {
 			caretComponent = null;
 			caretCreatingText = false;
 			caret = null;
+			// reset edit tool after end edit
+			if (Fromdoubleclick)
+				resetEditTool();
 		}
 
 		@Override
@@ -103,20 +106,24 @@ public class TextTool extends Tool {
 			if (a != null)
 				proj.doAction(a);
 			// reset edit tool after end edit
-			if (Fromdoubleclick) {
-				Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
-				if (tool == null) {
-					for (Library lib : proj.getLogisimFile().getLibraries()) {
-						tool = Canvas.findTool(lib.getTools());
-						if (tool != null)
-							break;
-					}
-					if (tool == null)
-						tool = new TextTool();
+			if (Fromdoubleclick)
+				resetEditTool();
+		}
+
+		private void resetEditTool() {
+			Project proj = caretCanvas.getProject();
+			Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
+			if (tool == null) {
+				for (Library lib : proj.getLogisimFile().getLibraries()) {
+					tool = Canvas.findTool(lib.getTools());
+					if (tool != null)
+						break;
 				}
-				proj.setTool(tool);
-				Fromdoubleclick = false;
+				if (tool == null)
+					tool = new TextTool();
 			}
+			proj.setTool(tool);
+			Fromdoubleclick = false;
 		}
 	}
 
@@ -136,12 +143,10 @@ public class TextTool extends Tool {
 
 	public void AddLabelforDoubleClick(Canvas canvas, Component comp, TextEditable editable, ComponentUserEvent event) {
 		Project proj = canvas.getProject();
-		Circuit circ = canvas.getCircuit();
 		Fromdoubleclick = true;
 		caret = editable.getTextCaret(event, Fromdoubleclick);
 		if (caret != null) {
 			caretComponent = comp;
-			proj.getFrame().viewComponentAttributes(circ, caretComponent);
 			caretCreatingText = false;
 		}
 		if (caret != null) {
@@ -239,7 +244,6 @@ public class TextTool extends Tool {
 	public void mousePressed(Canvas canvas, Graphics g, MouseEvent e) {
 		Project proj = canvas.getProject();
 		Circuit circ = canvas.getCircuit();
-		Fromdoubleclick = false;
 		Action act = SelectionActions.dropAll(canvas.getSelection());
 		canvas.getProject().doAction(act);
 		if (!proj.getLogisimFile().contains(circ)) {

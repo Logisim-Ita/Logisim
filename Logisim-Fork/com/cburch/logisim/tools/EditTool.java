@@ -355,6 +355,7 @@ public class EditTool extends Tool {
 					}
 					((TextTool) tool).AddLabelforDoubleClick(canvas, comp, editable, event);
 					proj.setTool(tool);
+					proj.getFrame().viewComponentAttributes(circ, comp);
 					return;
 				}
 			}
