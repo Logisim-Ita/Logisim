@@ -82,7 +82,7 @@ public class WindowMenu extends JMenu {
 		this.owner = owner;
 		WindowMenuManager.addMenu(this);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMask();
+		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
 		minimize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, menuMask));
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask));
 

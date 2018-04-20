@@ -3,7 +3,7 @@
 
 package com.cburch.logisim.gui.appear;
 
-import java.awt.event.InputEvent;
+import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -38,8 +38,9 @@ class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyCha
 
 		ArrayList<ToolbarItem> rawItems = new ArrayList<ToolbarItem>();
 		int i = 1;
+		int mask = new Frame().getToolkit().getMenuShortcutKeyMaskEx();
 		for (AbstractTool tool : tools) {
-			tool.setCltrIndex(" (" + InputEventUtil.toKeyDisplayString(InputEvent.CTRL_DOWN_MASK) + "-" + i + ")");
+			tool.setCltrIndex(" (" + InputEventUtil.toKeyDisplayString(mask) + "-" + i + ")");
 			i++;
 			rawItems.add(new ToolbarToolItem(tool));
 		}

@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.InputEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -113,9 +112,8 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			if (index <= 10) {
 				if (index == 10)
 					index = 0;
-				// int mask = frame.getToolkit().getMenuShortcutKeyMask(); // still not updated
-				// in java 9
-				ret += " (" + InputEventUtil.toKeyDisplayString(InputEvent.CTRL_DOWN_MASK) + "-" + index + ")";
+				int mask = frame.getToolkit().getMenuShortcutKeyMaskEx();
+				ret += " (" + InputEventUtil.toKeyDisplayString(mask) + "-" + index + ")";
 			}
 			return ret;
 		}
@@ -153,7 +151,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 		return null;
 	}
 
-	// private Frame frame;
+	private Frame frame;
 	private Project proj;
 	private MyListener myListener;
 	private List<ToolbarItem> items;
@@ -161,7 +159,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 	private Tool haloedTool;
 
 	public LayoutToolbarModel(Frame frame, Project proj) {
-		// this.frame = frame;
+		this.frame = frame;
 		this.proj = proj;
 		myListener = new MyListener();
 		items = Collections.emptyList();
