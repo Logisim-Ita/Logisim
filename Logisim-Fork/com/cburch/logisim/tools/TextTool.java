@@ -109,22 +109,22 @@ public class TextTool extends Tool {
 			if (Fromdoubleclick)
 				resetEditTool();
 		}
+	}
 
-		private void resetEditTool() {
-			Project proj = caretCanvas.getProject();
-			Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
-			if (tool == null) {
-				for (Library lib : proj.getLogisimFile().getLibraries()) {
-					tool = Canvas.findTool(lib.getTools());
-					if (tool != null)
-						break;
-				}
-				if (tool == null)
-					tool = new TextTool();
+	private void resetEditTool() {
+		Project proj = caretCanvas.getProject();
+		Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
+		if (tool == null) {
+			for (Library lib : proj.getLogisimFile().getLibraries()) {
+				tool = Canvas.findTool(lib.getTools());
+				if (tool != null)
+					break;
 			}
-			proj.setTool(tool);
-			Fromdoubleclick = false;
+			if (tool == null)
+				tool = new TextTool();
 		}
+		proj.setTool(tool);
+		Fromdoubleclick = false;
 	}
 
 	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
@@ -259,9 +259,11 @@ public class TextTool extends Tool {
 				caret.mousePressed(e);
 				proj.repaintCanvas();
 				return;
-			} else { // No. End the current caret.
+			} else if (Fromdoubleclick) {// No. End the current caret
 				caret.stopEditing();
-			}
+				return;
+			} else // No. End the current caret
+				caret.stopEditing();
 		}
 		// caret will be null at this point
 

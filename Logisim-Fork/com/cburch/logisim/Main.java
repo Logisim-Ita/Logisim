@@ -32,7 +32,7 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
-	public static final LogisimVersion VERSION = LogisimVersion.get(2, 14, 3, 0, LogisimVersion.getVariantFromFile());
+	public static final LogisimVersion VERSION = LogisimVersion.get(2, 15, 0, 0, LogisimVersion.getVariantFromFile());
 
 	public static final String VERSION_NAME = VERSION.toString();
 
@@ -46,16 +46,23 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);
-		if (AppPreferences.SEND_DATA.getBoolean())
-			Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
-			}
-		});
 		if (startup != null) {
+			// if it's not command line
+			if (!startup.isTty()) {
+				// remove online user when runtime stopped
+				Runtime.getRuntime().addShutdownHook(new Thread() {
+					@Override
+					public void run() {
+						if (AppPreferences.SEND_DATA.getBoolean())
+							Startup.runRemotePhpCode(
+									"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
+					}
+				});
+				// add online user
+				if (AppPreferences.SEND_DATA.getBoolean())
+					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
+			}
+			// search for updates, if true update and restart, else run logisim
 			if (!startup.autoUpdate(true, null)) {
 				try {
 					startup.run();
@@ -72,6 +79,7 @@ public class Main {
 							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1");
 				Startup.restart(args);
 			}
-		}
+		} else
+			System.exit(-1);
 	}
 }

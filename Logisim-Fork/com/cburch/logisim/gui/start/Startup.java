@@ -80,6 +80,7 @@ public class Startup {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 			LocaleManager.setReplaceAccents(false);
+			AppPreferences.handleGraphicsAcceleration();
 			AppPreferences.setLayout();
 		}
 
@@ -348,6 +349,10 @@ public class Startup {
 	public Startup(boolean isTty) {
 		this.isTty = isTty;
 		this.showSplash = !isTty;
+	}
+
+	public boolean isTty() {
+		return this.isTty;
 	}
 
 	/**
