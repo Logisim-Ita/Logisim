@@ -154,7 +154,7 @@ public class PlaRomData implements InstanceData {
 	}
 
 	public String getSizeString() {
-		return this.getInputs() + "x" + this.getAnd() + "x" + this.getOutputs();
+		return this.getInputs() + 'x' + this.getAnd() + "x" + this.getOutputs();
 	}
 
 	private void InitializeInputValue() {
@@ -190,7 +190,7 @@ public class PlaRomData implements InstanceData {
 			}
 			if (val != last || i == size1 - 1) {
 				if (count >= 3)
-					data += last + "*" + count + " ";
+					data += last + "*" + count + ' ';
 				else
 					for (int j = 0; j < count; j++)
 						data += last + " ";
@@ -221,7 +221,7 @@ public class PlaRomData implements InstanceData {
 			}
 			if (val != last || i == size2 - 1) {
 				if (count >= 3)
-					data += last + "*" + count + " ";
+					data += last + "*" + count + ' ';
 				else
 					for (int j = 0; j < count; j++)
 						data += last + " ";

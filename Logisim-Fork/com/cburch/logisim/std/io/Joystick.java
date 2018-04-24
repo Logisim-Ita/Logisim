@@ -146,10 +146,8 @@ public class Joystick extends InstanceFactory {
 		Direction dir = attrs.getValue(StdAttr.FACING);
 		if (dir == Direction.EAST || dir == Direction.WEST)
 			return Bounds.create(-30, -10, 30, 30).rotate(Direction.EAST, dir, 0, 5);
-		else if (dir == Direction.SOUTH)
-			return Bounds.create(-20, -30, 30, 30);
 		else
-			return Bounds.create(-20, 0, 30, 30);
+			return Bounds.create(-20, -30, 30, 30).rotate(Direction.NORTH, dir, -5, 0);
 
 	}
 

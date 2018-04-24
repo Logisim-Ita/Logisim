@@ -60,7 +60,6 @@ This is an italian fork based on the original Logisim version.<br>
 	* String attribute not calling attributechanged method while writing its value
 ## Features we want to add
 * Solve dirty points when rotating
-* Buzzer (75% done)
 * Add a new type of library
 * Draw also in circuits
 * Suggest us everything at logisimit@gmail.com

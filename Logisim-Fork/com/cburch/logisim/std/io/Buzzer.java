@@ -1,141 +1,126 @@
 package com.cburch.logisim.std.io;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.SourceDataLine;
+
+import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.comp.Component;
+import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
+import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.instance.InstanceFactory;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
-import javax.swing.JOptionPane;
+import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.util.GraphicsUtil;
 
 public class Buzzer extends InstanceFactory {
-	public static final byte FREQ = 0;
-	public static final byte ENABLE = 1;
-	public static final byte VOL = 2;
-
-	public Buzzer() {
-		super("Buzzer", Strings.getter("buzzerComponent"));
-
-		Port[] p = new Port[3];
-		p[FREQ] = new Port(0, -10, Port.INPUT, 16);
-		p[ENABLE] = new Port(0, 0, Port.INPUT, 1);
-		p[VOL] = new Port(0, 10, Port.INPUT, 7);
-		p[FREQ].setToolTip(Strings.getter("buzzerFrequecy"));
-		p[ENABLE].setToolTip(Strings.getter("enableSound"));
-		p[VOL].setToolTip(Strings.getter("buzzerVolume"));
-		setPorts(p);
-
-		setOffsetBounds(Bounds.create(0, -20, 40, 40));
-	}
-
 	private static class Data implements InstanceData {
-		public volatile boolean is_on = false;
-		public volatile int freq = 500;
-		public volatile byte vol = 16;
-		public volatile boolean sound_changed = true;
-
-		public volatile boolean still_alive = true;
+		public AtomicBoolean is_on = new AtomicBoolean(false);
+		public int freq = 500;
+		public byte vol = 16;
 		public Thread thread;
+
+		public Data() {
+			StartThread();
+		}
+
+		@Override
+		public Object clone() {
+			return new Data();
+		}
 
 		public void StartThread() {
 			thread = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					SourceDataLine line = null;
-
-					AudioFormat format = new AudioFormat(11025.0F, 8, 1, true, false);
-					DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+					AudioFormat format = new AudioFormat(44100.0F, 8, 1, true, false);
 
 					try {
-						line = (SourceDataLine) AudioSystem.getLine(info);
-						line.open(format, 11025);
+						line = AudioSystem.getSourceDataLine(format);
+						line.open(format, 2200);
 					} catch (Exception e) {
-						StringWriter sw = new StringWriter();
-						e.printStackTrace(new PrintWriter(sw));
-						JOptionPane.showMessageDialog(null, sw.getBuffer().toString(), "Could not initialise audio", 0);
+						e.printStackTrace();
+						System.err.println("Could not initialise audio");
 						return;
 					}
-
 					line.start();
-
-					byte[] audioData = new byte['ю'];
-					sound_changed = true;
-					int i = 0;
-					for (;;) {
-						if (sound_changed) {
-							sound_changed = false;
-							double step = 11025.0D / freq;
-							double n = step;
-							byte val = vol;
-							for (int k = 0; k < audioData.length; k++) {
-								n -= 1.0D;
-								if (n < 0.0D) {
-									n += step;
-									val = (byte) -val;
-								}
-								audioData[k] = val;
-							}
-						}
-						if (is_on)
-							line.write(audioData, 0, audioData.length);
-						try {
-							Thread.sleep(99L);
-						} catch (Exception e) {
-							break;
-						}
-						i++;
-						if (i == 10) {
-							if (!still_alive)
-								break;
-							still_alive = false;
-							i = 0;
+					byte[] audioData = new byte[1];
+					while (is_on.get()) {
+						for (int i = 0; is_on.get() && i < 44100; i++) {
+							double angle = i / ((float) 44100 / freq) * 2.0 * Math.PI;
+							audioData[0] = (byte) (Math.sin(angle) * vol);
+							line.write(audioData, 0, 1);
 						}
 					}
+					line.drain();
 					line.stop();
 					line.close();
 				}
 			});
 			thread.start();
 		}
+	}
 
-		public Data(boolean b) {
-			is_on = b;
+	public static final byte FREQ = 0;
+	public static final byte ENABLE = 1;
+	public static final byte VOL = 2;
 
-			StartThread();
-		}
+	public Buzzer() {
+		super("Buzzer", Strings.getter("buzzerComponent"));
+		setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.EAST, "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+		setFacingAttribute(StdAttr.FACING);
+		setIconName("buzzer.gif");
+	}
 
-		public Object clone() {
-			return new Data(is_on);
+	@Override
+	public Bounds getOffsetBounds(AttributeSet attrs) {
+		Direction dir = attrs.getValue(StdAttr.FACING);
+		if (dir == Direction.EAST || dir == Direction.WEST)
+			return Bounds.create(-40, -20, 40, 40).rotate(Direction.EAST, dir, 0, 0);
+		else
+			return Bounds.create(-20, 0, 40, 40).rotate(Direction.NORTH, dir, 0, 0);
+
+	}
+
+	@Override
+	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
+		if (attr == StdAttr.FACING) {
+			instance.recomputeBounds();
+			updateports(instance);
 		}
 	}
 
-	public void propagate(InstanceState state) {
-		Data d = (Data) state.getData();
-		if (d == null) {
-			state.setData(d = new Data(false));
-		}
-		d.is_on = (state.getPort(ENABLE) == Value.TRUE);
-		if (d.is_on)
-			d.still_alive = true;
-		int freq = state.getPort(FREQ).toIntValue();
-		int vol = state.getPort(VOL).toIntValue();
-		if ((freq != d.freq) || (vol != d.vol)) {
-			d.freq = freq;
-			d.vol = ((byte) vol);
-			d.sound_changed = true;
-		}
-		if ((!d.thread.isAlive()) && (d.is_on))
-			d.StartThread();
+	@Override
+	protected void configureNewInstance(Instance instance) {
+		Bounds b = instance.getBounds();
+		updateports(instance);
+		instance.addAttributeListener();
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, b.getX() + b.getWidth() / 2,
+				b.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
 	}
 
+	@Override
+	public void paintGhost(InstancePainter painter) {
+		Bounds b = painter.getBounds();
+		Graphics g = painter.getGraphics();
+		g.setColor(Color.GRAY);
+		g.drawOval(b.getX(), b.getY(), 40, 40);
+	}
+
+	@Override
 	public void paintInstance(InstancePainter painter) {
 		Graphics g = painter.getGraphics();
 		Bounds b = painter.getBounds();
@@ -146,19 +131,48 @@ public class Buzzer extends InstanceFactory {
 			g.drawOval(x + 20 - k, y + 20 - k, k * 2, k * 2);
 		}
 		painter.drawPorts();
-		Data d = (Data) painter.getData();
-		if (d != null) {
-			d.still_alive = true;
-			if (!d.thread.isAlive()) {
-				d.StartThread();
-			}
+		painter.drawLabel();
+	}
+
+	@Override
+	public void propagate(InstanceState state) {
+		Data d = (Data) state.getData();
+		if (d == null) {
+			state.setData(d = new Data());
+		}
+		d.is_on.set(state.getPort(ENABLE) == Value.TRUE);
+		int freq = state.getPort(FREQ).toIntValue();
+		byte vol = (byte) state.getPort(VOL).toIntValue();
+		if (freq >= 0 && vol >= 0) {
+			d.freq = freq;
+			d.vol = vol;
+		}
+		if ((!d.thread.isAlive()) && (d.is_on.get()))
+			d.StartThread();
+	}
+
+	public void stopSound(CircuitState circState, Component comp) {
+		Data d = (Data) circState.getData(comp);
+		if (d != null && d.thread.isAlive()) {
+			d.is_on.set(false);
 		}
 	}
 
-	public void paintGhost(InstancePainter painter) {
-		Bounds b = painter.getBounds();
-		Graphics g = painter.getGraphics();
-		g.setColor(Color.GRAY);
-		g.drawOval(b.getX(), b.getY(), 40, 40);
+	private void updateports(Instance instance) {
+		Direction dir = instance.getAttributeValue(StdAttr.FACING);
+		Port[] p = new Port[3];
+		if (dir == Direction.EAST || dir == Direction.WEST) {
+			p[FREQ] = new Port(0, -10, Port.INPUT, 12);
+			p[VOL] = new Port(0, 10, Port.INPUT, 7);
+		} else {
+			p[FREQ] = new Port(-10, 0, Port.INPUT, 12);
+			p[VOL] = new Port(10, 0, Port.INPUT, 7);
+		}
+		p[ENABLE] = new Port(0, 0, Port.INPUT, 1);
+		p[FREQ].setToolTip(Strings.getter("buzzerFrequecy"));
+		p[ENABLE].setToolTip(Strings.getter("enableSound"));
+		p[VOL].setToolTip(Strings.getter("buzzerVolume"));
+		instance.setPorts(p);
+
 	}
 }

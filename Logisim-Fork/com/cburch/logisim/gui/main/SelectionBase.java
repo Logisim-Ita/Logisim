@@ -23,6 +23,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.std.io.Buzzer;
 import com.cburch.logisim.util.CollectionUtil;
 
 class SelectionBase {
@@ -191,6 +192,8 @@ class SelectionBase {
 
 	void deleteAllHelper(CircuitMutation xn) {
 		for (Component comp : selected) {
+			if (comp.getFactory() instanceof Buzzer)
+				((Buzzer) comp.getFactory()).stopSound(proj.getCircuitState(), comp);
 			xn.remove(comp);
 		}
 		selected.clear();

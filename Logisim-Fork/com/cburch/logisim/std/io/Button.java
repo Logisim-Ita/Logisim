@@ -90,10 +90,10 @@ public class Button extends InstanceFactory {
 			x = bds.getX() + (bds.getWidth() - DEPTH) / 2;
 			y = bds.getY() + (bds.getHeight() - DEPTH) / 2;
 		} else if (labelLoc == Direction.NORTH) {
-			y = bds.getY() - 2;
+			y = bds.getY() - 3;
 			valign = GraphicsUtil.V_BOTTOM;
 		} else if (labelLoc == Direction.SOUTH) {
-			y = bds.getY() + bds.getHeight() + 2;
+			y = bds.getY() + bds.getHeight() + 3;
 			valign = GraphicsUtil.V_TOP;
 		} else if (labelLoc == Direction.EAST) {
 			x = bds.getX() + bds.getWidth() + 2;

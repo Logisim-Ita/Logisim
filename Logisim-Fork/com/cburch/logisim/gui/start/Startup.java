@@ -6,13 +6,11 @@ package com.cburch.logisim.gui.start;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -299,8 +297,8 @@ public class Startup {
 			conn = (HttpURLConnection) URL.openConnection();
 			conn.setRequestMethod("GET");
 			ir = conn.getInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(ir));
-			System.out.println(br.readLine());
+			// BufferedReader br = new BufferedReader(new InputStreamReader(ir));
+			// System.out.println(br.readLine());
 			ir.close();
 		} catch (MalformedURLException e) {
 			System.err.println("The URL is malformed.\nPlease report this error to the software maintainer");
@@ -349,10 +347,6 @@ public class Startup {
 	public Startup(boolean isTty) {
 		this.isTty = isTty;
 		this.showSplash = !isTty;
-	}
-
-	public boolean isTty() {
-		return this.isTty;
 	}
 
 	/**
@@ -621,6 +615,10 @@ public class Startup {
 
 	int getTtyFormat() {
 		return ttyFormat;
+	}
+
+	public boolean isTty() {
+		return this.isTty;
 	}
 
 	private void loadTemplate(Loader loader, File templFile, boolean templEmpty) {

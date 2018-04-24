@@ -111,32 +111,16 @@ public class TextTool extends Tool {
 		}
 	}
 
-	private void resetEditTool() {
-		Project proj = caretCanvas.getProject();
-		Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
-		if (tool == null) {
-			for (Library lib : proj.getLogisimFile().getLibraries()) {
-				tool = Canvas.findTool(lib.getTools());
-				if (tool != null)
-					break;
-			}
-			if (tool == null)
-				tool = new TextTool();
-		}
-		proj.setTool(tool);
-		Fromdoubleclick = false;
-	}
-
 	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
 
 	private MyListener listener = new MyListener();
+
 	private AttributeSet attrs;
 	private Caret caret = null;
 	private boolean caretCreatingText = false, Fromdoubleclick = false;
 	private Canvas caretCanvas = null;
 	private Circuit caretCircuit = null;
 	private Component caretComponent = null;
-
 	public TextTool() {
 		attrs = Text.FACTORY.createAttributeSet();
 	}
@@ -334,5 +318,21 @@ public class TextTool extends Tool {
 	@Override
 	public void paintIcon(ComponentDrawContext c, int x, int y) {
 		Text.FACTORY.paintIcon(c, x, y, null);
+	}
+
+	private void resetEditTool() {
+		Project proj = caretCanvas.getProject();
+		Tool tool = Canvas.findTool(proj.getLogisimFile().getOptions().getToolbarData().getContents());
+		if (tool == null) {
+			for (Library lib : proj.getLogisimFile().getLibraries()) {
+				tool = Canvas.findTool(lib.getTools());
+				if (tool != null)
+					break;
+			}
+			if (tool == null)
+				tool = new TextTool();
+		}
+		proj.setTool(tool);
+		Fromdoubleclick = false;
 	}
 }

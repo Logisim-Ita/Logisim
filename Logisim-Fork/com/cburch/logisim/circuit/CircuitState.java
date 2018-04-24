@@ -470,8 +470,8 @@ public class CircuitState implements InstanceData {
 		for (Component clock : circuit.getClocks()) {
 			ret |= Clock.tick(this, ticks, clock);
 		}
-		for (Component clock : circuit.getProgrammableGenerators()) {
-			ret |= ProgrammableGenerator.tick(this, ticks, clock);
+		for (Component programmablegenerator : circuit.getProgrammableGenerators()) {
+			ret |= ProgrammableGenerator.tick(this, ticks, programmablegenerator);
 		}
 		CircuitState[] subs = new CircuitState[substates.size()];
 		for (CircuitState substate : substates.toArray(subs)) {
