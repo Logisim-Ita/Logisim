@@ -3,6 +3,7 @@
 
 package com.cburch.logisim.gui.main;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -14,6 +15,7 @@ import javax.swing.KeyStroke;
 import com.cburch.draw.toolbar.Toolbar;
 import com.cburch.draw.toolbar.ToolbarItem;
 import com.cburch.draw.toolbar.ToolbarModel;
+import com.cburch.logisim.Main;
 
 public class KeyboardToolSelection extends AbstractAction {
 	/**
@@ -24,7 +26,7 @@ public class KeyboardToolSelection extends AbstractAction {
 	public static void register(Toolbar toolbar) {
 		ActionMap amap = toolbar.getActionMap();
 		InputMap imap = toolbar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		int mask = toolbar.getToolkit().getMenuShortcutKeyMaskEx();
+		int mask = (Main.JAVA_VERSION < 10.0) ? 128 : new Frame().getToolkit().getMenuShortcutKeyMaskEx();
 		for (int i = 0; i < 10; i++) {
 			KeyStroke keyStroke = KeyStroke.getKeyStroke((char) ('0' + i), mask);
 			int j = (i == 0 ? 10 : i - 1);

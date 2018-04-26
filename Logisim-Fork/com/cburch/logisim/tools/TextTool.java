@@ -121,6 +121,7 @@ public class TextTool extends Tool {
 	private Canvas caretCanvas = null;
 	private Circuit caretCircuit = null;
 	private Component caretComponent = null;
+
 	public TextTool() {
 		attrs = Text.FACTORY.createAttributeSet();
 	}

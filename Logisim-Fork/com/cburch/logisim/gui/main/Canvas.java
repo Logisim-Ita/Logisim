@@ -45,6 +45,7 @@ import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.circuit.WidthIncompatibilityData;
 import com.cburch.logisim.circuit.WireSet;
 import com.cburch.logisim.comp.Component;
+import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.comp.ComponentUserEvent;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeEvent;
@@ -66,6 +67,7 @@ import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectEvent;
 import com.cburch.logisim.proj.ProjectListener;
+import com.cburch.logisim.std.io.Buzzer;
 import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.EditTool;
 import com.cburch.logisim.tools.Library;
@@ -270,6 +272,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					|| AppPreferences.ANTI_ALIASING.isSource(event)
 					|| AppPreferences.FILL_COMPONENT_BACKGROUND.isSource(event)) {
 				paintThread.requestRepaint();
+			} else if (AppPreferences.REFRESH_RATE.isSource(event)) {
+				paintThread.setRefreshRate(Integer.parseInt(AppPreferences.REFRESH_RATE.get()));
 			} else if (AppPreferences.COMPONENT_TIPS.isSource(event)) {
 				boolean showTips = AppPreferences.COMPONENT_TIPS.getBoolean();
 				setToolTipText(showTips ? "" : null);
@@ -634,7 +638,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	static final Color HALO_COLOR = new Color(200, 250, 255);
 
 	// pixels shown in canvas beyond outermost boundaries
-	private static final int THRESH_SIZE_UPDATE = 10;
+	private static final byte THRESH_SIZE_UPDATE = 10;
 	// don't bother to update the size if it hasn't changed more than this
 	static final double SQRT_2 = Math.sqrt(2.0);
 	private static final int BUTTONS_MASK = InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON2_DOWN_MASK
@@ -645,7 +649,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 
-	public static int zoomButtonSize = 52, zoomButtonMargin = 30;
+	public static final byte zoomButtonSize = 52, zoomButtonMargin = 30;
 
 	public static Color defaultzoomButtonColor = Color.WHITE;
 
@@ -723,18 +727,32 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		}
 	}
 
+	public static void StopBuzzerSound(Component comp, CircuitState circState) {
+		ComponentFactory compFact = comp.getFactory();
+		// if there is a buzzer, stop its sound thread
+		if (compFact instanceof Buzzer)
+			((Buzzer) comp.getFactory()).stopSound(circState, comp);
+		// search other buzzer's instances in subcircuits and stop all sound threads
+		else if (compFact instanceof SubcircuitFactory) {
+			for (Component subComponent : ((SubcircuitFactory) comp.getFactory()).getSubcircuit().getComponents()) {
+				// recursive if there are other subcircuits
+				StopBuzzerSound(subComponent, ((SubcircuitFactory) compFact).getSubstate(circState, comp));
+			}
+		}
+	}
 	private Project proj;
 	private Tool drag_tool, temp_tool;
 	private Selection selection;
 	private MouseMappings mappings;
 	private CanvasPane canvasPane;
 	private Bounds oldPreferredSize;
-	private MyListener myListener = new MyListener();
 
+	private MyListener myListener = new MyListener();
 	private MyViewport viewport = new MyViewport();
 	private MyProjectListener myProjectListener = new MyProjectListener();
 	private TickCounter tickCounter;
 	private CanvasPaintThread paintThread;
+
 	private CanvasPainter painter;
 
 	private boolean paintDirty = false; // only for within paintComponent
@@ -775,6 +793,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		AppPreferences.FILL_COMPONENT_BACKGROUND.addPropertyChangeListener(myListener);
 		AppPreferences.SEND_DATA.addPropertyChangeListener(myListener);
 		AppPreferences.SHOW_TICK_RATE.addPropertyChangeListener(myListener);
+		AppPreferences.REFRESH_RATE.addPropertyChangeListener(myListener);
 		AppPreferences.LOOK_AND_FEEL.addPropertyChangeListener(myListener);
 		AppPreferences.GRAPHICS_ACCELERATION.addPropertyChangeListener(myListener);
 		loadOptions(options);
@@ -811,6 +830,9 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void closeCanvas() {
+		for (Component comp : proj.getCurrentCircuit().getComponents()) {
+			StopBuzzerSound(comp, proj.getCircuitState());
+		}
 		paintThread.requestStop();
 	}
 

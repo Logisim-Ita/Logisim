@@ -19,6 +19,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import com.cburch.logisim.Main;
+
 public class WindowMenu extends JMenu {
 	private class MyListener implements LocaleListener, ActionListener {
 		@Override
@@ -82,7 +84,7 @@ public class WindowMenu extends JMenu {
 		this.owner = owner;
 		WindowMenuManager.addMenu(this);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
+		int menuMask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		minimize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, menuMask));
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask));
 

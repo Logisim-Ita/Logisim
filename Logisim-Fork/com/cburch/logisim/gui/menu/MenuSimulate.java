@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.CircuitEvent;
 import com.cburch.logisim.circuit.CircuitListener;
@@ -240,7 +241,7 @@ class MenuSimulate extends Menu {
 		menubar.registerItem(LogisimMenuBar.TICK_ENABLE, ticksEnabled);
 		menubar.registerItem(LogisimMenuBar.TICK_STEP, tickOnce);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
+		int menuMask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		run.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, menuMask));
 		reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, menuMask));
 		step.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, menuMask));
@@ -335,7 +336,7 @@ class MenuSimulate extends Menu {
 		menu.removeAll();
 		menu.setEnabled(items.size() > 0);
 		boolean first = true;
-		int mask = getToolkit().getMenuShortcutKeyMaskEx();
+		int mask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		for (int i = items.size() - 1; i >= 0; i--) {
 			JMenuItem item = items.get(i);
 			menu.add(item);

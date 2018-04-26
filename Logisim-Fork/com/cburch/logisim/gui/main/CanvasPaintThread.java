@@ -5,8 +5,10 @@ package com.cburch.logisim.gui.main;
 
 import java.awt.Rectangle;
 
+import com.cburch.logisim.prefs.AppPreferences;
+
 class CanvasPaintThread extends Thread {
-	private static final int REPAINT_TIMESPAN = 50; // 50 ms between repaints
+	private static double REPAINT_TIMESPAN; // time to wait to get the selected framerate
 
 	private Canvas canvas;
 	private Object lock;
@@ -18,6 +20,7 @@ class CanvasPaintThread extends Thread {
 	public CanvasPaintThread(Canvas canvas) {
 		this.canvas = canvas;
 		lock = new Object();
+		REPAINT_TIMESPAN = 1000 / Integer.parseInt(AppPreferences.REFRESH_RATE.get());
 		repaintRequested = false;
 		alive = true;
 		nextRepaint = System.currentTimeMillis();
@@ -75,9 +78,13 @@ class CanvasPaintThread extends Thread {
 				if (!alive)
 					break;
 				repaintRequested = false;
-				nextRepaint = now + REPAINT_TIMESPAN;
+				nextRepaint = Math.round(now + REPAINT_TIMESPAN);
 			}
 			canvas.repaint();
 		}
+	}
+
+	public void setRefreshRate(int refreshrate) {
+		REPAINT_TIMESPAN = 1000 / refreshrate;
 	}
 }

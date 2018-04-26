@@ -6,6 +6,7 @@ package com.cburch.logisim.gui.main;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -16,6 +17,7 @@ import java.util.List;
 import com.cburch.draw.toolbar.AbstractToolbarModel;
 import com.cburch.draw.toolbar.ToolbarItem;
 import com.cburch.draw.toolbar.ToolbarSeparator;
+import com.cburch.logisim.Main;
 import com.cburch.logisim.comp.ComponentDrawContext;
 import com.cburch.logisim.data.AttributeEvent;
 import com.cburch.logisim.data.AttributeListener;
@@ -112,7 +114,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			if (index <= 10) {
 				if (index == 10)
 					index = 0;
-				int mask = frame.getToolkit().getMenuShortcutKeyMaskEx();
+				int mask = (Main.JAVA_VERSION < 10.0) ? 128 : frame.getToolkit().getMenuShortcutKeyMaskEx();
 				ret += " (" + InputEventUtil.toKeyDisplayString(mask) + "-" + index + ")";
 			}
 			return ret;

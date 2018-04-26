@@ -40,9 +40,18 @@ public class Main {
 
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 
+	public static final double JAVA_VERSION = getVersion();
+
 	// here will be saved the file in use to reopen when restarting
 	public static ArrayList<String> OpenedFiles = new ArrayList<String>();
 	/* URL for the automatic updater */
+
+	// get the runtinme java version
+	private final static double getVersion() {
+		String version = System.getProperty("java.version");
+		byte pos = (byte) version.indexOf('.', version.indexOf('.') + 1);
+		return Double.parseDouble(version.substring(0, pos));
+	}
 
 	public static void main(String[] args) throws Exception {
 		Startup startup = Startup.parseArgs(args);

@@ -156,7 +156,8 @@ public class AppPreferences {
 			"toolbarPlacement", new String[] { Direction.NORTH.toString(), Direction.SOUTH.toString(),
 					Direction.EAST.toString(), Direction.WEST.toString(), TOOLBAR_DOWN_MIDDLE, TOOLBAR_HIDDEN },
 			Direction.NORTH.toString()));
-
+	public static final PrefMonitor<String> REFRESH_RATE = create(
+			new PrefMonitorStringOpts("windowRefreshRate", new String[] { "20", "30", "60", "120", "144" }, "60"));
 	// Layout preferences
 	public static final String ADD_AFTER_UNCHANGED = "unchanged";
 	public static final String ADD_AFTER_EDIT = "edit";

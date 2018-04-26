@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectEvent;
@@ -67,7 +68,7 @@ class MenuEdit extends Menu {
 	public MenuEdit(LogisimMenuBar menubar) {
 		this.menubar = menubar;
 
-		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
+		int menuMask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuMask));
 		cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask));
 		copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask));

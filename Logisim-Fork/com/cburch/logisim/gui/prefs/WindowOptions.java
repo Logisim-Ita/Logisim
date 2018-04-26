@@ -15,7 +15,7 @@ class WindowOptions extends OptionsPanel {
 	 */
 	private static final long serialVersionUID = 1043476425449770400L;
 	private PrefBoolean[] checks;
-	private PrefOptionList toolbarPlacement;
+	private PrefOptionList toolbarPlacement, Refreshrate;
 
 	public WindowOptions(PreferencesFrame window) {
 		super(window);
@@ -30,12 +30,17 @@ class WindowOptions extends OptionsPanel {
 						new PrefOption(Direction.WEST.toString(), Direction.WEST.getDisplayGetter()),
 						new PrefOption(AppPreferences.TOOLBAR_DOWN_MIDDLE, Strings.getter("windowToolbarDownMiddle")),
 						new PrefOption(AppPreferences.TOOLBAR_HIDDEN, Strings.getter("windowToolbarHidden")) });
-
+		Refreshrate = new PrefOptionList(AppPreferences.REFRESH_RATE, Strings.getter("windowRefreshRate"),
+				new PrefOption[] { new PrefOption("20", Strings.getter("20Hz")),
+						new PrefOption("30", Strings.getter("30Hz")), new PrefOption("60", Strings.getter("60Hz")),
+						new PrefOption("120", Strings.getter("120Hz")),
+						new PrefOption("144", Strings.getter("144Hz")) });
 		JPanel panel = new JPanel(new TableLayout(2));
 
 		panel.add(toolbarPlacement.getJLabel());
 		panel.add(toolbarPlacement.getJComboBox());
-
+		panel.add(Refreshrate.getJLabel());
+		panel.add(Refreshrate.getJComboBox());
 		setLayout(new TableLayout(1));
 		for (int i = 0; i < checks.length; i++) {
 			add(checks[i]);
@@ -59,5 +64,6 @@ class WindowOptions extends OptionsPanel {
 			checks[i].localeChanged();
 		}
 		toolbarPlacement.localeChanged();
+		Refreshrate.localeChanged();
 	}
 }

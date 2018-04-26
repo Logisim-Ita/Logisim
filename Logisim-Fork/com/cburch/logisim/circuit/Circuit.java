@@ -309,7 +309,7 @@ public class Circuit {
 		return clocks;
 	}
 
-	private Set<Component> getComponents() {
+	public Set<Component> getComponents() {
 		return CollectionUtil.createUnmodifiableSetUnion(new HashSet<Component>(comps),
 				new HashSet<Wire>(wires.getWires()));
 	}

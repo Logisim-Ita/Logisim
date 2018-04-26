@@ -23,6 +23,7 @@ import com.cburch.draw.tools.RectangleTool;
 import com.cburch.draw.tools.RoundRectangleTool;
 import com.cburch.draw.tools.TextTool;
 import com.cburch.draw.tools.ToolbarToolItem;
+import com.cburch.logisim.Main;
 import com.cburch.logisim.util.InputEventUtil;
 
 class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyChangeListener {
@@ -38,7 +39,7 @@ class AppearanceToolbarModel extends AbstractToolbarModel implements PropertyCha
 
 		ArrayList<ToolbarItem> rawItems = new ArrayList<ToolbarItem>();
 		int i = 1;
-		int mask = new Frame().getToolkit().getMenuShortcutKeyMaskEx();
+		int mask = (Main.JAVA_VERSION < 10.0) ? 128 : new Frame().getToolkit().getMenuShortcutKeyMaskEx();
 		for (AbstractTool tool : tools) {
 			tool.setCltrIndex(" (" + InputEventUtil.toKeyDisplayString(mask) + "-" + i + ")");
 			i++;

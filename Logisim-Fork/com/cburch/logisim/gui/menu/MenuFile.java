@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import com.cburch.logisim.Main;
 import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.gui.opts.OptionsFrame;
 import com.cburch.logisim.gui.prefs.PreferencesFrame;
@@ -40,8 +41,7 @@ class MenuFile extends Menu implements ActionListener {
 		this.menubar = menubar;
 		openRecent = new OpenRecent(menubar);
 
-		int menuMask = getToolkit().getMenuShortcutKeyMaskEx();
-
+		int menuMask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		newi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuMask));
 		open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuMask));
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask | InputEvent.SHIFT_DOWN_MASK));
