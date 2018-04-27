@@ -147,7 +147,7 @@ public class Switch extends InstanceFactory {
 		int y = bds.getY(); // y position
 		int w = bds.getWidth(); // width
 		int h = bds.getHeight(); // height
-		int circle = 4; // 0 symbol radius
+		byte circle = 4; // 0 symbol radius
 		int[] xp;
 		int[] yp;
 		int[] xr;

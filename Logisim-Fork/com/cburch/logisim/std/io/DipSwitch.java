@@ -216,7 +216,7 @@ public class DipSwitch extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int y = attrs.getValue(ATTR_NSWITCHES).intValue() * 20;
+		short y = (short) (attrs.getValue(ATTR_NSWITCHES).intValue() * 20);
 		if (facing == Direction.EAST)
 			return Bounds.create(-30, 0, 30, y);
 		else if (facing == Direction.WEST)

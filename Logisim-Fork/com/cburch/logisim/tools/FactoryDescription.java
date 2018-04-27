@@ -22,10 +22,10 @@ import com.cburch.logisim.util.StringGetter;
  * no-arguments constructor.
  */
 public class FactoryDescription {
-	public static List<Tool> getTools(Class<? extends Library> base, FactoryDescription[] descriptions) {
-		Tool[] tools = new Tool[descriptions.length];
+	public static List<Tool> getTools(Class<? extends Library> base, Object[] objects) {
+		Tool[] tools = new Tool[objects.length];
 		for (int i = 0; i < tools.length; i++) {
-			tools[i] = new AddTool(base, descriptions[i]);
+			tools[i] = new AddTool(base, (FactoryDescription) objects[i]);
 		}
 		return Arrays.asList(tools);
 	}

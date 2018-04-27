@@ -145,7 +145,7 @@ public class Slider extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		int width = 120, height = 30;
+		byte width = 120, height = 30;
 		if (facing == Direction.EAST)
 			return Bounds.create(-width, -height / 2, width, height);
 		else if (facing == Direction.WEST)

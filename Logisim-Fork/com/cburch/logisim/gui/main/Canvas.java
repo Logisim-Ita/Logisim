@@ -740,6 +740,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			}
 		}
 	}
+
 	private Project proj;
 	private Tool drag_tool, temp_tool;
 	private Selection selection;

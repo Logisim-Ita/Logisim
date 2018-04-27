@@ -42,7 +42,6 @@ public class Io extends Library {
 					"digitaloscilloscope.gif", "DigitalOscilloscope"),
 			new FactoryDescription("7-Segment Display", Strings.getter("sevenSegmentComponent"), "7seg.gif",
 					"SevenSegment"),
-
 			new FactoryDescription("Hex Digit Display", Strings.getter("hexDigitComponent"), "hexdig.gif", "HexDigit"),
 			new FactoryDescription("DotMatrix", Strings.getter("dotMatrixComponent"), "dotmat.gif", "DotMatrix"),
 			new FactoryDescription("TTY", Strings.getter("ttyComponent"), "tty.gif", "Tty"), };
