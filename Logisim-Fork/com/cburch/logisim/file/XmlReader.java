@@ -342,7 +342,7 @@ class XmlReader {
 			// fourth, execute a transaction that initializes all the circuits
 			XmlCircuitReader builder;
 			builder = new XmlCircuitReader(this, circuitsData);
-			builder.execute();
+			builder.execute(null);
 		}
 
 		Tool toTool(Element elt) throws XmlReaderException {

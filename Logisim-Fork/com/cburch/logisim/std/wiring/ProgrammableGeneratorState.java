@@ -101,7 +101,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 		gbs.anchor = GridBagConstraints.CENTER;
 		gbs.insets = inset;
 		panel.add(up, gbs);
-		JLabel down = new JLabel("<html><div style='text-align:center'>" + Strings.get("clockHighAttr") + "<br>("
+		JLabel down = new JLabel("<html><div style='text-align:center'>" + Strings.get("clockLowAttr") + "<br>("
 				+ Strings.get("clockDurationValue", "") + ")</div></html>");
 		gbs.gridx = 2;
 		panel.add(down, gbs);

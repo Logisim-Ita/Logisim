@@ -12,6 +12,8 @@ import java.util.HashSet;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
+import com.cburch.logisim.gui.main.Canvas;
+import com.cburch.logisim.proj.Project;
 
 class CircuitMutatorImpl implements CircuitMutator {
 	private ArrayList<CircuitChange> log;
@@ -97,12 +99,12 @@ class CircuitMutatorImpl implements CircuitMutator {
 	}
 
 	@Override
-	public void replace(Circuit circuit, Component prev, Component next) {
-		replace(circuit, new ReplacementMap(prev, next));
+	public void replace(Circuit circuit, Component prev, Component next, Project proj) {
+		replace(circuit, new ReplacementMap(prev, next), proj);
 	}
 
 	@Override
-	public void replace(Circuit circuit, ReplacementMap repl) {
+	public void replace(Circuit circuit, ReplacementMap repl, Project proj) {
 		if (!repl.isEmpty()) {
 			modified.add(circuit);
 			log.add(CircuitChange.replace(circuit, repl));
@@ -111,6 +113,8 @@ class CircuitMutatorImpl implements CircuitMutator {
 			getMap(circuit).append(repl);
 
 			for (Component c : repl.getRemovals()) {
+				if (proj != null)
+					Canvas.StopBuzzerSound(c, proj.getCircuitState());
 				circuit.mutatorRemove(c);
 			}
 			for (Component c : repl.getAdditions()) {

@@ -67,8 +67,10 @@ public class Buzzer extends InstanceFactory {
 					}
 					line.drain();
 					line.stop();
+					line.close();
 				}
 			});
+			thread.setName("Sound Thread");
 			thread.start();
 		}
 	}

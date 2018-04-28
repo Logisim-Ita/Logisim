@@ -15,6 +15,7 @@ import java.util.TreeSet;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Location;
+import com.cburch.logisim.proj.Project;
 
 class WireRepair extends CircuitTransaction {
 
@@ -110,7 +111,7 @@ class WireRepair extends CircuitTransaction {
 				}
 			}
 		}
-		mutator.replace(circuit, repl);
+		mutator.replace(circuit, repl, null);
 	}
 
 	private void doMergeSet(ArrayList<Wire> mergeSet, ReplacementMap replacements, Set<Location> splitLocs) {
@@ -200,7 +201,7 @@ class WireRepair extends CircuitTransaction {
 				doMergeSet(mergeSet, replacements, splitLocs);
 			}
 		}
-		mutator.replace(circuit, replacements);
+		mutator.replace(circuit, replacements, null);
 	}
 
 	private void doSplits(CircuitMutator mutator) {
@@ -229,7 +230,7 @@ class WireRepair extends CircuitTransaction {
 				repl.put(w, subs);
 			}
 		}
-		mutator.replace(circuit, repl);
+		mutator.replace(circuit, repl, null);
 	}
 
 	@Override
@@ -238,7 +239,7 @@ class WireRepair extends CircuitTransaction {
 	}
 
 	@Override
-	protected void run(CircuitMutator mutator) {
+	protected void run(CircuitMutator mutator, Project proj) {
 		doMerges(mutator);
 		doOverlaps(mutator);
 		doSplits(mutator);

@@ -8,17 +8,18 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 import com.cburch.logisim.circuit.appear.CircuitPins;
+import com.cburch.logisim.proj.Project;
 
 public abstract class CircuitTransaction {
 	public static final Integer READ_ONLY = Integer.valueOf(1);
 	public static final Integer READ_WRITE = Integer.valueOf(2);
 
-	public final CircuitTransactionResult execute() {
+	public final CircuitTransactionResult execute(Project proj) {
 		CircuitMutatorImpl mutator = new CircuitMutatorImpl();
 		Map<Circuit, Lock> locks = CircuitLocker.acquireLocks(this, mutator);
 		CircuitTransactionResult result;
 		try {
-			this.run(mutator);
+			this.run(mutator, proj);
 
 			// Let the port locations of each subcircuit's appearance be
 			// updated to reflect the changes - this needs to happen before
@@ -41,7 +42,7 @@ public abstract class CircuitTransaction {
 				CircuitMutatorImpl circMutator = circuit.getLocker().getMutator();
 				if (circMutator == mutator) {
 					WireRepair repair = new WireRepair(circuit);
-					repair.run(mutator);
+					repair.run(mutator, proj);
 				} else {
 					// this is a transaction executed within a transaction -
 					// wait to repair wires until overall transaction is done
@@ -61,6 +62,5 @@ public abstract class CircuitTransaction {
 
 	protected abstract Map<Circuit, Integer> getAccessedCircuits();
 
-	protected abstract void run(CircuitMutator mutator);
-
+	protected abstract void run(CircuitMutator mutator, Project proj);
 }

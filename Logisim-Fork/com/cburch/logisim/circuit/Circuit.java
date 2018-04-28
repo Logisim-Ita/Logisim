@@ -26,6 +26,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Location;
+import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Clock;
 import com.cburch.logisim.std.wiring.ProgrammableGenerator;
 import com.cburch.logisim.util.CollectionUtil;
@@ -49,7 +50,7 @@ public class Circuit {
 		}
 
 		@Override
-		protected void run(CircuitMutator mutator) {
+		protected void run(CircuitMutator mutator, Project proj) {
 			for (Location loc : toRemove.keySet()) {
 				EndData removed = toRemove.get(loc);
 				EndData replaced = toAdd.remove(loc);

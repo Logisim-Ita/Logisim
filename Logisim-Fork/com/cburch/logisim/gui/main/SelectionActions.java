@@ -104,7 +104,7 @@ public class SelectionActions {
 			Circuit circuit = proj.getCurrentCircuit();
 			CircuitMutation xn = new CircuitMutation(circuit);
 			sel.deleteAllHelper(xn);
-			CircuitTransactionResult result = xn.execute();
+			CircuitTransactionResult result = xn.execute(proj);
 			xnReverse = result.getReverseTransaction();
 		}
 
@@ -115,7 +115,7 @@ public class SelectionActions {
 
 		@Override
 		public void undo(Project proj) {
-			xnReverse.execute();
+			xnReverse.execute(proj);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class SelectionActions {
 			for (Component comp : drops) {
 				sel.remove(xn, comp);
 			}
-			CircuitTransactionResult result = xn.execute();
+			CircuitTransactionResult result = xn.execute(proj);
 			xnReverse = result.getReverseTransaction();
 		}
 
@@ -169,7 +169,7 @@ public class SelectionActions {
 
 		@Override
 		public void undo(Project proj) {
-			xnReverse.execute();
+			xnReverse.execute(proj);
 		}
 	}
 
@@ -188,7 +188,7 @@ public class SelectionActions {
 			CircuitMutation xn = new CircuitMutation(circuit);
 			sel.duplicateHelper(xn);
 
-			CircuitTransactionResult result = xn.execute();
+			CircuitTransactionResult result = xn.execute(proj);
 			xnReverse = result.getReverseTransaction();
 			after = SelectionSave.create(sel);
 		}
@@ -200,7 +200,7 @@ public class SelectionActions {
 
 		@Override
 		public void undo(Project proj) {
-			xnReverse.execute();
+			xnReverse.execute(proj);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class SelectionActions {
 			Collection<Component> toAdd = computeAdditions(comps);
 			if (toAdd.size() > 0) {
 				sel.pasteHelper(xn, toAdd);
-				CircuitTransactionResult result = xn.execute();
+				CircuitTransactionResult result = xn.execute(proj);
 				xnReverse = result.getReverseTransaction();
 				after = SelectionSave.create(sel);
 			} else {
@@ -257,7 +257,7 @@ public class SelectionActions {
 		@Override
 		public void undo(Project proj) {
 			if (xnReverse != null) {
-				xnReverse.execute();
+				xnReverse.execute(proj);
 			}
 		}
 	}
@@ -288,7 +288,7 @@ public class SelectionActions {
 				xn.replace(replacements);
 			}
 
-			CircuitTransactionResult result = xn.execute();
+			CircuitTransactionResult result = xn.execute(proj);
 			xnReverse = result.getReverseTransaction();
 		}
 
@@ -316,7 +316,7 @@ public class SelectionActions {
 
 		@Override
 		public void undo(Project proj) {
-			xnReverse.execute();
+			xnReverse.execute(proj);
 		}
 	}
 

@@ -55,7 +55,7 @@ public class SetAttributeAction extends Action {
 		}
 
 		if (!xn.isEmpty()) {
-			CircuitTransactionResult result = xn.execute();
+			CircuitTransactionResult result = xn.execute(proj);
 			xnReverse = result.getReverseTransaction();
 		}
 	}
@@ -79,7 +79,7 @@ public class SetAttributeAction extends Action {
 	@Override
 	public void undo(Project proj) {
 		if (xnReverse != null)
-			xnReverse.execute();
+			xnReverse.execute(proj);
 		for (int i = oldValues.size() - 1; i >= 0; i--) {
 			Component comp = comps.get(i);
 			Attribute<Object> attr = attrs.get(i);

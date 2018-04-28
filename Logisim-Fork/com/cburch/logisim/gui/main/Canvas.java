@@ -831,9 +831,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void closeCanvas() {
-		for (Component comp : proj.getCurrentCircuit().getComponents()) {
+		for (Component comp : proj.getCurrentCircuit().getComponents())
 			StopBuzzerSound(comp, proj.getCircuitState());
-		}
 		paintThread.requestStop();
 	}
 

@@ -144,12 +144,12 @@ class CircuitChange {
 			prevReplacements.append((ReplacementMap) newValue);
 			break;
 		case SET:
-			mutator.replace(circuit, prevReplacements);
+			mutator.replace(circuit, prevReplacements, null);
 			prevReplacements.reset();
 			mutator.set(circuit, comp, attr, newValue);
 			break;
 		case SET_FOR_CIRCUIT:
-			mutator.replace(circuit, prevReplacements);
+			mutator.replace(circuit, prevReplacements, null);
 			prevReplacements.reset();
 			mutator.setForCircuit(circuit, attr, newValue);
 			break;

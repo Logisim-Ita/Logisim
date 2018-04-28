@@ -13,6 +13,7 @@ import java.util.Map;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.proj.Action;
+import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.StringGetter;
 
 public final class CircuitMutation extends CircuitTransaction {
@@ -89,14 +90,14 @@ public final class CircuitMutation extends CircuitTransaction {
 	}
 
 	@Override
-	protected void run(CircuitMutator mutator) {
+	protected void run(CircuitMutator mutator, Project proj) {
 		Circuit curCircuit = null;
 		ReplacementMap curReplacements = null;
 		for (CircuitChange change : changes) {
 			Circuit circ = change.getCircuit();
 			if (circ != curCircuit) {
 				if (curCircuit != null) {
-					mutator.replace(curCircuit, curReplacements);
+					mutator.replace(curCircuit, curReplacements, proj);
 				}
 				curCircuit = circ;
 				curReplacements = new ReplacementMap();
@@ -104,7 +105,7 @@ public final class CircuitMutation extends CircuitTransaction {
 			change.execute(mutator, curReplacements);
 		}
 		if (curCircuit != null) {
-			mutator.replace(curCircuit, curReplacements);
+			mutator.replace(curCircuit, curReplacements, proj);
 		}
 	}
 
@@ -121,4 +122,5 @@ public final class CircuitMutation extends CircuitTransaction {
 			name = Strings.getter("unknownChangeAction");
 		return new CircuitAction(name, this);
 	}
+
 }

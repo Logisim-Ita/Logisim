@@ -98,9 +98,9 @@ class CircuitLocker {
 
 	void execute(CircuitTransaction xn) {
 		if (mutatingThread == Thread.currentThread()) {
-			xn.run(mutatingMutator);
+			xn.run(mutatingMutator, null);
 		} else {
-			xn.execute();
+			xn.execute(null);
 		}
 	}
 

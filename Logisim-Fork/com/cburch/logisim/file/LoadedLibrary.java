@@ -66,7 +66,7 @@ public class LoadedLibrary extends Library implements LibraryEventSource {
 					xn.add(factory.createComponent(comp.getLocation(), newAttrs));
 				}
 			}
-			xn.execute();
+			xn.execute(null);
 		}
 	}
 

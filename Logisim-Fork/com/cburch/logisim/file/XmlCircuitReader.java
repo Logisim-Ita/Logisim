@@ -19,6 +19,7 @@ import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Location;
+import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.AddTool;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.tools.Tool;
@@ -150,7 +151,7 @@ public class XmlCircuitReader extends CircuitTransaction {
 	}
 
 	@Override
-	protected void run(CircuitMutator mutator) {
+	protected void run(CircuitMutator mutator, Project proj) {
 		for (XmlReader.CircuitData circuitData : circuitsData) {
 			buildCircuit(circuitData, mutator);
 		}

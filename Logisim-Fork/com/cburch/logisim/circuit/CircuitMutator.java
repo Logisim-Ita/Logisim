@@ -5,6 +5,7 @@ package com.cburch.logisim.circuit;
 
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.proj.Project;
 
 public interface CircuitMutator {
 	public void add(Circuit circuit, Component comp);
@@ -13,9 +14,9 @@ public interface CircuitMutator {
 
 	public void remove(Circuit circuit, Component comp);
 
-	public void replace(Circuit circuit, Component oldComponent, Component newComponent);
+	public void replace(Circuit circuit, Component oldComponent, Component newComponent, Project proj);
 
-	public void replace(Circuit circuit, ReplacementMap replacements);
+	public void replace(Circuit circuit, ReplacementMap replacements, Project proj);
 
 	public void set(Circuit circuit, Component comp, Attribute<?> attr, Object value);
 

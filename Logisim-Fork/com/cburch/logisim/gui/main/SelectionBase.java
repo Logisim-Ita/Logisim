@@ -191,7 +191,6 @@ class SelectionBase {
 
 	void deleteAllHelper(CircuitMutation xn) {
 		for (Component comp : selected) {
-			Canvas.StopBuzzerSound(comp, proj.getCircuitState());
 			xn.remove(comp);
 		}
 		selected.clear();
