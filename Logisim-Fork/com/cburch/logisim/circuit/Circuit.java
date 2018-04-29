@@ -238,8 +238,7 @@ public class Circuit {
 		Iterator<Component> it = comps.iterator();
 		if (!it.hasNext())
 			return wireBounds;
-		Component first = it.next();
-		Bounds firstBounds = first.getBounds();
+		Bounds firstBounds = it.next().getBounds();
 		int xMin = firstBounds.getX();
 		int yMin = firstBounds.getY();
 		int xMax = xMin + firstBounds.getWidth();

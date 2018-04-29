@@ -27,6 +27,7 @@ import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.gui.main.Canvas;
+import com.cburch.logisim.gui.main.SelectionActions;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.util.Icons;
@@ -264,6 +265,7 @@ public class PokeTool extends Tool {
 						setPokedComponent(circ, c, caret);
 						AttributeSet attrs = c.getAttributeSet();
 						if (attrs != null && attrs.getAttributes().size() > 0) {
+							SelectionActions.dropAll(canvas.getSelection());
 							Project proj = canvas.getProject();
 							proj.getFrame().viewComponentAttributes(circ, c);
 						}

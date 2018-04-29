@@ -9,7 +9,9 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
 
 import com.cburch.logisim.circuit.CircuitState;
+import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.comp.Component;
+import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Bounds;
@@ -26,11 +28,11 @@ import com.cburch.logisim.util.GraphicsUtil;
 
 public class Buzzer extends InstanceFactory {
 	private static class Data implements InstanceData {
-		public AtomicBoolean is_on = new AtomicBoolean(false);
+		private AtomicBoolean is_on = new AtomicBoolean(false);
 		private final int SAMPLE_RATE = 44100;
-		public int hz = 500;
-		public byte vol = 1;
-		public Thread thread;
+		private int hz = 500;
+		private byte vol = 1;
+		private Thread thread;
 
 		public Data() {
 			StartThread();
@@ -42,15 +44,18 @@ public class Buzzer extends InstanceFactory {
 		}
 
 		public void StartThread() {
+			// avoid crash (for example if you connect a clock at 4KHz to the enable pin)
+			if (Thread.activeCount() > 100)
+				return;
 			thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
 					SourceDataLine line = null;
-					AudioFormat format = new AudioFormat(SAMPLE_RATE, 8, 1, true, false);
+					AudioFormat format = new AudioFormat(SAMPLE_RATE, 8, 1, true, true);
 
 					try {
 						line = AudioSystem.getSourceDataLine(format);
-						line.open(format, 2200);
+						line.open(format, SAMPLE_RATE / 10);
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.err.println("Could not initialise audio");
@@ -59,25 +64,44 @@ public class Buzzer extends InstanceFactory {
 					line.start();
 					byte[] audioData = new byte[1];
 					while (is_on.get()) {
-						for (int i = 0; is_on.get() && i < 44100; i++) {
-							double angle = 2 * Math.PI * i * hz / SAMPLE_RATE;
-							audioData[0] = (byte) Math.round(Math.sin(angle) * vol);
+						for (int i = 0; is_on.get() && i < SAMPLE_RATE * 2; i += 2) {
+							audioData[0] = (byte) Math.round(Math.sin(Math.PI * i * hz / SAMPLE_RATE) * vol);
 							line.write(audioData, 0, 1);
 						}
 					}
-					line.drain();
 					line.stop();
+					line.drain();
 					line.close();
 				}
 			});
-			thread.setName("Sound Thread");
 			thread.start();
+			thread.setName("Sound Thread");
 		}
 	}
 
 	public static final byte FREQ = 0;
 	public static final byte ENABLE = 1;
 	public static final byte VOL = 2;
+
+	public static void StopBuzzerSound(Component comp, CircuitState circState) {
+		// static method, have to check if the comp parameter is a Buzzer or contains it
+		ComponentFactory compFact = comp.getFactory();
+		// if it is a buzzer, stop its sound thread
+		if (compFact instanceof Buzzer) {
+			Data d = (Data) circState.getData(comp);
+			if (d != null && d.thread.isAlive()) {
+				d.is_on.set(false);
+			}
+		}
+		// if it's a subcircuit search other buzzer's instances inside it and stop all
+		// sound threads
+		else if (compFact instanceof SubcircuitFactory) {
+			for (Component subComponent : ((SubcircuitFactory) comp.getFactory()).getSubcircuit().getComponents()) {
+				// recursive if there are other subcircuits
+				StopBuzzerSound(subComponent, ((SubcircuitFactory) compFact).getSubstate(circState, comp));
+			}
+		}
+	}
 
 	public Buzzer() {
 		super("Buzzer", Strings.getter("buzzerComponent"));
@@ -151,25 +175,19 @@ public class Buzzer extends InstanceFactory {
 	@Override
 	public void propagate(InstanceState state) {
 		Data d = (Data) state.getData();
+		boolean active = state.getPort(ENABLE) == Value.TRUE;
 		if (d == null) {
 			state.setData(d = new Data());
 		}
-		d.is_on.set(state.getPort(ENABLE) == Value.TRUE);
+		d.is_on.set(active);
 		int freq = state.getPort(FREQ).toIntValue();
 		byte vol = (byte) state.getPort(VOL).toIntValue();
 		if (freq >= 0)
 			d.hz = freq;
 		if (vol >= 0)
 			d.vol = vol;
-		if ((!d.thread.isAlive()) && (d.is_on.get()))
+		if (active && !d.thread.isAlive())
 			d.StartThread();
-	}
-
-	public void stopSound(CircuitState circuitState, Component comp) {
-		Data d = (Data) circuitState.getData(comp);
-		if (d != null && d.is_on.get()) {
-			d.is_on.set(false);
-		}
 	}
 
 	private void updateports(Instance instance) {

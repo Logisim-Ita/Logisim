@@ -39,13 +39,13 @@ public class Main {
 
 	public static final short COPYRIGHT_YEAR = (short) Calendar.getInstance().get(Calendar.YEAR);
 
+	/* URL for the automatic updater */
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
 
 	public static final double JAVA_VERSION = getVersion();
 
 	// here will be saved the file in use to reopen when restarting
 	public static ArrayList<String> OpenedFiles = new ArrayList<String>();
-	/* URL for the automatic updater */
 
 	// get the runtinme java version
 	private final static double getVersion() {

@@ -330,8 +330,8 @@ public class Pin extends InstanceFactory {
 			bds = painter.getBounds();
 		int x = bds.getX();
 		int y = bds.getY();
-		int width = bds.getWidth();
-		int height = bds.getHeight();
+		short width = (short) bds.getWidth();
+		short height = (short) bds.getHeight();
 		if (facing == Direction.EAST || facing == Direction.WEST) {
 			width -= 5;
 			if (facing == Direction.WEST)

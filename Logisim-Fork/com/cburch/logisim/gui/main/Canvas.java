@@ -45,7 +45,6 @@ import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.circuit.WidthIncompatibilityData;
 import com.cburch.logisim.circuit.WireSet;
 import com.cburch.logisim.comp.Component;
-import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.comp.ComponentUserEvent;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeEvent;
@@ -186,7 +185,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		public void mousePressed(MouseEvent e) {
 			viewport.setErrorMessage(null, null);
 			if (proj.isStartupScreen()) {
-				Bounds bounds = proj.getCurrentCircuit().getBounds();
+				Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
 				// set the project as dirty only if it contains something
 				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
 					proj.setStartupScreen(false);
@@ -727,20 +726,6 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		}
 	}
 
-	public static void StopBuzzerSound(Component comp, CircuitState circState) {
-		ComponentFactory compFact = comp.getFactory();
-		// if there is a buzzer, stop its sound thread
-		if (compFact instanceof Buzzer)
-			((Buzzer) comp.getFactory()).stopSound(circState, comp);
-		// search other buzzer's instances in subcircuits and stop all sound threads
-		else if (compFact instanceof SubcircuitFactory) {
-			for (Component subComponent : ((SubcircuitFactory) comp.getFactory()).getSubcircuit().getComponents()) {
-				// recursive if there are other subcircuits
-				StopBuzzerSound(subComponent, ((SubcircuitFactory) compFact).getSubstate(circState, comp));
-			}
-		}
-	}
-
 	private Project proj;
 	private Tool drag_tool, temp_tool;
 	private Selection selection;
@@ -802,13 +787,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void autoZoomCenter() {
-		Bounds bounds = proj.getCurrentCircuit().getBounds();
+		Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
 		if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
 			setScrollBar(0, 0);
 			return;
 		}
 		// the white space around
-		int padding = 50;
+		byte padding = 50;
 		// set autozoom
 		double height = (bounds.getHeight() + 2 * padding) * getZoomFactor();
 		double width = (bounds.getWidth() + 2 * padding) * getZoomFactor();
@@ -832,7 +817,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	public void closeCanvas() {
 		for (Component comp : proj.getCurrentCircuit().getComponents())
-			StopBuzzerSound(comp, proj.getCircuitState());
+			Buzzer.StopBuzzerSound(comp, proj.getCircuitState());
 		paintThread.requestStop();
 	}
 
@@ -844,7 +829,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void computeSize(boolean immediate) {
-		Bounds bounds = proj.getCurrentCircuit().getBounds();
+		Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
 		int height = 0, width = 0;
 		if (bounds != null && viewport != null) {
 			width = bounds.getX() + bounds.getWidth() + viewport.getWidth();
@@ -1106,21 +1091,26 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void setArrows() {
-		Bounds circBds = proj.getCurrentCircuit().getBounds();
+		Bounds circBds = proj.getCurrentCircuit().getBounds(getGraphics());
 		// no circuit
 		if (circBds == null || circBds.getHeight() == 0 || circBds.getWidth() == 0)
 			return;
-		setArrows(circBds.getX(), circBds.getY(), circBds.getX() + circBds.getWidth(),
-				circBds.getY() + circBds.getHeight());
+		int x = circBds.getX();
+		int y = circBds.getY();
+		if (x < 0)
+			x = 0;
+		if (y < 0)
+			y = 0;
+		setArrows(x, y, x + circBds.getWidth(), y + circBds.getHeight());
 	}
 
-	public void setArrows(Integer x0, Integer y0, Integer x1, Integer y1) {
+	public void setArrows(int x0, int y0, int x1, int y1) {
 		viewport.clearArrows();
 		Rectangle viewableBase, viewable;
 		if (canvasPane != null) {
 			viewableBase = canvasPane.getViewport().getViewRect();
 		} else {
-			Bounds bds = proj.getCurrentCircuit().getBounds();
+			Bounds bds = proj.getCurrentCircuit().getBounds(getGraphics());
 			viewableBase = new Rectangle(0, 0, bds.getWidth(), bds.getHeight());
 		}
 		double zoom = getZoomFactor();

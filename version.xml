@@ -2,25 +2,15 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.14.3.0</jar_version>
+  <jar_version>2.15.0.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.14.3.0</exe_version>
+  <exe_version>2.15.0.0</exe_version>
   <changelog>
-* Bug fix for online users counter
-* Fixed Logisim not reopening all files after a restart (ex. after an update)
-* Fixed some translation
-* New Counter behavior, now easier to understand, with possibility to continue using the old one
-	Truth table:
- RCNT        LD
-   0          0     up count
-   0          1     load
-   1          0     down count
-   1          1     load
-   X          X     up count
-   X          0     up count
-   X          1     load
-   0          X     up count
-   1          X     down count
-EN = 0 --> no count
-</changelog>
+* Compiled with Java 10
+* Double click with Edit Tool to label a component
+* Finally added the Buzzer (I/O library)! Tell me if you have any problem with it
+* Graphics paint refresh rate was set at 20Hz, now is 60Hz by default and you can change it in Preferences/Window
+* Shift Register will show its internal bits even when set to serial load
+* A lot of bug fixes, optimizations and small changes
+  </changelog>
 </logisim>

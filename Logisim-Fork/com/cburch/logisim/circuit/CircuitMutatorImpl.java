@@ -12,8 +12,8 @@ import java.util.HashSet;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
-import com.cburch.logisim.gui.main.Canvas;
 import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.std.io.Buzzer;
 
 class CircuitMutatorImpl implements CircuitMutator {
 	private ArrayList<CircuitChange> log;
@@ -114,7 +114,7 @@ class CircuitMutatorImpl implements CircuitMutator {
 
 			for (Component c : repl.getRemovals()) {
 				if (proj != null)
-					Canvas.StopBuzzerSound(c, proj.getCircuitState());
+					Buzzer.StopBuzzerSound(c, proj.getCircuitState());
 				circuit.mutatorRemove(c);
 			}
 			for (Component c : repl.getAdditions()) {
