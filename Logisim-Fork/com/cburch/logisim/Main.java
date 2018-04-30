@@ -33,7 +33,10 @@ import com.cburch.logisim.gui.start.Startup;
 import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
+	// current version
 	public static final LogisimVersion VERSION = LogisimVersion.get(2, 15, 0, 0, LogisimVersion.getVariantFromFile());
+	// the version of the file you're using, equals to current version if new file
+	public static LogisimVersion FILE_VERSION;
 
 	public static final String VERSION_NAME = VERSION.toString();
 

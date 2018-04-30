@@ -6,6 +6,8 @@ package com.cburch.logisim.std.memory;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import com.cburch.logisim.LogisimVersion;
+import com.cburch.logisim.Main;
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
@@ -109,15 +111,19 @@ public class ShiftRegister extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int len = attrs.getValue(ATTR_LENGTH).intValue();
-		return Bounds.create(0, -20, 20 + 10 * len, 40);
+		boolean parallel = attrs.getValue(ATTR_LOAD);
+		if (!parallel && Main.FILE_VERSION.compareTo(LogisimVersion.get(2, 15, 0, 0)) < 0) {
+			return Bounds.create(0, -20, 30, 40);
+		} else {
+			int len = attrs.getValue(ATTR_LENGTH).intValue();
+			return Bounds.create(0, -20, 20 + 10 * len, 40);
+
+		}
 	}
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
-		if (attr == ATTR_LOAD || attr == StdAttr.WIDTH) {
-			configurePorts(instance);
-		} else if (attr == ATTR_LENGTH) {
+		if (attr == ATTR_LOAD || attr == ATTR_LENGTH || attr == StdAttr.WIDTH) {
 			instance.recomputeBounds();
 			configurePorts(instance);
 		}
@@ -127,47 +133,52 @@ public class ShiftRegister extends InstanceFactory {
 	public void paintInstance(InstancePainter painter) {
 		// draw boundary, label
 		painter.drawRoundBounds(Color.WHITE);
-
 		// draw state
-		BitWidth widObj = painter.getAttributeValue(StdAttr.WIDTH);
-		int wid = widObj.getWidth();
-		Integer lenObj = painter.getAttributeValue(ATTR_LENGTH);
-		int len = lenObj == null ? 8 : lenObj.intValue();
-		if (painter.getShowState()) {
-			if (wid <= 4) {
-				ShiftRegisterData data = getData(painter);
+		boolean parallel = painter.getAttributeValue(ATTR_LOAD).booleanValue();
+		// always print internal bits from all versions next to 2.15.0.0 mantaining
+		// retro compatibility
+		if (parallel || Main.FILE_VERSION.compareTo(LogisimVersion.get(2, 15, 0, 0)) >= 0) {
+			BitWidth widObj = painter.getAttributeValue(StdAttr.WIDTH);
+			int wid = widObj.getWidth();
+			Integer lenObj = painter.getAttributeValue(ATTR_LENGTH);
+			int len = lenObj == null ? 8 : lenObj.intValue();
+			if (painter.getShowState()) {
+				if (wid <= 4) {
+					ShiftRegisterData data = getData(painter);
+					Bounds bds = painter.getBounds();
+					int x = bds.getX() + 20;
+					int y = bds.getY();
+					Object label = painter.getAttributeValue(StdAttr.LABEL);
+					if (label == null || label.equals("")) {
+						y += bds.getHeight() / 2;
+					} else {
+						y += 3 * bds.getHeight() / 4;
+					}
+					Graphics g = painter.getGraphics();
+					for (int i = 0; i < len; i++) {
+						String s = data.get(len - 1 - i).toHexString();
+						GraphicsUtil.drawCenteredText(g, s, x, y);
+						x += 10;
+
+					}
+					painter.drawLabel();
+				}
+			} else {
 				Bounds bds = painter.getBounds();
-				int x = bds.getX() + 20;
+				int x = bds.getX() + bds.getWidth() / 2;
 				int y = bds.getY();
+				int h = bds.getHeight();
+				Graphics g = painter.getGraphics();
 				Object label = painter.getAttributeValue(StdAttr.LABEL);
 				if (label == null || label.equals("")) {
-					y += bds.getHeight() / 2;
-				} else {
-					y += 3 * bds.getHeight() / 4;
+					String a = Strings.get("shiftRegisterLabel1");
+					GraphicsUtil.drawCenteredText(g, a, x, y + h / 4);
 				}
-				Graphics g = painter.getGraphics();
-				for (int i = 0; i < len; i++) {
-					String s = data.get(len - 1 - i).toHexString();
-					GraphicsUtil.drawCenteredText(g, s, x, y);
-					x += 10;
-
-				}
+				String b = Strings.get("shiftRegisterLabel2", "" + len, "" + wid);
+				GraphicsUtil.drawCenteredText(g, b, x, y + 3 * h / 4);
 				painter.drawLabel();
 			}
-		} else {
-			Bounds bds = painter.getBounds();
-			int x = bds.getX() + bds.getWidth() / 2;
-			int y = bds.getY();
-			int h = bds.getHeight();
-			Graphics g = painter.getGraphics();
-			Object label = painter.getAttributeValue(StdAttr.LABEL);
-			if (label == null || label.equals("")) {
-				String a = Strings.get("shiftRegisterLabel1");
-				GraphicsUtil.drawCenteredText(g, a, x, y + h / 4);
-			}
-			String b = Strings.get("shiftRegisterLabel2", "" + len, "" + wid);
-			GraphicsUtil.drawCenteredText(g, b, x, y + 3 * h / 4);
-			painter.drawLabel();
+
 		}
 
 		// draw input and output ports

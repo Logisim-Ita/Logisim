@@ -97,7 +97,10 @@ public class Slider extends InstanceFactory {
 	private static final Attribute<AttributeOption> ATTR_DIR = Attributes.forOption("Direction",
 			new LocaleManager("resources/logisim", "circuit").getter("wireDirectionAttr"),
 			new AttributeOption[] { RIGHT_TO_LEFT, LEFT_TO_RIGHT });
-
+	
+	private static final Attribute<Integer> ATTR_VALUE = Attributes.forInteger("value",
+			Strings.getter("constantValueAttr"));
+	
 	private static SliderValue getValueState(InstanceState state) {
 		SliderValue ret = (SliderValue) state.getData();
 		if (ret == null) {
@@ -112,9 +115,9 @@ public class Slider extends InstanceFactory {
 		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR,ATTR_VALUE },
 				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT,0 });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -207,8 +210,10 @@ public class Slider extends InstanceFactory {
 		byte currentx = (byte) (state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT ? 100 - data.getCurrentX()
 				: data.getCurrentX());
 		// 100(slider width-20):2^b-1 = currentx:value(dec)
+		int value = (int) Math.round(currentx * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20));
 		state.setPort(0, Value.createKnown(b,
 				(int) Math.round(currentx * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20))), 1);
+		state.getAttributeSet().setValue(ATTR_VALUE, value);
 	}
 
 	private void updateports(Instance instance) {

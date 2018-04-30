@@ -51,7 +51,6 @@ class XmlReader {
 
 	class ReadContext {
 		LogisimFile file;
-		LogisimVersion sourceVersion;
 		HashMap<String, Library> libs = new HashMap<String, Library>();
 		private ArrayList<String> messages;
 
@@ -108,7 +107,7 @@ class XmlReader {
 			if (attrs == null)
 				return;
 
-			LogisimVersion ver = sourceVersion;
+			LogisimVersion ver = Main.FILE_VERSION;
 			boolean setDefaults = defaults != null && !defaults.isAllDefaultValues(attrs, ver);
 			// We need to process this in order, and we have to refetch the
 			// attribute list each time because it may change as we iterate
@@ -285,9 +284,9 @@ class XmlReader {
 			// determine the version producing this file
 			String versionString = elt.getAttribute("source");
 			if (versionString.equals("")) {
-				sourceVersion = Main.VERSION;
+				Main.FILE_VERSION = Main.VERSION;
 			} else {
-				sourceVersion = LogisimVersion.parse(versionString);
+				Main.FILE_VERSION = LogisimVersion.parse(versionString);
 			}
 
 			// first, load the sublibraries
