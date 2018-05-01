@@ -31,18 +31,29 @@ public class Slider extends InstanceFactory {
 	public static class Poker extends InstancePoker {
 		private SliderValue data;
 		private boolean dragging = false;
+		private BitWidth b;
 
 		@Override
 		public void mouseDragged(InstanceState state, MouseEvent e) {
 			if (dragging) {
-				data.setCurrentX((byte) (e.getX() - state.getInstance().getBounds().getX() - 10));
+				byte sliderPosition = (byte) (e.getX() - state.getInstance().getBounds().getX() - 10);
+				if (sliderPosition < 0)
+					sliderPosition = 0;
+				else if (sliderPosition > SliderWidth)
+					sliderPosition = SliderWidth;
+				if (data.right_to_left)
+					sliderPosition = (byte) (SliderWidth - sliderPosition);
+				int value = (int) Math.round(sliderPosition * (Math.pow(2, b.getWidth()) - 1) / SliderWidth);
+				data.setCurrentValue(value);
+				state.getAttributeSet().setValue(ATTR_VALUE, value);
 				state.fireInvalidated();
 			}
 		}
 
 		@Override
 		public void mousePressed(InstanceState state, MouseEvent e) {
-			data = getValueState(state);
+			this.data = getValueState(state);
+			this.b = state.getAttributeValue(StdAttr.WIDTH);
 			Bounds bds = state.getInstance().getBounds();
 			Rectangle slider = new Rectangle(bds.getX() + data.getCurrentX() + 5, bds.getY() + bds.getHeight() - 16, 12,
 					12);
@@ -58,7 +69,8 @@ public class Slider extends InstanceFactory {
 	}
 
 	public static class SliderValue implements InstanceData, Cloneable {
-		private byte currentx = 0;
+		private int currentvalue = 0;
+		private byte bitwidth = 8;
 		private boolean right_to_left = false;
 
 		@Override
@@ -71,22 +83,27 @@ public class Slider extends InstanceFactory {
 		}
 
 		public byte getCurrentX() {
-			return this.currentx;
+			byte currentx = (byte) ((currentvalue & 0xffffffffL) * SliderWidth / Math.pow(2, bitwidth));
+			if (right_to_left)
+				currentx = (byte) (SliderWidth - currentx);
+			return currentx;
 		}
 
-		public void setCurrentX(byte x) {
-			if (x < 0)
-				x = 0;
-			else if (x > 100)
-				x = 100;
-			this.currentx = x;
+		public int getCurrentValue() {
+			return this.currentvalue;
+		}
+
+		public void setCurrentValue(int x) {
+			this.currentvalue = x;
+		}
+
+		public void setCurrentBitWidth(BitWidth b) {
+			this.bitwidth = (byte) b.getWidth();
 		}
 
 		public void updateDir(boolean b) {
-			if (b != right_to_left) {
+			if (b != right_to_left)
 				right_to_left = b;
-				currentx = (byte) (100 - currentx);
-			}
 		}
 	}
 
@@ -97,17 +114,22 @@ public class Slider extends InstanceFactory {
 	private static final Attribute<AttributeOption> ATTR_DIR = Attributes.forOption("Direction",
 			new LocaleManager("resources/logisim", "circuit").getter("wireDirectionAttr"),
 			new AttributeOption[] { RIGHT_TO_LEFT, LEFT_TO_RIGHT });
-	
-	private static final Attribute<Integer> ATTR_VALUE = Attributes.forInteger("value",
+
+	private static final Attribute<Integer> ATTR_VALUE = Attributes.forHexInteger("value",
 			Strings.getter("constantValueAttr"));
-	
+
+	private static final byte SliderWidth = 100;
+
 	private static SliderValue getValueState(InstanceState state) {
 		SliderValue ret = (SliderValue) state.getData();
 		if (ret == null) {
 			ret = new SliderValue();
 			state.setData(ret);
-		} else
+		} else {
 			ret.updateDir(state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT);
+			ret.setCurrentValue(state.getAttributeValue(ATTR_VALUE));
+			ret.setCurrentBitWidth(state.getAttributeValue(StdAttr.WIDTH));
+		}
 		return ret;
 	}
 
@@ -115,9 +137,9 @@ public class Slider extends InstanceFactory {
 		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR,ATTR_VALUE },
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR, ATTR_VALUE },
 				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT,0 });
+						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT, 0 });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -148,7 +170,7 @@ public class Slider extends InstanceFactory {
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
 		Direction facing = attrs.getValue(StdAttr.FACING);
-		byte width = 120, height = 30;
+		byte width = SliderWidth + 20, height = 30;
 		if (facing == Direction.EAST)
 			return Bounds.create(-width, -height / 2, width, height);
 		else if (facing == Direction.WEST)
@@ -165,12 +187,11 @@ public class Slider extends InstanceFactory {
 			instance.recomputeBounds();
 			updateports(instance);
 			computeTextField(instance);
-		} else if (attr == StdAttr.WIDTH)
+		} else if (attr == StdAttr.WIDTH) {
 			updateports(instance);
-		else if (attr == ATTR_DIR) {
 			instance.fireInvalidated();
-		}
-
+		} else if (attr == ATTR_VALUE)
+			instance.fireInvalidated();
 	}
 
 	@Override
@@ -204,16 +225,9 @@ public class Slider extends InstanceFactory {
 
 	@Override
 	public void propagate(InstanceState state) {
-		SliderValue data = getValueState(state);
 		BitWidth b = state.getAttributeValue(StdAttr.WIDTH);
-		Bounds bds = state.getInstance().getBounds();
-		byte currentx = (byte) (state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT ? 100 - data.getCurrentX()
-				: data.getCurrentX());
-		// 100(slider width-20):2^b-1 = currentx:value(dec)
-		int value = (int) Math.round(currentx * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20));
-		state.setPort(0, Value.createKnown(b,
-				(int) Math.round(currentx * (Math.pow(2, b.getWidth()) - 1) / (bds.getWidth() - 20))), 1);
-		state.getAttributeSet().setValue(ATTR_VALUE, value);
+		int value = state.getAttributeValue(ATTR_VALUE);
+		state.setPort(0, Value.createKnown(b, value), 1);
 	}
 
 	private void updateports(Instance instance) {

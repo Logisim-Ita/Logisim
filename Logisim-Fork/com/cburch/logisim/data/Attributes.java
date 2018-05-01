@@ -217,8 +217,8 @@ public class Attributes {
 			} else if (value.startsWith("0b")) {
 				value = value.substring(2);
 				return Integer.valueOf((int) Long.parseLong(value, 2));
-			} else if (value.startsWith("0")) {
-				value = value.substring(1);
+			} else if (value.startsWith("0o")) {
+				value = value.substring(2);
 				return Integer.valueOf((int) Long.parseLong(value, 8));
 			} else {
 				return Integer.valueOf((int) Long.parseLong(value, 10));
