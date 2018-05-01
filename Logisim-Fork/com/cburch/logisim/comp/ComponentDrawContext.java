@@ -54,7 +54,7 @@ public class ComponentDrawContext {
 
 	public void drawBounds(Component comp, Bounds bds, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || color != Color.WHITE) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || !color.equals(Color.WHITE)) {
 			g.setColor(color);
 			g.fillRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight());
 		}
@@ -227,7 +227,7 @@ public class ComponentDrawContext {
 
 	public void drawRoundBounds(Component comp, Bounds bds, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || color != Color.WHITE) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || !color.equals(Color.WHITE)) {
 			g.setColor(color);
 			g.fillRoundRect(bds.getX(), bds.getY(), bds.getWidth(), bds.getHeight(), 10, 10);
 		}
@@ -243,7 +243,7 @@ public class ComponentDrawContext {
 	public void drawRoundRectangle(ComponentFactory source, int x, int y, int width, int height, String label,
 			Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || color != Color.WHITE) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || !color.equals(Color.WHITE)) {
 			g.setColor(color);
 			g.fillRoundRect(x, y, width, height, 10, 10);
 		}
@@ -262,7 +262,7 @@ public class ComponentDrawContext {
 
 	public void drawRoundRectangle(int x, int y, int width, int height, String label, Color color) {
 		GraphicsUtil.switchToWidth(g, 2);
-		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || color != Color.WHITE) {
+		if (color != null && AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() || !color.equals(Color.WHITE)) {
 			g.setColor(color);
 			g.fillRoundRect(x, y, width, height, 10, 10);
 		}

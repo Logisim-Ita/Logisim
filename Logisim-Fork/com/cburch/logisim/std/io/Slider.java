@@ -45,6 +45,7 @@ public class Slider extends InstanceFactory {
 					sliderPosition = (byte) (SliderWidth - sliderPosition);
 				int value = (int) Math.round(sliderPosition * (Math.pow(2, b.getWidth()) - 1) / SliderWidth);
 				data.setCurrentValue(value);
+				data.setCurrentX(sliderPosition);
 				state.getAttributeSet().setValue(ATTR_VALUE, value);
 				state.fireInvalidated();
 			}
@@ -70,7 +71,7 @@ public class Slider extends InstanceFactory {
 
 	public static class SliderValue implements InstanceData, Cloneable {
 		private int currentvalue = 0;
-		private byte bitwidth = 8;
+		private byte bitwidth = 8, currentx = 0;
 		private boolean right_to_left = false;
 
 		@Override
@@ -82,11 +83,25 @@ public class Slider extends InstanceFactory {
 			}
 		}
 
+		private void setCurrentX() {
+			byte currentx = (byte) ((this.currentvalue & 0xffffffffL) * SliderWidth / (Math.pow(2, this.bitwidth) - 1));
+			if (!this.right_to_left)
+				this.currentx = currentx;
+			else
+				this.currentx = (byte) (SliderWidth - currentx);
+
+		}
+
+		public void setCurrentX(byte x) {
+			if (!this.right_to_left)
+				this.currentx = x;
+			else
+				this.currentx = (byte) (SliderWidth - x);
+
+		}
+
 		public byte getCurrentX() {
-			byte currentx = (byte) ((currentvalue & 0xffffffffL) * SliderWidth / Math.pow(2, bitwidth));
-			if (right_to_left)
-				currentx = (byte) (SliderWidth - currentx);
-			return currentx;
+			return this.currentx;
 		}
 
 		public int getCurrentValue() {
@@ -94,16 +109,24 @@ public class Slider extends InstanceFactory {
 		}
 
 		public void setCurrentValue(int x) {
-			this.currentvalue = x;
+			if (x != this.currentvalue) {
+				this.currentvalue = x;
+				setCurrentX();
+			}
 		}
 
-		public void setCurrentBitWidth(BitWidth b) {
-			this.bitwidth = (byte) b.getWidth();
+		public void setCurrentBitWidth(int b) {
+			if (b != this.bitwidth) {
+				this.bitwidth = (byte) b;
+				setCurrentX();
+			}
 		}
 
 		public void updateDir(boolean b) {
-			if (b != right_to_left)
+			if (b != right_to_left) {
 				right_to_left = b;
+				setCurrentX();
+			}
 		}
 	}
 
@@ -126,9 +149,18 @@ public class Slider extends InstanceFactory {
 			ret = new SliderValue();
 			state.setData(ret);
 		} else {
+			byte width = (byte) state.getAttributeValue(StdAttr.WIDTH).getWidth();
+			int value = state.getAttributeValue(ATTR_VALUE);
+			int maxvalue = (int) (Math.pow(2, width) - 1);
+			// if old value is bigger than the max value for the selected bitwidth, set
+			// value to its max value
+			if (value > maxvalue) {
+				value = maxvalue;
+				state.getAttributeSet().setValue(ATTR_VALUE, value);
+			}
 			ret.updateDir(state.getAttributeValue(ATTR_DIR) == RIGHT_TO_LEFT);
-			ret.setCurrentValue(state.getAttributeValue(ATTR_VALUE));
-			ret.setCurrentBitWidth(state.getAttributeValue(StdAttr.WIDTH));
+			ret.setCurrentValue(value);
+			ret.setCurrentBitWidth(width);
 		}
 		return ret;
 	}
