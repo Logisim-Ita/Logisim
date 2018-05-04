@@ -6,11 +6,15 @@ package com.cburch.logisim.std.wiring;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import javax.swing.Icon;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import com.cburch.logisim.circuit.CircuitState;
@@ -34,6 +38,8 @@ import com.cburch.logisim.instance.InstancePoker;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
+import com.cburch.logisim.proj.Project;
+import com.cburch.logisim.tools.MenuExtender;
 import com.cburch.logisim.tools.key.BitWidthConfigurator;
 import com.cburch.logisim.tools.key.DirectionConfigurator;
 import com.cburch.logisim.tools.key.JoinedConfigurator;
@@ -149,6 +155,47 @@ public class Pin extends InstanceFactory {
 		}
 	}
 
+	private static class PinMenu implements ActionListener, MenuExtender {
+		private JMenuItem edit;
+		private Instance instance;
+		private CircuitState circState;
+
+		public PinMenu(Instance instance) {
+			this.instance = instance;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			PinState data = Pin.getState(instance, circState);
+			/*if (evt.getSource() == edit) {
+				if (data.editWindow() == 1)
+					data.ClearMatrixValues();
+			// if something changed
+			if (!data.getSavedData().equals(instance.getAttributeValue(CONTENTS_ATTR))) {
+				instance.fireInvalidated();
+				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
+				circState.getProject().getLogisimFile().setDirty(true);
+			}*/
+		}
+
+		@Override
+		public void configureMenu(JPopupMenu menu, Project proj) {
+			this.circState = proj.getCircuitState();
+			boolean enabled = circState != null && instance.getAttributeValue(Pin.ATTR_TYPE);
+
+			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
+			menu.addSeparator();
+			menu.add(this.edit);
+		}
+
+		private JMenuItem createItem(boolean enabled, String label) {
+			JMenuItem ret = new JMenuItem(label);
+			ret.setEnabled(enabled);
+			ret.addActionListener(this);
+			return ret;
+		}
+	}
+
 	private static class PinState implements InstanceData, Cloneable {
 		Value sending;
 		Value receiving;
@@ -205,6 +252,29 @@ public class Pin extends InstanceFactory {
 			}
 			ret = new PinState(val, val);
 			state.setData(ret);
+		}
+		if (ret.sending.getWidth() != width.getWidth()) {
+			ret.sending = ret.sending.extendWidth(width.getWidth(), attrs.threeState ? Value.UNKNOWN : Value.FALSE);
+		}
+		if (ret.receiving.getWidth() != width.getWidth()) {
+			ret.receiving = ret.receiving.extendWidth(width.getWidth(), Value.UNKNOWN);
+		}
+		return ret;
+	}
+
+	private static PinState getState(Instance state, CircuitState circ) {
+		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
+		BitWidth width = attrs.width;
+		PinState ret = (PinState) state.getData(circ);
+		if (ret == null) {
+			Value val = attrs.threeState ? Value.UNKNOWN : Value.FALSE;
+			if (width.getWidth() > 1) {
+				Value[] arr = new Value[width.getWidth()];
+				java.util.Arrays.fill(arr, val);
+				val = Value.create(arr);
+			}
+			ret = new PinState(val, val);
+			state.setData(circ, ret);
 		}
 		if (ret.sending.getWidth() != width.getWidth()) {
 			ret.sending = ret.sending.extendWidth(width.getWidth(), attrs.threeState ? Value.UNKNOWN : Value.FALSE);
