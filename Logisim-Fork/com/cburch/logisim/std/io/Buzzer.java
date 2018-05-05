@@ -187,7 +187,7 @@ public class Buzzer extends InstanceFactory {
 			state.setData(d = new Data());
 		}
 		d.is_on.set(active);
-		
+
 		int freq = state.getPort(FREQ).toIntValue();
 		if (freq >= 0) {
 			d.hz = freq;

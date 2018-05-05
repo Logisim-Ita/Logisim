@@ -68,6 +68,66 @@ public class Pin extends InstanceFactory {
 		}
 	}
 
+	private static class PinMenu implements ActionListener, MenuExtender {
+		private JMenuItem edit;
+		private Instance instance;
+		private CircuitState circState;
+
+		public PinMenu(Instance instance) {
+			this.instance = instance;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if (evt.getSource() == edit) {
+				PinState data = Pin.getState(instance, circState);
+				int CurrentValue = data.sending.toIntValue();
+				// pop up input dialog
+				String input = (String) JOptionPane.showInputDialog(null, Strings.get("constantValueAttr"),
+						Strings.get("constantValueAttr"), JOptionPane.PLAIN_MESSAGE, null, null,
+						CurrentValue & 0xffffffffL);
+				// something typed
+				if (input != null && !input.equals("")) {
+					byte CurrentWidth = (byte) data.sending.getWidth();
+					long TypedValue;
+					// should avoid some problem
+					if (input.length() > 10) {
+						TypedValue = (long) Math.pow(2, CurrentWidth) - 1;
+					} else {
+						// get value from input text
+						TypedValue = Long.parseLong(input);
+					}
+					// check if bigger than max
+					if (TypedValue >= Math.pow(2, CurrentWidth)) {
+						TypedValue = (long) Math.pow(2, CurrentWidth) - 1;
+					}
+					// if different from old value
+					if (TypedValue != (CurrentValue & 0xffffffffL)) {
+						data.sending = Value.createKnown(BitWidth.create(CurrentWidth), (int) TypedValue);
+						instance.fireInvalidated();
+					}
+				}
+			}
+		}
+
+		@Override
+		public void configureMenu(JPopupMenu menu, Project proj) {
+			this.circState = proj.getCircuitState();
+			// enabled if input
+			boolean enabled = circState != null && !instance.getAttributeValue(Pin.ATTR_TYPE);
+			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
+			menu.addSeparator();
+			menu.add(this.edit);
+		}
+
+		private JMenuItem createItem(boolean enabled, String label) {
+			JMenuItem ret = new JMenuItem(label);
+			ret.setEnabled(enabled);
+			ret.addActionListener(this);
+			return ret;
+		}
+	}
+
 	public static class PinPoker extends InstancePoker {
 		int bitPressed = -1;
 
@@ -155,47 +215,6 @@ public class Pin extends InstanceFactory {
 		}
 	}
 
-	private static class PinMenu implements ActionListener, MenuExtender {
-		private JMenuItem edit;
-		private Instance instance;
-		private CircuitState circState;
-
-		public PinMenu(Instance instance) {
-			this.instance = instance;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent evt) {
-			PinState data = Pin.getState(instance, circState);
-			/*if (evt.getSource() == edit) {
-				if (data.editWindow() == 1)
-					data.ClearMatrixValues();
-			// if something changed
-			if (!data.getSavedData().equals(instance.getAttributeValue(CONTENTS_ATTR))) {
-				instance.fireInvalidated();
-				instance.getAttributeSet().setValue(CONTENTS_ATTR, data.getSavedData());
-				circState.getProject().getLogisimFile().setDirty(true);
-			}*/
-		}
-
-		@Override
-		public void configureMenu(JPopupMenu menu, Project proj) {
-			this.circState = proj.getCircuitState();
-			boolean enabled = circState != null && instance.getAttributeValue(Pin.ATTR_TYPE);
-
-			this.edit = createItem(enabled, Strings.get("ramEditMenuItem"));
-			menu.addSeparator();
-			menu.add(this.edit);
-		}
-
-		private JMenuItem createItem(boolean enabled, String label) {
-			JMenuItem ret = new JMenuItem(label);
-			ret.setEnabled(enabled);
-			ret.addActionListener(this);
-			return ret;
-		}
-	}
-
 	private static class PinState implements InstanceData, Cloneable {
 		Value sending;
 		Value receiving;
@@ -239,29 +258,6 @@ public class Pin extends InstanceFactory {
 
 	private static final Font ICON_WIDTH_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 8);
 
-	private static PinState getState(InstanceState state) {
-		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
-		BitWidth width = attrs.width;
-		PinState ret = (PinState) state.getData();
-		if (ret == null) {
-			Value val = attrs.threeState ? Value.UNKNOWN : Value.FALSE;
-			if (width.getWidth() > 1) {
-				Value[] arr = new Value[width.getWidth()];
-				java.util.Arrays.fill(arr, val);
-				val = Value.create(arr);
-			}
-			ret = new PinState(val, val);
-			state.setData(ret);
-		}
-		if (ret.sending.getWidth() != width.getWidth()) {
-			ret.sending = ret.sending.extendWidth(width.getWidth(), attrs.threeState ? Value.UNKNOWN : Value.FALSE);
-		}
-		if (ret.receiving.getWidth() != width.getWidth()) {
-			ret.receiving = ret.receiving.extendWidth(width.getWidth(), Value.UNKNOWN);
-		}
-		return ret;
-	}
-
 	private static PinState getState(Instance state, CircuitState circ) {
 		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
 		BitWidth width = attrs.width;
@@ -275,6 +271,29 @@ public class Pin extends InstanceFactory {
 			}
 			ret = new PinState(val, val);
 			state.setData(circ, ret);
+		}
+		if (ret.sending.getWidth() != width.getWidth()) {
+			ret.sending = ret.sending.extendWidth(width.getWidth(), attrs.threeState ? Value.UNKNOWN : Value.FALSE);
+		}
+		if (ret.receiving.getWidth() != width.getWidth()) {
+			ret.receiving = ret.receiving.extendWidth(width.getWidth(), Value.UNKNOWN);
+		}
+		return ret;
+	}
+
+	private static PinState getState(InstanceState state) {
+		PinAttributes attrs = (PinAttributes) state.getAttributeSet();
+		BitWidth width = attrs.width;
+		PinState ret = (PinState) state.getData();
+		if (ret == null) {
+			Value val = attrs.threeState ? Value.UNKNOWN : Value.FALSE;
+			if (width.getWidth() > 1) {
+				Value[] arr = new Value[width.getWidth()];
+				java.util.Arrays.fill(arr, val);
+				val = Value.create(arr);
+			}
+			ret = new PinState(val, val);
+			state.setData(ret);
 		}
 		if (ret.sending.getWidth() != width.getWidth()) {
 			ret.sending = ret.sending.extendWidth(width.getWidth(), attrs.threeState ? Value.UNKNOWN : Value.FALSE);
@@ -333,6 +352,14 @@ public class Pin extends InstanceFactory {
 	@Override
 	public AttributeSet createAttributeSet() {
 		return new PinAttributes();
+	}
+
+	@Override
+	protected Object getInstanceFeature(Instance instance, Object key) {
+		if (key == MenuExtender.class) {
+			return new PinMenu(instance);
+		}
+		return super.getInstanceFeature(instance, key);
 	}
 
 	@Override

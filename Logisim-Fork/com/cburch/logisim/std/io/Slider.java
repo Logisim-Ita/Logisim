@@ -83,6 +83,28 @@ public class Slider extends InstanceFactory {
 			}
 		}
 
+		public int getCurrentValue() {
+			return this.currentvalue;
+		}
+
+		public byte getCurrentX() {
+			return this.currentx;
+		}
+
+		public void setCurrentBitWidth(int b) {
+			if (b != this.bitwidth) {
+				this.bitwidth = (byte) b;
+				setCurrentX();
+			}
+		}
+
+		public void setCurrentValue(int x) {
+			if (x != this.currentvalue) {
+				this.currentvalue = x;
+				setCurrentX();
+			}
+		}
+
 		private void setCurrentX() {
 			byte currentx = (byte) ((this.currentvalue & 0xffffffffL) * SliderWidth / (Math.pow(2, this.bitwidth) - 1));
 			if (!this.right_to_left)
@@ -98,28 +120,6 @@ public class Slider extends InstanceFactory {
 			else
 				this.currentx = (byte) (SliderWidth - x);
 
-		}
-
-		public byte getCurrentX() {
-			return this.currentx;
-		}
-
-		public int getCurrentValue() {
-			return this.currentvalue;
-		}
-
-		public void setCurrentValue(int x) {
-			if (x != this.currentvalue) {
-				this.currentvalue = x;
-				setCurrentX();
-			}
-		}
-
-		public void setCurrentBitWidth(int b) {
-			if (b != this.bitwidth) {
-				this.bitwidth = (byte) b;
-				setCurrentX();
-			}
 		}
 
 		public void updateDir(boolean b) {
