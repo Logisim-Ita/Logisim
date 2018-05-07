@@ -13,6 +13,7 @@ import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.comp.Component;
 import com.cburch.logisim.comp.ComponentFactory;
 import com.cburch.logisim.data.Attribute;
+import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.BitWidth;
@@ -32,7 +33,7 @@ public class Buzzer extends InstanceFactory {
 	private static class Data implements InstanceData {
 		private AtomicBoolean is_on = new AtomicBoolean(false);
 		private final int SAMPLE_RATE = 44100;
-		private int hz = 500;
+		private double hz = 500;
 		private double vol = 1;
 		private Thread thread;
 
@@ -84,7 +85,12 @@ public class Buzzer extends InstanceFactory {
 	private static final byte ENABLE = 1;
 	private static final byte VOL = 2;
 	private static final Attribute<BitWidth> VOLUME_WIDTH = Attributes.forBitWidth("vol_width",
-			Strings.getter("BuzzerVolumeSensibility"));
+			Strings.getter("buzzerVolumeBitWidth"));
+
+	private static final AttributeOption Hz = new AttributeOption("Hz", Strings.getter("Hz"));
+	private static final AttributeOption dHz = new AttributeOption("dHz", Strings.getter("dHz (0.1Hz)"));
+	private static final Attribute<AttributeOption> FREQUENCY_MEASURE = Attributes.forOption("freq_measure",
+			Strings.getter("frequecy"), new AttributeOption[] { Hz, dHz });
 
 	public static void StopBuzzerSound(Component comp, CircuitState circState) {
 		// static method, have to check if the comp parameter is a Buzzer or contains it
@@ -109,9 +115,9 @@ public class Buzzer extends InstanceFactory {
 	public Buzzer() {
 		super("Buzzer", Strings.getter("buzzerComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, VOLUME_WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT,
+				new Attribute[] { StdAttr.FACING, FREQUENCY_MEASURE, VOLUME_WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT,
 						StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.WEST, BitWidth.create(7), "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+				new Object[] { Direction.WEST, Hz, BitWidth.create(7), "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("buzzer.gif");
 	}
@@ -190,6 +196,8 @@ public class Buzzer extends InstanceFactory {
 
 		int freq = state.getPort(FREQ).toIntValue();
 		if (freq >= 0) {
+			if (state.getAttributeValue(FREQUENCY_MEASURE) == dHz)
+				freq /= 10;
 			d.hz = freq;
 		}
 		if (state.getPort(VOL).isFullyDefined()) {
@@ -206,10 +214,10 @@ public class Buzzer extends InstanceFactory {
 		byte VolumeWidth = (byte) instance.getAttributeValue(VOLUME_WIDTH).getWidth();
 		Port[] p = new Port[3];
 		if (dir == Direction.EAST || dir == Direction.WEST) {
-			p[FREQ] = new Port(0, -10, Port.INPUT, 12);
+			p[FREQ] = new Port(0, -10, Port.INPUT, 14);
 			p[VOL] = new Port(0, 10, Port.INPUT, VolumeWidth);
 		} else {
-			p[FREQ] = new Port(-10, 0, Port.INPUT, 12);
+			p[FREQ] = new Port(-10, 0, Port.INPUT, 14);
 			p[VOL] = new Port(10, 0, Port.INPUT, VolumeWidth);
 		}
 		p[ENABLE] = new Port(0, 0, Port.INPUT, 1);
