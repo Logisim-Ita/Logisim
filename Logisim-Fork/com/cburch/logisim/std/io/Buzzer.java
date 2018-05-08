@@ -33,8 +33,8 @@ public class Buzzer extends InstanceFactory {
 	private static class Data implements InstanceData {
 		private AtomicBoolean is_on = new AtomicBoolean(false);
 		private final int SAMPLE_RATE = 44100;
-		private double hz = 500;
-		private double vol = 1;
+		private double hz = 523;
+		private double vol = 12;
 		private Thread thread;
 
 		public Data() {
@@ -90,7 +90,7 @@ public class Buzzer extends InstanceFactory {
 	private static final AttributeOption Hz = new AttributeOption("Hz", Strings.getter("Hz"));
 	private static final AttributeOption dHz = new AttributeOption("dHz", Strings.getter("dHz (0.1Hz)"));
 	private static final Attribute<AttributeOption> FREQUENCY_MEASURE = Attributes.forOption("freq_measure",
-			Strings.getter("frequecy"), new AttributeOption[] { Hz, dHz });
+			Strings.getter("buzzerFrequecy"), new AttributeOption[] { Hz, dHz });
 
 	public static void StopBuzzerSound(Component comp, CircuitState circState) {
 		// static method, have to check if the comp parameter is a Buzzer or contains it
@@ -225,6 +225,5 @@ public class Buzzer extends InstanceFactory {
 		p[ENABLE].setToolTip(Strings.getter("enableSound"));
 		p[VOL].setToolTip(Strings.getter("buzzerVolume"));
 		instance.setPorts(p);
-
 	}
 }

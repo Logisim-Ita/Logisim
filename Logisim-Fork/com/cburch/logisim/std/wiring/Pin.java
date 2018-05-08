@@ -45,6 +45,7 @@ import com.cburch.logisim.tools.key.DirectionConfigurator;
 import com.cburch.logisim.tools.key.JoinedConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.Icons;
+import com.cburch.logisim.util.LocaleManager;
 
 public class Pin extends InstanceFactory {
 	public static class PinLogger extends InstanceLogger {
@@ -89,17 +90,32 @@ public class Pin extends InstanceFactory {
 				// something typed
 				if (input != null && !input.equals("")) {
 					byte CurrentWidth = (byte) data.sending.getWidth();
+					double MaxValue = Math.pow(2, CurrentWidth);
 					long TypedValue;
 					// should avoid some problem
-					if (input.length() > 10) {
-						TypedValue = (long) Math.pow(2, CurrentWidth) - 1;
+					if (input.length() > 10 && input.charAt(0) != '-') {
+						// set max number
+						TypedValue = (long) MaxValue - 1;
+					} else if (input.length() > 11 && input.charAt(0) == '-') {
+						// set minimum negative number
+						TypedValue = 1 << CurrentWidth - 1;
 					} else {
-						// get value from input text
-						TypedValue = Long.parseLong(input);
+						try {
+							// get value from input text
+							TypedValue = Long.parseLong(input);
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(null,
+									new LocaleManager("resources/logisim", "menu").get("FrequencyNumberNotAccepted"));
+							return;
+						}
 					}
-					// check if bigger than max
-					if (TypedValue >= Math.pow(2, CurrentWidth)) {
-						TypedValue = (long) Math.pow(2, CurrentWidth) - 1;
+					// check if bigger or equal to than max - 1
+					if (TypedValue >= MaxValue) {
+						TypedValue = (long) MaxValue - 1;
+					} // check if smaller than -max/2
+					else if (TypedValue < -MaxValue / 2) {
+						// minimum negative number
+						TypedValue = 1 << CurrentWidth - 1;
 					}
 					// if different from old value
 					if (TypedValue != (CurrentValue & 0xffffffffL)) {

@@ -7,8 +7,10 @@
   <exe_version>2.15.0.0</exe_version>
   <changelog>
 * Compiled with Java 10
-* Double click with Edit Tool to label a component
-* Finally added the Buzzer (I/O library)! Tell me if you have any problem with it
+* Double click using Edit Tool to label a component
+* Finally added the Buzzer (I/O library)!
+* Right click on Pin, Edit Contents and enter the decimal value you want to set
+* I/O Slider, Value attribute
 * Graphics paint refresh rate was set at 20Hz, now is 60Hz by default and you can change it in Preferences/Window
 * Shift Register will show its internal bits even when set to serial load
 * A lot of bug fixes, optimizations and small changes

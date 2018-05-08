@@ -37,6 +37,7 @@ This is an italian fork based on the original Logisim version.<br>
 * New Counter behavior
 * Controlled Buffer / Inverter: Negate Control Input attribute
 * The Shift Register will show you its internal bits even when set to serial load
+* Right click on Pin, Edit Contents and set its value typing the decimal number
 * Added Sel pin in Register component
 * Added Preset pin in Register and Counter components
 * Added Sel Active Level attribute in components with Sel pin
@@ -63,7 +64,6 @@ This is an italian fork based on the original Logisim version.<br>
 ## Bugs
 * All the original Logisim's bugs we haven't fixed yet:
 	* Some random blue/red line caused by bad values refresh
-	* Sometimes bugged attribute's list
 	* Some problem with high frequencies
 	* String attribute not calling attributechanged method while writing its value
 ## Features we want to add
