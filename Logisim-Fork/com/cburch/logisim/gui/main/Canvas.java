@@ -185,7 +185,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		public void mousePressed(MouseEvent e) {
 			viewport.setErrorMessage(null, null);
 			if (proj.isStartupScreen()) {
-				Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+				Graphics g = getGraphics();
+				Bounds bounds;
+				if (g != null)
+					bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+				else
+					bounds = proj.getCurrentCircuit().getBounds();
 				// set the project as dirty only if it contains something
 				if (bounds.getHeight() != 0 || bounds.getWidth() != 0)
 					proj.setStartupScreen(false);
@@ -787,7 +792,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void autoZoomCenter() {
-		Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+		Graphics g = getGraphics();
+		Bounds bounds;
+		if (g != null)
+			bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+		else
+			bounds = proj.getCurrentCircuit().getBounds();
 		if (bounds.getHeight() == 0 || bounds.getWidth() == 0) {
 			setScrollBar(0, 0);
 			return;
@@ -829,7 +839,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void computeSize(boolean immediate) {
-		Bounds bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+		Graphics g = getGraphics();
+		Bounds bounds;
+		if (g != null)
+			bounds = proj.getCurrentCircuit().getBounds(getGraphics());
+		else
+			bounds = proj.getCurrentCircuit().getBounds();
 		int height = 0, width = 0;
 		if (bounds != null && viewport != null) {
 			width = bounds.getX() + bounds.getWidth() + viewport.getWidth();
@@ -1091,7 +1106,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 	}
 
 	public void setArrows() {
-		Bounds circBds = proj.getCurrentCircuit().getBounds(getGraphics());
+		Graphics g = getGraphics();
+		Bounds circBds;
+		if (g != null)
+			circBds = proj.getCurrentCircuit().getBounds(getGraphics());
+		else
+			circBds = proj.getCurrentCircuit().getBounds();
 		// no circuit
 		if (circBds == null || circBds.getHeight() == 0 || circBds.getWidth() == 0)
 			return;
@@ -1110,7 +1130,12 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		if (canvasPane != null) {
 			viewableBase = canvasPane.getViewport().getViewRect();
 		} else {
-			Bounds bds = proj.getCurrentCircuit().getBounds(getGraphics());
+			Graphics g = getGraphics();
+			Bounds bds;
+			if (g != null)
+				bds = proj.getCurrentCircuit().getBounds(getGraphics());
+			else
+				bds = proj.getCurrentCircuit().getBounds();
 			viewableBase = new Rectangle(0, 0, bds.getWidth(), bds.getHeight());
 		}
 		double zoom = getZoomFactor();
