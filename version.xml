@@ -2,17 +2,11 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.15.0.0</jar_version>
+  <jar_version>2.15.0.1</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.15.0.0</exe_version>
+  <exe_version>2.15.0.1</exe_version>
   <changelog>
-* Compiled with Java 10
-* Double click using Edit Tool to label a component
-* Finally added the Buzzer (I/O library)!
-* Right click on Pin, Edit Contents and enter the decimal value you want to set
-* I/O Slider, Value attribute
-* Graphics paint refresh rate was set at 20Hz, now is 60Hz by default and you can change it in Preferences/Window
-* Shift Register will show its internal bits even when set to serial load
-* A lot of bug fixes, optimizations and small changes
+* Fixed visual bug in the Hex editor
+* Fix for some jar libraries crashing
   </changelog>
 </logisim>
