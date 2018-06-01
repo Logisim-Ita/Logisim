@@ -20,8 +20,9 @@ import com.cburch.logisim.gui.hex.HexFrame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
-import Main.main;
+
 import Frame.Form;
+import Main.main;
 
 class MemMenu implements ActionListener, MenuExtender {
 	private Mem factory;

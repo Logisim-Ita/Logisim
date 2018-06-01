@@ -1,14 +1,11 @@
 package com.cburch.logisim.std.memory;
 
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 
 import com.cburch.logisim.circuit.CircuitState;
 import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.proj.Project;
 
 import Main.main;
 

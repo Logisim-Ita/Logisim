@@ -13,10 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.CodeSource;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -272,13 +271,34 @@ public class Startup {
 		}
 	}
 
+	public static String getFolderPath() {
+		try {
+			return URLDecoder.decode(
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getParentFile().getAbsolutePath(),
+					"UTF-8");
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	public static String getFilePath() {
+		try {
+			return URLDecoder.decode(
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getAbsolutePath(),
+					"UTF-8");
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
 	public static void restart(String[] parameters) {
 		try {
 			String[] exexute = new String[3 + parameters.length];
 			exexute[0] = "java";
 			exexute[1] = "-jar";
-			exexute[2] = new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-					.getAbsolutePath();
+			exexute[2] = getFilePath();
 			for (byte i = 0; i < parameters.length; i++)
 				exexute[i + 3] = parameters[i];
 			Runtime.getRuntime().exec(exexute);
@@ -407,14 +427,9 @@ public class Startup {
 			} else {
 				AsktoSave(frame);
 			}
-			// Obtain the base directory of the archive
-			CodeSource codeSource = Startup.class.getProtectionDomain().getCodeSource();
-			File jarFile = null;
-			try {
-				jarFile = new File(codeSource.getLocation().toURI().getPath());
-			} catch (URISyntaxException e) {
+			String FilePath = getFilePath();
+			if (FilePath.equals("")) {
 				System.err.println("Error in the syntax of the URI for the path of the executed Logisim file!");
-				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, Strings.get("UpdateFailedMessage"), Strings.get("UpdateFailed"),
 						JOptionPane.ERROR_MESSAGE);
 				return (false);
@@ -423,7 +438,7 @@ public class Startup {
 			// Get the appropriate remote filename to download
 			String remoteJar = Main.VERSION.isJar() ? logisimData.child("jar_file").content()
 					: logisimData.child("exe_file").content();
-			String updatemessage = downloadInstallUpdatedVersion(remoteJar, jarFile.getAbsolutePath());
+			String updatemessage = downloadInstallUpdatedVersion(remoteJar, FilePath);
 
 			if (updatemessage == "OK") {
 				return (true);
@@ -695,7 +710,21 @@ public class Startup {
 		// if user has double-clicked a file to open, we'll
 		// use that as the file to open now.
 		initialized = true;
+		JOptionPane.showMessageDialog(null, getFolderPath() + "\\LogisimLibraries");
+		File folder = new File(getFolderPath() + "\\LogisimLibraries");
+		if (folder.exists() && folder.isDirectory()) {
+			File[] listOfFiles = folder.listFiles();
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+					System.out.println("File " + listOfFiles[i].getName());
+				} else if (listOfFiles[i].isDirectory()) {
+					System.out.println("Directory " + listOfFiles[i].getName());
+				}
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, folder.mkdirs());
 
+		}
 		// load file
 		if (filesToOpen.isEmpty()) {
 			ProjectActions.doNew(monitor, true);
