@@ -20,6 +20,8 @@ import com.cburch.logisim.gui.hex.HexFrame;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.MenuExtender;
+import Main.main;
+import Frame.Form;
 
 class MemMenu implements ActionListener, MenuExtender {
 	private Mem factory;
@@ -31,6 +33,7 @@ class MemMenu implements ActionListener, MenuExtender {
 	private JMenuItem clear;
 	private JMenuItem load;
 	private JMenuItem save;
+	private JMenuItem assembler;
 
 	MemMenu(Mem factory, Instance instance) {
 		this.factory = factory;
@@ -48,6 +51,9 @@ class MemMenu implements ActionListener, MenuExtender {
 			doLoad(factory instanceof Ram);
 		else if (src == save)
 			doSave(factory instanceof Ram);
+		else if (src == assembler)
+			if(factory instanceof Rom || factory instanceof Ram)
+			doAss();
 	}
 
 	@Override
@@ -66,12 +72,14 @@ class MemMenu implements ActionListener, MenuExtender {
 		clear = createItem(enabled, Strings.get("ramClearMenuItem"));
 		load = createItem(enabled, Strings.get("ramLoadMenuItem"));
 		save = createItem(enabled, Strings.get("ramSaveMenuItem"));
+		assembler = createItem(enabled, Strings.get("Assembler"));
 
 		menu.addSeparator();
 		menu.add(edit);
 		menu.add(clear);
 		menu.add(load);
 		menu.add(save);
+		menu.add(assembler);
 	}
 
 	private JMenuItem createItem(boolean enabled, String label) {
@@ -146,5 +154,13 @@ class MemMenu implements ActionListener, MenuExtender {
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+	private void doAss() {
+		MemState s = factory.getState(instance, circState);
+		if (s == null)
+			return;
+		main.start();
+		KappemblerListener k=new KappemblerListener(factory,instance,circState);
+		Form.export.addActionListener(k);
 	}
 }
