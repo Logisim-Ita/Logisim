@@ -115,11 +115,46 @@ public class Buzzer extends InstanceFactory {
 	public Buzzer() {
 		super("Buzzer", Strings.getter("buzzerComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, FREQUENCY_MEASURE, VOLUME_WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT,
+				new Attribute[] { StdAttr.FACING, FREQUENCY_MEASURE, VOLUME_WIDTH, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
 						StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.WEST, Hz, BitWidth.create(7), "", StdAttr.DEFAULT_LABEL_FONT, Color.BLACK });
+				new Object[] { Direction.WEST, Hz, BitWidth.create(7), "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK});
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("buzzer.gif");
+	}
+	
+	private void computeTextField(Instance instance) {
+		Direction facing = instance.getAttributeValue(StdAttr.FACING);
+		Object labelLoc = instance.getAttributeValue(Io.ATTR_LABEL_LOC);
+
+		Bounds bds = instance.getBounds();
+		int x = bds.getX() + bds.getWidth() / 2;
+		int y = bds.getY() + bds.getHeight() / 2;
+		int halign = GraphicsUtil.H_CENTER;
+		int valign = GraphicsUtil.V_CENTER_OVERALL;
+		if (labelLoc == Direction.NORTH) {
+			y = bds.getY() - 2;
+			valign = GraphicsUtil.V_BOTTOM;
+		} else if (labelLoc == Direction.SOUTH) {
+			y = bds.getY() + bds.getHeight() + 2;
+			valign = GraphicsUtil.V_TOP;
+		} else if (labelLoc == Direction.EAST) {
+			x = bds.getX() + bds.getWidth() + 2;
+			halign = GraphicsUtil.H_LEFT;
+		} else if (labelLoc == Direction.WEST) {
+			x = bds.getX() - 2;
+			halign = GraphicsUtil.H_RIGHT;
+		}
+		if (labelLoc == facing) {
+			if (labelLoc == Direction.NORTH || labelLoc == Direction.SOUTH) {
+				x += 15;
+				halign = GraphicsUtil.H_LEFT;
+			} else {
+				y -= 10;
+				valign = GraphicsUtil.V_BOTTOM;
+			}
+		}
+
+		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
 
 	@Override
@@ -129,6 +164,7 @@ public class Buzzer extends InstanceFactory {
 		instance.addAttributeListener();
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, b.getX() + b.getWidth() / 2,
 				b.getY() - 3, GraphicsUtil.H_CENTER, GraphicsUtil.V_BOTTOM);
+		computeTextField(instance);
 	}
 
 	@Override
@@ -146,8 +182,10 @@ public class Buzzer extends InstanceFactory {
 		if (attr == StdAttr.FACING) {
 			instance.recomputeBounds();
 			updateports(instance);
+			computeTextField(instance);
 		} else if (attr == VOLUME_WIDTH) {
 			updateports(instance);
+			computeTextField(instance);
 		}
 	}
 
