@@ -2,11 +2,10 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.15.0.1</jar_version>
+  <jar_version>2.15.0.2</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.15.0.1</exe_version>
+  <exe_version>2.15.0.2</exe_version>
   <changelog>
-* Fixed visual bug in the Hex editor
-* Fix for some jar libraries crashing
+* Added Label position to some components.
   </changelog>
 </logisim>
