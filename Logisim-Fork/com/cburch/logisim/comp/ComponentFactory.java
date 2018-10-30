@@ -50,8 +50,7 @@ public interface ComponentFactory extends AttributeDefaultProvider {
 	 * <code>TOOL_TIP</code> (return a <code>String</code>) and
 	 * <code>SHOULD_SNAP</code> (return a <code>Boolean</code>).
 	 * 
-	 * @param key
-	 *            an object representing a feature.
+	 * @param key an object representing a feature.
 	 * @return an object representing information about how the component supports
 	 *         the feature, or <code>null</code> if it does not support the feature.
 	 */

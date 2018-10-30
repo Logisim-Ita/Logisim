@@ -169,9 +169,9 @@ public class Slider extends InstanceFactory {
 		super("Slider", Strings.getter("Slider"));
 		setAttributes(
 				new Attribute[] { StdAttr.FACING, StdAttr.WIDTH, RadixOption.ATTRIBUTE, Io.ATTR_COLOR, StdAttr.LABEL,
-						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR, ATTR_VALUE },
+						Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, ATTR_DIR, ATTR_VALUE },
 				new Object[] { Direction.EAST, BitWidth.create(8), RadixOption.RADIX_2, Color.WHITE, "",
-						StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT, 0 });
+						Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK, LEFT_TO_RIGHT, 0 });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("slider.gif");
 		setPorts(new Port[] { new Port(0, 0, Port.OUTPUT, 1) });
@@ -180,6 +180,8 @@ public class Slider extends InstanceFactory {
 
 	private void computeTextField(Instance instance) {
 		Object d = instance.getAttributeValue(StdAttr.FACING);
+		Object labelLoc = instance.getAttributeValue(Io.ATTR_LABEL_LOC);
+
 		Bounds bds = instance.getBounds();
 		int x = bds.getX() - 3;
 		int y = bds.getY() + bds.getHeight() / 2 - 1;
@@ -188,6 +190,25 @@ public class Slider extends InstanceFactory {
 		if (d == Direction.WEST) {
 			y = bds.getY();
 			valign = GraphicsUtil.V_BASELINE;
+		}
+		if (labelLoc == Direction.NORTH) {
+			y = bds.getY() - 2;
+			valign = GraphicsUtil.V_BOTTOM;
+		} else if (labelLoc == Direction.SOUTH) {
+			y = bds.getY() + bds.getHeight() + 2;
+			valign = GraphicsUtil.V_TOP;
+		} else if (labelLoc == Direction.EAST) {
+			x = bds.getX() + bds.getWidth() + 2;
+			halign = GraphicsUtil.H_LEFT;
+		} else if (labelLoc == Direction.WEST) {
+			x = bds.getX() - 2;
+			halign = GraphicsUtil.H_RIGHT;
+		}
+		if (labelLoc == d) {
+			if (labelLoc == Direction.WEST || labelLoc == Direction.EAST) {
+				y += 2;
+				valign = GraphicsUtil.V_BOTTOM;
+			}
 		}
 		instance.setTextField(StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, x, y, halign, valign);
 	}
@@ -224,6 +245,8 @@ public class Slider extends InstanceFactory {
 			instance.fireInvalidated();
 		} else if (attr == ATTR_VALUE)
 			instance.fireInvalidated();
+		else if (attr == Io.ATTR_LABEL_LOC)
+			computeTextField(instance);
 	}
 
 	@Override

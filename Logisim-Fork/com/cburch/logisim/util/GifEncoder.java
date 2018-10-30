@@ -407,15 +407,12 @@ public class GifEncoder {
 	 * refers to the red intensity of the pixel at column x, row y.
 	 * <P>
 	 *
-	 * @param r
-	 *            An array containing the red intensity values.
-	 * @param g
-	 *            An array containing the green intensity values.
-	 * @param b
-	 *            An array containing the blue intensity values.
+	 * @param r An array containing the red intensity values.
+	 * @param g An array containing the green intensity values.
+	 * @param b An array containing the blue intensity values.
 	 *
-	 * @exception AWTException
-	 *                Will be thrown if the image contains more than 256 colors.
+	 * @exception AWTException Will be thrown if the image contains more than 256
+	 *                         colors.
 	 */
 	public GifEncoder(byte r[][], byte g[][], byte b[][]) throws AWTException {
 		width_ = (short) (r.length);
@@ -429,12 +426,11 @@ public class GifEncoder {
 	 * color array. <B>This may take some time.</B>
 	 * <P>
 	 * 
-	 * @param image
-	 *            The image to encode. The image <B>must</B> be completely loaded.
-	 * @exception AWTException
-	 *                Will be thrown if the pixel grab fails. This can happen if
-	 *                Java runs out of memory. It may also indicate that the image
-	 *                contains more than 256 colors.
+	 * @param image The image to encode. The image <B>must</B> be completely loaded.
+	 * @exception AWTException Will be thrown if the pixel grab fails. This can
+	 *                         happen if Java runs out of memory. It may also
+	 *                         indicate that the image contains more than 256
+	 *                         colors.
 	 */
 	public GifEncoder(Image image, ProgressMonitor monitor) throws AWTException {
 		width_ = (short) image.getWidth(null);
@@ -506,12 +502,10 @@ public class GifEncoder {
 	 * take some time.</B>
 	 * <P>
 	 *
-	 * @param output
-	 *            The stream to output to. This should probably be a buffered
-	 *            stream.
+	 * @param output The stream to output to. This should probably be a buffered
+	 *               stream.
 	 *
-	 * @exception IOException
-	 *                Will be thrown if a write operation fails.
+	 * @exception IOException Will be thrown if a write operation fails.
 	 */
 	public void write(OutputStream output) throws IOException {
 		BitUtils.WriteString(output, "GIF87a");

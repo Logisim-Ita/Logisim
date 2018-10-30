@@ -55,8 +55,7 @@ public interface Component {
 	 * <code>MenuExtender.class</code>, <code>ToolTipMaker.class</code>,
 	 * <code>ExpressionComputer.class</code>, and <code>Loggable.class</code>.
 	 * 
-	 * @param key
-	 *            an object representing a feature.
+	 * @param key an object representing a feature.
 	 * @return an object representing information about how the component supports
 	 *         the feature, or <code>null</code> if it does not support the feature.
 	 */

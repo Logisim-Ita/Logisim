@@ -479,10 +479,8 @@ public class Startup {
 	 * Original idea taken from:
 	 * http://baptiste-wicht.developpez.com/tutoriels/java/update/ by Baptiste Wicht
 	 *
-	 * @param filePath
-	 *            remote file URL
-	 * @param destination
-	 *            local destination for the updated Jar file
+	 * @param filePath    remote file URL
+	 * @param destination local destination for the updated Jar file
 	 * @return true if the new version has been downloaded and installed, false
 	 *         otherwise
 	 * @throws IOException
