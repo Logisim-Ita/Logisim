@@ -28,13 +28,11 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	private byte[] outputports;
 
 	/**
-	 * @param name
-	 *            = name to display in the center of the TTl
-	 * @param pins
-	 *            = the total number of pins (GND and VCC included)
-	 * @param outputports
-	 *            = an array with the indexes of the output ports (indexes are the
-	 *            same you can find on Google searching the TTL you want to add)
+	 * @param name        = name to display in the center of the TTl
+	 * @param pins        = the total number of pins (GND and VCC included)
+	 * @param outputports = an array with the indexes of the output ports (indexes
+	 *                    are the same you can find on Google searching the TTL you
+	 *                    want to add)
 	 **/
 	protected AbstractTtlGate(String name, byte pins, byte[] outputports) {
 		super(name);
@@ -50,16 +48,13 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	}
 
 	/**
-	 * @param name
-	 *            = name to display in the center of the TTl
-	 * @param pins
-	 *            = the total number of pins (GND and VCC included)
-	 * @param outputports
-	 *            = an array with the indexes of the output ports (indexes are the
-	 *            same you can find on Google searching the TTL you want to add)
-	 * @param drawgates
-	 *            = if true, it calls the paintInternal method many times as the
-	 *            number of output ports passing the coordinates
+	 * @param name        = name to display in the center of the TTl
+	 * @param pins        = the total number of pins (GND and VCC included)
+	 * @param outputports = an array with the indexes of the output ports (indexes
+	 *                    are the same you can find on Google searching the TTL you
+	 *                    want to add)
+	 * @param drawgates   = if true, it calls the paintInternal method many times as
+	 *                    the number of output ports passing the coordinates
 	 **/
 	protected AbstractTtlGate(String name, byte pins, byte[] outputports, boolean drawgates) {
 		this(name, pins, outputports);
@@ -67,16 +62,13 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	}
 
 	/**
-	 * @param name
-	 *            = name to display in the center of the TTl
-	 * @param pins
-	 *            = the total number of pins (GND and VCC included)
-	 * @param outputports
-	 *            = an array with the indexes of the output ports (indexes are the
-	 *            same you can find on Google searching the TTL you want to add)
-	 * @param Ttlportnames
-	 *            = an array of strings which will be tooltips of the corresponding
-	 *            port in the order you pass
+	 * @param name         = name to display in the center of the TTl
+	 * @param pins         = the total number of pins (GND and VCC included)
+	 * @param outputports  = an array with the indexes of the output ports (indexes
+	 *                     are the same you can find on Google searching the TTL you
+	 *                     want to add)
+	 * @param Ttlportnames = an array of strings which will be tooltips of the
+	 *                     corresponding port in the order you pass
 	 **/
 	protected AbstractTtlGate(String name, byte pins, byte[] outputports, String[] Ttlportnames) {
 		// the ttl name, the total number of pins and an array with the indexes of
@@ -326,23 +318,18 @@ public abstract class AbstractTtlGate extends InstanceFactory {
 	}
 
 	/**
-	 * @param painter
-	 *            = the instance painter you have to use to create Graphics
-	 *            (Graphics g = painter.getGraphics())
-	 * @param x
-	 *            = if drawgates is false or not used, the component's left side; if
-	 *            drawgates is true it gets the component's width, subtracts 20 (for
-	 *            GND or Vcc) and divides for the number of outputs for each side,
-	 *            you'll get the x coordinate of the leftmost input -10 before the
-	 *            last output
-	 * @param y
-	 *            = the component's upper side
-	 * @param height
-	 *            = the component's height
-	 * @param up
-	 *            = true if drawgates is true when drawing the gates in the upper
-	 *            side (introduced this because can't draw upside down so you have
-	 *            to write what to draw if down and up)
+	 * @param painter = the instance painter you have to use to create Graphics
+	 *                (Graphics g = painter.getGraphics())
+	 * @param x       = if drawgates is false or not used, the component's left
+	 *                side; if drawgates is true it gets the component's width,
+	 *                subtracts 20 (for GND or Vcc) and divides for the number of
+	 *                outputs for each side, you'll get the x coordinate of the
+	 *                leftmost input -10 before the last output
+	 * @param y       = the component's upper side
+	 * @param height  = the component's height
+	 * @param up      = true if drawgates is true when drawing the gates in the
+	 *                upper side (introduced this because can't draw upside down so
+	 *                you have to write what to draw if down and up)
 	 **/
 	abstract public void paintInternal(InstancePainter painter, int x, int y, int height, boolean up);
 

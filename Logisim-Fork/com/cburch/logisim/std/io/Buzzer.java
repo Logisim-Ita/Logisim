@@ -115,13 +115,14 @@ public class Buzzer extends InstanceFactory {
 	public Buzzer() {
 		super("Buzzer", Strings.getter("buzzerComponent"));
 		setAttributes(
-				new Attribute[] { StdAttr.FACING, FREQUENCY_MEASURE, VOLUME_WIDTH, StdAttr.LABEL, Io.ATTR_LABEL_LOC, StdAttr.LABEL_FONT,
-						StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { Direction.WEST, Hz, BitWidth.create(7), "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT, Color.BLACK});
+				new Attribute[] { StdAttr.FACING, FREQUENCY_MEASURE, VOLUME_WIDTH, StdAttr.LABEL, Io.ATTR_LABEL_LOC,
+						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
+				new Object[] { Direction.WEST, Hz, BitWidth.create(7), "", Direction.NORTH, StdAttr.DEFAULT_LABEL_FONT,
+						Color.BLACK });
 		setFacingAttribute(StdAttr.FACING);
 		setIconName("buzzer.gif");
 	}
-	
+
 	private void computeTextField(Instance instance) {
 		Direction facing = instance.getAttributeValue(StdAttr.FACING);
 		Object labelLoc = instance.getAttributeValue(Io.ATTR_LABEL_LOC);

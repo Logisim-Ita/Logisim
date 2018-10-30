@@ -181,7 +181,7 @@ public class Slider extends InstanceFactory {
 	private void computeTextField(Instance instance) {
 		Object d = instance.getAttributeValue(StdAttr.FACING);
 		Object labelLoc = instance.getAttributeValue(Io.ATTR_LABEL_LOC);
-		
+
 		Bounds bds = instance.getBounds();
 		int x = bds.getX() - 3;
 		int y = bds.getY() + bds.getHeight() / 2 - 1;
@@ -245,7 +245,7 @@ public class Slider extends InstanceFactory {
 			instance.fireInvalidated();
 		} else if (attr == ATTR_VALUE)
 			instance.fireInvalidated();
-		else if (attr == Io.ATTR_LABEL_LOC) 
+		else if (attr == Io.ATTR_LABEL_LOC)
 			computeTextField(instance);
 	}
 
