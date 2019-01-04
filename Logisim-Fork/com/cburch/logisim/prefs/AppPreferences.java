@@ -108,6 +108,13 @@ public class AppPreferences {
 					}
 					propertySupport.firePropertyChange(TEMPLATE_FILE, oldValue, value);
 				}
+			} else if (prop.equals(LIBRARIES_FOLDER_PATH)) {
+				File oldValue = LibrariesFolder;
+				File value = convertFile(prefs.get(LIBRARIES_FOLDER_PATH, null));
+				if (value == null ? oldValue != null : !value.equals(oldValue)) {
+					LibrariesFolder = value;
+					propertySupport.firePropertyChange(LIBRARIES_FOLDER_PATH, oldValue, value);
+				}
 			}
 		}
 	}
@@ -199,8 +206,13 @@ public class AppPreferences {
 	public static final PrefMonitor<Boolean> ANTI_ALIASING = create(new PrefMonitorBoolean("AntiAliasing", true));
 	public static final PrefMonitor<Boolean> FILL_COMPONENT_BACKGROUND = create(
 			new PrefMonitorBoolean("FillComponentBackground", true));
-	public static final PrefMonitor<Boolean> SEND_DATA = create(new PrefMonitorBoolean("SendLogisimUsageData", true));
+	// public static final PrefMonitor<Boolean> SEND_DATA = create(new
+	// PrefMonitorBoolean("SendLogisimUsageData", true));
 	public static final PrefMonitor<Boolean> NEW_TOOLBAR = create(new PrefMonitorBoolean("UseSimpleToolbar", true));
+	public static final PrefMonitor<Boolean> LOAD_LIBRARIES_FOLDER_AT_STARTUP = create(
+			new PrefMonitorBoolean("LoadLibrariesAtStartup", false));
+	public static final String LIBRARIES_FOLDER_PATH = "LibrariesFolderPath";
+	private static File LibrariesFolder = null;
 	public static final String ALWAYS = "Always";
 	public static final String ASKME = "Ask Me";
 	public static final String NO = "No";
@@ -308,6 +320,11 @@ public class AppPreferences {
 		return emptyTemplate;
 	}
 
+	public static File getLibrariesFolder() {
+		getPrefs();
+		return LibrariesFolder;
+	}
+
 	private static Template getPlainTemplate() {
 		if (plainTemplate == null) {
 			ClassLoader ld = Startup.class.getClassLoader();
@@ -349,6 +366,7 @@ public class AppPreferences {
 					prefs = p;
 
 					setTemplateFile(convertFile(p.get(TEMPLATE_FILE, null)));
+					setLibrariesFolder(convertFile(p.get(LIBRARIES_FOLDER_PATH, null)));
 					setTemplateType(p.getInt(TEMPLATE_TYPE, TEMPLATE_PLAIN));
 				}
 			}
@@ -428,6 +446,18 @@ public class AppPreferences {
 			UIManager.setLookAndFeel(layout);
 		} catch (Exception ex) {
 			System.err.println("Layout error " + layout);
+		}
+	}
+
+	public static void setLibrariesFolder(File value) {
+		getPrefs();
+		if (value != null && !value.canRead())
+			value = null;
+		if (value == null ? LibrariesFolder != null : !value.equals(LibrariesFolder)) {
+			try {
+				getPrefs().put(LIBRARIES_FOLDER_PATH, value == null ? "" : value.getCanonicalPath());
+			} catch (IOException ex) {
+			}
 		}
 	}
 

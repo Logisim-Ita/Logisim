@@ -25,7 +25,6 @@ import com.cburch.logisim.Main;
 import com.cburch.logisim.gui.generic.LFrame;
 import com.cburch.logisim.gui.start.About;
 import com.cburch.logisim.gui.start.Startup;
-import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.util.MacCompatibility;
 
 class MenuHelp extends JMenu implements ActionListener {
@@ -101,9 +100,11 @@ class MenuHelp extends JMenu implements ActionListener {
 		} else if (src == update) {
 			Startup startup = new Startup(true);
 			if (startup.autoUpdate(false, menubar.getProject().getFrame())) {
-				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode(
-							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1");
+				/*
+				 * if (AppPreferences.SEND_DATA.getBoolean()) Startup.runRemotePhpCode(
+				 * "http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1"
+				 * );
+				 */
 				Startup.restart(Main.OpenedFiles.toArray(new String[0]));
 			}
 

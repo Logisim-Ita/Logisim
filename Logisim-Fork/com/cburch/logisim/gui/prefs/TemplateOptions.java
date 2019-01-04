@@ -5,6 +5,7 @@ package com.cburch.logisim.gui.prefs;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -140,11 +141,12 @@ class TemplateOptions extends OptionsPanel {
 		GridBagLayout gridbag = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(gridbag);
-		gbc.weightx = 1.0;
+		int margin = 5;
+		gbc.insets = new Insets(0, margin, 0, margin);
 		gbc.gridx = 0;
 		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.gridwidth = 3;
-		gbc.anchor = GridBagConstraints.LINE_START;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.WEST;
 		gridbag.setConstraints(plain, gbc);
 		add(plain);
 		gridbag.setConstraints(empty, gbc);
@@ -156,9 +158,11 @@ class TemplateOptions extends OptionsPanel {
 		gbc.gridy = 3;
 		gbc.gridx = GridBagConstraints.RELATIVE;
 		gbc.weightx = 1.0;
+		gbc.insets = new Insets(0, margin, 0, 0);
 		gridbag.setConstraints(templateField, gbc);
 		add(templateField);
 		gbc.weightx = 0.0;
+		gbc.insets = new Insets(0, 0, 0, margin);
 		gridbag.setConstraints(templateButton, gbc);
 		add(templateButton);
 

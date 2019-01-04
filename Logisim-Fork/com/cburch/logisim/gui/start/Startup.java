@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
+//import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -56,6 +56,28 @@ public class Startup {
 	static void doPrint(File file) {
 		if (startupTemp != null)
 			startupTemp.doPrintFile(file);
+	}
+
+	public static String getFilePath() {
+		try {
+			return URLDecoder.decode(
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getAbsolutePath(),
+					"UTF-8");
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	public static String getFolderPath() {
+		try {
+			return URLDecoder.decode(
+					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+							.getParentFile().getAbsolutePath(),
+					"UTF-8");
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	public static Startup parseArgs(String[] args) {
@@ -271,28 +293,6 @@ public class Startup {
 		}
 	}
 
-	public static String getFolderPath() {
-		try {
-			return URLDecoder.decode(
-					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-							.getParentFile().getAbsolutePath(),
-					"UTF-8");
-		} catch (Exception e) {
-			return "";
-		}
-	}
-
-	public static String getFilePath() {
-		try {
-			return URLDecoder.decode(
-					new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-							.getAbsolutePath(),
-					"UTF-8");
-		} catch (Exception e) {
-			return "";
-		}
-	}
-
 	public static void restart(String[] parameters) {
 		try {
 			String[] exexute = new String[3 + parameters.length];
@@ -308,25 +308,18 @@ public class Startup {
 		}
 	}
 
-	public static void runRemotePhpCode(String url) {
-		URL URL;
-		HttpURLConnection conn;
-		InputStream ir;
-		try {
-			URL = new URL(url);
-			conn = (HttpURLConnection) URL.openConnection();
-			conn.setRequestMethod("GET");
-			ir = conn.getInputStream();
-			// BufferedReader br = new BufferedReader(new InputStreamReader(ir));
-			// System.out.println(br.readLine());
-			ir.close();
-		} catch (MalformedURLException e) {
-			System.err.println("The URL is malformed.\nPlease report this error to the software maintainer");
-		} catch (IOException e) {
-			System.err.println(
-					"Although an Internet connection should be available, the system couldn't connect to the URL requested\nPlease contact the software maintainer");
-		}
-	}
+	/*
+	 * public static void runRemotePhpCode(String url) { URL URL; HttpURLConnection
+	 * conn; InputStream ir; try { URL = new URL(url); conn = (HttpURLConnection)
+	 * URL.openConnection(); conn.setRequestMethod("GET"); ir =
+	 * conn.getInputStream(); // BufferedReader br = new BufferedReader(new
+	 * InputStreamReader(ir)); // System.out.println(br.readLine()); ir.close(); }
+	 * catch (MalformedURLException e) { System.err.
+	 * println("The URL is malformed.\nPlease report this error to the software maintainer"
+	 * ); } catch (IOException e) { System.err.println(
+	 * "Although an Internet connection should be available, the system couldn't connect to the URL requested\nPlease contact the software maintainer"
+	 * ); } }
+	 */
 
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
@@ -708,21 +701,20 @@ public class Startup {
 		// if user has double-clicked a file to open, we'll
 		// use that as the file to open now.
 		initialized = true;
-		JOptionPane.showMessageDialog(null, getFolderPath() + "\\LogisimLibraries");
-		File folder = new File(getFolderPath() + "\\LogisimLibraries");
-		if (folder.exists() && folder.isDirectory()) {
-			File[] listOfFiles = folder.listFiles();
-			for (int i = 0; i < listOfFiles.length; i++) {
-				if (listOfFiles[i].isFile()) {
-					System.out.println("File " + listOfFiles[i].getName());
-				} else if (listOfFiles[i].isDirectory()) {
-					System.out.println("Directory " + listOfFiles[i].getName());
-				}
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, folder.mkdirs());
 
-		}
+		/*
+		 * JOptionPane.showMessageDialog(null, getFolderPath() + "\\LogisimLibraries");
+		 * File folder = new File(getFolderPath() + "\\LogisimLibraries"); if
+		 * (folder.exists() && folder.isDirectory()) { File[] listOfFiles =
+		 * folder.listFiles(); for (int i = 0; i < listOfFiles.length; i++) { if
+		 * (listOfFiles[i].isFile()) { System.out.println("File " +
+		 * listOfFiles[i].getName()); } else if (listOfFiles[i].isDirectory()) {
+		 * System.out.println("Directory " + listOfFiles[i].getName()); } } } else {
+		 * JOptionPane.showMessageDialog(null, folder.mkdirs());
+		 * 
+		 * }
+		 */
+
 		// load file
 		if (filesToOpen.isEmpty()) {
 			ProjectActions.doNew(monitor, true);

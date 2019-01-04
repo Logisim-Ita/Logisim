@@ -30,7 +30,6 @@ import java.util.Calendar;
 import javax.swing.JOptionPane;
 
 import com.cburch.logisim.gui.start.Startup;
-import com.cburch.logisim.prefs.AppPreferences;
 
 public class Main {
 	// current version
@@ -61,20 +60,17 @@ public class Main {
 		Startup startup = Startup.parseArgs(args);
 		if (startup != null) {
 			// if it's not command line
-			if (!startup.isTty()) {
-				// remove online user when runtime stopped
-				Runtime.getRuntime().addShutdownHook(new Thread() {
-					@Override
-					public void run() {
-						if (AppPreferences.SEND_DATA.getBoolean())
-							Startup.runRemotePhpCode(
-									"http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
-					}
-				});
-				// add online user
-				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
-			}
+			/*
+			 * if (!startup.isTty()) { // remove online user when runtime stopped
+			 * Runtime.getRuntime().addShutdownHook(new Thread() {
+			 * 
+			 * @Override public void run() { if (AppPreferences.SEND_DATA.getBoolean())
+			 * Startup.runRemotePhpCode(
+			 * "http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0"); }
+			 * }); // add online user if (AppPreferences.SEND_DATA.getBoolean())
+			 * Startup.runRemotePhpCode(
+			 * "http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1"); }
+			 */
 			// search for updates, if true update and restart, else run logisim
 			if (!startup.autoUpdate(true, null)) {
 				try {
@@ -87,9 +83,11 @@ public class Main {
 					System.exit(-1);
 				}
 			} else {
-				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode(
-							"http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1");
+				/*
+				 * if (AppPreferences.SEND_DATA.getBoolean()) Startup.runRemotePhpCode(
+				 * "http://logisim.altervista.org/LogisimData/Autoupdates/autoupdates.php?val=1"
+				 * );
+				 */
 				Startup.restart(args);
 			}
 		} else

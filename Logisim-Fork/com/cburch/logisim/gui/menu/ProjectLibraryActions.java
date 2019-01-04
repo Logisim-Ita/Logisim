@@ -90,43 +90,8 @@ public class ProjectLibraryActions {
 		chooser.setDialogTitle(Strings.get("loadJarDialogTitle"));
 		chooser.setFileFilter(Loader.JAR_FILTER);
 		int check = chooser.showOpenDialog(proj.getFrame());
-		if (check == JFileChooser.APPROVE_OPTION) {
-			File f = chooser.getSelectedFile();
-			String className = null;
-
-			// try to retrieve the class name from the "Library-Class"
-			// attribute in the manifest. This section of code was contributed
-			// by Christophe Jacquet (Request Tracker #2024431).
-			JarFile jarFile = null;
-			try {
-				jarFile = new JarFile(f);
-				Manifest manifest = jarFile.getManifest();
-				className = manifest.getMainAttributes().getValue("Library-Class");
-			} catch (IOException e) {
-				// if opening the JAR file failed, do nothing
-			} finally {
-				if (jarFile != null) {
-					try {
-						jarFile.close();
-					} catch (IOException e) {
-					}
-				}
-			}
-
-			// if the class name was not found, go back to the good old dialog
-			if (className == null) {
-				className = JOptionPane.showInputDialog(proj.getFrame(), Strings.get("jarClassNamePrompt"),
-						Strings.get("jarClassNameTitle"), JOptionPane.QUESTION_MESSAGE);
-				// if user canceled selection, abort
-				if (className == null)
-					return;
-			}
-
-			Library lib = loader.loadJarLibrary(f, className);
-			if (lib != null) {
-				proj.doAction(LogisimFileActions.loadLibrary(lib));
-			}
-		}
+		if (check == JFileChooser.APPROVE_OPTION)
+			LoadJarLibrary(proj, chooser.getSelectedFile());
 	}
 
 	public static void doLoadLogisimLibrary(Project proj) {
@@ -135,13 +100,8 @@ public class ProjectLibraryActions {
 		chooser.setDialogTitle(Strings.get("loadLogisimDialogTitle"));
 		chooser.setFileFilter(Loader.LOGISIM_FILTER);
 		int check = chooser.showOpenDialog(proj.getFrame());
-		if (check == JFileChooser.APPROVE_OPTION) {
-			File f = chooser.getSelectedFile();
-			Library lib = loader.loadLogisimLibrary(f);
-			if (lib != null) {
-				proj.doAction(LogisimFileActions.loadLibrary(lib));
-			}
-		}
+		if (check == JFileChooser.APPROVE_OPTION)
+			LoadLogisimLibrary(proj, chooser.getSelectedFile());
 	}
 
 	public static void doUnloadLibraries(Project proj) {
@@ -175,6 +135,50 @@ public class ProjectLibraryActions {
 					JOptionPane.ERROR_MESSAGE);
 		} else {
 			proj.doAction(LogisimFileActions.unloadLibrary(lib));
+		}
+	}
+
+	private static void LoadJarLibrary(Project proj, File f) {
+		String className = null;
+
+		// try to retrieve the class name from the "Library-Class"
+		// attribute in the manifest. This section of code was contributed
+		// by Christophe Jacquet (Request Tracker #2024431).
+		JarFile jarFile = null;
+		try {
+			jarFile = new JarFile(f);
+			Manifest manifest = jarFile.getManifest();
+			className = manifest.getMainAttributes().getValue("Library-Class");
+		} catch (IOException e) {
+			// if opening the JAR file failed, do nothing
+		} finally {
+			if (jarFile != null) {
+				try {
+					jarFile.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+		// if the class name was not found, go back to the good old dialog
+		if (className == null) {
+			className = JOptionPane.showInputDialog(proj.getFrame(), Strings.get("jarClassNamePrompt"),
+					Strings.get("jarClassNameTitle"), JOptionPane.QUESTION_MESSAGE);
+			// if user canceled selection, abort
+			if (className == null)
+				return;
+		}
+
+		Library lib = proj.getLogisimFile().getLoader().loadJarLibrary(f, className);
+		if (lib != null) {
+			proj.doAction(LogisimFileActions.loadLibrary(lib));
+		}
+	}
+
+	private static void LoadLogisimLibrary(Project proj, File f) {
+		Library lib = proj.getLogisimFile().getLoader().loadLogisimLibrary(f);
+		if (lib != null) {
+			proj.doAction(LogisimFileActions.loadLibrary(lib));
 		}
 	}
 

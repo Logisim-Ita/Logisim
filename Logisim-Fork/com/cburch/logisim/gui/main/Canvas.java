@@ -291,12 +291,13 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 					return;
 				Startup.AsktoSave(proj.getFrame());
 				Startup.restart(Main.OpenedFiles.toArray(new String[0]));
-			} else if (AppPreferences.SEND_DATA.isSource(event)) {
-				if (AppPreferences.SEND_DATA.getBoolean())
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
-				else
-					Startup.runRemotePhpCode("http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0");
-			}
+			} /*
+				 * else if (AppPreferences.SEND_DATA.isSource(event)) { if
+				 * (AppPreferences.SEND_DATA.getBoolean()) Startup.runRemotePhpCode(
+				 * "http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=1");
+				 * else Startup.runRemotePhpCode(
+				 * "http://logisim.altervista.org/LogisimData/OnlineUsers/online.php?val=0"); }
+				 */
 		}
 	}
 
@@ -782,7 +783,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		AppPreferences.GATE_SHAPE.addPropertyChangeListener(myListener);
 		AppPreferences.ANTI_ALIASING.addPropertyChangeListener(myListener);
 		AppPreferences.FILL_COMPONENT_BACKGROUND.addPropertyChangeListener(myListener);
-		AppPreferences.SEND_DATA.addPropertyChangeListener(myListener);
+		// AppPreferences.SEND_DATA.addPropertyChangeListener(myListener);
 		AppPreferences.SHOW_TICK_RATE.addPropertyChangeListener(myListener);
 		AppPreferences.REFRESH_RATE.addPropertyChangeListener(myListener);
 		AppPreferences.LOOK_AND_FEEL.addPropertyChangeListener(myListener);

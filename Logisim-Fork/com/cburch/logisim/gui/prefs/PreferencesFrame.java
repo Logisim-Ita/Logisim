@@ -110,7 +110,8 @@ public class PreferencesFrame extends LFrame {
 		close.addActionListener(myListener);
 
 		Container contents = getContentPane();
-		tabbedPane.setPreferredSize(new Dimension(450, 300));
+		tabbedPane.setPreferredSize(new Dimension(400, 300));
+		setMinimumSize(new Dimension(420, 300));
 		contents.add(tabbedPane, BorderLayout.CENTER);
 		contents.add(buttonPanel, BorderLayout.SOUTH);
 
