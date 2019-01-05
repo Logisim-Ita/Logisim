@@ -163,9 +163,9 @@ public class Popups {
 			} else if (src == loadBuiltin) {
 				ProjectLibraryActions.doLoadBuiltinLibrary(proj);
 			} else if (src == loadLogisim) {
-				ProjectLibraryActions.doLoadLogisimLibrary(proj);
+				ProjectLibraryActions.LoadLogisimLibraryFromChooser(proj);
 			} else if (src == loadJar) {
-				ProjectLibraryActions.doLoadJarLibrary(proj);
+				ProjectLibraryActions.LoadJarLibraryFromChooser(proj);
 			}
 		}
 	}

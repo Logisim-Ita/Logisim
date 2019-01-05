@@ -101,8 +101,8 @@ public class Drawgates {
 		Graphics g = painter.getGraphics();
 		g.drawRect(x + 10, y + AbstractTtlGate.pinheight + 10, portnames.length * 10,
 				height - 2 * AbstractTtlGate.pinheight - 20);
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < portnames.length / 2; j++) {
+		for (byte i = 0; i < 2; i++) {
+			for (byte j = 0; j < portnames.length / 2; j++) {
 				GraphicsUtil.drawCenteredText(g, portnames[j + (i * 7)],
 						i == 0 ? x + 10 + j * 20 : x + 160 - j * 20 - 10,
 						y + height - AbstractTtlGate.pinheight - 7 - i * (height - 2 * AbstractTtlGate.pinheight - 11));

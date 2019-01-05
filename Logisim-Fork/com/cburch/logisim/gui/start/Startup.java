@@ -58,6 +58,14 @@ public class Startup {
 			startupTemp.doPrintFile(file);
 	}
 
+	private static String getFileExtension(File file) {
+		String fileName = file.getName();
+		if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+			return fileName.substring(fileName.lastIndexOf("."));
+		else
+			return "";
+	}
+
 	public static String getFilePath() {
 		try {
 			return URLDecoder.decode(
@@ -293,6 +301,19 @@ public class Startup {
 		}
 	}
 
+	/*
+	 * public static void runRemotePhpCode(String url) { URL URL; HttpURLConnection
+	 * conn; InputStream ir; try { URL = new URL(url); conn = (HttpURLConnection)
+	 * URL.openConnection(); conn.setRequestMethod("GET"); ir =
+	 * conn.getInputStream(); // BufferedReader br = new BufferedReader(new
+	 * InputStreamReader(ir)); // System.out.println(br.readLine()); ir.close(); }
+	 * catch (MalformedURLException e) { System.err.
+	 * println("The URL is malformed.\nPlease report this error to the software maintainer"
+	 * ); } catch (IOException e) { System.err.println(
+	 * "Although an Internet connection should be available, the system couldn't connect to the URL requested\nPlease contact the software maintainer"
+	 * ); } }
+	 */
+
 	public static void restart(String[] parameters) {
 		try {
 			String[] exexute = new String[3 + parameters.length];
@@ -307,19 +328,6 @@ public class Startup {
 			ex.printStackTrace();
 		}
 	}
-
-	/*
-	 * public static void runRemotePhpCode(String url) { URL URL; HttpURLConnection
-	 * conn; InputStream ir; try { URL = new URL(url); conn = (HttpURLConnection)
-	 * URL.openConnection(); conn.setRequestMethod("GET"); ir =
-	 * conn.getInputStream(); // BufferedReader br = new BufferedReader(new
-	 * InputStreamReader(ir)); // System.out.println(br.readLine()); ir.close(); }
-	 * catch (MalformedURLException e) { System.err.
-	 * println("The URL is malformed.\nPlease report this error to the software maintainer"
-	 * ); } catch (IOException e) { System.err.println(
-	 * "Although an Internet connection should be available, the system couldn't connect to the URL requested\nPlease contact the software maintainer"
-	 * ); } }
-	 */
 
 	private static void setLocale(String lang) {
 		Locale[] opts = Strings.getLocaleOptions();
@@ -346,10 +354,11 @@ public class Startup {
 	private boolean showSplash;
 	private boolean updatecanceled = false;
 	private UpdateScreen updatescreen = null;
-	private File loadFile;
 
+	private File loadFile;
 	private HashMap<File, File> substitutions = new HashMap<File, File>();
 	private int ttyFormat = 0;
+
 	// from other sources
 	private boolean initialized = false;
 
@@ -702,18 +711,24 @@ public class Startup {
 		// use that as the file to open now.
 		initialized = true;
 
-		/*
-		 * JOptionPane.showMessageDialog(null, getFolderPath() + "\\LogisimLibraries");
-		 * File folder = new File(getFolderPath() + "\\LogisimLibraries"); if
-		 * (folder.exists() && folder.isDirectory()) { File[] listOfFiles =
-		 * folder.listFiles(); for (int i = 0; i < listOfFiles.length; i++) { if
-		 * (listOfFiles[i].isFile()) { System.out.println("File " +
-		 * listOfFiles[i].getName()); } else if (listOfFiles[i].isDirectory()) {
-		 * System.out.println("Directory " + listOfFiles[i].getName()); } } } else {
-		 * JOptionPane.showMessageDialog(null, folder.mkdirs());
-		 * 
-		 * }
-		 */
+		if (AppPreferences.LOAD_LIBRARIES_FOLDER_AT_STARTUP.get()) {
+			File folder = AppPreferences.getLibrariesFolder();
+			if (folder != null && folder.exists() && folder.isDirectory()) {
+				File[] listOfFiles = folder.listFiles();
+				for (int i = 0; i < listOfFiles.length; i++) {
+					if (listOfFiles[i].canRead()) {
+						if (listOfFiles[i].isFile()) {
+							String extension = getFileExtension(listOfFiles[i]);
+							if (extension.equals(Loader.LOGISIM_EXTENSION) || extension.equals(Loader.JAR_EXTENSION))
+								System.out.println(listOfFiles[i].getName());
+						}
+					} else
+						System.err.println("Cannot read file " + listOfFiles[i].getName());
+				}
+			} else {
+				AppPreferences.setLibrariesFolder(null);
+			}
+		}
 
 		// load file
 		if (filesToOpen.isEmpty()) {

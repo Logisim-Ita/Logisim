@@ -84,26 +84,6 @@ public class ProjectLibraryActions {
 		}
 	}
 
-	public static void doLoadJarLibrary(Project proj) {
-		Loader loader = proj.getLogisimFile().getLoader();
-		JFileChooser chooser = loader.createChooser();
-		chooser.setDialogTitle(Strings.get("loadJarDialogTitle"));
-		chooser.setFileFilter(Loader.JAR_FILTER);
-		int check = chooser.showOpenDialog(proj.getFrame());
-		if (check == JFileChooser.APPROVE_OPTION)
-			LoadJarLibrary(proj, chooser.getSelectedFile());
-	}
-
-	public static void doLoadLogisimLibrary(Project proj) {
-		Loader loader = proj.getLogisimFile().getLoader();
-		JFileChooser chooser = loader.createChooser();
-		chooser.setDialogTitle(Strings.get("loadLogisimDialogTitle"));
-		chooser.setFileFilter(Loader.LOGISIM_FILTER);
-		int check = chooser.showOpenDialog(proj.getFrame());
-		if (check == JFileChooser.APPROVE_OPTION)
-			LoadLogisimLibrary(proj, chooser.getSelectedFile());
-	}
-
 	public static void doUnloadLibraries(Project proj) {
 		LogisimFile file = proj.getLogisimFile();
 		ArrayList<Library> canUnload = new ArrayList<Library>();
@@ -138,7 +118,7 @@ public class ProjectLibraryActions {
 		}
 	}
 
-	private static void LoadJarLibrary(Project proj, File f) {
+	public static void LoadJarLibrary(Project proj, File f) {
 		String className = null;
 
 		// try to retrieve the class name from the "Library-Class"
@@ -175,11 +155,31 @@ public class ProjectLibraryActions {
 		}
 	}
 
-	private static void LoadLogisimLibrary(Project proj, File f) {
+	public static void LoadJarLibraryFromChooser(Project proj) {
+		Loader loader = proj.getLogisimFile().getLoader();
+		JFileChooser chooser = loader.createChooser();
+		chooser.setDialogTitle(Strings.get("loadJarDialogTitle"));
+		chooser.setFileFilter(Loader.JAR_FILTER);
+		int check = chooser.showOpenDialog(proj.getFrame());
+		if (check == JFileChooser.APPROVE_OPTION)
+			LoadJarLibrary(proj, chooser.getSelectedFile());
+	}
+
+	public static void LoadLogisimLibrary(Project proj, File f) {
 		Library lib = proj.getLogisimFile().getLoader().loadLogisimLibrary(f);
 		if (lib != null) {
 			proj.doAction(LogisimFileActions.loadLibrary(lib));
 		}
+	}
+
+	public static void LoadLogisimLibraryFromChooser(Project proj) {
+		Loader loader = proj.getLogisimFile().getLoader();
+		JFileChooser chooser = loader.createChooser();
+		chooser.setDialogTitle(Strings.get("loadLogisimDialogTitle"));
+		chooser.setFileFilter(Loader.LOGISIM_FILTER);
+		int check = chooser.showOpenDialog(proj.getFrame());
+		if (check == JFileChooser.APPROVE_OPTION)
+			LoadLogisimLibrary(proj, chooser.getSelectedFile());
 	}
 
 	private ProjectLibraryActions() {

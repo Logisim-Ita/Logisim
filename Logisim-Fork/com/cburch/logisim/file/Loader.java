@@ -32,7 +32,7 @@ public class Loader implements LibraryLoader {
 	private static class JarFileFilter extends FileFilter {
 		@Override
 		public boolean accept(File f) {
-			return f.isDirectory() || f.getName().endsWith(".jar");
+			return f.isDirectory() || f.getName().endsWith(JAR_EXTENSION);
 		}
 
 		@Override
@@ -53,25 +53,11 @@ public class Loader implements LibraryLoader {
 		}
 	}
 
-	private static class LogisimLloFilter extends FileFilter {
-		@Override
-		public boolean accept(File f) {
-			return f.isDirectory() || f.getName().endsWith(LLO_EXTENSION);
-		}
-
-		@Override
-		public String getDescription() {
-			return Strings.get("lloFileFilter");
-		}
-	}
-
 	public static final String LOGISIM_EXTENSION = ".circ";
-
-	public static final String LLO_EXTENSION = ".llo";
 
 	public static final FileFilter LOGISIM_FILTER = new LogisimFileFilter();
 
-	public static final FileFilter LLO_FILTER = new LogisimLloFilter();
+	public static final String JAR_EXTENSION = ".jar";
 
 	public static final FileFilter JAR_FILTER = new JarFileFilter();
 

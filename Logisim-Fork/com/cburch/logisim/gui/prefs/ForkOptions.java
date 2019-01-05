@@ -32,20 +32,6 @@ class ForkOptions extends OptionsPanel {
 				if (action == JFileChooser.APPROVE_OPTION) {
 					File folder = chooser.getSelectedFile();
 					AppPreferences.setLibrariesFolder(folder);
-					/*
-					 * FileInputStream reader = null; InputStream reader2 = null; try { Loader
-					 * loader = new Loader(getPreferencesFrame()); reader = new
-					 * FileInputStream(file); Template template = Template.create(reader); reader2 =
-					 * template.createStream(); LogisimFile.load(reader2, loader); // to see if OK
-					 * AppPreferences.setTemplateFile(file, template);
-					 * AppPreferences.setTemplateType(AppPreferences.TEMPLATE_CUSTOM); } catch
-					 * (LoaderException ex) { } catch (IOException ex) {
-					 * JOptionPane.showMessageDialog(getPreferencesFrame(),
-					 * StringUtil.format(Strings.get("templateErrorMessage"), ex.toString()),
-					 * Strings.get("templateErrorTitle"), JOptionPane.ERROR_MESSAGE); } finally {
-					 * try { if (reader != null) reader.close(); } catch (IOException ex) { } try {
-					 * if (reader != null) reader2.close(); } catch (IOException ex) { } }
-					 */
 				}
 			} else if (src == loadLibrariesFolderAtStartup) {
 				boolean enabled = loadLibrariesFolderAtStartup.isSelected();

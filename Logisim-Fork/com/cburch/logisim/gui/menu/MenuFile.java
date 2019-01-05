@@ -31,7 +31,6 @@ class MenuFile extends Menu implements ActionListener {
 	private JMenuItem close = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
 	private JMenuItem saveAs = new JMenuItem();
-	private JMenuItem exportllo = new JMenuItem();
 	private MenuItemImpl print = new MenuItemImpl(this, LogisimMenuBar.PRINT);
 	private MenuItemImpl exportImage = new MenuItemImpl(this, LogisimMenuBar.EXPORT_IMAGE);
 	private JMenuItem prefs = new JMenuItem();
@@ -47,7 +46,6 @@ class MenuFile extends Menu implements ActionListener {
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask | InputEvent.SHIFT_DOWN_MASK));
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuMask));
 		saveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuMask | InputEvent.SHIFT_DOWN_MASK));
-		exportllo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, menuMask | InputEvent.SHIFT_DOWN_MASK));
 		print.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, menuMask));
 		quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuMask));
 
@@ -58,7 +56,6 @@ class MenuFile extends Menu implements ActionListener {
 		add(close);
 		add(save);
 		add(saveAs);
-		// add(exportllo);
 		addSeparator();
 		add(exportImage);
 		add(print);
@@ -82,7 +79,6 @@ class MenuFile extends Menu implements ActionListener {
 			close.addActionListener(this);
 			save.addActionListener(this);
 			saveAs.addActionListener(this);
-			exportllo.addActionListener(this);
 		}
 		menubar.registerItem(LogisimMenuBar.EXPORT_IMAGE, exportImage);
 		menubar.registerItem(LogisimMenuBar.PRINT, print);
@@ -109,9 +105,7 @@ class MenuFile extends Menu implements ActionListener {
 		} else if (src == save) {
 			ProjectActions.doSave(proj);
 		} else if (src == saveAs) {
-			ProjectActions.doSaveAs(proj, true);
-		} else if (src == exportllo) {
-			ProjectActions.doSaveAs(proj, false);
+			ProjectActions.doSaveAs(proj);
 		} else if (src == prefs) {
 			PreferencesFrame.showPreferences();
 		} else if (src == quit) {
@@ -133,7 +127,6 @@ class MenuFile extends Menu implements ActionListener {
 		close.setText(Strings.get("fileCloseItem"));
 		save.setText(Strings.get("fileSaveItem"));
 		saveAs.setText(Strings.get("fileSaveAsItem"));
-		exportllo.setText(Strings.get("Export as .llo"));
 		exportImage.setText(Strings.get("fileExportImageItem"));
 		print.setText(Strings.get("filePrintItem"));
 		prefs.setText(Strings.get("filePreferencesItem"));

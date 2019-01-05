@@ -21,9 +21,9 @@ class MenuProject extends Menu {
 			if (src == loadBuiltin) {
 				ProjectLibraryActions.doLoadBuiltinLibrary(proj);
 			} else if (src == loadLogisim) {
-				ProjectLibraryActions.doLoadLogisimLibrary(proj);
+				ProjectLibraryActions.LoadLogisimLibraryFromChooser(proj);
 			} else if (src == loadJar) {
-				ProjectLibraryActions.doLoadJarLibrary(proj);
+				ProjectLibraryActions.LoadJarLibraryFromChooser(proj);
 			} else if (src == unload) {
 				ProjectLibraryActions.doUnloadLibraries(proj);
 			} else if (src == options) {

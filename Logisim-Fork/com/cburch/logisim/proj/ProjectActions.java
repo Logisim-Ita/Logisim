@@ -265,7 +265,7 @@ public class ProjectActions {
 		Loader loader = proj.getLogisimFile().getLoader();
 		File f = loader.getMainFile();
 		if (f == null)
-			return doSaveAs(proj, true);
+			return doSaveAs(proj);
 		else
 			return doSave(proj, f);
 	}
@@ -284,14 +284,10 @@ public class ProjectActions {
 	}
 
 	// returns true if save is completed
-	public static boolean doSaveAs(Project proj, boolean iscirc) {
+	public static boolean doSaveAs(Project proj) {
 		Loader loader = proj.getLogisimFile().getLoader();
 		JFileChooser chooser = loader.createChooser();
-		if (iscirc) {
-			chooser.setFileFilter(Loader.LOGISIM_FILTER);
-			// chooser.addChoosableFileFilter(Loader.LLO_FILTER);
-		} else
-			chooser.setFileFilter(Loader.LLO_FILTER);
+		chooser.setFileFilter(Loader.LOGISIM_FILTER);
 		if (loader.getMainFile() != null) {
 			chooser.setSelectedFile(loader.getMainFile());
 		}
@@ -300,7 +296,7 @@ public class ProjectActions {
 			return false;
 
 		File f = chooser.getSelectedFile();
-		String circExt = iscirc ? Loader.LOGISIM_EXTENSION : Loader.LLO_EXTENSION;
+		String circExt = Loader.LOGISIM_EXTENSION;
 		if (!f.getName().endsWith(circExt)) {
 			String old = f.getName();
 			int ext0 = old.lastIndexOf('.');
