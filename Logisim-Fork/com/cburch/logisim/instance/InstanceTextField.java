@@ -136,7 +136,8 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		boolean wasReg = shouldRegister();
 		this.labelAttr = labelAttr;
 		this.fontAttr = fontAttr;
-		this.colorAttr = colorAttr;
+		if (colorAttr != null)
+			this.colorAttr = colorAttr;
 		this.fieldX = x;
 		this.fieldY = y;
 		this.halign = halign;

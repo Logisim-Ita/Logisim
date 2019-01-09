@@ -32,6 +32,7 @@ import com.cburch.logisim.file.Loader;
 import com.cburch.logisim.gui.main.Frame;
 import com.cburch.logisim.gui.main.Print;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
+import com.cburch.logisim.gui.menu.ProjectLibraryActions;
 import com.cburch.logisim.gui.menu.WindowManagers;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
@@ -711,6 +712,8 @@ public class Startup {
 		// use that as the file to open now.
 		initialized = true;
 
+		ArrayList<File> jarLibrariesFromDirectory = new ArrayList<File>();
+		ArrayList<File> logisimLibrariesFromDirectory = new ArrayList<File>();
 		if (AppPreferences.LOAD_LIBRARIES_FOLDER_AT_STARTUP.get()) {
 			File folder = AppPreferences.getLibrariesFolder();
 			if (folder != null && folder.exists() && folder.isDirectory()) {
@@ -719,27 +722,48 @@ public class Startup {
 					if (listOfFiles[i].canRead()) {
 						if (listOfFiles[i].isFile()) {
 							String extension = getFileExtension(listOfFiles[i]);
-							if (extension.equals(Loader.LOGISIM_EXTENSION) || extension.equals(Loader.JAR_EXTENSION))
-								System.out.println(listOfFiles[i].getName());
+							if (extension.equals(Loader.LOGISIM_EXTENSION))
+								logisimLibrariesFromDirectory.add(listOfFiles[i]);
+							else if (extension.equals(Loader.JAR_EXTENSION))
+								jarLibrariesFromDirectory.add(listOfFiles[i]);
 						}
 					} else
 						System.err.println("Cannot read file " + listOfFiles[i].getName());
 				}
 			} else {
 				AppPreferences.setLibrariesFolder(null);
+				AppPreferences.LOAD_LIBRARIES_FOLDER_AT_STARTUP.setBoolean(false);
 			}
 		}
 
 		// load file
 		if (filesToOpen.isEmpty()) {
-			ProjectActions.doNew(monitor, true);
+			Project p = ProjectActions.doNew(monitor, true);
+			if (!logisimLibrariesFromDirectory.isEmpty() || !jarLibrariesFromDirectory.isEmpty()) {
+				for (File f : logisimLibrariesFromDirectory) {
+					ProjectLibraryActions.LoadLogisimLibrary(p, f);
+				}
+				for (File f : jarLibrariesFromDirectory) {
+					ProjectLibraryActions.LoadJarLibrary(p, f);
+				}
+				p.setFileAsClean();
+			}
 			if (showSplash)
 				monitor.close();
 		} else {
 			boolean first = true;
 			for (File fileToOpen : filesToOpen) {
 				try {
-					ProjectActions.doOpen(monitor, fileToOpen, substitutions);
+					Project p = ProjectActions.doOpen(monitor, fileToOpen, substitutions);
+					if (!logisimLibrariesFromDirectory.isEmpty() || !jarLibrariesFromDirectory.isEmpty()) {
+						for (File f : logisimLibrariesFromDirectory) {
+							ProjectLibraryActions.LoadLogisimLibrary(p, f);
+						}
+						for (File f : jarLibrariesFromDirectory) {
+							ProjectLibraryActions.LoadJarLibrary(p, f);
+						}
+						p.setFileAsClean();
+					}
 				} catch (LoadFailedException ex) {
 					System.err.println(fileToOpen.getName() + ": " + ex.getMessage()); // OK
 					System.exit(-1);
