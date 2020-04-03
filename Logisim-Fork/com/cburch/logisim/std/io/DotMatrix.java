@@ -220,6 +220,12 @@ public class DotMatrix extends InstanceFactory {
 		Bounds bds = painter.getBounds();
 		boolean showState = painter.getShowState();
 		Graphics g = painter.getGraphics();
+		
+		if(!drawSquare) {
+			GraphicsUtil.switchToWidth(g, 2);
+			painter.drawRoundBounds(Color.WHITE);
+			GraphicsUtil.switchToWidth(g, 1);
+		}
 		int rows = data.rows;
 		int cols = data.cols;
 		for (int j = 0; j < rows; j++) {
@@ -248,12 +254,12 @@ public class DotMatrix extends InstanceFactory {
 			}
 		}
 		g.setColor(Color.BLACK);
-		GraphicsUtil.switchToWidth(g, 2);
-		if (drawSquare)
+		
+		if (drawSquare) {
+			GraphicsUtil.switchToWidth(g, 2);
 			painter.drawBounds(null);
-		else
-			painter.drawRoundBounds(null);
-		GraphicsUtil.switchToWidth(g, 1);
+			GraphicsUtil.switchToWidth(g, 1);
+		}
 		painter.drawPorts();
 	}
 
