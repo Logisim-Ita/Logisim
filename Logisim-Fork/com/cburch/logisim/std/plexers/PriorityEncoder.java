@@ -29,8 +29,10 @@ public class PriorityEncoder extends InstanceFactory {
 
 	public PriorityEncoder() {
 		super("Priority Encoder", Strings.getter("priorityEncoderComponent"));
-		setAttributes(new Attribute[] { StdAttr.FACING, Plexers.ATTR_SELECT, Plexers.ATTR_DISABLED },
-				new Object[] { Direction.EAST, BitWidth.create(3), Plexers.DISABLED_FLOATING });
+		setAttributes(
+				new Attribute[] { StdAttr.FACING, Plexers.ATTR_SELECT, Plexers.ATTR_DISABLED, Plexers.ATTR_NO_INPUT },
+				new Object[] { Direction.EAST, BitWidth.create(3), Plexers.DISABLED_FLOATING,
+						Plexers.DISABLED_FLOATING });
 		setKeyConfigurator(new BitWidthConfigurator(Plexers.ATTR_SELECT, 1, 5, 0));
 		setIconName("priencod.gif");
 		setFacingAttribute(StdAttr.FACING);
@@ -67,7 +69,7 @@ public class PriorityEncoder extends InstanceFactory {
 			updatePorts(instance);
 		} else if (attr == Plexers.ATTR_SELECT) {
 			updatePorts(instance);
-		} else if (attr == Plexers.ATTR_DISABLED) {
+		} else if (attr == Plexers.ATTR_DISABLED || attr == Plexers.ATTR_NO_INPUT) {
 			instance.fireInvalidated();
 		}
 	}
@@ -115,7 +117,9 @@ public class PriorityEncoder extends InstanceFactory {
 		int out = -1;
 		Value outDefault;
 		if (enabled) {
-			outDefault = Value.createUnknown(select);
+			Object opt = state.getAttributeValue(Plexers.ATTR_NO_INPUT);
+			Value base = opt == Plexers.DISABLED_ZERO ? Value.FALSE : Value.UNKNOWN;
+			outDefault = Value.repeat(base, select.getWidth());
 			for (int i = n - 1; i >= 0; i--) {
 				if (state.getPort(i) == Value.TRUE) {
 					out = i;

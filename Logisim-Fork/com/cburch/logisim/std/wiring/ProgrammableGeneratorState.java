@@ -233,7 +233,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			// if there are no digits the value is 0 and it isn't saved
 			if (onlynumber != "")
 				value = Integer.parseInt(onlynumber);
-			if (value >= 1) {
+			if (value >= 0) {
 				if (i % 2 == 0)
 					setdurationHigh(i / 2, value);
 				else

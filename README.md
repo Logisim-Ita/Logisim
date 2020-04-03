@@ -1,7 +1,7 @@
 # Logisim ITA
 Logisim is a digital circuit simulator, [originally available here](http://www.cburch.com/logisim/).<br><br>
 This is an italian fork based on the original Logisim version.<br>
-<b>[DOWNLOAD BUTTON AND CHANGELOG](http://logisim.altervista.org)</b><br>
+<b>[DOWNLOAD AND CHANGELOG](http://logisim.altervista.org)</b><br>
 <b>[CONTACT US](http://logisim.altervista.org/contacts.html)</b><br>
 <b>[PLUGINS](http://logisim.altervista.org/plugins.html)</b><br>
 <b>[USER TUTORIALS](http://logisim.altervista.org/userstutorial.php)</b><br>
@@ -44,6 +44,7 @@ This is an italian fork based on the original Logisim version.<br>
 * Press ESC or DEL to cancel "Add Tool" action, F1 opens Library Reference
 * TTY and Keyboard components can use 16-bit values (UTF-16)
 * Clock custom frequency
+* Priority Plexer "No Input" attribute
 * Joystick facing attribute
 * Sel location attribute for Bit Finder component
 * Added missing tooltips
@@ -66,6 +67,7 @@ This is an italian fork based on the original Logisim version.<br>
 	* Some random blue/red line caused by bad values refresh
 	* Some problem with high frequencies
 	* String attribute not calling attributechanged method while writing its value
+* Programmable Generator: trying to edit its values by clicking on "(click to edit)" is a bit buggy, use "Edit Contents" instead in menu by clicking with right mouse button
 ## Features we want to add
 * Solve dirty points when rotating
 * Add a new type of library

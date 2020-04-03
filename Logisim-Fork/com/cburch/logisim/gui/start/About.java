@@ -108,7 +108,7 @@ public class About {
 				panel.credits.setScroll((int) elapse);
 				panel.repaint();
 				try {
-					Thread.sleep(20);
+					Thread.sleep(1000 / Integer.parseInt(AppPreferences.REFRESH_RATE.get()));
 				} catch (InterruptedException ex) {
 				}
 			}

@@ -2,10 +2,15 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.15.0.2</jar_version>
+  <jar_version>2.16.0.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.15.0.2</exe_version>
+  <exe_version>2.16.0.0</exe_version>
   <changelog>
-* Added Label position to some components.
+* Compiled with Java 13
+* Fixed startup crash with new Java versions
+* Preferences / Fork / Loads Libraries From Folder At Startup
+* Added Priority Plexer "No Input" attribute
+* Can set 0 value in Programmable Generator
+* Cresits in About Menu move at set Window Refresh Rate preference
   </changelog>
 </logisim>

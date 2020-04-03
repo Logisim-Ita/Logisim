@@ -53,7 +53,7 @@ public class Main {
 	private final static double getVersion() {
 		String version = System.getProperty("java.version");
 		byte pos = (byte) version.indexOf('.', version.indexOf('.') + 1);
-		return Double.parseDouble(version.substring(0, pos));
+		return Double.parseDouble((pos != -1) ? version.substring(0, pos) : version);
 	}
 
 	public static void main(String[] args) throws Exception {
