@@ -143,14 +143,14 @@ class MenuSimulate extends Menu {
 				currentSim.setTickFrequency(freq);
 			if (isChoice) {
 				String Freq = (String) JOptionPane.showInputDialog(null,
-						Strings.get("EnterTickFrequency") + " (0-4096 Hz)", Strings.get("CustomFrequency"),
+						Strings.get("EnterTickFrequency") + " (0.25 - 4096 Hz)", Strings.get("CustomFrequency"),
 						JOptionPane.PLAIN_MESSAGE, null, null, (this.freq != -1 ? this.freq : ""));
 
 				if (Freq != null) {// not cancelled
 					try {
 						double convert = Math.round(Double.parseDouble(Freq) * 1000.0) / 1000.0;
 						// save only if it's in the range
-						if (convert > 0 && convert <= 4096) {
+						if (convert >= 0.25 && convert <= 4096) {
 							this.freq = convert;
 							if (currentSim != null)
 								currentSim.setTickFrequency(freq);

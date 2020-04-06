@@ -74,10 +74,8 @@ class SimulatorTicker extends Thread {
 				long nextTick = lastTick + millis;
 				int wait = (int) (nextTick - System.currentTimeMillis());
 				if (wait < 1)
-					wait = 1;
-				if (wait > 100)
-					wait = 100;
-				Thread.sleep(wait);
+					wait = 0;
+				Thread.sleep(wait / 2); // this is shit and this way can go like 4KHz don't know why
 			} catch (InterruptedException e) {
 			}
 		}

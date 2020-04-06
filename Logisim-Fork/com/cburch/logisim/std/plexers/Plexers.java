@@ -34,7 +34,7 @@ public class Plexers extends Library {
 			Strings.getter("plexerDisabledAttr"), new AttributeOption[] { DISABLED_FLOATING, DISABLED_ZERO });
 	public static final Attribute<AttributeOption> ATTR_NO_INPUT = Attributes.forOption("noInputState",
 			Strings.getter("plexerNoInputStateAttr"), new AttributeOption[] { DISABLED_FLOATING, DISABLED_ZERO });
-	
+
 	public static final Attribute<Boolean> ATTR_ENABLE = Attributes.forBoolean("enable",
 			Strings.getter("plexerEnableAttr"));
 
