@@ -115,6 +115,11 @@ class AboutCredits extends JComponent {
 				"\u041C\u043E\u0441\u043A\u043E\u0432\u0441\u043A\u0438\u0439 \u0433\u043E\u0441\u0443\u0434\u0430\u0440\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u0439"));
 		lines.add(new CreditsLine(2,
 				"\u0443\u043D\u0438\u0432\u0435\u0440\u0441\u0438\u0442\u0435\u0442 \u043F\u0435\u0447\u0430\u0442\u0438"));
+		lines.add(new CreditsLine(0, Strings.get("creditsRoleSimplifiedChinese")));
+		lines.add(new CreditsLine(1, "HUST Tiger"));
+		lines.add(new CreditsLine(2	, "\u751f\u4ea7\u961f\u7684\u5927\u841d\u535c"));
+		lines.add(new CreditsLine(2	, "\u4e2d\u56fd\u5927\u5b66\u6155\u8bfe\u300a\u8ba1\u7b97\u673a\u786c\u4ef6\u7cfb\u7edf\u8bbe\u8ba1\u300b"));
+		lines.add(new CreditsLine(2	, "Chenyang Chao"));
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleTesting")));
 		lines.add(new CreditsLine(1, "Ilia Lilov"));
 		lines.add(new CreditsLine(2,
