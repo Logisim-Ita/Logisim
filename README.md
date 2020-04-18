@@ -13,9 +13,9 @@ This is an italian fork based on the original Logisim version.<br>
 * Constantly supported and listening to all your suggestions/reports
 ## Changelog
 * Core Stuff:
-	* Italian and partial french translation!
+	* Italian, Simplified Chinese and partial french translation!
 	* Autoupdates!
-	* Compiled with Java 13
+	* Compiled with Java 14
 	* Complete new movement system with mouse dragging
 	* Auto center and Auto zoom when opening new files/circuits or with ctrl-0, double mouse wheel click and with the round button you'll see on the lower-right corner
 	* Almost infinite canvas, arrows will show you in what direction is the circuit if it's outside of your view

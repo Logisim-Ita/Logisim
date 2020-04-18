@@ -7,5 +7,6 @@
   <exe_version>2.16.1.0</exe_version>
   <changelog>
 * Added Simplified Chinese translation
+* Compiled with Jdk 14
   </changelog>
 </logisim>
