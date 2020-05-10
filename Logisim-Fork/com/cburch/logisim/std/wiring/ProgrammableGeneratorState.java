@@ -23,6 +23,7 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	Value sending = Value.FALSE;
 	private int[] durationHigh;
 	private int[] durationLow;
+	private boolean allZeros = false;
 	private String SavedData = "";
 	// number of clock ticks performed in the current state
 	private int ticks, currentstate;
@@ -166,17 +167,24 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	}
 
 	public int getStateTick() {
+		if (this.allZeros)
+			return -1;
 		return this.ticks;
 	}
 
 	public void incrementCurrentState() {
-		this.ticks = 1;
+		if (this.allZeros)
+			return;
+		this.ticks = 0;
 		this.currentstate++;
 		if (this.currentstate >= this.durationHigh.length)
 			this.currentstate = 0;
+		incrementTicks();
 	}
 
 	public void incrementTicks() {
+		if (this.allZeros)
+			return;
 		this.ticks++;
 		if (this.ticks > getdurationHighValue() + getdurationLowValue())
 			incrementCurrentState();
@@ -222,9 +230,11 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 	private void SaveValues(JTextField[] inputs) {
 		String onlynumber;
 		int value;
-		for (byte i = 0; i < inputs.length; i++) {
+		boolean allZeros = true;
+		byte i;
+		for (i = 0; i < inputs.length; i++) {
 			onlynumber = "";
-			value = 0;
+			value = -1;
 			// create a string composed by the digits of the text field
 			for (byte j = 0; j < inputs[i].getText().length(); j++) {
 				if (Character.isDigit(inputs[i].getText().charAt(j)))
@@ -234,12 +244,15 @@ public class ProgrammableGeneratorState implements InstanceData, Cloneable {
 			if (onlynumber != "")
 				value = Integer.parseInt(onlynumber);
 			if (value >= 0) {
+				if (value != 0)
+					allZeros = false;
 				if (i % 2 == 0)
 					setdurationHigh(i / 2, value);
 				else
 					setdurationLow(i / 2, value);
 			}
 		}
+		this.allZeros = allZeros;
 	}
 
 	public void setdurationHigh(int i, int value) {

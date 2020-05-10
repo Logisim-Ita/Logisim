@@ -302,9 +302,12 @@ public class ProgrammableGenerator extends InstanceFactory {
 	public static boolean tick(CircuitState circState, int ticks, Component comp) {
 		ProgrammableGeneratorState state = getState(comp, circState);
 		state.incrementTicks();
-		int durationHigh = state.getdurationHighValue();
 		int statetick = state.getStateTick();
-		Value desired = (statetick - 1 < durationHigh ? Value.TRUE : Value.FALSE);
+		Value desired = Value.UNKNOWN;
+		if (statetick > 0) {
+			int durationHigh = state.getdurationHighValue();
+			desired = (statetick - 1 < durationHigh ? Value.TRUE : Value.FALSE);
+		}
 		if (!state.sending.equals(desired)) {
 			state.sending = desired;
 			Instance.getInstanceFor(comp).fireInvalidated();
