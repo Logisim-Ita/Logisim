@@ -35,10 +35,13 @@ public class Drawgates {
 	}
 
 	static void paintDoubleInputgate(Graphics g, int xrightpin, int y, int xinput, int youtput, int portheight,
-			boolean up) {
+			boolean up, boolean rightToLeft) {
 		int[] yPoints, xPoints;
-		// rightmost input
-		xPoints = new int[] { xrightpin, xrightpin, xrightpin - 10, xrightpin - 10, xinput };
+		// rightmost input if !rightToLeft
+		if (!rightToLeft)
+			xPoints = new int[] { xrightpin, xrightpin, xrightpin - 10, xrightpin - 10, xinput };
+		else // leftmost input if !rightToLeft
+			xPoints = new int[] { xrightpin - 20, xrightpin - 20, xrightpin - 10, xrightpin - 10, xinput };
 		if (!up)
 			yPoints = new int[] { y + AbstractTtlGate.height - AbstractTtlGate.pinheight,
 					y + AbstractTtlGate.height - AbstractTtlGate.pinheight - (10 - AbstractTtlGate.pinheight),
@@ -50,8 +53,11 @@ public class Drawgates {
 					y + AbstractTtlGate.pinheight + (10 - AbstractTtlGate.pinheight), youtput - portheight / 3,
 					youtput - portheight / 3 };
 		g.drawPolyline(xPoints, yPoints, 5);
-		// leftmost input
-		xPoints = new int[] { xrightpin - 20, xrightpin - 20, xinput };
+		// leftmost input if !rightToLeft
+		if (!rightToLeft)
+			xPoints = new int[] { xrightpin - 20, xrightpin - 20, xinput };
+		else // rightmost input if rightToLeft
+			xPoints = new int[] { xrightpin, xrightpin, xinput };
 		if (!up)
 			yPoints = new int[] { y + AbstractTtlGate.height - AbstractTtlGate.pinheight, youtput - portheight / 3,
 					youtput - portheight / 3 };
@@ -79,12 +85,20 @@ public class Drawgates {
 		g.drawOval(x - 4, y - 2, 4, 4);
 	}
 
-	static void paintOr(Graphics g, int x, int y, boolean negated) {
-		if (negated)
-			paintNegatedOutput(g, x, y);
-		GraphicsUtil.drawCenteredArc(g, x - 14, y - 10, 17, -90, 54);
-		GraphicsUtil.drawCenteredArc(g, x - 14, y + 10, 17, 90, -54);
-		GraphicsUtil.drawCenteredArc(g, x - 28, y, 15, -27, 54);
+	static void paintOr(Graphics g, int x, int y, boolean negated, boolean rightToLeft) {
+		if (!rightToLeft) {
+			if (negated)
+				paintNegatedOutput(g, x, y);
+			GraphicsUtil.drawCenteredArc(g, x - 14, y - 10, 17, -90, 54);
+			GraphicsUtil.drawCenteredArc(g, x - 14, y + 10, 17, 90, -54);
+			GraphicsUtil.drawCenteredArc(g, x - 28, y, 15, -27, 54);
+		} else {
+			if (negated)
+				paintNegatedOutput(g, x - 4, y);
+			GraphicsUtil.drawCenteredArc(g, x + 14, y - 10, 17, -90, -54);
+			GraphicsUtil.drawCenteredArc(g, x + 14, y + 10, 17, 90, 54);
+			GraphicsUtil.drawCenteredArc(g, x + 28, y, 15, 153, 54);
+		}
 	}
 
 	static void paintOutputgate(Graphics g, int xpin, int y, int xoutput, int youtput, boolean up) {
@@ -120,8 +134,8 @@ public class Drawgates {
 		g.drawPolyline(xPoints, yPoints, 3);
 	}
 
-	static void paintXor(Graphics g, int x, int y, boolean negated) {
-		paintOr(g, x, y, negated);
+	static void paintXor(Graphics g, int x, int y, boolean negated, boolean rightToLeft) {
+		paintOr(g, x, y, negated, rightToLeft);
 		GraphicsUtil.drawCenteredArc(g, x - 32, y, 15, -27, 54);
 	}
 }

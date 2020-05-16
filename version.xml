@@ -2,10 +2,10 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.16.1.1</jar_version>
+  <jar_version>2.16.1.2</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.16.1.1</exe_version>
+  <exe_version>2.16.1.2</exe_version>
   <changelog>
-* Fixed a problem with zeros in programmable generator
+* TTL7402 pinout was wrong, sorry :/
   </changelog>
 </logisim>

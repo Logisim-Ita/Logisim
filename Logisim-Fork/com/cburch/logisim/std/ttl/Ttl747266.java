@@ -16,11 +16,11 @@ public class Ttl747266 extends AbstractTtlGate {
 		Graphics g = painter.getGraphics();
 		int portwidth = 18, portheight = 15;
 		int youtput = y + (up ? 20 : 40);
-		Drawgates.paintXor(g, x + 44, youtput, true);
+		Drawgates.paintXor(g, x + 44, youtput, true, false);
 		// output line
 		Drawgates.paintOutputgate(g, x + 50, y, x + 48, youtput, up);
 		// input lines
-		Drawgates.paintDoubleInputgate(g, x + 30, y, x + 44 - portwidth, youtput, portheight, up);
+		Drawgates.paintDoubleInputgate(g, x + 30, y, x + 44 - portwidth, youtput, portheight, up, false);
 	}
 
 	@Override

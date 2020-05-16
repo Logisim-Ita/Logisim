@@ -20,7 +20,7 @@ public class Ttl7408 extends AbstractTtlGate {
 		// output line
 		Drawgates.paintOutputgate(g, x + 50, y, x + 44, youtput, up);
 		// input lines
-		Drawgates.paintDoubleInputgate(g, x + 30, y, x + 44 - portwidth, youtput, portheight, up);
+		Drawgates.paintDoubleInputgate(g, x + 30, y, x + 44 - portwidth, youtput, portheight, up, false);
 	}
 
 	@Override
