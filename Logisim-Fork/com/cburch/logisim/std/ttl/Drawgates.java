@@ -40,7 +40,7 @@ public class Drawgates {
 		// rightmost input if !rightToLeft
 		if (!rightToLeft)
 			xPoints = new int[] { xrightpin, xrightpin, xrightpin - 10, xrightpin - 10, xinput };
-		else // leftmost input if !rightToLeft
+		else // leftmost input if rightToLeft
 			xPoints = new int[] { xrightpin - 20, xrightpin - 20, xrightpin - 10, xrightpin - 10, xinput };
 		if (!up)
 			yPoints = new int[] { y + AbstractTtlGate.height - AbstractTtlGate.pinheight,
