@@ -32,9 +32,9 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class Buzzer extends InstanceFactory {
 	private static class Data implements InstanceData {
 		private AtomicBoolean is_on = new AtomicBoolean(false);
-		private final int SAMPLE_RATE = 44100;
-		private double hz = 523;
-		private double vol = 12;
+		private final int SAMPLE_RATE = 80000;
+		private int hz = 523;
+		private float vol = 12;
 		private Thread thread;
 
 		public Data() {
@@ -53,8 +53,8 @@ public class Buzzer extends InstanceFactory {
 			thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					SourceDataLine line = null;
 					AudioFormat format = new AudioFormat(SAMPLE_RATE, 8, 1, true, true);
+					SourceDataLine line = null;
 					try {
 						line = AudioSystem.getSourceDataLine(format);
 						line.open(format, SAMPLE_RATE / 10);
@@ -65,10 +65,20 @@ public class Buzzer extends InstanceFactory {
 					}
 					line.start();
 					byte[] audioData = new byte[1];
+					int framesPerWavelength = Math.round(SAMPLE_RATE / (float) hz);
+					int oldHz = hz;
 					while (is_on.get()) {
-						for (int i = 0; is_on.get() && i < SAMPLE_RATE * 2; i += 2) {
-							audioData[0] = (byte) Math.round(Math.sin(Math.PI * i * hz / SAMPLE_RATE) * vol);
-							line.write(audioData, 0, 1);
+						if (hz > 0 && vol > 0) {
+							for (int i = 0; i < framesPerWavelength; i++) {
+								if (oldHz != hz) {
+									float WavePoint = i / (float) framesPerWavelength;
+									framesPerWavelength = Math.round(SAMPLE_RATE / (float) hz);
+									i = Math.round(framesPerWavelength * WavePoint);
+									oldHz = hz;
+								}
+								audioData[0] = (byte) Math.round(Math.sin(2 * Math.PI * i / framesPerWavelength) * vol);
+								line.write(audioData, 0, 1);
+							}
 						}
 					}
 					line.stop();
@@ -187,6 +197,8 @@ public class Buzzer extends InstanceFactory {
 		} else if (attr == VOLUME_WIDTH) {
 			updateports(instance);
 			computeTextField(instance);
+		} else if (attr == FREQUENCY_MEASURE) {
+			instance.fireInvalidated();
 		}
 	}
 
@@ -242,7 +254,7 @@ public class Buzzer extends InstanceFactory {
 		if (state.getPort(VOL).isFullyDefined()) {
 			int vol = state.getPort(VOL).toIntValue();
 			byte VolumeWidth = (byte) state.getAttributeValue(VOLUME_WIDTH).getWidth();
-			d.vol = ((vol & 0xffffffffL) * 127) / (Math.pow(2, VolumeWidth) - 1);
+			d.vol = (float) (((vol & 0xffffffffL) * 127) / (Math.pow(2, VolumeWidth) - 1));
 		}
 		if (active && !d.thread.isAlive())
 			d.StartThread();
@@ -253,10 +265,10 @@ public class Buzzer extends InstanceFactory {
 		byte VolumeWidth = (byte) instance.getAttributeValue(VOLUME_WIDTH).getWidth();
 		Port[] p = new Port[3];
 		if (dir == Direction.EAST || dir == Direction.WEST) {
-			p[FREQ] = new Port(0, -10, Port.INPUT, 14);
+			p[FREQ] = new Port(0, -10, Port.INPUT, 12);
 			p[VOL] = new Port(0, 10, Port.INPUT, VolumeWidth);
 		} else {
-			p[FREQ] = new Port(-10, 0, Port.INPUT, 14);
+			p[FREQ] = new Port(-10, 0, Port.INPUT, 12);
 			p[VOL] = new Port(10, 0, Port.INPUT, VolumeWidth);
 		}
 		p[ENABLE] = new Port(0, 0, Port.INPUT, 1);
