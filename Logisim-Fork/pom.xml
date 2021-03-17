@@ -4,13 +4,102 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
-    <artifactId>Logisim-Fork</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <groupId>logisimit</groupId>
+    <artifactId>Logisim</artifactId>
+    <version>TTL7402</version>
 
     <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
-    
+
+    <build>
+        <finalName>Logisim</finalName>
+
+        <resources>
+            <resource>
+                <targetPath>resources/logisim</targetPath>
+                <directory>${basedir}/src/main/java/resources/logisim</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+
+                <configuration>
+                    <archive>
+                        <manifestFile>src/main/java/resources/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifestFile>src/main/java/resources/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/javax.help/javahelp -->
+        <dependency>
+            <groupId>javax.help</groupId>
+            <artifactId>javahelp</artifactId>
+            <version>2.0.05</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.roydesign/mrjadapter -->
+        <dependency>
+            <groupId>net.roydesign</groupId>
+            <artifactId>mrjadapter</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.connectina.swing</groupId>
+            <version>latest</version>
+            <artifactId>fontchooser</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.bric</groupId>
+          <artifactId>colorpicker</artifactId>
+          <version>1.3.1</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>clojars</id>
+            <url>https://repo.clojars.org/</url>
+        </repository>
+
+        <repository>
+            <id>libs</id>
+            <url>file://${project.basedir}/libs</url>
+        </repository>
+    </repositories>
 </project>
