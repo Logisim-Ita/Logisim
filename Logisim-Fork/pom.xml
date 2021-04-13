@@ -21,7 +21,11 @@
         <resources>
             <resource>
                 <targetPath>resources/logisim</targetPath>
-                <directory>${basedir}/src/main/java/resources/logisim</directory>
+                <directory>${project.basedir}/src/main/java/resources/logisim</directory>
+            </resource>
+            <resource>
+                <targetPath>doc</targetPath>
+                <directory>${project.basedir}/doc</directory>
             </resource>
         </resources>
 
