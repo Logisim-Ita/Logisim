@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 
 import com.cburch.logisim.Main;
+import com.cburch.logisim.plugin.PluginLoader;
 import com.cburch.logisim.std.Builtin;
 import com.cburch.logisim.tools.Library;
 import com.cburch.logisim.util.JFileChoosers;
@@ -135,6 +136,11 @@ public class Loader implements LibraryLoader {
 	// helper methods
 	//
 	File getFileFor(String name, FileFilter filter) {
+		//Check if the library is in plugin list
+        String ret=PluginLoader.check(name);
+        if(ret!=null) {
+        	name=ret;
+        }
 		// Determine the actual file name.
 		File file = new File(name);
 		if (!file.isAbsolute()) {

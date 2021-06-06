@@ -34,6 +34,9 @@ import com.cburch.logisim.gui.main.Print;
 import com.cburch.logisim.gui.menu.LogisimMenuBar;
 import com.cburch.logisim.gui.menu.ProjectLibraryActions;
 import com.cburch.logisim.gui.menu.WindowManagers;
+import com.cburch.logisim.plugin.PluginFolder;
+import com.cburch.logisim.plugin.PluginPreferences;
+import com.cburch.logisim.plugin.PluginUtils;
 import com.cburch.logisim.prefs.AppPreferences;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.proj.ProjectActions;
@@ -593,6 +596,7 @@ public class Startup {
 				this.updatescreen.setVisible(false);
 			return "An error occured while retrieving remote file (local size != remote size), download corrupted.\nIf the error persist, please contact the software maintainer";
 		}
+		
 
 		// Open stream for local Jar and write data
 		FileOutputStream destinationFile;
@@ -651,6 +655,12 @@ public class Startup {
 	}
 
 	public void run() {
+        //Create or Verify Logisim Folder
+        PluginFolder.createFolder();
+        //Check if plugin autoUpdate is enabled and if yes update all. Restart is required by dialog
+        if (PluginPreferences.getBoleanPreference(PluginPreferences.AUTO_UPDATE)) {
+                PluginUtils.updateAllPlugin();
+        }
 		if (isTty) {
 			try {
 				TtyInterface.run(this);
@@ -739,6 +749,10 @@ public class Startup {
 		// load file
 		if (filesToOpen.isEmpty()) {
 			Project p = ProjectActions.doNew(monitor, true);
+            //Check if auto Load Plugin is enabled
+            if (PluginPreferences.getBoleanPreference(PluginPreferences.AUTO_LOAD)) {
+                    PluginUtils.loadAllPlugin(p);
+            }
 			if (!logisimLibrariesFromDirectory.isEmpty() || !jarLibrariesFromDirectory.isEmpty()) {
 				for (File f : logisimLibrariesFromDirectory) {
 					ProjectLibraryActions.LoadLogisimLibrary(p, f);
@@ -755,6 +769,10 @@ public class Startup {
 			for (File fileToOpen : filesToOpen) {
 				try {
 					Project p = ProjectActions.doOpen(monitor, fileToOpen, substitutions);
+                    //Check if auto Load Plugin is enabled
+                    if (PluginPreferences.getBoleanPreference(PluginPreferences.AUTO_LOAD)) {
+                            PluginUtils.loadAllPlugin(p);
+                    }
 					if (!logisimLibrariesFromDirectory.isEmpty() || !jarLibrariesFromDirectory.isEmpty()) {
 						for (File f : logisimLibrariesFromDirectory) {
 							ProjectLibraryActions.LoadLogisimLibrary(p, f);
