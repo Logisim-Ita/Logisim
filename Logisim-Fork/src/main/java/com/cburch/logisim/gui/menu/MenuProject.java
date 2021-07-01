@@ -10,6 +10,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.cburch.logisim.gui.plugin.PluginFrame;
+import com.cburch.logisim.plugin.PluginLoader;
+import com.cburch.logisim.plugin.PluginUtils;
 import com.cburch.logisim.proj.Project;
 
 class MenuProject extends Menu {
@@ -18,7 +21,9 @@ class MenuProject extends Menu {
 		public void actionPerformed(ActionEvent event) {
 			Object src = event.getSource();
 			Project proj = menubar.getProject();
-			if (src == loadBuiltin) {
+			if (src == plugin) {
+				 PluginFrame.showPlugin();
+			}else if (src == loadBuiltin) {
 				ProjectLibraryActions.doLoadBuiltinLibrary(proj);
 			} else if (src == loadLogisim) {
 				ProjectLibraryActions.LoadLogisimLibraryFromChooser(proj);
@@ -29,6 +34,10 @@ class MenuProject extends Menu {
 			} else if (src == options) {
 				JFrame frame = proj.getOptionsFrame(true);
 				frame.setVisible(true);
+				
+            }else if(src instanceof JMenuItem){
+	            String text = ((JMenuItem) src).getText();
+	            PluginLoader.add(text,proj);
 			}
 		}
 	}
@@ -42,6 +51,9 @@ class MenuProject extends Menu {
 	private MyListener myListener = new MyListener();
 
 	private MenuItemImpl addCircuit = new MenuItemImpl(this, LogisimMenuBar.ADD_CIRCUIT);
+    private JMenuItem plugin = new JMenuItem();
+    private JMenu loadInternaPlugin = new JMenu();
+    private JMenuItem[] array = PluginUtils.makeArray();
 	private JMenu loadLibrary = new JMenu();
 	private JMenuItem loadBuiltin = new JMenuItem();
 	private JMenuItem loadLogisim = new JMenuItem();
@@ -64,6 +76,7 @@ class MenuProject extends Menu {
 		this.menubar = menubar;
 
 		menubar.registerItem(LogisimMenuBar.ADD_CIRCUIT, addCircuit);
+		plugin.addActionListener(myListener);
 		loadBuiltin.addActionListener(myListener);
 		loadLogisim.addActionListener(myListener);
 		loadJar.addActionListener(myListener);
@@ -80,12 +93,20 @@ class MenuProject extends Menu {
 		menubar.registerItem(LogisimMenuBar.ANALYZE_CIRCUIT, analyze);
 		menubar.registerItem(LogisimMenuBar.CIRCUIT_STATS, stats);
 		options.addActionListener(myListener);
-
+		
+        if (array!=null) {
+        	for (int i = 0; i < array.length; i++) {
+        		loadInternaPlugin.add(array[i]);
+        		array[i].addActionListener(myListener);
+            }
+        }
 		loadLibrary.add(loadBuiltin);
 		loadLibrary.add(loadLogisim);
 		loadLibrary.add(loadJar);
 
 		add(addCircuit);
+        add(plugin);
+        add(loadInternaPlugin);
 		add(loadLibrary);
 		add(unload);
 		addSeparator();
@@ -106,6 +127,7 @@ class MenuProject extends Menu {
 		add(options);
 
 		boolean known = menubar.getProject() != null;
+		loadInternaPlugin.setEnabled(known&&array!=null);
 		loadLibrary.setEnabled(known);
 		loadBuiltin.setEnabled(known);
 		loadLogisim.setEnabled(known);
@@ -127,6 +149,8 @@ class MenuProject extends Menu {
 	public void localeChanged() {
 		setText(Strings.get("projectMenu"));
 		addCircuit.setText(Strings.get("projectAddCircuitItem"));
+		plugin.setText(Strings.get("projectPluginItem"));
+        loadInternaPlugin.setText(Strings.get("projectLoadInternalPlugin"));
 		loadLibrary.setText(Strings.get("projectLoadLibraryItem"));
 		loadBuiltin.setText(Strings.get("projectLoadBuiltinItem"));
 		loadLogisim.setText(Strings.get("projectLoadLogisimItem"));
