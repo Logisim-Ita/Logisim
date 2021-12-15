@@ -102,7 +102,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 			createField(comp.getAttributeSet(), "");
 		String text = field.getText();
 		if (text == null || text.equals("") || Fromdoubleclick)
-			return field.getCaret(g, 0);
+			return field.getCaret(g, 0, 0);
 
 		Bounds bds = field.getBounds(g);
 		if (bds.getWidth() < 4 || bds.getHeight() < 4) {
@@ -154,7 +154,7 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 
 	private void updateField(AttributeSet attrs) {
 		String text = attrs.getValue(labelAttr);
-		if (text == null || text.equals("")) {
+		if (text == null /*|| text.equals("")------->necessary?*/) { 
 			if (field != null) {
 				field.removeTextFieldListener(this);
 				field = null;
