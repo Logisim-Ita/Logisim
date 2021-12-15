@@ -30,6 +30,7 @@ public class TextField {
 	private Font font;
 	private Color color;
 	private String text = "";
+	private int longestWidth = 0;
 	private LinkedList<TextFieldListener> listeners = new LinkedList<TextFieldListener>();
 
 	public TextField(int x, int y, int halign, int valign) {
@@ -62,7 +63,7 @@ public class TextField {
 		int x = this.x;
 		int y = this.y;
 		FontMetrics fm = g.getFontMetrics();
-		int width = fm.stringWidth(text);
+		int width = longestWidth;
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
 		switch (halign) {
@@ -110,7 +111,7 @@ public class TextField {
 			fm = g.getFontMetrics();
 		else
 			fm = g.getFontMetrics(font);
-		int width = fm.stringWidth(text);
+		int width = longestWidth;
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
 		switch (halign) {
@@ -225,6 +226,12 @@ public class TextField {
 			TextFieldEvent e = new TextFieldEvent(this, this.text, text);
 			this.text = text;
 			fireTextChanged(e);
+		}
+	}
+	
+	public void setCurrentLongestWidth(int longestWidth) {
+		if (longestWidth != this.longestWidth) {
+			this.longestWidth = longestWidth;
 		}
 	}
 
