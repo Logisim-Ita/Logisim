@@ -23,6 +23,10 @@
                 <targetPath>resources/logisim</targetPath>
                 <directory>${basedir}/src/main/java/resources/logisim</directory>
             </resource>
+            <resource>
+                <targetPath>doc</targetPath>
+                <directory>${basedir}/doc</directory>
+            </resource>
         </resources>
 
         <plugins>
