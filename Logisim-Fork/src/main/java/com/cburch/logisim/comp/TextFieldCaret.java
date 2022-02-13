@@ -16,9 +16,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Location;
+import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Caret;
 import com.cburch.logisim.tools.CaretEvent;
 import com.cburch.logisim.tools.CaretListener;
+import com.cburch.logisim.tools.TextEditable;
 
 class TextFieldCaret implements Caret, TextFieldListener {
 	private LinkedList<CaretListener> listeners = new LinkedList<CaretListener>();
@@ -27,7 +30,8 @@ class TextFieldCaret implements Caret, TextFieldListener {
 	private String oldText;
 	private String curText;
 	private int posx;
-	private int posy=0;
+	private int posy = 0;
+	private static final String LINE_SEPARATOR = "$";
 	private List<String> lines = new ArrayList<>();
 	
 	public TextFieldCaret(TextField field, Graphics g, int posx) {
@@ -38,6 +42,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		this.posx = posx;
 
 		field.addTextFieldListener(this);
+		refreshLines(); //If there is already the TextField (i.e. double click editing) sync lines list
 	}
 
 	public TextFieldCaret(TextField field, Graphics g, int x, int y) {
@@ -50,15 +55,13 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		listeners.add(l);
 	}
 	
-	private int getLongestWidth(List<String> arr, FontMetrics fm) {
+	public int getLongestWidth(FontMetrics fm) {
 		int longestWidth = 0;
-
-		for (String i : arr) {
+		for (String i : lines) {
 			if (fm.stringWidth(i) > longestWidth) {
 				longestWidth = fm.stringWidth(i); 
 			}
 		}
-		field.setCurrentLongestWidth( longestWidth ); //Update the longestWidth attribute in TextField class 
 		return longestWidth;
 	}
 	
@@ -70,6 +73,18 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		}
 		pos+=posx;
 		return pos;
+	}
+	
+
+	private void refreshLines() {
+		if (curText.contains(LINE_SEPARATOR) && !field.getEditMode()) {
+			lines = Arrays.asList(curText.split("\\"+LINE_SEPARATOR, -1)); //-1 is to include also empty tokens
+			field.setLinesSize(lines.size()); //Sync with TextField class
+		}
+		else {		
+			lines = new ArrayList<>(); //Empty the list
+			lines.add(curText);
+		}
 	}
 
 	@Override
@@ -107,9 +122,10 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		int x = field.getX();
 		int y = field.getY();
 		FontMetrics fm = g.getFontMetrics();
-		int width = getLongestWidth(lines, fm);
+		int width = getLongestWidth(fm);
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
+		
 		switch (field.getHAlign()) {
 		case TextField.H_CENTER:
 			x -= width / 2;
@@ -136,16 +152,9 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		default:
 			break;
 		}
-		if (curText.contains("\n")) {
-			lines = Arrays.asList(curText.split("\\n", -1)); //-1 is to include also empty tokens
-			for (int i=0; i<lines.size(); i++) {
-				g.drawString(lines.get(i), x, y+(i*ascent));
-			}
-		}
-		else {		
-			lines = new ArrayList<>(); //Empty the list
-			lines.add(curText);
-			g.drawString(curText, x, y);
+		refreshLines();
+		for (int i=0; i<lines.size(); i++) {
+			g.drawString(lines.get(i), x, y+(i*ascent));
 		}
 		g.setColor(Color.BLACK);
 		// draw cursor
@@ -153,6 +162,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			x += fm.stringWidth(lines.get(posy).substring(0, posx));
 		y += (posy*ascent);
 		g.drawLine(x, y + descent, x, y - ascent);
+	
 	}
 
 	@Override
@@ -165,8 +175,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			fm = g.getFontMetrics();
 		else
 			fm = g.getFontMetrics(font);
-		
-		int width = getLongestWidth(lines, fm);
+		int width = getLongestWidth(fm);
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
 		int height = ascent*lines.size() + descent; 
@@ -206,7 +215,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		int absPos;
+		int absPos = getAbsolutePosition(lines, posx, posy);
 		int ign = InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK;
 		if ((e.getModifiersEx() & ign) != 0)
 			return;
@@ -262,13 +271,24 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			posx = 0;
 			posy = 0;
 			break;
-//		case KeyEvent.VK_ENTER:
-//			stopEditing(); -------------> necessary?
-//			break;
+		case KeyEvent.VK_ENTER:
+			if (e.isShiftDown() && !field.getEditMode())
+			{
+				if (absPos < curText.length()) {
+					curText = curText.substring(0, absPos) + LINE_SEPARATOR + curText.substring(absPos);
+				} else {				
+					curText += LINE_SEPARATOR;
+				}
+				++posy;
+				posx=0;
+				field.setText(curText);
+			}
+			else
+			{
+				stopEditing(); 	
+			}
+			break;
 		case KeyEvent.VK_BACK_SPACE:
-			
-			absPos = getAbsolutePosition(lines, posx, posy);
-
 			if (absPos > 0) {
 				curText = curText.substring(0, absPos-1) + curText.substring(absPos);
 				field.setText(curText);
@@ -285,10 +305,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			}
 			
 			break;
-		case KeyEvent.VK_DELETE:
-			
-			absPos = getAbsolutePosition(lines, posx, posy);
-			
+		case KeyEvent.VK_DELETE:	
 			if (absPos < curText.length()) {
 				curText = curText.substring(0, absPos) + curText.substring(absPos + 1);
 				field.setText(curText);
@@ -317,17 +334,8 @@ class TextFieldCaret implements Caret, TextFieldListener {
 			return;
 
 		char c = e.getKeyChar();
-		if (c == '\n' && e.isShiftDown()) {
-			if (absPos < curText.length()) {
-				curText = curText.substring(0, absPos) + '\n' + curText.substring(absPos);
-			} else {				
-				curText += '\n';
-			}
-			++posy;
-			posx=0;
-			field.setText(curText);
-		} else if (c == '\n') {
-			stopEditing();
+		if (c == '\n' || c == LINE_SEPARATOR.charAt(0)) {
+			; //Avoid \n character concatenation to the string, see the KeyPressed() method above for the newline handling
 		} else if (c != KeyEvent.CHAR_UNDEFINED && !Character.isISOControl(c)) {
 			if (absPos < curText.length()) {
 				curText = curText.substring(0, absPos) + c + curText.substring(absPos);
