@@ -16,12 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Location;
-import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.tools.Caret;
 import com.cburch.logisim.tools.CaretEvent;
 import com.cburch.logisim.tools.CaretListener;
-import com.cburch.logisim.tools.TextEditable;
 
 class TextFieldCaret implements Caret, TextFieldListener {
 	private LinkedList<CaretListener> listeners = new LinkedList<CaretListener>();
