@@ -30,7 +30,9 @@ public class TextField {
 	private Font font;
 	private Color color;
 	private String text = "";
+	private int nLines = 1; 
 	private int longestWidth = 0;
+	private boolean singleLineEditMode = false;
 	private LinkedList<TextFieldListener> listeners = new LinkedList<TextFieldListener>();
 
 	public TextField(int x, int y, int halign, int valign) {
@@ -54,6 +56,7 @@ public class TextField {
 	}
 
 	public void draw(Graphics g) {
+		singleLineEditMode = true; 
 		Font oldFont = g.getFont();
 		Color oldColor = g.getColor();
 		if (font != null)
@@ -63,7 +66,8 @@ public class TextField {
 		int x = this.x;
 		int y = this.y;
 		FontMetrics fm = g.getFontMetrics();
-		int width = longestWidth;
+		requestLongestWidth(fm);
+		int width = ( longestWidth == 0 && fm.stringWidth(text) > 0) ? longestWidth = fm.stringWidth(text) : longestWidth; //if longestWidth is zero but stringWidth(text) is > 0 requestLongestWidth() didn't find any TextFieldCaret object
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
 		switch (halign) {
@@ -111,9 +115,11 @@ public class TextField {
 			fm = g.getFontMetrics();
 		else
 			fm = g.getFontMetrics(font);
+		requestLongestWidth(fm);
 		int width = longestWidth;
 		int ascent = fm.getAscent();
 		int descent = fm.getDescent();
+		int height = ascent*nLines + descent; 
 		switch (halign) {
 		case TextField.H_CENTER:
 			x -= width / 2;
@@ -140,13 +146,21 @@ public class TextField {
 		default:
 			break;
 		}
-		return Bounds.create(x, y - ascent, width, ascent + descent);
+		return Bounds.create(x, y - ascent, width, height);
 	}
 
 	public TextFieldCaret getCaret(Graphics g, int pos) {
 		return new TextFieldCaret(this, g, pos);
 	}
 
+	
+	private void requestLongestWidth(FontMetrics fm) {
+		for (TextFieldListener l : new ArrayList<TextFieldListener>(listeners)) {
+			if (l instanceof TextFieldCaret) 
+				longestWidth = ( (TextFieldCaret) l).getLongestWidth(fm);
+		}
+	}
+	
 	//
 	// graphics methods
 	//
@@ -229,10 +243,14 @@ public class TextField {
 		}
 	}
 	
-	public void setCurrentLongestWidth(int longestWidth) {
-		if (longestWidth != this.longestWidth) {
-			this.longestWidth = longestWidth;
+	public void setLinesSize(int nLines) {
+		if (nLines != this.nLines) {
+			this.nLines = nLines;
 		}
+	}
+	
+	public boolean getEditMode() {
+		return singleLineEditMode;
 	}
 
 	public void setVertAlign(int valign) {

@@ -109,6 +109,7 @@ public class TextTool extends Tool {
 			if (Fromdoubleclick)
 				resetEditTool();
 		}
+
 	}
 
 	private static Cursor cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);

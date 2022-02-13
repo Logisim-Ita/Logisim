@@ -23,6 +23,7 @@ public class GraphicsUtil {
 	public static final int V_BASELINE = 1;
 	public static final int V_BOTTOM = 2;
 	public static final int V_CENTER_OVERALL = 3;
+	private static final String LINE_SEPARATOR = "$";
 	private static List<String> lines = new ArrayList<>();
 
 	private static int getLongestWidth(List<String> arr, FontMetrics fm) {
@@ -101,8 +102,8 @@ public class GraphicsUtil {
 	static public Rectangle getTextBounds(Graphics g, String text, int x, int y, int halign, int valign) {
 		if (g == null)
 			return new Rectangle(x, y, 0, 0);
-		if (text.contains("\n")) {
-			lines = Arrays.asList(text.split("\\n", -1));
+		if (text.contains(LINE_SEPARATOR)) {
+			lines = Arrays.asList(text.split("\\"+LINE_SEPARATOR, -1));
 		} 
 		else {
 			lines = new ArrayList<>();
