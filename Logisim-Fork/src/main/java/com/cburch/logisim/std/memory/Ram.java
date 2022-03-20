@@ -150,9 +150,9 @@ public class Ram extends Mem {
 			new AttributeOption[] { BUS_COMBINED, BUS_ASYNCH, BUS_SEPARATE });
 
 	private static Attribute<?>[] ATTRIBUTES = { Mem.ADDR_ATTR, Mem.DATA_ATTR, StdAttr.LABEL, StdAttr.LABEL_FONT,
-			StdAttr.ATTR_LABEL_COLOR, ATTR_BUS, Mem.ATTR_SELECTION };
+			StdAttr.ATTR_LABEL_COLOR, ATTR_BUS, Mem.ATTR_SELECTION, Mem.SIMPLE_MODE };
 	private static Object[] DEFAULTS = { BitWidth.create(8), BitWidth.create(8), "", StdAttr.DEFAULT_LABEL_FONT,
-			Color.BLACK, BUS_COMBINED, Mem.SEL_LOW };
+			Color.BLACK, BUS_COMBINED, Mem.SEL_LOW, Boolean.TRUE };
 	private static final int OE = MEM_INPUTS + 0;
 	private static final int CLR = MEM_INPUTS + 1;
 	private static final int CLK = MEM_INPUTS + 2;
@@ -275,14 +275,18 @@ public class Ram extends Mem {
 		Object busVal = painter.getAttributeValue(ATTR_BUS);
 		boolean asynch = busVal == null ? false : busVal.equals(BUS_ASYNCH);
 		boolean separate = busVal == null ? false : busVal.equals(BUS_SEPARATE);
-
+		boolean isSimple = painter.getAttributeValue(Mem.SIMPLE_MODE);
+		
 		if (!asynch)
 			painter.drawClock(CLK, Direction.NORTH);
-		painter.drawPort(OE, Strings.get("ramOELabel"), Direction.SOUTH);
-		painter.drawPort(CLR, Strings.get("ramClrLabel"), Direction.SOUTH);
+		if (!separate)
+			painter.drawPort(OE, Strings.get("ramOELabel"), Direction.SOUTH);
+		if (!isSimple)
+			painter.drawPort(CLR, Strings.get("ramClrLabel"), Direction.SOUTH);
 
 		if (separate) {
-			painter.drawPort(WE, Strings.get("ramWELabel"), Direction.SOUTH);
+			if (!isSimple)
+				painter.drawPort(WE, Strings.get("ramWELabel"), Direction.SOUTH);
 			painter.getGraphics().setColor(Color.BLACK);
 			painter.drawPort(DIN, Strings.get("ramDataLabel"), Direction.EAST);
 		}

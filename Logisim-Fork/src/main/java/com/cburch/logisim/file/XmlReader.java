@@ -478,6 +478,28 @@ class XmlReader {
 					}
 				}
 			}
+			// compatibility for new RAM and ROM layout
+			if (version.compareTo(LogisimVersion.get(2, 16, 1, 4)) < 0) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null) {
+						if (compElt.getAttribute("name").equals("RAM")) {
+							boolean simpleMode = true;
+							// check if the attribute is already defined
+							for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+								if (attrElt.getAttribute("name").equals("simpleMode"))
+									simpleMode = false;
+							}
+							// if these attributes are not defined, set them to match with old default value
+							if (simpleMode) {
+								Element sizeattribute = doc.createElement("a");
+								sizeattribute.setAttribute("name", "simpleMode");
+								sizeattribute.setAttribute("val", "false");
+								compElt.appendChild(sizeattribute);
+							}
+						}
+					}
+				}
+			}
 			// compatibility for new ff layout
 			if (version.compareTo(LogisimVersion.get(2, 10, 0, 0)) < 0) {
 				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {

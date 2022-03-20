@@ -20,7 +20,7 @@ import com.cburch.logisim.proj.Project;
 class RomAttributes extends AbstractAttributeSet {
 
 	private static List<Attribute<?>> ATTRIBUTES = Arrays.asList(new Attribute<?>[] { Mem.ADDR_ATTR, Mem.DATA_ATTR,
-			StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, Rom.CONTENTS_ATTR, Mem.ATTR_SELECTION });
+			StdAttr.LABEL, StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR, Rom.CONTENTS_ATTR, Mem.ATTR_SELECTION, Mem.SIMPLE_MODE });
 
 	private static WeakHashMap<MemContents, RomContentsListener> listenerRegistry = new WeakHashMap<MemContents, RomContentsListener>();
 	private static WeakHashMap<MemContents, HexFrame> windowRegistry = new WeakHashMap<MemContents, HexFrame>();
@@ -51,7 +51,8 @@ class RomAttributes extends AbstractAttributeSet {
 	private Font labelfont = StdAttr.DEFAULT_LABEL_FONT;
 	private Color labelcolor = Color.BLACK;
 	AttributeOption sel = Mem.SEL_LOW;
-
+	private Boolean isSimple = Boolean.TRUE;
+	
 	RomAttributes() {
 		contents = MemContents.create(addrBits.getWidth(), dataBits.getWidth());
 	}
@@ -66,6 +67,7 @@ class RomAttributes extends AbstractAttributeSet {
 		d.labelcolor = labelcolor;
 		d.contents = contents.clone();
 		d.sel = sel;
+		d.isSimple = isSimple;
 	}
 
 	@Override
@@ -89,6 +91,8 @@ class RomAttributes extends AbstractAttributeSet {
 			return (V) contents;
 		if (attr == Mem.ATTR_SELECTION)
 			return (V) sel;
+		if (attr == Mem.SIMPLE_MODE)
+			return (V) isSimple;
 		return null;
 	}
 
@@ -114,6 +118,8 @@ class RomAttributes extends AbstractAttributeSet {
 			contents = (MemContents) value;
 		} else if (attr == Mem.ATTR_SELECTION) {
 			sel = (AttributeOption) value;
+		} else if (attr == Mem.SIMPLE_MODE) {
+			isSimple = (Boolean) value;
 		}
 		fireAttributeValueChanged(attr, value);
 	}
