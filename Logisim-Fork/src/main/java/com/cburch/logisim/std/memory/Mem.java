@@ -76,6 +76,8 @@ abstract class Mem extends InstanceFactory {
 
 	static final Attribute<AttributeOption> ATTR_SELECTION = Attributes.forOption("Select",
 			Strings.getter("ramSelAttr"), new AttributeOption[] { SEL_HIGH, SEL_LOW });
+	static final Attribute<Boolean> SIMPLE_MODE = Attributes.forBoolean("simpleMode",
+			Strings.getter("memSimpleMode"));
 	// port-related constants
 	static final int DATA = 0;
 	static final int ADDR = 1;
@@ -187,7 +189,9 @@ abstract class Mem extends InstanceFactory {
 		painter.drawPort(DATA, Strings.get("ramDataLabel"), Direction.WEST);
 		painter.drawPort(ADDR, Strings.get("ramAddrLabel"), Direction.EAST);
 		g.setColor(Color.GRAY);
-		painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
+		boolean isSimple = painter.getAttributeValue(Mem.SIMPLE_MODE).booleanValue();
+		if (!isSimple)
+			painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
 		painter.drawLabel();
 	}
 
