@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.instance.InstanceTextField;
 import com.cburch.logisim.util.GraphicsUtil;
+import com.cburch.logisim.util.StringGetter;
 
 public class TextField {
 	public static final int H_LEFT = GraphicsUtil.H_LEFT;
@@ -158,6 +160,13 @@ public class TextField {
 		for (TextFieldListener l : new ArrayList<TextFieldListener>(listeners)) {
 			if (l instanceof TextFieldCaret) 
 				longestWidth = ( (TextFieldCaret) l).getLongestWidth(fm);
+		}
+	}
+	
+	public void infoMessage(StringGetter message) {
+		for (TextFieldListener l : new ArrayList<TextFieldListener>(listeners)) {
+			if (l instanceof InstanceTextField) 
+				((InstanceTextField) l).setInfoMessage(message);
 		}
 	}
 	

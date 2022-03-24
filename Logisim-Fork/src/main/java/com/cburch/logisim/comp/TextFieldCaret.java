@@ -19,6 +19,7 @@ import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.tools.Caret;
 import com.cburch.logisim.tools.CaretEvent;
 import com.cburch.logisim.tools.CaretListener;
+import com.cburch.logisim.comp.Strings;
 
 class TextFieldCaret implements Caret, TextFieldListener {
 	private LinkedList<CaretListener> listeners = new LinkedList<CaretListener>();
@@ -40,6 +41,10 @@ class TextFieldCaret implements Caret, TextFieldListener {
 
 		field.addTextFieldListener(this);
 		refreshLines(); //If there is already the TextField (i.e. double click editing) sync lines list
+		
+		if (!field.getEditMode()) {
+			field.infoMessage(Strings.getter("MultilineTip"));
+		}
 	}
 
 	public TextFieldCaret(TextField field, Graphics g, int x, int y) {
@@ -395,6 +400,7 @@ class TextFieldCaret implements Caret, TextFieldListener {
 		for (CaretListener l : new ArrayList<CaretListener>(listeners)) {
 			l.editingStopped(e);
 		}
+		field.infoMessage(null);
 		field.removeTextFieldListener(this);
 	}
 

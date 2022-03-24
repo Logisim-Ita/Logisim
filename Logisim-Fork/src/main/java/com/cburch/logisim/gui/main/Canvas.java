@@ -184,6 +184,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		@Override
 		public void mousePressed(MouseEvent e) {
 			viewport.setErrorMessage(null, null);
+			viewport.setInfoMessage(null, null);
 			if (proj.isStartupScreen()) {
 				Graphics g = getGraphics();
 				Bounds bounds;
@@ -383,6 +384,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			int act = event.getAction();
 			if (act == ProjectEvent.ACTION_SET_CURRENT) {
 				viewport.setErrorMessage(null, null);
+				viewport.setInfoMessage(null, null);
 				if (painter.getHaloedComponent() != null) {
 					proj.getFrame().viewComponentAttributes(null, null);
 				}
@@ -399,6 +401,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 				}
 			} else if (act == ProjectEvent.ACTION_SET_TOOL) {
 				viewport.setErrorMessage(null, null);
+				viewport.setInfoMessage(null, null);
 
 				Tool t = event.getTool();
 				if (t == null)
@@ -458,7 +461,9 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		 */
 		private static final long serialVersionUID = -7658870263931307849L;
 		StringGetter errorMessage = null;
+		StringGetter infoMessage = null;
 		Color errorColor = DEFAULT_ERROR_COLOR;
+		Color infoColor = DEFAULT_INFO_COLOR;
 		String widthMessage = null;
 		boolean isNorth = false;
 		boolean isSouth = false;
@@ -514,8 +519,16 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			}
 
 			StringGetter message = errorMessage;
+			
 			if (message != null) {
 				g.setColor(errorColor);
+				paintString(g, message.get());
+				return;
+			}
+			
+			message = infoMessage;
+			if (message != null) {
+				g.setColor(infoColor);
 				paintString(g, message.get());
 				return;
 			}
@@ -595,6 +608,8 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		}
 
 		void setErrorMessage(StringGetter msg, Color color) {
+			if (infoMessage != null) //Error has priority
+				setInfoMessage(null, null);
 			if (errorMessage != msg) {
 				errorMessage = msg;
 				errorColor = color == null ? DEFAULT_ERROR_COLOR : color;
@@ -602,6 +617,16 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			}
 		}
 
+		void setInfoMessage(StringGetter msg, Color color) {
+			if (errorMessage == null) { //Error has priority
+				if (infoMessage != msg) {
+					infoMessage = msg;
+					infoColor = color == null ? DEFAULT_INFO_COLOR : color;
+					paintThread.requestRepaint();
+				}
+			}
+		}		
+		
 		void setNorth(boolean value) {
 			isNorth = value;
 		}
@@ -650,6 +675,7 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 			| InputEvent.BUTTON3_DOWN_MASK;
 
 	public static final Color DEFAULT_ERROR_COLOR = new Color(192, 0, 0);
+	public static final Color DEFAULT_INFO_COLOR = new Color(0, 0, 0);
 	public static final Color TICK_RATE_COLOR = Color.GRAY;
 
 	private static final Font TICK_RATE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
@@ -901,6 +927,10 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 
 	public StringGetter getErrorMessage() {
 		return viewport.errorMessage;
+	}
+	
+	public StringGetter getInfoMessage() {
+		return viewport.infoMessage;
 	}
 
 	GridPainter getGridPainter() {
@@ -1193,6 +1223,14 @@ public class Canvas extends JPanel implements LocaleListener, CanvasPaneContents
 		viewport.setErrorMessage(message, color);
 	}
 
+	public void setInfoMessage(StringGetter message) {
+		viewport.setInfoMessage(message, null);
+	}	
+	
+	public void setInfoMessage(StringGetter message, Color color) {
+		viewport.setInfoMessage(message, color);
+	}	
+	
 	void setHaloedComponent(Circuit circ, Component comp) {
 		painter.setHaloedComponent(circ, comp);
 	}

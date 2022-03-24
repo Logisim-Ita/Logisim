@@ -25,6 +25,7 @@ import com.cburch.logisim.proj.Action;
 import com.cburch.logisim.tools.Caret;
 import com.cburch.logisim.tools.SetAttributeAction;
 import com.cburch.logisim.tools.TextEditable;
+import com.cburch.logisim.util.StringGetter;
 
 public class InstanceTextField implements AttributeListener, TextFieldListener, TextEditable {
 	private Canvas canvas;
@@ -72,6 +73,10 @@ public class InstanceTextField implements AttributeListener, TextFieldListener, 
 		field.addTextFieldListener(this);
 	}
 
+	public void setInfoMessage(StringGetter message) {
+		canvas.setInfoMessage(message);
+	}
+	
 	void draw(Component comp, ComponentDrawContext context) {
 		if (field != null) {
 			Graphics g = context.getGraphics().create();
