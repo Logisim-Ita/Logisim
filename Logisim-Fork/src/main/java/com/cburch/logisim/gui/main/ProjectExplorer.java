@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -435,7 +436,22 @@ public class ProjectExplorer extends JTree implements LocaleListener {
 			if (parent == proj.getLogisimFile()) {
 				return ((Library) parent).getElements();
 			} else if (parent instanceof Library) {
-				return ((Library) parent).getTools();
+				List<?> tools =((Library) parent).getTools();
+				List<AddTool> list = new ArrayList(Arrays.asList(tools.toArray()));
+				for (int i=0; i<list.size();i++) {
+					
+					try {
+						AddTool tool =((AddTool) list.get(i));
+						Boolean isVisible=tool.getFactoryDescription().isVisible();
+						if(!isVisible) {
+							list.remove(i);
+							i--;
+						}
+					} catch (Exception e) {
+					}
+				}
+				//list.remove(0);
+				return list;
 			} else {
 				return Collections.EMPTY_LIST;
 			}

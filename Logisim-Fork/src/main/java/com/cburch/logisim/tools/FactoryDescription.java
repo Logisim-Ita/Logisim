@@ -39,6 +39,7 @@ public class FactoryDescription {
 	private boolean factoryLoadAttempted;
 	private ComponentFactory factory;
 	private StringGetter toolTip;
+	private Boolean visible=true;
 
 	public FactoryDescription(String name, StringGetter displayName, Icon icon, String factoryClassName) {
 		this(name, displayName, factoryClassName);
@@ -66,6 +67,15 @@ public class FactoryDescription {
 		this.icon = null;
 	}
 
+	public FactoryDescription(String name, StringGetter displayName, String iconName, String factoryClassName,Boolean visible) {
+		this(name, displayName, factoryClassName);
+		this.iconName = iconName;
+		this.iconLoadAttempted = false;
+		this.icon = null;
+		this.visible=visible;
+		
+	}
+	
 	public String getDisplayName() {
 		return displayName.get();
 	}
@@ -136,6 +146,10 @@ public class FactoryDescription {
 
 	public boolean isFactoryLoaded() {
 		return factoryLoadAttempted;
+	}
+	
+	public Boolean isVisible() {
+		return visible;
 	}
 
 	public FactoryDescription setToolTip(StringGetter getter) {
