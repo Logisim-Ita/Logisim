@@ -189,9 +189,7 @@ abstract class Mem extends InstanceFactory {
 		painter.drawPort(DATA, Strings.get("ramDataLabel"), Direction.WEST);
 		painter.drawPort(ADDR, Strings.get("ramAddrLabel"), Direction.EAST);
 		g.setColor(Color.GRAY);
-		boolean isSimple = painter.getAttributeValue(Mem.SIMPLE_MODE).booleanValue();
-		if (!isSimple)
-			painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
+		painter.drawPort(CS, Strings.get("ramCSLabel"), Direction.SOUTH);
 		painter.drawLabel();
 	}
 
