@@ -92,6 +92,8 @@ class AboutCredits extends JComponent {
 		lines.add(new CreditsLine(1, "www.logisim.altervista.org"));
 		lines.add(new CreditsLine(0, Strings.get("creditsRoleLead")));
 		lines.add(new CreditsLine(1, "Andrea Sanguineti"));
+		lines.add(new CreditsLine(1, "Andrea Albanese"));
+		lines.add(new CreditsLine(1, "Alessio Giardina"));
 		lines.add(new CreditsLine(2, "Samuele Capani"));
 		lines.add(new CreditsLine(2, "Angelo Sterlini"));
 		lines.add(new CreditsLine(2, "Theldo Cruz Franqueira"));
