@@ -10,6 +10,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GraphicsUtil {
 	public static final int H_LEFT = -1;
@@ -20,7 +23,20 @@ public class GraphicsUtil {
 	public static final int V_BASELINE = 1;
 	public static final int V_BOTTOM = 2;
 	public static final int V_CENTER_OVERALL = 3;
+	private static final String LINE_SEPARATOR = "$";
+	private static List<String> lines = new ArrayList<>();
 
+	private static int getLongestWidth(List<String> arr, FontMetrics fm) {
+		int longestWidth = 0;
+
+		for (String i : arr) {
+			if (fm.stringWidth(i) > longestWidth) {
+				longestWidth = fm.stringWidth(i); 
+			}
+		}
+		return longestWidth;
+	}
+	
 	static public void drawArrow(Graphics g, int x0, int y0, int x1, int y1, int headLength, int headAngle) {
 		double offs = headAngle * Math.PI / 180.0;
 		double angle = Math.atan2(y0 - y1, x0 - x1);
@@ -66,7 +82,9 @@ public class GraphicsUtil {
 		if (text.length() == 0)
 			return;
 		Rectangle bd = getTextBounds(g, text, x, y, halign, valign);
-		g.drawString(text, bd.x, bd.y + g.getFontMetrics().getAscent());
+		for (int i=1; i<=lines.size(); i++) {
+			g.drawString(lines.get(i-1), bd.x, bd.y + (i*g.getFontMetrics().getAscent()));
+		}
 	}
 
 	static public Rectangle getTextBounds(Graphics g, Font font, String text, int x, int y, int halign, int valign) {
@@ -84,11 +102,18 @@ public class GraphicsUtil {
 	static public Rectangle getTextBounds(Graphics g, String text, int x, int y, int halign, int valign) {
 		if (g == null)
 			return new Rectangle(x, y, 0, 0);
+		if (text.contains(LINE_SEPARATOR)) {
+			lines = Arrays.asList(text.split("\\"+LINE_SEPARATOR, -1));
+		} 
+		else {
+			lines = new ArrayList<>();
+			lines.add(text);
+		}
 		FontMetrics mets = g.getFontMetrics();
-		int width = mets.stringWidth(text);
+		int width = getLongestWidth(lines, mets);
 		int ascent = mets.getAscent();
 		int descent = mets.getDescent();
-		int height = ascent + descent;
+		int height = ascent*lines.size() + descent;
 
 		Rectangle ret = new Rectangle(x, y, width, height);
 		switch (halign) {
