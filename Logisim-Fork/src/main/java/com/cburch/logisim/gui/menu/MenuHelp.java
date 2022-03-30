@@ -83,7 +83,7 @@ class MenuHelp extends JMenu implements ActionListener {
 			showHelp("libs");
 		} else if (src == bug) {
 			try {
-				Desktop.getDesktop().browse(new URI("https://github.com/LogisimIt/Logisim/issues"));
+				Desktop.getDesktop().browse(new URI("https://github.com/Logisim-Ita/Logisim/issues"));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} catch (URISyntaxException e1) {

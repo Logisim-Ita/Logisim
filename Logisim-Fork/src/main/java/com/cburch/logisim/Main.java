@@ -42,7 +42,7 @@ public class Main {
 	public static final short COPYRIGHT_YEAR = (short) Calendar.getInstance().get(Calendar.YEAR);
 
 	/* URL for the automatic updater */
-	public static final String UPDATE_URL = "https://raw.githubusercontent.com/LogisimIt/Logisim/master/version.xml";
+	public static final String UPDATE_URL = "https://raw.githubusercontent.com/Logisim-Ita/Logisim/master/version.xml";
 
 	public static final double JAVA_VERSION = getVersion();
 
