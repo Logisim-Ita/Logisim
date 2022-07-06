@@ -26,6 +26,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
@@ -44,16 +46,18 @@ public class Main {
 	/* URL for the automatic updater */
 	public static final String UPDATE_URL = "https://raw.githubusercontent.com/Logisim-Ita/Logisim/master/version.xml";
 
-	public static final double JAVA_VERSION = getVersion();
+	public static final int JAVA_MAJOR_VERSION = getMajorVersion();
 
 	// here will be saved the file in use to reopen when restarting
 	public static ArrayList<String> OpenedFiles = new ArrayList<String>();
 
 	// get the runtinme java version
-	private final static double getVersion() {
+	private final static int getMajorVersion() {
 		String version = System.getProperty("java.version");
-		byte pos = (byte) version.indexOf('.', version.indexOf('.') + 1);
-		return Double.parseDouble((pos != -1) ? version.substring(0, pos) : version);
+		Pattern pattern = Pattern.compile("^(\\d)+.*");
+		Matcher matcher = pattern.matcher(version);
+		matcher.find();
+		return Integer.parseInt(matcher.group(1));
 	}
 
 	public static void main(String[] args) throws Exception {

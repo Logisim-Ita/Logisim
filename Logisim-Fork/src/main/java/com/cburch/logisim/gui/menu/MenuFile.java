@@ -40,7 +40,7 @@ class MenuFile extends Menu implements ActionListener {
 		this.menubar = menubar;
 		openRecent = new OpenRecent(menubar);
 
-		int menuMask = (Main.JAVA_VERSION < 10.0) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
+		int menuMask = (Main.JAVA_MAJOR_VERSION < 10) ? 128 : getToolkit().getMenuShortcutKeyMaskEx();
 		newi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuMask));
 		open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuMask));
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, menuMask | InputEvent.SHIFT_DOWN_MASK));
