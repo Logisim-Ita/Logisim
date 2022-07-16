@@ -114,7 +114,7 @@ class LayoutToolbarModel extends AbstractToolbarModel {
 			if (index <= 10) {
 				if (index == 10)
 					index = 0;
-				int mask = (Main.JAVA_VERSION < 10.0) ? 128 : frame.getToolkit().getMenuShortcutKeyMaskEx();
+				int mask = (Main.JAVA_MAJOR_VERSION < 10) ? 128 : frame.getToolkit().getMenuShortcutKeyMaskEx();
 				ret += " (" + InputEventUtil.toKeyDisplayString(mask) + "-" + index + ")";
 			}
 			return ret;
