@@ -22,6 +22,8 @@ import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
 
+import static java.lang.Character.isDigit;
+
 public class Analyze {
 
 	/*
@@ -212,8 +214,11 @@ public class Analyze {
 		ArrayList<Instance> pinList = new ArrayList<Instance>(ret.keySet());
 		HashSet<String> labelsTaken = new HashSet<String>();
 		for (Instance pin : pinList) {
+			// Struttura nomina pin e out di analizza tabaella (Qui la "label" è ancora giusta)
 			String label = pin.getAttributeSet().getValue(StdAttr.LABEL);
+			System.out.println(label);
 			label = toValidLabel(label);
+			System.out.println(label);
 			if (label != null) {
 				if (labelsTaken.contains(label)) {
 					int i = 2;
@@ -299,6 +304,7 @@ public class Analyze {
 	 */
 
 	private static String toValidLabel(String label) {
+		System.out.println("Label: " + label + "\nLabel len: " + label.length());
 		if (label == null)
 			return null;
 		StringBuilder end = null;
@@ -321,8 +327,14 @@ public class Analyze {
 				} else {
 					if (end == null)
 						end = new StringBuilder();
-					end.append(c);
+					if(isDigit(c)) {
+						end.append(c);
+						System.out.println("Ret digit: " + ret);
+					} else {
+						end.append(c);
+					}
 				}
+				System.out.println("Primo elseif");
 				afterWhitespace = false;
 			} else if (Character.isWhitespace(c)) {
 				afterWhitespace = true;
@@ -332,8 +344,10 @@ public class Analyze {
 		}
 		if (end != null && ret.length() > 0)
 			ret.append(end.toString());
-		if (ret.length() == 0)
+		if (ret.length() == 0) {
+			System.out.println("Uscito con null\nEnd: " + end.toString() + "\nRet: " + ret.toString() + "\nRet length: " + ret.length());
 			return null;
+		}
 		return ret.toString();
 	}
 
