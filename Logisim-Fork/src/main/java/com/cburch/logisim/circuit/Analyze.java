@@ -303,8 +303,8 @@ public class Analyze {
 	 * throw new AnalyzeException.Conflict(); } } expressionMap.put(p2, e); } } } }
 	 */
 
+	// Metodo che controlla il nome delle etichette (specialmente per l'analizza circuito)
 	private static String toValidLabel(String label) {
-		System.out.println("Label: " + label + "\nLabel len: " + label.length());
 		if (label == null)
 			return null;
 		StringBuilder end = null;
@@ -327,14 +327,8 @@ public class Analyze {
 				} else {
 					if (end == null)
 						end = new StringBuilder();
-					if(isDigit(c)) {
-						end.append(c);
-						System.out.println("Ret digit: " + ret);
-					} else {
-						end.append(c);
-					}
+					end.append(c);
 				}
-				System.out.println("Primo elseif");
 				afterWhitespace = false;
 			} else if (Character.isWhitespace(c)) {
 				afterWhitespace = true;
@@ -343,9 +337,10 @@ public class Analyze {
 			}
 		}
 		if (end != null && ret.length() > 0)
-			ret.append(end.toString());
-		if (ret.length() == 0) {
-			System.out.println("Uscito con null\nEnd: " + end.toString() + "\nRet: " + ret.toString() + "\nRet length: " + ret.length());
+			ret.append(end);
+		if (ret.length() == 0 && end != null) {
+			return end.toString();
+		} else if(ret.length() == 0) {
 			return null;
 		}
 		return ret.toString();
