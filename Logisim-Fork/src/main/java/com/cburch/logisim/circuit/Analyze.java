@@ -216,9 +216,7 @@ public class Analyze {
 		for (Instance pin : pinList) {
 			// Struttura nomina pin e out di analizza tabaella (Qui la "label" è ancora giusta)
 			String label = pin.getAttributeSet().getValue(StdAttr.LABEL);
-			System.out.println(label);
 			label = toValidLabel(label);
-			System.out.println(label);
 			if (label != null) {
 				if (labelsTaken.contains(label)) {
 					int i = 2;
@@ -305,6 +303,24 @@ public class Analyze {
 
 	// Metodo che controlla il nome delle etichette (specialmente per l'analizza circuito)
 	private static String toValidLabel(String label) {
+		boolean letter = false;						// false = nella label non ci sono lettere
+		for(int i = 0; i < label.length(); i++) {	// Passa per tutta la label
+			char c = label.charAt(i);
+			if(c != ' ') {							// Se non è uno spazio
+				letter = true;						// è una lettera
+				label = label.trim();				// Toglie tutti gli spazi extra iniziali e finali
+				break;								// Esci dal loop
+			}
+		}
+		if(!letter)									// Se non sono state trovate lettere
+			return null;							// Restituisci null
+		else
+			return label;							// Restituisci la label
+	}
+
+	/*
+	// Vecchio metodo per validare le stringhe
+	private static String toValidLabel(String label) {
 		if (label == null)
 			return null;
 		StringBuilder end = null;
@@ -345,6 +361,7 @@ public class Analyze {
 		}
 		return ret.toString();
 	}
+	 */
 
 	private Analyze() {
 	}
