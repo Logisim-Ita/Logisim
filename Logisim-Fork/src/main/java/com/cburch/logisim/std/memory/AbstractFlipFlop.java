@@ -367,7 +367,7 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		} else {
 			throw new RuntimeException("flip-flop input > 2");
 		}
-
+	// QUi
 		if (instance.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
 			ps[numInputs + STD_PORTS + enable] = new Port(-bds.getWidth(), newlayout ? 0 : 10 * (numInputs - 1),
 					Port.INPUT, 1);
