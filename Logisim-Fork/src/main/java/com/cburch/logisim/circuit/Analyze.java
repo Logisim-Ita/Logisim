@@ -3,12 +3,15 @@
 
 package com.cburch.logisim.circuit;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.analyze.model.Entry;
@@ -21,8 +24,9 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
+import com.cburch.logisim.util.StringUtil;
 
-import static java.lang.Character.isDigit;
+import static java.lang.Character.*;
 
 public class Analyze {
 
@@ -303,19 +307,21 @@ public class Analyze {
 
 	// Metodo che controlla il nome delle etichette (specialmente per l'analizza circuito)
 	private static String toValidLabel(String label) {
-		boolean letter = false;						// false = nella label non ci sono lettere
-		for(int i = 0; i < label.length(); i++) {	// Passa per tutta la label
-			char c = label.charAt(i);
-			if(c != ' ') {							// Se non è uno spazio
-				letter = true;						// è una lettera
-				label = label.trim();				// Toglie tutti gli spazi extra iniziali e finali
-				break;								// Esci dal loop
+		StringBuilder buildLabel = new StringBuilder();	// StringBuilder per tenere la stringa in costruzione
+		// Questi sono i caratteri speciali proibiti. Sono semplicemente tutti quei finti spazi.
+		String invalidChars = "         \u200B\u200C\u200D\u200E\u200F\u202A\u202B\u202C\u202D\u202E \u206A\u206B\u206C\u206E\u206D\u206E\u206F  ";
+		label = StringUtils.strip(label, invalidChars);	// Toglie dalla stringa tutti i caratteri proibiti
+		for(int i = 0; i < label.length(); i++) {		// Passa per tutta la label
+			char c = label.charAt(i);					// Carattere a posizione i
+			if(isLetterOrDigit(c) || c == ' ') { 		// Controlla se è una lettera, un numero o uno spazio
+				buildLabel.append(c);					// Nel caso lo aggiunge alla stringa in costruzione
 			}
 		}
-		if(!letter)									// Se non sono state trovate lettere
-			return null;							// Restituisci null
-		else
-			return label;							// Restituisci la label
+		String newLabel = buildLabel.toString().trim();	// Trasforma la stringa costruita in una stringa trimmata
+		if(newLabel.length() > 0)						// Se è stato trovato un carattere o un numero
+			return newLabel;							// Restituisci la stringa
+		else											// Se no
+			return null;								// Restituisci null
 	}
 
 	/*
