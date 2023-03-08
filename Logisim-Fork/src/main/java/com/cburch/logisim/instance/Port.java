@@ -65,12 +65,13 @@ public class Port {
 	private boolean exclude;
 
 	private StringGetter toolTip;
+	private String name;
 
 	public Port(int dx, int dy, String type, Attribute<BitWidth> attr) {
-		this(dx, dy, type, attr, defaultExclusive(type));
+		this(dx, dy, type, attr, defaultExclusive(type), "");
 	}
 
-	public Port(int dx, int dy, String type, Attribute<BitWidth> attr, String exclude) {
+	public Port(int dx, int dy, String type, Attribute<BitWidth> attr, String exclude, String name) {
 		this.dx = dx;
 		this.dy = dy;
 		this.type = toType(type);
@@ -78,13 +79,18 @@ public class Port {
 		this.widthAttr = attr;
 		this.exclude = toExclusive(exclude);
 		this.toolTip = null;
+		this.name = "";
 	}
 
 	public Port(int dx, int dy, String type, BitWidth bits) {
-		this(dx, dy, type, bits, defaultExclusive(type));
+		this(dx, dy, type, bits, defaultExclusive(type), "");
 	}
 
 	public Port(int dx, int dy, String type, BitWidth bits, String exclude) {
+		this(dx,dy,type,bits,exclude,"");
+	}
+
+	public Port(int dx, int dy, String type, BitWidth bits, String exclude, String name) {
 		this.dx = dx;
 		this.dy = dy;
 		this.type = toType(type);
@@ -92,19 +98,28 @@ public class Port {
 		this.widthAttr = null;
 		this.exclude = toExclusive(exclude);
 		this.toolTip = null;
+		this.name = name;
 	}
 
 	public Port(int dx, int dy, String type, int bits) {
-		this(dx, dy, type, BitWidth.create(bits), defaultExclusive(type));
+		this(dx, dy, type, BitWidth.create(bits), defaultExclusive(type), "");
 	}
 
 	public Port(int dx, int dy, String type, int bits, String exclude) {
-		this(dx, dy, type, BitWidth.create(bits), exclude);
+		this(dx, dy, type, BitWidth.create(bits), exclude, "");
+	}
+
+	public Port(int dx, int dy, String type, String name, int bits) {
+		this(dx, dy, type, BitWidth.create(bits), defaultExclusive(type), name);
 	}
 
 	public String getToolTip() {
 		StringGetter getter = toolTip;
 		return getter == null ? null : getter.get();
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	public Attribute<BitWidth> getWidthAttribute() {

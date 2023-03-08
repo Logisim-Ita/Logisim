@@ -3,7 +3,7 @@
 
 package com.cburch.logisim.circuit;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Iterator;
