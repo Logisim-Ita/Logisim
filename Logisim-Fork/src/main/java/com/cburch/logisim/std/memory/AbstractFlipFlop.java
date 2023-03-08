@@ -292,7 +292,6 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				painter.drawPort(n);
 				// Qn
 				painter.drawPort(n + 1);
-				GraphicsUtil.drawCenteredText(g, "!Q", bds.getX() + 42, bds.getY() + 56);
 				// clear
 				painter.drawPort(n + 2);
 				// preset
