@@ -176,6 +176,10 @@ public class AddTool extends Tool {
 	public AttributeSet getAttributeSet() {
 		return attrs;
 	}
+	
+	public FactoryDescription getFactoryDescription() {
+		return description;
+	}
 
 	private AttributeSet getBaseAttributes() {
 		AttributeSet ret = attrs;
