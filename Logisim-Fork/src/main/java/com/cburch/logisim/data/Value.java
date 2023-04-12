@@ -117,6 +117,8 @@ public class Value {
 	private final int unknown;
 	private final int value;
 
+	private String label = "";
+
 	private Value(int width, int error, int unknown, int value) {
 		// To ensure that the one-bit values are unique, this should be called
 		// only
@@ -484,5 +486,13 @@ public class Value {
 			return Value.create(Math.max(this.width, other.width),
 					this.error | other.error | this.unknown | other.unknown, 0, this.value ^ other.value);
 		}
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getLabel() {
+		return this.label;
 	}
 }
