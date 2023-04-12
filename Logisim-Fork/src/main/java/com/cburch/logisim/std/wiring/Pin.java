@@ -636,7 +636,7 @@ public class Pin extends InstanceFactory {
 		Value val = state.getPort(0);
 
 		PinState q = getState(state);
-		q.sending.setLabel(state.getAttributeValue(StdAttr.LABEL));
+		//q.sending.setLabel(state.getAttributeValue(StdAttr.LABEL));
 		if (attrs.type == EndData.OUTPUT_ONLY) {
 			q.sending = val;
 			q.receiving = val;
