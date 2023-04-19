@@ -117,6 +117,19 @@ class SplitterAttributes extends AbstractAttributeSet {
 			Strings.getter("splitterAppearanceAttr"),
 			new AttributeOption[] { APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER, APPEAR_LEGACY });
 
+
+
+	public static final AttributeOption INV_TRUE = new AttributeOption("true",
+			Strings.getter("splitterDistributeAscending"));
+	public static final AttributeOption INV_FALSE = new AttributeOption("false",
+			Strings.getter("splitterDistributeDescending"));
+
+
+
+	public static final Attribute<AttributeOption> ATTR_INVERSE = Attributes.forOption("inverse",
+			Strings.getter("splitterDistribute"),
+			new AttributeOption[] { INV_TRUE, INV_FALSE });
+
 	public static final Attribute<BitWidth> ATTR_WIDTH = Attributes.forBitWidth("incoming",
 			Strings.getter("splitterBitWidthAttr"));
 
@@ -124,7 +137,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 			Strings.getter("splitterFanOutAttr"), 1, 32);
 
 	private static final List<Attribute<?>> INIT_ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE, });
+			.asList(new Attribute<?>[] { StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE, ATTR_INVERSE});
 
 	private static final String unchosen_val = "none";
 
@@ -184,6 +197,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 	Direction facing = Direction.EAST;
 	byte fanout = 4; // number of ends this splits into
 	byte[] bit_end = new byte[4]; // how each bit maps to an end (0 if nowhere);
+	AttributeOption dir = INV_TRUE;
 
 	// other values will be between 1 and fanout
 	BitOutOption[] options = null;
