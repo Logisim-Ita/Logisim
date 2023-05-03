@@ -18,6 +18,8 @@ import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.instance.StdAttr;
 
 class SplitterAttributes extends AbstractAttributeSet {
+
+	public static int order=0;
 	static class BitOutAttribute extends Attribute<Integer> {
 		int which;
 		BitOutOption[] options;
@@ -103,6 +105,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		}
 	}
 
+	//the list of selection for the splitter attributes
 	public static final AttributeOption APPEAR_LEGACY = new AttributeOption("legacy",
 			Strings.getter("splitterAppearanceLegacy"));
 	public static final AttributeOption APPEAR_LEFT = new AttributeOption("left",
@@ -117,18 +120,17 @@ class SplitterAttributes extends AbstractAttributeSet {
 			Strings.getter("splitterAppearanceAttr"),
 			new AttributeOption[] { APPEAR_LEFT, APPEAR_RIGHT, APPEAR_CENTER, APPEAR_LEGACY });
 
-
-
-	public static final AttributeOption INV_TRUE = new AttributeOption("true",
+	//////////////////////////////////////////////////////dis///////////////////////////////////////////////////
+	public static final AttributeOption APPEAR_ASS = new AttributeOption("ascending",
 			Strings.getter("splitterDistributeAscending"));
-	public static final AttributeOption INV_FALSE = new AttributeOption("false",
+
+	public static final AttributeOption APPEAR_DESS = new AttributeOption("descending",
 			Strings.getter("splitterDistributeDescending"));
-
-
-
-	public static final Attribute<AttributeOption> ATTR_INVERSE = Attributes.forOption("inverse",
+	public static final Attribute<AttributeOption> ATTR_ORDER = Attributes.forOption("order",
 			Strings.getter("splitterDistribute"),
-			new AttributeOption[] { INV_TRUE, INV_FALSE });
+			new AttributeOption[] { APPEAR_ASS, APPEAR_DESS });
+
+	////////////////////////////////////////////////////////////dis/////////////////////////////////////////////
 
 	public static final Attribute<BitWidth> ATTR_WIDTH = Attributes.forBitWidth("incoming",
 			Strings.getter("splitterBitWidthAttr"));
@@ -137,11 +139,13 @@ class SplitterAttributes extends AbstractAttributeSet {
 			Strings.getter("splitterFanOutAttr"), 1, 32);
 
 	private static final List<Attribute<?>> INIT_ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE, ATTR_INVERSE});
+			.asList(new Attribute<?>[] { StdAttr.FACING, ATTR_FANOUT, ATTR_WIDTH, ATTR_APPEARANCE,ATTR_ORDER });
 
 	private static final String unchosen_val = "none";
 
 	static byte[] computeDistribution(int fanout, int bits, int order) {
+		//order=-1;   -1== 3,2,1,0  1=0,1,2,3 order of bits
+		order=SplitterAttributes.order; //i think i can call it bypass
 		byte[] ret = new byte[bits];
 		if (order >= 0) {
 			if (fanout >= bits) {
@@ -194,10 +198,11 @@ class SplitterAttributes extends AbstractAttributeSet {
 	private ArrayList<Attribute<?>> attrs = new ArrayList<Attribute<?>>(INIT_ATTRIBUTES);
 	private SplitterParameters parameters;
 	AttributeOption appear = APPEAR_LEFT;
+	AttributeOption ordershow=APPEAR_ASS;
+
 	Direction facing = Direction.EAST;
 	byte fanout = 4; // number of ends this splits into
 	byte[] bit_end = new byte[4]; // how each bit maps to an end (0 if nowhere);
-	AttributeOption dir = INV_TRUE;
 
 	// other values will be between 1 and fanout
 	BitOutOption[] options = null;
@@ -231,6 +236,15 @@ class SplitterAttributes extends AbstractAttributeSet {
 				fireAttributeValueChanged(attr, Integer.valueOf(bit_end[i]));
 			}
 		}
+
+		////////////////////////////////////////////////////////////////////////////
+		/*
+		SplitterAttributes.order=0;
+		if(SplitterAttributes.ATTR_ORDER.getName()=){
+
+		}
+		*/
+		////////////////////////////////////////////////////////////////////////////////
 
 		// add new attributes
 		for (int i = curNum; i < bit_end.length; i++) {
@@ -296,6 +310,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		return ret;
 	}
 
+	// val that will remain in the text box after selection
 	@Override
 	public <V> V getValue(Attribute<V> attr) {
 		if (attr == StdAttr.FACING) {
@@ -306,6 +321,8 @@ class SplitterAttributes extends AbstractAttributeSet {
 			return (V) BitWidth.create(bit_end.length);
 		} else if (attr == ATTR_APPEARANCE) {
 			return (V) appear;
+		} else if (attr == ATTR_ORDER) {
+			return (V) ordershow;
 		} else if (attr instanceof BitOutAttribute) {
 			BitOutAttribute bitOut = (BitOutAttribute) attr;
 			return (V) Integer.valueOf(bit_end[bitOut.which]);
@@ -314,6 +331,7 @@ class SplitterAttributes extends AbstractAttributeSet {
 		}
 	}
 
+	//what happends when the one of the selection is selected
 	@Override
 	public <V> void setValue(Attribute<V> attr, V value) {
 		if (attr == StdAttr.FACING) {
@@ -336,7 +354,24 @@ class SplitterAttributes extends AbstractAttributeSet {
 			bit_end = new byte[width.getWidth()];
 			configureOptions();
 			configureDefaults();
-		} else if (attr == ATTR_APPEARANCE) {
+
+/////////////////////////////////////////button order///////////////////////////////
+		} else if (value == APPEAR_ASS) {
+			SplitterAttributes.order=1;
+			ordershow = (AttributeOption) value;
+			configureOptions();
+			configureDefaults();
+
+		} else if (value == APPEAR_DESS) {
+			SplitterAttributes.order =-1;
+			ordershow = (AttributeOption) value;
+			configureOptions();
+			configureDefaults();
+
+		}
+///////////////////////////////////////button order////////////////////////////////
+
+		else if (attr == ATTR_APPEARANCE) {
 			appear = (AttributeOption) value;
 			parameters = null;
 		} else if (attr instanceof BitOutAttribute) {
