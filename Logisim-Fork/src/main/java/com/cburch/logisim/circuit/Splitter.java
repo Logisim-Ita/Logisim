@@ -103,8 +103,8 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 	@Override
 	public void configureMenu(JPopupMenu menu, Project proj) {
 		menu.addSeparator();
-		menu.add(new SplitterDistributeItem(proj, this, 1));
 		menu.add(new SplitterDistributeItem(proj, this, -1));
+		menu.add(new SplitterDistributeItem(proj, this, 1));
 	}
 
 	@Override
@@ -195,15 +195,15 @@ public class Splitter extends ManagedComponent implements WireRepair, ToolTipMak
 				appendBuf(buf, beginString, bit_end.length - 1);
 			String base;
 			switch (bits) {
-			case 0:
-				base = Strings.get("splitterSplit0Tip");
-				break;
-			case 1:
-				base = Strings.get("splitterSplit1Tip");
-				break;
-			default:
-				base = Strings.get("splitterSplitManyTip");
-				break;
+				case 0:
+					base = Strings.get("splitterSplit0Tip");
+					break;
+				case 1:
+					base = Strings.get("splitterSplit1Tip");
+					break;
+				default:
+					base = Strings.get("splitterSplitManyTip");
+					break;
 			}
 			return StringUtil.format(base, buf.toString());
 		} else {
