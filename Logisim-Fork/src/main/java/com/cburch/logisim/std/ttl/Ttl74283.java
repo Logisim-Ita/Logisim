@@ -9,7 +9,7 @@ public class Ttl74283 extends AbstractTtlGate {
 
 	public Ttl74283() {
 		super("74283", (byte) 16, new byte[] { 1, 4, 9, 10, 13 },
-				new String[] { "Σ2", "B2", "A2", "Σ1", "A1", "B1", "CIN", "C4", "Σ4", "B4", "A4", "Σ3", "A3", "B3" });
+				new String[] { "\u03a32", "B2", "A2", "\u03a31", "A1", "B1", "CIN", "C4", "\u03a34", "B4", "A4", "\u03a33", "A3", "B3" });
 	}
 
 	@Override
