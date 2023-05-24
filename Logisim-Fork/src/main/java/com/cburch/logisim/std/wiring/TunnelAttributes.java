@@ -38,7 +38,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	private int labelY;
 	private int labelHAlign;
 	private int labelVAlign;
-	private int mode;
+	private boolean mode;	// True normale || False micro
 
 	public TunnelAttributes() {
 		facing = Direction.EAST;
@@ -46,7 +46,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 		label = "tunnel";
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
 		offsetBounds = null;
-		mode = 0;
+		mode = true;
 		configureLabel();
 	}
 
@@ -136,6 +136,13 @@ class TunnelAttributes extends AbstractAttributeSet {
 			return (V) label;
 		if (attr == StdAttr.LABEL_FONT)
 			return (V) labelFont;
+		if (attr == ATTR_MODE) {
+			if(mode) {
+				return (V) Strings.getter("tunnelnormal");
+			} else {
+				return (V) Strings.getter("tunnelmicro");
+			}
+		}
 		return null;
 	}
 
@@ -161,9 +168,9 @@ class TunnelAttributes extends AbstractAttributeSet {
 			labelFont = (Font) value;
 		} else if(attr == ATTR_MODE){
 			if(value == ATTR_NORMAL) {
-				mode = 0;
+				mode = true;
 			} else {
-				mode = 1;
+				mode = false;
 			}
 		} else {
 			throw new IllegalArgumentException("unknown attribute");
