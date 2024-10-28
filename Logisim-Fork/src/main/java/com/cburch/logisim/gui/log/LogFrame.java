@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -41,6 +42,8 @@ public class LogFrame extends LFrame {
 			if (src == clearLog) {
 				getModel().clearAllLogs();
 				getModel().fireSelectionChanged(new ModelEvent());
+			} else if (src == alwaysOnTop) {
+				setAlwaysOnTopWindow(alwaysOnTop.isSelected());
 			}
 		}
 
@@ -61,6 +64,7 @@ public class LogFrame extends LFrame {
 				panels[i].localeChanged();
 			}
 			clearLog.setText(Strings.get("clearLogButton"));
+			alwaysOnTop.setText(Strings.get("alwaysOnTopCheckBox"));
 			windowManager.localeChanged();
 		}
 
@@ -145,6 +149,7 @@ public class LogFrame extends LFrame {
 	private JTabbedPane tabbedPane;
 
 	private JButton clearLog = new JButton();
+	private JCheckBox alwaysOnTop = new JCheckBox();
 
 	public LogFrame(Project project) {
 		this.project = project;
@@ -165,6 +170,9 @@ public class LogFrame extends LFrame {
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(clearLog);
 		clearLog.addActionListener(myListener);
+		
+		buttonPanel.add(alwaysOnTop);
+		alwaysOnTop.addActionListener(myListener);
 
 		Container contents = getContentPane();
 		tabbedPane.setPreferredSize(new Dimension(450, 300));
@@ -233,5 +241,9 @@ public class LogFrame extends LFrame {
 			windowManager.frameOpened(this);
 		}
 		super.setVisible(value);
+	}
+	
+	public void setAlwaysOnTopWindow (boolean value) {
+		super.setAlwaysOnTop(value);
 	}
 }
