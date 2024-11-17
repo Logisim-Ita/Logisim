@@ -3,21 +3,31 @@
 
 package com.cburch.logisim.std.wiring;
 
+
 import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
 
+import com.cburch.logisim.circuit.Strings;
 import com.cburch.logisim.comp.TextField;
-import com.cburch.logisim.data.AbstractAttributeSet;
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.BitWidth;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Direction;
+import com.cburch.logisim.data.*;
 import com.cburch.logisim.instance.StdAttr;
 
 class TunnelAttributes extends AbstractAttributeSet {
+	// Creazione proprità "modalità micro"
+
+	public static final AttributeOption ATTR_NORMAL = new AttributeOption("NormalMode",
+			Strings.getter("tunnelnormal"));
+
+	public static final AttributeOption ATTR_MICRO = new AttributeOption("MicroMode",
+			Strings.getter("tunnelmicro"));
+
+	public static final Attribute<AttributeOption> ATTR_MODE = Attributes.forOption("selectedMode",
+			com.cburch.logisim.circuit.Strings.getter("tunnelmode"),
+			new AttributeOption[] { ATTR_NORMAL, ATTR_MICRO});
+
 	private static final List<Attribute<?>> ATTRIBUTES = Arrays
-			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT });
+			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT, ATTR_MODE});
 
 	private Direction facing;
 	private BitWidth width;
@@ -28,6 +38,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 	private int labelY;
 	private int labelHAlign;
 	private int labelVAlign;
+	private boolean mode;	// True normale || False micro
 
 	public TunnelAttributes() {
 		facing = Direction.EAST;
@@ -35,6 +46,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 		label = "tunnel";
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
 		offsetBounds = null;
+		mode = true;
 		configureLabel();
 	}
 
@@ -124,6 +136,13 @@ class TunnelAttributes extends AbstractAttributeSet {
 			return (V) label;
 		if (attr == StdAttr.LABEL_FONT)
 			return (V) labelFont;
+		if (attr == ATTR_MODE) {
+			if(mode) {
+				return (V) Strings.getter("tunnelnormal");
+			} else {
+				return (V) Strings.getter("tunnelmicro");
+			}
+		}
 		return null;
 	}
 
@@ -147,6 +166,12 @@ class TunnelAttributes extends AbstractAttributeSet {
 			label = (String) value;
 		} else if (attr == StdAttr.LABEL_FONT) {
 			labelFont = (Font) value;
+		} else if(attr == ATTR_MODE){
+			if(value == ATTR_NORMAL) {
+				mode = true;
+			} else {
+				mode = false;
+			}
 		} else {
 			throw new IllegalArgumentException("unknown attribute");
 		}

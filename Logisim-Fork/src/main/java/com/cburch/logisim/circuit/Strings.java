@@ -7,7 +7,7 @@ import com.cburch.logisim.util.LocaleManager;
 import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 
-class Strings {
+public class Strings {
 	private static LocaleManager source = new LocaleManager("resources/logisim", "circuit");
 
 	public static String get(String key) {

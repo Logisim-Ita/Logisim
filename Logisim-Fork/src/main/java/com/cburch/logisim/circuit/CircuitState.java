@@ -3,13 +3,7 @@
 
 package com.cburch.logisim.circuit;
 
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,15 +14,14 @@ import com.cburch.logisim.comp.ComponentState;
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.Instance;
-import com.cburch.logisim.instance.InstanceData;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstanceState;
+import com.cburch.logisim.instance.*;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Clock;
 import com.cburch.logisim.std.wiring.Pin;
 import com.cburch.logisim.std.wiring.ProgrammableGenerator;
 import com.cburch.logisim.util.ArraySet;
+
+import javax.print.DocFlavor;
 
 public class CircuitState implements InstanceData {
 	private class MyCircuitListener implements CircuitListener {
@@ -313,7 +306,7 @@ public class CircuitState implements InstanceData {
 		dirtyComponents.addAll(comps);
 	}
 
-	public void markPointAsDirty(Location pt) {
+	public void  markPointAsDirty(Location pt) {
 		dirtyPoints.add(pt);
 	}
 

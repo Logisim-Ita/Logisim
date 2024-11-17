@@ -25,11 +25,13 @@ import com.cburch.logisim.util.GraphicsUtil;
 public class Tunnel extends InstanceFactory {
 	public static final Tunnel FACTORY = new Tunnel();
 
-	static final int MARGIN = 3;
-	static final int ARROW_MARGIN = 5;
+	static final int MARGIN = 3;			// Grandezza del tunnel
+	static final int ARROW_MARGIN = 5;		// Allunga la freccina
 	static final int ARROW_DEPTH = 4;
 	static final int ARROW_MIN_WIDTH = 16;
 	static final int ARROW_MAX_WIDTH = 20;
+
+	private int mode;
 
 	public Tunnel() {
 		super("Tunnel", Strings.getter("tunnelComponent"));
@@ -126,6 +128,9 @@ public class Tunnel extends InstanceFactory {
 			instance.recomputeBounds();
 		} else if (attr == StdAttr.LABEL || attr == StdAttr.LABEL_FONT) {
 			instance.recomputeBounds();
+		}
+		if(attr == TunnelAttributes.ATTR_MODE) {
+			mode = 0;
 		}
 	}
 

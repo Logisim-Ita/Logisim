@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.analyze.model.Entry;
@@ -21,6 +22,9 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
+import com.cburch.logisim.util.StringUtil;
+
+import static java.lang.Character.*;
 
 public class Analyze {
 
@@ -212,6 +216,7 @@ public class Analyze {
 		ArrayList<Instance> pinList = new ArrayList<Instance>(ret.keySet());
 		HashSet<String> labelsTaken = new HashSet<String>();
 		for (Instance pin : pinList) {
+			// Struttura nomina pin e out di analizza tabaella (Qui la "label" è ancora giusta)
 			String label = pin.getAttributeSet().getValue(StdAttr.LABEL);
 			label = toValidLabel(label);
 			if (label != null) {
@@ -298,6 +303,25 @@ public class Analyze {
 	 * throw new AnalyzeException.Conflict(); } } expressionMap.put(p2, e); } } } }
 	 */
 
+	// Metodo che controlla il nome delle etichette (specialmente per l'analizza circuito)
+	private static String toValidLabel(String label) {
+		StringBuilder buildLabel = new StringBuilder();	// StringBuilder per tenere la stringa in costruzione
+		for(int i = 0; i < label.length(); i++) {		// Passa per tutta la label
+			char c = label.charAt(i);					// Carattere a posizione i
+			int unicode = label.codePointAt(i);			// Unicode del carattere
+			if((unicode < 8192 || unicode > 8207) && (unicode < 8234 || unicode > 8239) && (unicode < 8298 || unicode > 8303)) { // Controlla che non sia un Unicode proibito
+				buildLabel.append(c);					// Nel caso lo aggiunge alla stringa in costruzione
+			}
+		}
+		String newLabel = buildLabel.toString().trim();	// Trasforma la stringa costruita in una stringa trimmata
+		if(newLabel.length() > 0)						// Se è stato trovato un carattere o un numero
+			return newLabel;							// Restituisci la stringa
+		else											// Se no
+			return null;								// Restituisci null
+	}
+
+	/*
+	// Vecchio metodo per validare le stringhe
 	private static String toValidLabel(String label) {
 		if (label == null)
 			return null;
@@ -331,11 +355,15 @@ public class Analyze {
 			}
 		}
 		if (end != null && ret.length() > 0)
-			ret.append(end.toString());
-		if (ret.length() == 0)
+			ret.append(end);
+		if (ret.length() == 0 && end != null) {
+			return end.toString();
+		} else if(ret.length() == 0) {
 			return null;
+		}
 		return ret.toString();
 	}
+	 */
 
 	private Analyze() {
 	}
