@@ -84,7 +84,7 @@ I fixed this problem but if you open an old file containing gates with those att
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile & use
-The project uses maven, from `Logisim/Logisim-Form` run `mvn package` or use your ide and import the directory as a maven project,
+The project uses maven, from `Logisim/Logisim-Fork` run `mvn package` or use your ide and import the directory as a maven project,
 the output file is `target/Logisim-jar-with-dependencies.jar`
 
 If you use ecplise, or a older version of Logisim:  
