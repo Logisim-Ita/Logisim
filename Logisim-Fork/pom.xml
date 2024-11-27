@@ -64,6 +64,34 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.25</version>
+                <executions>
+                    <execution>
+                        <id>generate-exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                       </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outfile>${project.build.directory}/${project.artifactId}-ITA.exe</outfile>
+                    <jar>${project.build.directory}/${project.build.finalName}-jar-with-dependencies.jar</jar>
+                    <dontWrapJar>false</dontWrapJar>
+                    <headerType>gui</headerType>
+                    <icon>src/main/java/resources/logisim/img/logisim-icon.ico</icon>
+                    <jre>
+                        <minVersion>1.8.0</minVersion>
+                    </jre>
+                    <classPath>
+                        <mainClass>com.cburch.logisim.Main</mainClass>
+                    </classPath>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
