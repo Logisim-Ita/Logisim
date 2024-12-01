@@ -67,38 +67,7 @@ public class TextField {
 			g.setColor(color);
 		int x = this.x;
 		int y = this.y;
-		FontMetrics fm = g.getFontMetrics();
-		requestLongestWidth(fm);
-		int width = ( longestWidth == 0 && fm.stringWidth(text) > 0) ? longestWidth = fm.stringWidth(text) : longestWidth; //if longestWidth is zero but stringWidth(text) is > 0 requestLongestWidth() didn't find any TextFieldCaret object
-		int ascent = fm.getAscent();
-		int descent = fm.getDescent();
-		switch (halign) {
-		case TextField.H_CENTER:
-			x -= width / 2;
-			break;
-		case TextField.H_RIGHT:
-			x -= width;
-			break;
-		default:
-			break;
-		}
-		switch (valign) {
-		case TextField.V_TOP:
-			y += ascent;
-			break;
-		case TextField.V_CENTER:
-			y += ascent / 2;
-			break;
-		case TextField.V_CENTER_OVERALL:
-			y += (ascent - descent) / 2;
-			break;
-		case TextField.V_BOTTOM:
-			y -= descent;
-			break;
-		default:
-			break;
-		}
-		g.drawString(text, x, y);
+		GraphicsUtil.drawText(g, text, x, y, halign, valign);
 		g.setFont(oldFont);
 		g.setColor(oldColor);
 	}
