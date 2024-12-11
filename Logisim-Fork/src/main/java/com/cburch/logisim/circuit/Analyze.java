@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import com.cburch.logisim.analyze.model.AnalyzerModel;
 import com.cburch.logisim.analyze.model.Entry;
@@ -21,6 +22,7 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.proj.Project;
 import com.cburch.logisim.std.wiring.Pin;
+import com.cburch.logisim.util.StringUtil;
 
 public class Analyze {
 
@@ -298,43 +300,21 @@ public class Analyze {
 	 * throw new AnalyzeException.Conflict(); } } expressionMap.put(p2, e); } } } }
 	 */
 
+	// This function check label name
 	private static String toValidLabel(String label) {
-		if (label == null)
-			return null;
-		StringBuilder end = null;
-		StringBuilder ret = new StringBuilder();
-		boolean afterWhitespace = false;
-		for (int i = 0; i < label.length(); i++) {
+		StringBuilder buildLabel = new StringBuilder();	//StringBuilder for hold string in building
+		for(int i = 0; i < label.length(); i++) {
 			char c = label.charAt(i);
-			if (Character.isJavaIdentifierStart(c)) {
-				if (afterWhitespace) {
-					// capitalize words after the first one
-					c = Character.toTitleCase(c);
-					afterWhitespace = false;
-				}
-				ret.append(c);
-			} else if (Character.isJavaIdentifierPart(c)) {
-				// If we can't place it at the start, we'll dump it
-				// onto the end.
-				if (ret.length() > 0) {
-					ret.append(c);
-				} else {
-					if (end == null)
-						end = new StringBuilder();
-					end.append(c);
-				}
-				afterWhitespace = false;
-			} else if (Character.isWhitespace(c)) {
-				afterWhitespace = true;
-			} else {
-				; // just ignore any other characters
+			int unicode = label.codePointAt(i);			// Get character unicode 
+			if((unicode < 8192 || unicode > 8207) && (unicode < 8234 || unicode > 8239) && (unicode < 8298 || unicode > 8303)) { // Check that it is not a prohibited Unicode
+				buildLabel.append(c);					// Add character on final string
 			}
 		}
-		if (end != null && ret.length() > 0)
-			ret.append(end.toString());
-		if (ret.length() == 0)
+		String newLabel = buildLabel.toString().trim();
+		if(newLabel.length() > 0)						// If is find a character or number
+			return newLabel;							// Return a final string
+		else
 			return null;
-		return ret.toString();
 	}
 
 	private Analyze() {

@@ -2,3 +2,7 @@
 /KAppemblerListener.class
 /bin/
 target/
+/.settings/
+/.classpath
+/.vscode/
+/.idea/
