@@ -2,11 +2,16 @@
 <!DOCTYPE xml>
 <logisim>
   <jar_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.jar</jar_file>
-  <jar_version>2.16.1.4</jar_version>
+  <jar_version>2.16.2.0</jar_version>
   <exe_file>https://github.com/LogisimIt/Logisim/raw/master/Compiled/Logisim-ITA.exe</exe_file>
-  <exe_version>2.16.1.4</exe_version>
+  <exe_version>2.16.2.0</exe_version>
   <changelog>
-* Added multi-line text editing
-* Added simplified RAM/ROM mode
+  * Added button to reverse the bit distribution in the splitter
+  * Added "Always on top" checkbox in the Logging window
+  * Updated labels
+  * Corrected Italian translation key "projectEditAppearanceTip"
+  * Tunnel label
+  * Corrected Italian translation key "projectEditAppearanceTip"
+  * Tunnel label
   </changelog>
 </logisim>
