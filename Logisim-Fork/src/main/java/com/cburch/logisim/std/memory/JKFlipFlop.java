@@ -7,7 +7,7 @@ import com.cburch.logisim.data.Value;
 
 public class JKFlipFlop extends AbstractFlipFlop {
 	public JKFlipFlop() {
-		super("J-K Flip-Flop", "jkFlipFlop.gif", Strings.getter("jkFlipFlopComponent"), (byte) 2, false);
+		super("J-K Flip-Flop", "jkFlipFlop.gif", Strings.getter("jkFlipFlopComponent"), (byte) 2);
 	}
 
 	@Override

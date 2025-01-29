@@ -1,13 +1,10 @@
-/* Copyright (c) 2010, Carl Burch. License information is located in the
- * com.cburch.logisim.Main source code and at www.cburch.com/logisim/. */
-
 package com.cburch.logisim.std.memory;
 
 import com.cburch.logisim.data.Value;
 
-public class SRFlipFlop extends AbstractFlipFlop {
-	public SRFlipFlop() {
-		super("S-R Flip-Flop", "srFlipFlop.gif", Strings.getter("srFlipFlopComponent"), (byte) 2);
+public class SRLatch extends AbstractFlipFlop {
+	public SRLatch() {
+		super("S-R Latch", "srFlipFlop.gif", Strings.getter("srLatchComponent"), (byte) 2, false);
 	}
 
 	@Override

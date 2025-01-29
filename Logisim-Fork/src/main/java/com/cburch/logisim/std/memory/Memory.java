@@ -13,6 +13,8 @@ public class Memory extends Library {
 	protected static final int DELAY = 5;
 
 	private static FactoryDescription[] DESCRIPTIONS = {
+			new FactoryDescription("D Latch", Strings.getter("dLatchComponent"), "dFlipFlop.gif", "DLatch"),
+			new FactoryDescription("S-R Latch", Strings.getter("srLatchComponent"), "srFlipFlop.gif", "SRLatch"),
 			new FactoryDescription("D Flip-Flop", Strings.getter("dFlipFlopComponent"), "dFlipFlop.gif", "DFlipFlop"),
 			new FactoryDescription("T Flip-Flop", Strings.getter("tFlipFlopComponent"), "tFlipFlop.gif", "TFlipFlop"),
 			new FactoryDescription("J-K Flip-Flop", Strings.getter("jkFlipFlopComponent"), "jkFlipFlop.gif",
