@@ -10,20 +10,15 @@ import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstanceData;
 
 public class ShiftRegisterData extends ClockState implements InstanceData {
-	private BitWidth width;
 	private Value[] vs;
-	private int vsPos;
 
-	public ShiftRegisterData(BitWidth width, int len) {
-		this.width = width;
+	public ShiftRegisterData(int len) {
 		this.vs = new Value[len];
-		Arrays.fill(this.vs, Value.createKnown(width, 0));
-		this.vsPos = 0;
+		Arrays.fill(this.vs, Value.createKnown(BitWidth.ONE, 0));
 	}
 
 	public void clear() {
-		Arrays.fill(vs, Value.createKnown(width, 0));
-		vsPos = 0;
+		Arrays.fill(vs, Value.createKnown(BitWidth.ONE, 0));
 	}
 
 	@Override
@@ -34,59 +29,53 @@ public class ShiftRegisterData extends ClockState implements InstanceData {
 	}
 
 	public Value get(int index) {
-		int i = vsPos + index;
-		Value[] v = vs;
-		if (i >= v.length)
-			i -= v.length;
-		return v[i];
+		if (index >= vs.length)
+			index -= vs.length;
+		return vs[index];
+	}
+
+	public Value getValues() {
+		return Value.create(vs);
 	}
 
 	public int getLength() {
 		return vs.length;
 	}
 
+	public void push(Value mode, Value v) {
+		if (mode.equals(UniversalRegister.SHIFT_LEFT)) {
+			// Left shift
+			push(v);
+		} else if (mode.equals(UniversalRegister.SHIFT_RIGHT)) {
+			// Right shift
+			System.arraycopy(vs, 1, vs, 0, vs.length - 1);
+			vs[vs.length - 1] = v;
+		}
+	}
+
+	// Only left shift
 	public void push(Value v) {
-		int pos = vsPos;
-		vs[pos] = v;
-		vsPos = pos >= vs.length - 1 ? 0 : pos + 1;
+		System.arraycopy(vs, 0, vs, 1, vs.length - 1);
+		vs[0] = v;
+	}
+
+	public void parallelLoad(Value[] v) {
+		System.arraycopy(v, 0, vs, 0, vs.length);
 	}
 
 	public void set(int index, Value val) {
-		int i = vsPos + index;
-		Value[] v = vs;
-		if (i >= v.length)
-			i -= v.length;
-		v[i] = val;
+		vs[index] = val;
 	}
 
-	public void setDimensions(BitWidth newWidth, int newLength) {
-		Value[] v = vs;
-		BitWidth oldWidth = width;
-		int oldW = oldWidth.getWidth();
-		int newW = newWidth.getWidth();
-		if (v.length != newLength) {
+	public void setDimensions(int newLength) {
+		if (vs.length != newLength) {
 			Value[] newV = new Value[newLength];
-			int j = vsPos;
-			int copy = Math.min(newLength, v.length);
+			int copy = Math.min(newLength, vs.length);
 			for (int i = 0; i < copy; i++) {
-				newV[i] = v[j];
-				j++;
-				if (j == v.length)
-					j = 0;
+				newV[i] = vs[i];
 			}
-			Arrays.fill(newV, copy, newLength, Value.createKnown(newWidth, 0));
-			v = newV;
-			vsPos = 0;
+			Arrays.fill(newV, copy, newLength, Value.createKnown(BitWidth.ONE, 0));
 			vs = newV;
-		}
-		if (oldW != newW) {
-			for (int i = 0; i < v.length; i++) {
-				Value vi = v[i];
-				if (vi.getWidth() != newW) {
-					v[i] = vi.extendWidth(newW, Value.FALSE);
-				}
-			}
-			width = newWidth;
 		}
 	}
 }

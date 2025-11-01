@@ -9,7 +9,7 @@ import com.cburch.logisim.instance.InstanceLogger;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.StdAttr;
 
-public class ShiftRegisterLogger extends InstanceLogger {
+public class UniversalRegisterLogger extends InstanceLogger {
 	@Override
 	public String getLogName(InstanceState state, Object option) {
 		String inName = state.getAttributeValue(StdAttr.LABEL);
@@ -25,7 +25,7 @@ public class ShiftRegisterLogger extends InstanceLogger {
 
 	@Override
 	public Object[] getLogOptions(InstanceState state) {
-		Integer stages = state.getAttributeValue(ShiftRegister.ATTR_LENGTH);
+		Integer stages = state.getAttributeValue(UniversalRegister.ATTR_LENGTH);
 		Object[] ret = new Object[stages.intValue()];
 		for (int i = 0; i < ret.length; i++) {
 			ret[i] = Integer.valueOf(i);
