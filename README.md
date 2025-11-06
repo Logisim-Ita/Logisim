@@ -84,6 +84,10 @@ I fixed this problem but if you open an old file containing gates with those att
 ## EXE and JAR downloads + microprocessor project
 All in our website [here](https://logisim.altervista.org)
 ## How to compile & use
+The project uses maven, from `Logisim/Logisim-Fork` run `mvn package` or use your ide and import the directory as a maven project,
+the output file is `target/Logisim-jar-with-dependencies.jar`
+
+If you use ecplise, or a older version of Logisim:  
 Watch our tutorials on "TUTORIAL" section of our [website](https://logisim.altervista.org/developerstutorial.php)
 ## Translation
 New strings are translated really bad (Google Translate) because i just know Italian and English.<br>You can help me translating other languages or adding a new one, if you want so, contact me at logisimit@gmail.com
