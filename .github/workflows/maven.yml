@@ -1,0 +1,82 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches-ignore: 
+      - master
+  pull_request:
+    branches-ignore: 
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Git Configure
+      run: |
+        git config --local user.name "Github Actions Bot"
+        git config --local user.email "actions@github.com"
+    
+    - name: Get main.java version
+      run: |
+        currentLogisimVersion=$(grep -oP "LogisimVersion.get\(\K[0-9, ]+" Logisim-Fork/src/main/java/com/cburch/logisim/Main.java)
+        if [ $(git rev-list --count HEAD) -le 1 ]; then
+          echo "No previous commit to compare"
+          previousLogisimersion=""
+        else
+          previousLogisimersion=$(git show HEAD~1:Logisim-Fork/src/main/java/com/cburch/logisim/Main.java | grep -oP "LogisimVersion.get\(\K[0-9, ]+")
+        fi
+        echo "currentLogisimVersion=${currentLogisimVersion}" >> ${GITHUB_ENV}
+        echo "previousLogisimersion=${previousLogisimersion}" >> ${GITHUB_ENV}
+        echo "${previousLogisimVersion}---->${currentLogisimersion}"
+
+
+    - name: Check if is a new version
+      run: |
+        if [ "${{ env.currentLogisimVersion }}" != "${{ env.previousLogisimersion }}" ] ; then
+          echo "CheckV=new version" >> ${GITHUB_ENV}
+        else
+          echo "CheckV=no change"  >> ${GITHUB_ENV}
+        fi
+      
+    - name: Build with Maven if main.java have new version
+      if: ${{ env.CheckV == 'new version' }}
+      run: |
+        echo "${currentLogisimVersion}--+--${previousLogisimersion}--->${CheckV}"
+        mvn -B clean install --file Logisim-Fork/pom.xml
+
+    - name: Public new Release
+      if: ${{ env.CheckV == 'new version' }}
+      run: |
+        ls -la
+        ls -la Logisim-Fork/target
+        cp Logisim-Fork/target/Logisim-ITA.exe Compiled/Logisim-ITA.exe
+        cp Logisim-Fork/target/Logisim-jar-with-dependencies.jar Compiled/Logisim-ITA.jar
+        git add Compiled/Logisim-ITA.exe Compiled/Logisim-ITA.jar
+        git commit -m "Update: version ${currentLogisimVersion//, /.}"
+        git push origin
+

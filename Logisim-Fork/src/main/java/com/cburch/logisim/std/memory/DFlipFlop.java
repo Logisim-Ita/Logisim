@@ -7,7 +7,7 @@ import com.cburch.logisim.data.Value;
 
 public class DFlipFlop extends AbstractFlipFlop {
 	public DFlipFlop() {
-		super("D Flip-Flop", "dFlipFlop.gif", Strings.getter("dFlipFlopComponent"), (byte) 1, true);
+		super("D Flip-Flop", "dFlipFlop.gif", Strings.getter("dFlipFlopComponent"), (byte) 1);
 	}
 
 	@Override

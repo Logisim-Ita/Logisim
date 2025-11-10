@@ -3,12 +3,15 @@
 
 package com.cburch.logisim.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.Properties;
 import java.util.StringTokenizer;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -35,7 +38,7 @@ public class LocaleManager {
 	}
 
 	// static members
-	private static final String SETTINGS_NAME = "settings";
+	private static final String SETTINGS_NAME = "settings.properties";
 
 	private static ArrayList<LocaleManager> managers = new ArrayList<LocaleManager>();
 
@@ -56,7 +59,7 @@ public class LocaleManager {
 		HashMap<Character, String> ret = null;
 		String val;
 		try {
-			val = Strings.source.locale.getString("accentReplacements");
+			val = Strings.source.prop.getProperty("accentReplacements");
 		} catch (MissingResourceException e) {
 			return null;
 		}
@@ -175,14 +178,14 @@ public class LocaleManager {
 	// instance members
 	private String dir_name;
 	private String file_start;
-	private ResourceBundle settings = null;
-	private ResourceBundle locale = null;
+	private Properties settin = null;														/**/
+	private Properties prop = null;															/**/
 
-	private ResourceBundle dflt_locale = null;
+	private Properties dflt_locale = null;													//default locale
 
 	public LocaleManager(String dir_name, String file_start) {
 		this.dir_name = dir_name;
-		this.file_start = file_start;
+		this.file_start = file_start + ".properties";
 		loadDefault();
 		managers.add(this);
 	}
@@ -200,33 +203,32 @@ public class LocaleManager {
 
 	public String get(String key) {
 		String ret;
-		try {
-			ret = locale.getString(key);
-		} catch (MissingResourceException e) {
-			ResourceBundle backup = dflt_locale;
-			if (backup == null) {
-				Locale backup_loc = Locale.US;
-				backup = ResourceBundle.getBundle(dir_name + "/en/" + file_start, backup_loc);
-				dflt_locale = backup;
+		
+		if (prop.containsKey(key)) {
+			ret = prop.getProperty(key);
+		} else {
+			if (dflt_locale == null) {
+				dflt_locale = loadProperties(dir_name + "/en/" + file_start);	//set en properties in default
 			}
-			try {
-				ret = backup.getString(key);
-			} catch (MissingResourceException e2) {
+			if (dflt_locale.containsKey(key)) {
+				ret = dflt_locale.getProperty(key);
+			} else {
 				ret = key;
 			}
 		}
 		HashMap<Character, String> repl = LocaleManager.repl;
 		if (repl != null)
 			ret = replaceAccents(ret, repl);
+		
 		return ret;
 	}
 
 	public Locale[] getLocaleOptions() {
 		String locs = null;
 		try {
-			if (settings != null)
-				locs = settings.getString("locales");
-		} catch (java.util.MissingResourceException e) {
+			if (settin != null)
+				locs = settin.getProperty("locales");
+		} catch (MissingResourceException e) {
 		}
 		if (locs == null)
 			return new Locale[] {};
@@ -266,35 +268,45 @@ public class LocaleManager {
 	}
 
 	private void loadDefault() {
-		if (settings == null) {
-			try {
-				settings = ResourceBundle.getBundle(dir_name + "/" + SETTINGS_NAME);
-			} catch (java.util.MissingResourceException e) {
-			}
+		if (settin == null) {
+			settin = loadProperties(dir_name + "/" + SETTINGS_NAME);
 		}
 
 		try {
 			loadLocale(Locale.getDefault());
-			if (locale != null)
+			if (prop != null)
 				return;
 		} catch (java.util.MissingResourceException e) {
 		}
 		try {
 			loadLocale(Locale.ENGLISH);
-			if (locale != null)
+			if (prop != null)
 				return;
 		} catch (java.util.MissingResourceException e) {
 		}
 		Locale[] choices = getLocaleOptions();
 		if (choices != null && choices.length > 0)
 			loadLocale(choices[0]);
-		if (locale != null)
+		if (prop != null)
 			return;
 		throw new RuntimeException("No locale bundles are available");
+	}
+	
+	private Properties loadProperties(String dir) {
+		Properties properties = new Properties();
+		try (InputStreamReader input = new InputStreamReader(getClass().getClassLoader().getResourceAsStream(dir), StandardCharsets.UTF_8) ) {
+			properties.load(input);
+		} catch (NullPointerException e) {
+			properties = loadProperties(dir_name + "/en/" + file_start);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return properties;
 	}
 
 	private void loadLocale(Locale loc) {
 		String bundleName = dir_name + "/" + loc.getLanguage() + "/" + file_start;
-		locale = ResourceBundle.getBundle(bundleName, loc);
+		prop = loadProperties(bundleName);
 	}
 }

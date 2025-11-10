@@ -3,7 +3,6 @@ package com.cburch.logisim.std.ttl;
 import java.awt.Font;
 import java.awt.Graphics;
 
-import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
@@ -21,7 +20,7 @@ public class Ttl74165 extends AbstractTtlGate {
 	private ShiftRegisterData getData(InstanceState state) {
 		ShiftRegisterData data = (ShiftRegisterData) state.getData();
 		if (data == null) {
-			data = new ShiftRegisterData(BitWidth.ONE, 8);
+			data = new ShiftRegisterData(8);
 			state.setData(data);
 		}
 		return data;
