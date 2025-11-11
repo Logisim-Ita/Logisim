@@ -136,7 +136,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 		if (attr == StdAttr.LABEL_FONT)
 			return (V) labelFont;
 		if (attr == ATTR_MODE)
-			return (V) (mode ? Strings.getter("tunnelnormal") : Strings.getter("tunnelmicro"));
+			return (V) (mode ? ATTR_NORMAL : ATTR_MICRO);
 		return null;
 	}
 
