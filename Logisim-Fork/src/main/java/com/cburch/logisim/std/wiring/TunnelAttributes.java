@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
 
+import com.cburch.logisim.LogisimVersion;
+import com.cburch.logisim.Main;
 import com.cburch.logisim.circuit.Strings;
 import com.cburch.logisim.comp.TextField;
 import com.cburch.logisim.instance.StdAttr;
@@ -20,7 +22,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 			Strings.getter("tunnelmicro"));
 	public static final Attribute<AttributeOption> ATTR_MODE = Attributes.forOption("selectedMode",
 			Strings.getter("tunnelmode"),
-			new AttributeOption[] { ATTR_NORMAL, ATTR_MICRO});
+			new AttributeOption[] { ATTR_NORMAL, ATTR_MICRO });
 	private static final List<Attribute<?>> ATTRIBUTES = Arrays
 			.asList(new Attribute<?>[] { StdAttr.FACING, StdAttr.WIDTH, StdAttr.LABEL, StdAttr.LABEL_FONT, ATTR_MODE });
 
@@ -41,7 +43,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 		label = "tunnel";
 		labelFont = StdAttr.DEFAULT_LABEL_FONT;
 		offsetBounds = null;
-		mode=true;
+		mode = true;
 		configureLabel();
 	}
 
@@ -135,8 +137,9 @@ class TunnelAttributes extends AbstractAttributeSet {
 			return (V) label;
 		if (attr == StdAttr.LABEL_FONT)
 			return (V) labelFont;
-		if (attr == ATTR_MODE)
+		if (attr == ATTR_MODE) {
 			return (V) (mode ? ATTR_NORMAL : ATTR_MICRO);
+		}
 		return null;
 	}
 
@@ -151,6 +154,7 @@ class TunnelAttributes extends AbstractAttributeSet {
 
 	@Override
 	public <V> void setValue(Attribute<V> attr, V value) {
+
 		if (attr == StdAttr.FACING) {
 			facing = (Direction) value;
 			configureLabel();
@@ -160,8 +164,8 @@ class TunnelAttributes extends AbstractAttributeSet {
 			label = (String) value;
 		} else if (attr == StdAttr.LABEL_FONT) {
 			labelFont = (Font) value;
-		} else if(attr == ATTR_MODE){
-			mode = (value == ATTR_NORMAL) ? true:false;
+		} else if (attr == ATTR_MODE) {
+			mode = (value == ATTR_NORMAL) ? true : false;
 		} else {
 			throw new IllegalArgumentException("unknown attribute");
 		}
