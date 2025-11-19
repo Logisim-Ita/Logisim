@@ -13,6 +13,7 @@ import com.cburch.logisim.data.AttributeOption;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
 import com.cburch.logisim.data.Bounds;
+import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
 import com.cburch.logisim.instance.Instance;
 import com.cburch.logisim.instance.InstanceData;
@@ -24,6 +25,7 @@ import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
 import com.cburch.logisim.prefs.AppPreferences;
+import com.cburch.logisim.std.plexers.Plexers;
 import com.cburch.logisim.util.GraphicsUtil;
 import com.cburch.logisim.util.StringGetter;
 
@@ -87,6 +89,9 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	// attribute negate clear preset
 	private static final Attribute<Boolean> NEGATE_PRE_CLR = Attributes.forBoolean("NegatePresetClear",
 			Strings.getter("NegatePresetClear"));
+	// attribute use old ff layout
+	private static final Attribute<Boolean> NEW_FF_LAYOUT = Attributes.forBoolean("NewFFLayout",
+			Strings.getter("NewFFLayout"));
 	private byte inputs;
 	private Attribute<AttributeOption> triggerAttribute;
 
@@ -95,9 +100,10 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		setIconName(iconName);
 		triggerAttribute = StdAttr.EDGE_TRIGGER;
 		setAttributes(
-				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, StdAttr.LABEL,
+				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, NEW_FF_LAYOUT, StdAttr.LABEL,
 						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.FALSE, "", StdAttr.DEFAULT_LABEL_FONT,
+				new Object[] { StdAttr.TRIG_RISING, ABOVE_BELOW, Boolean.FALSE, Boolean.TRUE, "",
+						StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 
 		setInstancePoker(Poker.class);
@@ -110,9 +116,10 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 		setIconName(iconName);
 		triggerAttribute = onlyEnable ? StdAttr.LATCH_TRIGGER_E : StdAttr.FULL_LATCH_TRIGGER;
 		setAttributes(
-				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, StdAttr.LABEL,
+				new Attribute[] { triggerAttribute, PRE_CLR_POSITION, NEGATE_PRE_CLR, NEW_FF_LAYOUT, StdAttr.LABEL,
 						StdAttr.LABEL_FONT, StdAttr.ATTR_LABEL_COLOR },
-				new Object[] { StdAttr.TRIG_HIGH, ABOVE_BELOW, Boolean.FALSE, "", StdAttr.DEFAULT_LABEL_FONT,
+				new Object[] { StdAttr.TRIG_HIGH, ABOVE_BELOW, Boolean.FALSE, Boolean.TRUE, "",
+						StdAttr.DEFAULT_LABEL_FONT,
 						Color.BLACK });
 
 		setInstancePoker(Poker.class);
@@ -141,15 +148,22 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 
 	@Override
 	public Bounds getOffsetBounds(AttributeSet attrs) {
-		int width = 60;
-		int height = 80;
-		byte offs = (byte) -20;
+		Boolean newlayout = attrs.getValue(NEW_FF_LAYOUT);
+		int width = newlayout ? 60 : 40;
+		int height = newlayout ? 80 : 40;
+		byte offs = (byte) (newlayout ? -20 : -10);
 		return Bounds.create(-width, offs, width, height);
 	}
 
 	@Override
 	protected void instanceAttributeChanged(Instance instance, Attribute<?> attr) {
 		if (attr == triggerAttribute || attr == PRE_CLR_POSITION || attr == NEGATE_PRE_CLR) {
+			instance.recomputeBounds();
+			updateports(instance);
+		} else if (attr == NEW_FF_LAYOUT) {
+			if (instance.getAttributeValue(NEW_FF_LAYOUT) == Boolean.FALSE) {
+				instance.getAttributeSet().setValue(PRE_CLR_POSITION, LEGACY);
+			}
 			instance.recomputeBounds();
 			updateports(instance);
 		}
@@ -164,13 +178,28 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 				: painter.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2;
 		boolean prclrneg = painter.getAttributeValue(NEGATE_PRE_CLR);
 		GraphicsUtil.switchToWidth(g, 2);
+		Boolean newlayout = painter.getAttributeValue(NEW_FF_LAYOUT);
 
 		if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() && !isGhost) {
 			g.setColor(Color.WHITE);
 			g.fillRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
 			g.setColor(Color.BLACK);
 		}
-		g.drawRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
+
+		if (newlayout) {
+			if (AppPreferences.FILL_COMPONENT_BACKGROUND.getBoolean() && !isGhost) {
+				g.setColor(Color.WHITE);
+				g.fillRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
+				g.setColor(Color.BLACK);
+			}
+			g.drawRoundRect(bds.getX() + 10, bds.getY() + 10, bds.getWidth() - 20, bds.getHeight() - 20, 10, 10);
+		} else {
+			if (isGhost) {
+				super.paintGhost(painter);
+				return;
+			} else
+				painter.drawRoundBounds(Color.WHITE);
+		}
 
 		if (!isGhost) {
 			g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
@@ -189,81 +218,97 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 			}
 		}
 
-		// new layout
-		if (prclrpos != 2) {
-			if (!prclrneg) {
-				// upper centered port line (pr/clr)
-				g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY(), bds.getX() + bds.getWidth() / 2,
-						bds.getY() + 10);
-				// lower centered port line (pr/clr)
-				g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight(),
-						bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - 10);
-			} else {// negated pr/clr
-				g.drawOval(bds.getX() + 26, bds.getY() + 2, 8, 8);
-				g.drawOval(bds.getX() + 26, bds.getY() + bds.getHeight() - 10, 8, 8);
+		if (newlayout) {
+			// new layout
+			if (prclrpos != 2) {
+				if (!prclrneg) {
+					// upper centered port line (pr/clr)
+					g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY(), bds.getX() + bds.getWidth() / 2,
+							bds.getY() + 10);
+					// lower centered port line (pr/clr)
+					g.drawLine(bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight(),
+							bds.getX() + bds.getWidth() / 2, bds.getY() + bds.getHeight() - 10);
+				} else {// negated pr/clr
+					g.drawOval(bds.getX() + 26, bds.getY() + 2, 8, 8);
+					g.drawOval(bds.getX() + 26, bds.getY() + bds.getHeight() - 10, 8, 8);
+				}
+			} else {// 1st and 3rd lower line if legacy position
+				if (!prclrneg) {
+					g.drawLine(bds.getX() + 20, bds.getY() + bds.getHeight(), bds.getX() + 20,
+							bds.getY() + bds.getHeight() - 10);
+					g.drawLine(bds.getX() + 40, bds.getY() + bds.getHeight(), bds.getX() + 40,
+							bds.getY() + bds.getHeight() - 10);
+				} else {// negated pr/clr
+					g.drawOval(bds.getX() + 16, bds.getY() + bds.getHeight() - 10, 8, 8);
+					g.drawOval(bds.getX() + 36, bds.getY() + bds.getHeight() - 10, 8, 8);
+				}
 			}
-		} else {// 1st and 3rd lower line if legacy position
-			if (!prclrneg) {
-				g.drawLine(bds.getX() + 20, bds.getY() + bds.getHeight(), bds.getX() + 20,
-						bds.getY() + bds.getHeight() - 10);
-				g.drawLine(bds.getX() + 40, bds.getY() + bds.getHeight(), bds.getX() + 40,
-						bds.getY() + bds.getHeight() - 10);
-			} else {// negated pr/clr
-				g.drawOval(bds.getX() + 16, bds.getY() + bds.getHeight() - 10, 8, 8);
-				g.drawOval(bds.getX() + 36, bds.getY() + bds.getHeight() - 10, 8, 8);
-			}
-		}
-		if (!isGhost) {
-			g.setColor(Color.GRAY);
-			GraphicsUtil.drawCenteredText(g, "0",
-					prclrpos != 2 ? bds.getX() + bds.getWidth() / 2 : bds.getX() + 40,
-					prclrpos != 1 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
-			GraphicsUtil.drawCenteredText(g, "1",
-					prclrpos != 2 ? bds.getX() + bds.getWidth() / 2 : bds.getX() + 20,
-					prclrpos != 0 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
-			g.setColor(Color.BLACK);
-		}
-		if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
-			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_FALLING
-					&& painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LOW)
-				g.drawLine(bds.getX(), bds.getY() + 20, bds.getX() + 10, bds.getY() + 20);
-			else
-				g.drawOval(bds.getX() + 2, bds.getY() + 16, 8, 8);
-			if (triggerAttribute == StdAttr.EDGE_TRIGGER) {
-				// Paint ">"
-				g.drawLine(bds.getX() + 11, bds.getY() + 16, bds.getX() + 15, bds.getY() + 20);
-				g.drawLine(bds.getX() + 11, bds.getY() + 24, bds.getX() + 15, bds.getY() + 20);
-			} else {
-				// Paint "E"
-				GraphicsUtil.drawCenteredText(g, "E", bds.getX() + 17, bds.getY() + 20);
-			}
-			if (!isGhost)
-				painter.drawPort(n + STD_PORTS);
-		}
-		for (byte i = 0; i < n; i++) {
-			// inputs
-			g.drawLine(bds.getX(), bds.getY() + (i + 1 == n ? 60 : 40), bds.getX() + 10,
-					bds.getY() + (i + 1 == n ? 60 : 40));
 			if (!isGhost) {
-				GraphicsUtil.drawCenteredText(g, getInputName(i), bds.getX() + 17,
-						bds.getY() + (i + 1 == n ? 58 : 40));
-				painter.drawPort(i);
+				g.setColor(Color.GRAY);
+				GraphicsUtil.drawCenteredText(g, "0",
+						prclrpos != 2 ? bds.getX() + bds.getWidth() / 2 : bds.getX() + 40,
+						prclrpos != 1 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
+				GraphicsUtil.drawCenteredText(g, "1",
+						prclrpos != 2 ? bds.getX() + bds.getWidth() / 2 : bds.getX() + 20,
+						prclrpos != 0 ? bds.getY() + bds.getHeight() - 20 : bds.getY() + 17);
+				g.setColor(Color.BLACK);
 			}
-		}
-		// Qn
-		g.drawOval(bds.getX() + bds.getWidth() - 10, bds.getY() + bds.getHeight() - 24, 8, 8);
-		// Q
-		g.drawLine(bds.getX() + bds.getWidth() - 10, bds.getY() + 20, bds.getX() + bds.getWidth(), bds.getY() + 20);
-		if (!isGhost) {
+			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
+				if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_FALLING
+						&& painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LOW)
+					g.drawLine(bds.getX(), bds.getY() + 20, bds.getX() + 10, bds.getY() + 20);
+				else
+					g.drawOval(bds.getX() + 2, bds.getY() + 16, 8, 8);
+				if (triggerAttribute == StdAttr.EDGE_TRIGGER) {
+					// Paint ">"
+					g.drawLine(bds.getX() + 11, bds.getY() + 16, bds.getX() + 15, bds.getY() + 20);
+					g.drawLine(bds.getX() + 11, bds.getY() + 24, bds.getX() + 15, bds.getY() + 20);
+				} else {
+					// Paint "E"
+					GraphicsUtil.drawCenteredText(g, "E", bds.getX() + 17, bds.getY() + 20);
+				}
+				if (!isGhost)
+					painter.drawPort(n + STD_PORTS);
+			}
+			for (byte i = 0; i < n; i++) {
+				// inputs
+				g.drawLine(bds.getX(), bds.getY() + (i + 1 == n ? 60 : 40), bds.getX() + 10,
+						bds.getY() + (i + 1 == n ? 60 : 40));
+				if (!isGhost) {
+					GraphicsUtil.drawCenteredText(g, getInputName(i), bds.getX() + 17,
+							bds.getY() + (i + 1 == n ? 58 : 40));
+					painter.drawPort(i);
+				}
+			}
+			// Qn
+			g.drawOval(bds.getX() + bds.getWidth() - 10, bds.getY() + bds.getHeight() - 24, 8, 8);
 			// Q
-			GraphicsUtil.drawCenteredText(g, "Q", bds.getX() + 42, bds.getY() + 17);
-			painter.drawPort(n);
+			g.drawLine(bds.getX() + bds.getWidth() - 10, bds.getY() + 20, bds.getX() + bds.getWidth(), bds.getY() + 20);
+			if (!isGhost) {
+				// Q
+				GraphicsUtil.drawCenteredText(g, "Q", bds.getX() + 42, bds.getY() + 17);
+				painter.drawPort(n);
+				// Qn
+				painter.drawPort(n + 1);
+				// clear
+				painter.drawPort(n + 2);
+				// preset
+				painter.drawPort(n + 3);
+			}
+		} else {
+			// Old layout
+			// Q
+			painter.drawPort(n, "Q", Direction.WEST);
 			// Qn
 			painter.drawPort(n + 1);
-			// clear
-			painter.drawPort(n + 2);
-			// preset
-			painter.drawPort(n + 3);
+			g.setColor(Color.GRAY);
+			painter.drawPort(n + 2, "0", prclrpos == 1 ? Direction.NORTH : Direction.SOUTH);
+			painter.drawPort(n + 3, "1", prclrpos == 0 ? Direction.NORTH : Direction.SOUTH);
+			g.setColor(Color.BLACK);
+			if (painter.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH)
+				painter.drawClock(n + STD_PORTS, Direction.EAST);
+			for (byte i = 0; i < n; i++)
+				painter.drawPort(i, getInputName(i), Direction.EAST);
 		}
 
 	}
@@ -317,40 +362,85 @@ abstract class AbstractFlipFlop extends InstanceFactory {
 	}
 
 	private void updateports(Instance instance) {
+		// Bounds bds = instance.getBounds();
+		// // 0=above/below,1=below/above,2=legacy
+		// byte prclrpos = (byte) (instance.getAttributeValue(PRE_CLR_POSITION) ==
+		// ABOVE_BELOW ? 0
+		// : instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2);
+		// Boolean isFlipFlop = triggerAttribute == StdAttr.EDGE_TRIGGER;
+		// byte numInputs = this.inputs;
+		// byte withclock = (byte) (instance.getAttributeValue(triggerAttribute) ==
+		// StdAttr.TRIG_LATCH ? 0 : 1);
+		// Port[] ps = new Port[numInputs + STD_PORTS + withclock];
+		// if (numInputs == 1)
+		// ps[0] = new Port(-bds.getWidth(), 40, Port.INPUT, 1);
+		// else if (numInputs == 2) {
+		// ps[0] = new Port(-bds.getWidth(), 20, Port.INPUT, 1);
+		// ps[1] = new Port(-bds.getWidth(), 40, Port.INPUT, 1);
+		// } else {
+		// if (triggerAttribute == StdAttr.EDGE_TRIGGER)
+		// throw new RuntimeException("flip-flop input > 2");
+		// else
+		// throw new RuntimeException("latch input > 2");
+		// }
+		//
+		// if (instance.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
+		// ps[numInputs + STD_PORTS] = new Port(-bds.getWidth(), 0,
+		// Port.INPUT, 1);
+		// ps[numInputs + STD_PORTS]
+		// .setToolTip(isFlipFlop ? Strings.getter("flipFlopClockTip") :
+		// Strings.getter("latchETip"));
+		// }
+		// ps[numInputs] = new Port(0, 0, Port.OUTPUT, 1); // Q
+		// ps[numInputs + 1] = new Port(0, 40, Port.OUTPUT, 1); // Qn
+		// ps[numInputs + 2] = new Port(prclrpos == 2 ? -bds.getWidth() / 3 :
+		// -bds.getWidth() / 2,
+		// prclrpos == 1 ? -20 : bds.getHeight() - 20, Port.INPUT, 1); // Clear
+		// ps[numInputs + 3] = new Port(prclrpos == 2 ? -bds.getWidth() * 2 / 3 :
+		// -bds.getWidth() / 2,
+		// prclrpos == 0 ? -20 : bds.getHeight() - 20, Port.INPUT, 1); // Preset
+		// ps[numInputs].setToolTip(isFlipFlop ? Strings.getter("flipFlopQTip") :
+		// Strings.getter("latchQTip"));
+		// ps[numInputs + 1].setToolTip(isFlipFlop ? Strings.getter("flipFlopNotQTip") :
+		// Strings.getter("latchNotQTip"));
+		// if (instance.getAttributeValue(NEGATE_PRE_CLR)) {
+		// ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip", "0"));
+		// ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip", "0"));
+		// } else {
+		// ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip", "1"));
+		// ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip", "1"));
+		// }
+		// instance.setPorts(ps);
 		Bounds bds = instance.getBounds();
 		// 0=above/below,1=below/above,2=legacy
 		byte prclrpos = (byte) (instance.getAttributeValue(PRE_CLR_POSITION) == ABOVE_BELOW ? 0
 				: instance.getAttributeValue(PRE_CLR_POSITION) == BELOW_ABOVE ? 1 : 2);
-		Boolean isFlipFlop = triggerAttribute == StdAttr.EDGE_TRIGGER;
 		byte numInputs = this.inputs;
 		byte withclock = (byte) (instance.getAttributeValue(triggerAttribute) == StdAttr.TRIG_LATCH ? 0 : 1);
+		Boolean newlayout = instance.getAttributeValue(NEW_FF_LAYOUT);
 		Port[] ps = new Port[numInputs + STD_PORTS + withclock];
 		if (numInputs == 1)
-			ps[0] = new Port(-bds.getWidth(), 40, Port.INPUT, 1);
+			ps[0] = new Port(-bds.getWidth(), newlayout ? 40 : 20, Port.INPUT, 1);
 		else if (numInputs == 2) {
-			ps[0] = new Port(-bds.getWidth(), 20, Port.INPUT, 1);
-			ps[1] = new Port(-bds.getWidth(), 40, Port.INPUT, 1);
+			ps[0] = new Port(-bds.getWidth(), newlayout ? 20 : 0, Port.INPUT, 1);
+			ps[1] = new Port(-bds.getWidth(), newlayout ? 40 : 20, Port.INPUT, 1);
 		} else {
-			if (triggerAttribute == StdAttr.EDGE_TRIGGER)
-				throw new RuntimeException("flip-flop input > 2");
-			else
-				throw new RuntimeException("latch input > 2");
+			throw new RuntimeException("flip-flop input > 2");
 		}
 
 		if (instance.getAttributeValue(triggerAttribute) != StdAttr.TRIG_LATCH) {
-			ps[numInputs + STD_PORTS] = new Port(-bds.getWidth(), 0,
+			ps[numInputs + STD_PORTS] = new Port(-bds.getWidth(), newlayout ? 0 : 10 * (numInputs - 1),
 					Port.INPUT, 1);
-			ps[numInputs + STD_PORTS]
-					.setToolTip(isFlipFlop ? Strings.getter("flipFlopClockTip") : Strings.getter("latchETip"));
+			ps[numInputs + STD_PORTS].setToolTip(Strings.getter("flipFlopClockTip"));
 		}
 		ps[numInputs] = new Port(0, 0, Port.OUTPUT, 1); // Q
-		ps[numInputs + 1] = new Port(0, 40, Port.OUTPUT, 1); // Qn
-		ps[numInputs + 2] = new Port(prclrpos == 2 ? -bds.getWidth() / 3 : -bds.getWidth() / 2,
-				prclrpos == 1 ? -20 : bds.getHeight() - 20, Port.INPUT, 1); // Clear
-		ps[numInputs + 3] = new Port(prclrpos == 2 ? -bds.getWidth() * 2 / 3 : -bds.getWidth() / 2,
-				prclrpos == 0 ? -20 : bds.getHeight() - 20, Port.INPUT, 1); // Preset
-		ps[numInputs].setToolTip(isFlipFlop ? Strings.getter("flipFlopQTip") : Strings.getter("latchQTip"));
-		ps[numInputs + 1].setToolTip(isFlipFlop ? Strings.getter("flipFlopNotQTip") : Strings.getter("latchNotQTip"));
+		ps[numInputs + 1] = new Port(0, newlayout ? 40 : 20, Port.OUTPUT, 1); // Qn
+		ps[numInputs + 2] = new Port(prclrpos == 2 ? newlayout ? -bds.getWidth() / 3 : -10 : -bds.getWidth() / 2,
+				prclrpos == 1 ? newlayout ? -20 : -10 : newlayout ? bds.getHeight() - 20 : 30, Port.INPUT, 1); // Clear
+		ps[numInputs + 3] = new Port(prclrpos == 2 ? newlayout ? -bds.getWidth() * 2 / 3 : -30 : -bds.getWidth() / 2,
+				prclrpos == 0 ? newlayout ? -20 : -10 : newlayout ? bds.getHeight() - 20 : 30, Port.INPUT, 1); // Preset
+		ps[numInputs].setToolTip(Strings.getter("flipFlopQTip"));
+		ps[numInputs + 1].setToolTip(Strings.getter("flipFlopNotQTip"));
 		if (instance.getAttributeValue(NEGATE_PRE_CLR)) {
 			ps[numInputs + 2].setToolTip(Strings.getter("flipFlopResetTip", "0"));
 			ps[numInputs + 3].setToolTip(Strings.getter("flipFlopPresetTip", "0"));
