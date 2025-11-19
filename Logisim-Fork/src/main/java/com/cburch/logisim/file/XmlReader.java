@@ -417,6 +417,22 @@ class XmlReader {
 				}
 			}
 		}
+		System.out.println(version.toString());
+		for (Element lib : XmlIterator.forChildElements(root, "lib")) {
+			if (version.compareTo(LogisimVersion.get(2, 16, 2, 2)) < 0) {
+				if (lib.getAttribute("desc").equals("#Wiring")) {
+					for (Element tool : XmlIterator.forChildElements(lib, "tool")) {
+						if (tool.getAttribute("name") != null && tool.getAttribute("name").equals("Tunnel")) {
+							for (Element attrElt : XmlIterator.forChildElements(tool, "a")) {
+								if (attrElt.getAttribute("name").equals("selectedMode")) {
+									tool.removeChild(attrElt);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		for (Element circElt : XmlIterator.forChildElements(root, "circuit")) {
 			if (version.compareTo(LogisimVersion.get(2, 6, 3)) < 0) {
 				for (Element attrElt : XmlIterator.forChildElements(circElt, "a")) {
@@ -658,6 +674,21 @@ class XmlReader {
 						BehavorAttribute.setAttribute("name", "behavior");
 						BehavorAttribute.setAttribute("val", "old");
 						compElt.appendChild(BehavorAttribute);
+					}
+				}
+			}
+
+			// Fix Tunnel error attr
+
+			if (version.compareTo(LogisimVersion.get(2, 16, 2, 2)) < 0) {
+				for (Element compElt : XmlIterator.forChildElements(circElt, "comp")) {
+					if (compElt.getAttribute("name") != null && compElt.getAttribute("name").equals("Tunnel")) {
+						// check if the attribute is already defined
+						for (Element attrElt : XmlIterator.forChildElements(compElt, "a")) {
+							if (attrElt.getAttribute("name").equals("selectedMode")) {
+								compElt.removeChild(attrElt);
+							}
+						}
 					}
 				}
 			}
