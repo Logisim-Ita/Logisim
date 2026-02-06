@@ -4,14 +4,9 @@
 package com.cburch.logisim.std.memory;
 
 import java.awt.Color;
-import java.awt.Graphics;
 
-import com.cburch.logisim.LogisimVersion;
-import com.cburch.logisim.Main;
 import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
@@ -21,11 +16,7 @@ import com.cburch.logisim.instance.InstancePainter;
 import com.cburch.logisim.instance.InstanceState;
 import com.cburch.logisim.instance.Port;
 import com.cburch.logisim.instance.StdAttr;
-import com.cburch.logisim.tools.key.BitWidthConfigurator;
-import com.cburch.logisim.tools.key.IntegerConfigurator;
-import com.cburch.logisim.tools.key.JoinedConfigurator;
 import com.cburch.logisim.util.GraphicsUtil;
-import com.cburch.logisim.util.StringGetter;
 
 public class UniversalRegister extends InstanceFactory {
 	static final Attribute<Integer> ATTR_LENGTH = Attributes.forIntegerRange("length",
