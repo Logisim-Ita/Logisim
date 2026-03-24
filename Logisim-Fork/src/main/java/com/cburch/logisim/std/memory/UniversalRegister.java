@@ -7,6 +7,7 @@ import java.awt.Color;
 
 import com.cburch.logisim.data.Attribute;
 import com.cburch.logisim.data.Attributes;
+import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Bounds;
 import com.cburch.logisim.data.Direction;
 import com.cburch.logisim.data.Value;
@@ -83,7 +84,7 @@ public class UniversalRegister extends InstanceFactory {
 			data = new ShiftRegisterData(length);
 			state.setData(data);
 		} else {
-			data.setDimensions(length);
+			data.setDimensions(length, BitWidth.ONE);
 		}
 		return data;
 	}
