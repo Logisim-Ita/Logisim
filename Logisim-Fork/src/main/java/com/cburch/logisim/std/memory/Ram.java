@@ -279,8 +279,7 @@ public class Ram extends Mem {
 		
 		if (!asynch)
 			painter.drawClock(CLK, Direction.NORTH);
-		if (!separate)
-			painter.drawPort(OE, Strings.get("ramOELabel"), Direction.SOUTH);
+		painter.drawPort(OE, Strings.get("ramOELabel"), Direction.SOUTH);
 		if (!isSimple)
 			painter.drawPort(CLR, Strings.get("ramClrLabel"), Direction.SOUTH);
 
